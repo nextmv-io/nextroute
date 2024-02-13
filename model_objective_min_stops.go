@@ -1,0 +1,75 @@
+package nextroute
+
+import (
+	"github.com/nextmv-io/sdk/nextroute"
+)
+
+// NewMinStopsObjective returns a new MinStopsObjective.
+func NewMinStopsObjective(minStops, minStopsPenalty nextroute.VehicleTypeExpression) nextroute.ModelObjective {
+	return &minStopsObjectiveImpl{
+		minStops:        minStops,
+		minStopsPenalty: minStopsPenalty,
+	}
+}
+
+type minStopsObjectiveImpl struct {
+	minStops        nextroute.VehicleTypeExpression
+	minStopsPenalty nextroute.VehicleTypeExpression
+}
+
+func (t *minStopsObjectiveImpl) EstimateDeltaValue(move nextroute.SolutionMoveStops) float64 {
+	moveImpl := move.(*solutionMoveStopsImpl)
+	vehicle := moveImpl.vehicle()
+	modelVehicle := vehicle.ModelVehicle().(*modelVehicleImpl)
+	minimum := int(t.minStops.ValueForVehicleType(modelVehicle.vehicleType))
+
+	vehicleStops := vehicle.NumberOfStops()
+	if vehicleStops >= minimum {
+		return 0
+	}
+
+	moveStops := len(moveImpl.stopPositions)
+
+	if vehicle.IsEmpty() {
+		if moveStops >= minimum {
+			return 0
+		}
+		return t.minStopsPenalty.ValueForVehicleType(modelVehicle.vehicleType) *
+			(float64(minimum) - float64(moveStops)) *
+			(float64(minimum) - float64(moveStops))
+	}
+
+	oldDelta := minimum - vehicleStops
+	newDelta := minimum - vehicleStops - moveStops
+
+	if newDelta >= 0 {
+		return t.minStopsPenalty.ValueForVehicleType(modelVehicle.vehicleType) *
+			(float64(newDelta)*float64(newDelta) - float64(oldDelta)*float64(oldDelta))
+	}
+
+	return t.minStopsPenalty.ValueForVehicleType(modelVehicle.vehicleType) *
+		-float64(oldDelta) * float64(oldDelta)
+}
+
+func (t *minStopsObjectiveImpl) Value(solution nextroute.Solution) float64 {
+	solutionImpl := solution.(*solutionImpl)
+	penaltySum := 0.0
+	for _, vehicle := range solutionImpl.vehicles {
+		vehicleNumberOfStops := vehicle.NumberOfStops()
+		if vehicleNumberOfStops == 0 {
+			continue
+		}
+		modelVehicle := vehicle.ModelVehicle().(*modelVehicleImpl)
+		minimum := int(t.minStops.ValueForVehicleType(modelVehicle.vehicleType))
+		if vehicleNumberOfStops < minimum {
+			penaltySum += t.minStopsPenalty.ValueForVehicleType(modelVehicle.vehicleType) *
+				(float64(minimum) - float64(vehicleNumberOfStops)) *
+				(float64(minimum) - float64(vehicleNumberOfStops))
+		}
+	}
+	return penaltySum
+}
+
+func (t *minStopsObjectiveImpl) String() string {
+	return "min_stops"
+}

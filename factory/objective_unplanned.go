@@ -1,0 +1,101 @@
+package factory
+
+import (
+	"github.com/nextmv-io/nextroute"
+	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
+	"github.com/nextmv-io/sdk/nextroute/factory"
+	"github.com/nextmv-io/sdk/nextroute/schema"
+)
+
+const defaultUnplannedPenaltyStop = 1_000_000
+const defaultUnplannedPenaltyAlternateStop = 2_000_000
+
+// addUnplannedObjective uses the unplanned penalty from the stops to
+// create a new objective and add it to the model.
+func addUnplannedObjective(
+	input schema.Input,
+	model sdkNextRoute.Model,
+	options factory.Options,
+) (sdkNextRoute.Model, error) {
+	if options.Objectives.UnplannedPenalty == 0 {
+		return model, nil
+	}
+
+	unplannedPenalty := nextroute.NewStopExpression(
+		"unplanned_penalty",
+		defaultUnplannedPenaltyStop,
+	)
+	err := addUnplannedPenaltyStops(input, model, unplannedPenalty)
+	if err != nil {
+		return nil, err
+	}
+
+	err = addUnplannedPenaltyAlternateStops(input, model, unplannedPenalty)
+	if err != nil {
+		return nil, err
+	}
+
+	unplannedObjective := nextroute.NewUnPlannedObjective(unplannedPenalty)
+	_, err = model.Objective().NewTerm(options.Objectives.UnplannedPenalty, unplannedObjective)
+	if err != nil {
+		return nil, err
+	}
+	return model, nil
+}
+
+func addUnplannedPenaltyStops(
+	input schema.Input,
+	model sdkNextRoute.Model,
+	unplannedPenaltyExpression sdkNextRoute.StopExpression,
+) error {
+	for s, inputStop := range input.Stops {
+		if inputStop.UnplannedPenalty == nil {
+			continue
+		}
+		stop, err := model.Stop(s)
+		if err != nil {
+			return err
+		}
+		unplannedPenaltyExpression.SetValue(stop, float64(*inputStop.UnplannedPenalty))
+	}
+	return nil
+}
+
+func addUnplannedPenaltyAlternateStops(
+	input schema.Input,
+	model sdkNextRoute.Model,
+	unplannedPenaltyExpression sdkNextRoute.StopExpression,
+) error {
+	if input.AlternateStops == nil {
+		return nil
+	}
+
+	data, err := getModelData(model)
+
+	if err != nil {
+		return err
+	}
+
+	for _, vehicle := range input.Vehicles {
+		if vehicle.AlternateStops == nil {
+			continue
+		}
+
+		for _, alternateID := range *vehicle.AlternateStops {
+			stop, err := model.Stop(data.stopIDToIndex[alternateStopID(alternateID, vehicle)])
+			if err != nil {
+				return err
+			}
+
+			alternateInputStop := stop.Data().(alternateInputStop)
+
+			if alternateInputStop.stop.UnplannedPenalty == nil {
+				unplannedPenaltyExpression.SetValue(stop, defaultUnplannedPenaltyAlternateStop)
+				continue
+			}
+
+			unplannedPenaltyExpression.SetValue(stop, float64(*alternateInputStop.stop.UnplannedPenalty))
+		}
+	}
+	return nil
+}

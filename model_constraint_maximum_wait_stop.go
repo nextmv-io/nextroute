@@ -1,0 +1,102 @@
+package nextroute
+
+import (
+	"fmt"
+
+	"github.com/nextmv-io/sdk/nextroute"
+)
+
+// NewMaximumWaitStopConstraint returns a new MaximumWaitStopConstraint. The
+// maximum wait constraint for stops limits the time a vehicle can wait at a
+// stop.  Wait is defined as the time between arriving at a
+// stop and starting to do whatever you need to do,
+// [SolutionStop.StartValue()] - [SolutionStop.ArrivalValue()].
+func NewMaximumWaitStopConstraint(maxima nextroute.StopDurationExpression) (
+	nextroute.MaximumWaitStopConstraint,
+	error,
+) {
+	if maxima == nil {
+		return nil, fmt.Errorf("maxima must not be nil")
+	}
+	return &maximumWaitStopConstraintImpl{
+		modelConstraintImpl: newModelConstraintImpl(
+			"maximum_stop_wait",
+			nextroute.ModelExpressions{},
+		),
+		maxima: maxima,
+	}, nil
+}
+
+type maximumWaitStopConstraintImpl struct {
+	maxima nextroute.StopDurationExpression
+	modelConstraintImpl
+}
+
+func (l *maximumWaitStopConstraintImpl) String() string {
+	return l.name
+}
+
+func (l *maximumWaitStopConstraintImpl) EstimationCost() nextroute.Cost {
+	return nextroute.LinearStop
+}
+
+func (l *maximumWaitStopConstraintImpl) Maximum() nextroute.StopDurationExpression {
+	return l.maxima
+}
+
+func (l *maximumWaitStopConstraintImpl) EstimateIsViolated(
+	move nextroute.SolutionMoveStops,
+) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	solutionMoveStops := move.(*solutionMoveStopsImpl)
+
+	vehicle := solutionMoveStops.vehicle()
+	stopPositionsCount := len(solutionMoveStops.planUnit.solutionStopsImpl())
+	vehicleType := vehicle.ModelVehicle().VehicleType()
+	isDependentOnTime := vehicleType.TravelDurationExpression().IsDependentOnTime()
+
+	generator := newSolutionStopGenerator(*solutionMoveStops, false, true)
+	defer generator.release()
+	from, _ := generator.next()
+	previousEnd := from.EndValue()
+
+	for to, ok := generator.next(); ok; to, ok = generator.next() {
+		var arrival, start float64
+
+		_, arrival, start, previousEnd = vehicleType.TemporalValues(
+			previousEnd,
+			from.ModelStop(),
+			to.ModelStop(),
+		)
+
+		if !to.IsPlanned() {
+			stopPositionsCount--
+		}
+
+		if !isDependentOnTime &&
+			stopPositionsCount == 0 &&
+			to.IsPlanned() &&
+			arrival == to.ArrivalValue() {
+			break
+		}
+
+		wait := start - arrival
+
+		if wait > l.maxima.Value(nil, nil, to.modelStop()) {
+			return true, constNoPositionsHint
+		}
+
+		from = to
+	}
+
+	return false, constNoPositionsHint
+}
+
+func (l *maximumWaitStopConstraintImpl) DoesStopHaveViolations(s nextroute.SolutionStop) bool {
+	stop := s.(solutionStopImpl)
+	return stop.StartValue()-stop.ArrivalValue() >
+		l.maxima.Value(nil, nil, stop.modelStop())
+}
+
+func (l *maximumWaitStopConstraintImpl) IsTemporal() bool {
+	return true
+}

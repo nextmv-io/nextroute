@@ -1,0 +1,263 @@
+package nextroute
+
+import (
+	"fmt"
+
+	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/sdk/nextroute"
+)
+
+// NewCluster is the implementation of nextroute.NewCluster.
+func NewCluster() (nextroute.Cluster, error) {
+	return &clusterImpl{
+		modelConstraintImpl: newModelConstraintImpl(
+			"cluster",
+			nextroute.ModelExpressions{},
+		),
+		includeFirst: false,
+		includeLast:  false,
+	}, nil
+}
+
+// Implements nextroute.Cluster.
+type clusterImpl struct {
+	modelConstraintImpl
+	includeFirst bool
+	includeLast  bool
+}
+
+func (l *clusterImpl) IncludeFirst() bool {
+	return l.includeFirst
+}
+
+func (l *clusterImpl) IncludeLast() bool {
+	return l.includeLast
+}
+
+func (l *clusterImpl) SetIncludeFirst(includeFirst bool) {
+	l.includeFirst = includeFirst
+}
+
+func (l *clusterImpl) SetIncludeLast(includeLast bool) {
+	l.includeLast = includeLast
+}
+
+type centroidData struct {
+	location common.Location
+	// this will be 0.0 for all stops but the last and only if this is used as
+	// an objective.
+	compactness float64
+}
+
+func (c *centroidData) Copy() nextroute.Copier {
+	return &centroidData{
+		location:    c.location,
+		compactness: c.compactness,
+	}
+}
+
+func (c *centroidData) String() string {
+	return fmt.Sprintf("%v", c.location)
+}
+
+func (l *clusterImpl) String() string {
+	return fmt.Sprintf("%v", l.name)
+}
+
+func (l *clusterImpl) EstimationCost() nextroute.Cost {
+	return nextroute.LinearVehicle
+}
+
+func (l *clusterImpl) UpdateObjectiveStopData(
+	solutionStop nextroute.SolutionStop,
+) (nextroute.Copier, error) {
+	return l.updateData(solutionStop.(solutionStopImpl), true)
+}
+
+func (l *clusterImpl) UpdateConstraintStopData(
+	solutionStop nextroute.SolutionStop,
+) (nextroute.Copier, error) {
+	return l.updateData(solutionStop.(solutionStopImpl), false)
+}
+
+func (l *clusterImpl) updateData(
+	solutionStop solutionStopImpl,
+	asObjective bool,
+) (nextroute.Copier, error) {
+	if solutionStop.IsFirst() {
+		location, err := common.NewLocation(0, 0)
+		if err != nil {
+			return nil, err
+		}
+		return &centroidData{
+			location: location,
+		}, nil
+	}
+
+	if solutionStop.IsLast() {
+		if asObjective {
+			centroid := solutionStop.previous().ObjectiveData(l).(*centroidData)
+			stops := l.getSolutionStops(solutionStop.vehicle())
+			compact := compactness(stops, centroid.location, solutionStopImpl{}, false)
+			centroid.compactness = compact
+			return centroid, nil
+		}
+		return solutionStop.previous().ConstraintData(l).(*centroidData), nil
+	}
+	nrStops := solutionStop.Position()
+
+	var centroid *centroidData
+	if asObjective {
+		centroid = solutionStop.previous().ObjectiveData(l).(*centroidData)
+	} else {
+		centroid = solutionStop.previous().ConstraintData(l).(*centroidData)
+	}
+
+	location, err := common.NewLocation(
+		centroid.location.Longitude()+
+			(solutionStop.modelStop().Location().Longitude()-
+				centroid.location.Longitude())/float64(nrStops),
+		centroid.location.Latitude()+
+			(solutionStop.modelStop().Location().Latitude()-
+				centroid.location.Latitude())/float64(nrStops),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &centroidData{
+		location: location,
+	}, nil
+}
+
+func compactness(
+	stops []solutionStopImpl,
+	centroid common.Location,
+	newStop solutionStopImpl,
+	newStopIsSet bool,
+) float64 {
+	if newStopIsSet {
+		numberOfStops := len(stops)
+		location := newStop.modelStop().location
+		newLat := (centroid.Latitude()*float64(numberOfStops) +
+			location.Latitude()) / float64(numberOfStops+1)
+		newLong := (centroid.Longitude()*float64(numberOfStops) +
+			location.Longitude()) / float64(numberOfStops+1)
+		newLocation, err := common.NewLocation(newLong, newLat)
+		if err != nil {
+			panic(err)
+		}
+		centroid = newLocation
+		stops = append(stops, newStop)
+	}
+	compactness := 0.0
+	for _, stop := range stops {
+		dist := haversineDistance(centroid, stop.modelStop().Location())
+		compactness += dist.Value(common.Meters) * dist.Value(common.Meters)
+	}
+	return compactness
+}
+
+func (l *clusterImpl) EstimateDeltaValue(
+	move nextroute.SolutionMoveStops,
+) float64 {
+	score, _ := l.estimateDeltaScore(
+		move,
+		false,
+	)
+	return score
+}
+
+func (l *clusterImpl) EstimateIsViolated(
+	move nextroute.SolutionMoveStops,
+) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	score, hint := l.estimateDeltaScore(
+		move,
+		true,
+	)
+	return score != 0.0, hint
+}
+
+func (l *clusterImpl) estimateDeltaScore(
+	move nextroute.SolutionMoveStops,
+	asConstraint bool,
+) (deltaScore float64, stopPositionsHint nextroute.StopPositionsHint) {
+	solutionImpl := move.Solution().(*solutionImpl)
+	moveImpl := move.(*solutionMoveStopsImpl)
+	stopPositions := moveImpl.stopPositionsImpl()
+	deltaScore = 0.0
+
+	for _, stopPosition := range stopPositions {
+		vehicle := moveImpl.vehicle()
+		if vehicle.IsEmpty() {
+			return deltaScore, constNoPositionsHint
+		}
+
+		candidate := stopPosition.stop()
+
+		var c *centroidData
+		if asConstraint {
+			c = vehicle.last().ConstraintData(l).(*centroidData)
+		} else {
+			c = vehicle.last().ObjectiveData(l).(*centroidData)
+		}
+
+		centroid := c.location
+
+		if asConstraint {
+			distanceToCentroid := haversineDistance(
+				centroid,
+				candidate.modelStop().Location(),
+			).Value(common.Meters)
+
+			for _, otherVehicle := range solutionImpl.vehicles {
+				if otherVehicle.IsEmpty() ||
+					otherVehicle.Index() == vehicle.Index() {
+					continue
+				}
+				centroidOtherVehicle := otherVehicle.
+					last().
+					ConstraintData(l).(*centroidData).location
+
+				if haversineDistance(
+					centroidOtherVehicle,
+					candidate.modelStop().Location(),
+				).Value(common.Meters) < distanceToCentroid {
+					return 1.0, constSkipVehiclePositionsHint
+				}
+			}
+		} else {
+			stops := l.getSolutionStops(vehicle)
+			deltaScore += compactness(stops, centroid, candidate, true)
+			// we want to compute the difference in compactness, so we need to
+			// subtract the compactness of the current route
+			deltaScore -= c.compactness
+		}
+	}
+	return deltaScore, constNoPositionsHint
+}
+
+func (l *clusterImpl) getSolutionStops(vehicle nextroute.SolutionVehicle) []solutionStopImpl {
+	stops := make([]solutionStopImpl, 0, vehicle.NumberOfStops())
+	for _, stop := range vehicle.SolutionStops() {
+		if stop.IsFirst() && !l.includeFirst {
+			continue
+		}
+		if stop.IsLast() && !l.includeLast {
+			continue
+		}
+		stops = append(stops, stop.(solutionStopImpl))
+	}
+	return stops
+}
+func (l *clusterImpl) Value(solutionStop nextroute.Solution) float64 {
+	sum := 0.0
+	for _, v := range solutionStop.(*solutionImpl).vehiclesMutable() {
+		vehicle := v.(solutionVehicleImpl)
+		if vehicle.IsEmpty() {
+			continue
+		}
+		sum += vehicle.last().ObjectiveData(l).(*centroidData).compactness
+	}
+	return sum
+}

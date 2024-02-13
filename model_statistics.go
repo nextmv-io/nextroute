@@ -1,0 +1,242 @@
+package nextroute
+
+import (
+	"fmt"
+	"reflect"
+	"strings"
+
+	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/sdk/nextroute"
+)
+
+// NewModelStatistics returns a new model statistics implementation.
+func NewModelStatistics(model nextroute.Model) nextroute.ModelStatistics {
+	return modelStatisticsImpl{
+		model: model,
+	}
+}
+
+// NewVehicleStatistics returns a new vehicle statistics implementation.
+func NewVehicleStatistics(vehicle nextroute.ModelVehicle) nextroute.VehicleStatistics {
+	return vehicleStatisticsImpl{
+		vehicle: vehicle,
+	}
+}
+
+type vehicleStatisticsImpl struct {
+	vehicle nextroute.ModelVehicle
+}
+
+func (v vehicleStatisticsImpl) FirstToLastSeconds() float64 {
+	return v.vehicle.VehicleType().TravelDurationExpression().Duration(
+		v.vehicle.VehicleType(),
+		v.vehicle.First(),
+		v.vehicle.Last(),
+	).Seconds()
+}
+
+func (v vehicleStatisticsImpl) FromFirstSeconds() common.Statistics {
+	stops := make(nextroute.ModelStops, 0)
+	for _, planUnit := range v.vehicle.Model().PlanStopsUnits() {
+		stops = append(stops, planUnit.Stops()...)
+	}
+	return common.NewStatistics(
+		stops,
+		func(stop nextroute.ModelStop) float64 {
+			return v.vehicle.VehicleType().TravelDurationExpression().Duration(
+				v.vehicle.VehicleType(),
+				v.vehicle.First(),
+				stop,
+			).Seconds()
+		},
+	)
+}
+
+func (v vehicleStatisticsImpl) ToLastSeconds() common.Statistics {
+	stops := make(nextroute.ModelStops, 0)
+	for _, planUnit := range v.vehicle.Model().PlanStopsUnits() {
+		stops = append(stops, planUnit.Stops()...)
+	}
+	return common.NewStatistics(
+		stops,
+		func(stop nextroute.ModelStop) float64 {
+			return v.vehicle.VehicleType().TravelDurationExpression().Duration(
+				v.vehicle.VehicleType(),
+				stop,
+				v.vehicle.Last(),
+			).Seconds()
+		},
+	)
+}
+
+func (v vehicleStatisticsImpl) Report() string {
+	var sb strings.Builder
+	line := strings.Repeat("-", 80)
+	fmt.Fprintf(&sb, "%s\n", line)
+	fmt.Fprintf(&sb, "Vehicle %s\n", v.vehicle.ID())
+	fmt.Fprintf(&sb, "%s\n", line)
+
+	firstToLastSeconds := v.FirstToLastSeconds()
+	fmt.Fprintf(&sb, "First to last seconds       : %f\n",
+		firstToLastSeconds)
+	fmt.Fprintf(&sb, "First to all stops seconds  :\n")
+	fmt.Fprintf(&sb, "%v", v.FromFirstSeconds().Report())
+	if firstToLastSeconds > 0 {
+		fmt.Fprintf(&sb, "Last to all stops seconds   :\n")
+		fmt.Fprintf(&sb, "%v", v.ToLastSeconds().Report())
+	}
+	return sb.String()
+}
+
+type modelStatisticsImpl struct {
+	model nextroute.Model
+}
+
+func (m modelStatisticsImpl) PlanUnits() int {
+	return len(m.model.PlanUnits())
+}
+
+func (m modelStatisticsImpl) VehicleTypes() int {
+	return len(m.model.VehicleTypes())
+}
+
+func (m modelStatisticsImpl) Vehicles() int {
+	return len(m.model.Vehicles())
+}
+
+// locationToString is an auxiliary function to map an interface to a
+// comparable type.
+func locationToString(location common.Location) string {
+	return fmt.Sprintf("%f,%f", location.Longitude(), location.Latitude())
+}
+
+func (m modelStatisticsImpl) LastLocations() int {
+	return len(
+		common.UniqueDefined(
+			common.Map(
+				m.model.Vehicles(),
+				func(vehicle nextroute.ModelVehicle) common.Location {
+					return vehicle.Last().Location()
+				},
+			),
+			locationToString,
+		),
+	)
+}
+
+func (m modelStatisticsImpl) Locations() int {
+	stops := make(nextroute.ModelStops, 0)
+	for _, planUnit := range m.model.PlanStopsUnits() {
+		stops = append(stops, planUnit.Stops()...)
+	}
+	return len(
+		common.UniqueDefined(
+			common.Map(
+				stops,
+				func(stop nextroute.ModelStop) common.Location {
+					return stop.Location()
+				},
+			),
+			locationToString,
+		),
+	)
+}
+
+func (m modelStatisticsImpl) FirstLocations() int {
+	return len(
+		common.UniqueDefined(
+			common.Map(
+				m.model.Vehicles(),
+				func(vehicle nextroute.ModelVehicle) common.Location {
+					return vehicle.First().Location()
+				},
+			),
+			locationToString,
+		),
+	)
+}
+
+func (m modelStatisticsImpl) Stops() int {
+	return len(m.model.Stops())
+}
+
+func (m modelStatisticsImpl) Report() string {
+	var sb strings.Builder
+	line := strings.Repeat("-", 80)
+	fmt.Fprintf(&sb, "%s\nModel statistics\n%s\n",
+		line,
+		line)
+	fmt.Fprintf(&sb, "Stops                       : %d\n",
+		m.Stops())
+	fmt.Fprintf(&sb, "Plan units                  : %d\n",
+		m.PlanUnits())
+	fmt.Fprintf(&sb, "Unique locations            : %d\n",
+		m.Locations())
+	fmt.Fprintf(&sb, "%s\n", line)
+	fmt.Fprintf(&sb, "Vehicle types               : %d\n",
+		m.VehicleTypes())
+	fmt.Fprintf(&sb, "Vehicles                    : %d\n",
+		m.Vehicles())
+	fmt.Fprintf(&sb, "Unique first locations      : %d\n",
+		m.FirstLocations())
+	fmt.Fprintf(&sb, "Unique last locations       : %d\n",
+		m.LastLocations())
+	fmt.Fprintf(&sb, "%s\nExpressions\n%s\n",
+		line,
+		line)
+
+	for _, expression := range m.model.Expressions() {
+		fmt.Fprintf(&sb, "Name                        : %s\n",
+			expression.Name())
+		fmt.Fprintf(&sb, "Definition                  : %v\n",
+			expression)
+		fmt.Fprintf(&sb, "%s\n", line)
+	}
+	fmt.Fprintf(&sb, "Constraints\n%s\n",
+		line)
+
+	for _, constraint := range m.model.Constraints() {
+		fmt.Fprintf(&sb, "Name                        : %s\n",
+			reflect.TypeOf(constraint).String())
+		fmt.Fprintf(&sb, "Definition                  : %v\n",
+			constraint)
+		fmt.Fprintf(&sb, "%s\n", line)
+	}
+
+	fmt.Fprintf(&sb, "Vehicles\n%s\n",
+		line)
+
+	uniqueVehicles := common.GroupBy(m.model.Vehicles(),
+		func(t nextroute.ModelVehicle) string {
+			return fmt.Sprintf("%v-%v-%v-%v",
+				t.VehicleType().Index(),
+				t.First().Index(),
+				t.Last().Index(),
+				t.Start(),
+			)
+		},
+	)
+	common.RangeMap(uniqueVehicles, func(_ string, uniqueVehicle []nextroute.ModelVehicle) bool {
+		fmt.Fprintf(&sb, "Vehicle type index          : %v\n",
+			uniqueVehicle[0].VehicleType().Index())
+		fmt.Fprintf(&sb, "Travel duration expression  : %v\n",
+			uniqueVehicle[0].VehicleType().TravelDurationExpression().Name())
+		fmt.Fprintf(&sb, "Process duration expression : %v\n",
+			uniqueVehicle[0].VehicleType().DurationExpression().Name())
+		fmt.Fprintf(&sb, "Starts at time              : %v\n",
+			uniqueVehicle[0].Start())
+		fmt.Fprintf(&sb, "Start stop index            : %v {lat: %v, lon: %v}\n",
+			uniqueVehicle[0].First().Index(),
+			uniqueVehicle[0].First().Location().Latitude(),
+			uniqueVehicle[0].First().Location().Longitude())
+		fmt.Fprintf(&sb, "End stop index              : %v {lat: %v, lon: %v}\n",
+			uniqueVehicle[0].Last().Index(),
+			uniqueVehicle[0].Last().Location().Latitude(),
+			uniqueVehicle[0].Last().Location().Longitude())
+		statistics := NewVehicleStatistics(uniqueVehicle[0])
+		fmt.Fprintf(&sb, "%v", statistics.Report())
+		fmt.Fprintf(&sb, "%s\n", line)
+		return false
+	})
+	return sb.String()
+}
