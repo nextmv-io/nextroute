@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewSolutionStopGenerator return a solution stop iterator of a move.
@@ -27,10 +26,10 @@ import (
 //			  // Do something with solutionStop
 //	   }
 func NewSolutionStopGenerator(
-	move nextroute.SolutionMoveStops,
+	move SolutionMoveStops,
 	startAtFirst bool,
 	endAtLast bool,
-) nextroute.SolutionStopGenerator {
+) SolutionStopGenerator {
 	nextStop := move.Vehicle().First()
 	if !startAtFirst {
 		nextStop = move.StopPositions()[0].Previous()
@@ -77,7 +76,7 @@ type solutionStopGeneratorImpl struct {
 	endReached              bool
 }
 
-func (s *solutionStopGeneratorImpl) Next() nextroute.SolutionStop {
+func (s *solutionStopGeneratorImpl) Next() SolutionStop {
 	next, ok := s.next()
 	if !ok {
 		return nil

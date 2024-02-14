@@ -2,7 +2,6 @@ package nextroute
 
 import (
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // SolutionMoveStopsGeneratorChannel generates all possible moves for a given
@@ -23,16 +22,16 @@ func SolutionMoveStopsGeneratorChannel(
 	vehicle solutionVehicleImpl,
 	planUnit *solutionPlanStopsUnitImpl,
 	quit <-chan struct{},
-	stops nextroute.SolutionStops,
+	stops SolutionStops,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
-) chan nextroute.SolutionMoveStops {
-	ch := make(chan nextroute.SolutionMoveStops)
+) chan SolutionMoveStops {
+	ch := make(chan SolutionMoveStops)
 	go func() {
 		defer close(ch)
 		SolutionMoveStopsGenerator(
 			vehicle,
 			planUnit,
-			func(move nextroute.SolutionMoveStops) {
+			func(move SolutionMoveStops) {
 				select {
 				case <-quit:
 					return
@@ -56,12 +55,12 @@ func SolutionMoveStopsGeneratorChannel(
 
 // SolutionMoveStopsGeneratorChannelTest is here only for testing purposes.
 func SolutionMoveStopsGeneratorChannelTest(
-	vehicle nextroute.SolutionVehicle,
-	planUnit nextroute.SolutionPlanUnit,
+	vehicle SolutionVehicle,
+	planUnit SolutionPlanUnit,
 	quit <-chan struct{},
-	stops nextroute.SolutionStops,
+	stops SolutionStops,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
-) chan nextroute.SolutionMoveStops {
+) chan SolutionMoveStops {
 	return SolutionMoveStopsGeneratorChannel(
 		vehicle.(solutionVehicleImpl),
 		planUnit.(*solutionPlanStopsUnitImpl),
@@ -73,10 +72,10 @@ func SolutionMoveStopsGeneratorChannelTest(
 
 // SolutionMoveStopsGeneratorTest is here only for testing purposes.
 func SolutionMoveStopsGeneratorTest(
-	vehicle nextroute.SolutionVehicle,
-	planUnit nextroute.SolutionPlanUnit,
-	yield func(move nextroute.SolutionMoveStops),
-	stops nextroute.SolutionStops,
+	vehicle SolutionVehicle,
+	planUnit SolutionPlanUnit,
+	yield func(move SolutionMoveStops),
+	stops SolutionStops,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 	shouldStop func() bool,
 ) {
@@ -95,15 +94,15 @@ func SolutionMoveStopsGeneratorTest(
 func SolutionMoveStopsGenerator(
 	vehicle solutionVehicleImpl,
 	planUnit *solutionPlanStopsUnitImpl,
-	yield func(move nextroute.SolutionMoveStops),
-	stops nextroute.SolutionStops,
+	yield func(move SolutionMoveStops),
+	stops SolutionStops,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 	shouldStop func() bool,
 ) {
-	source := common.Map(stops, func(stop nextroute.SolutionStop) solutionStopImpl {
+	source := common.Map(stops, func(stop SolutionStop) solutionStopImpl {
 		return stop.(solutionStopImpl)
 	})
-	target := common.Map(vehicle.SolutionStops(), func(stop nextroute.SolutionStop) solutionStopImpl {
+	target := common.Map(vehicle.SolutionStops(), func(stop SolutionStop) solutionStopImpl {
 		return stop.(solutionStopImpl)
 	})
 	m := preAllocatedMoveContainer.singleStopPosSolutionMoveStop

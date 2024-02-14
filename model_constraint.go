@@ -1,9 +1,5 @@
 package nextroute
 
-import (
-	"github.com/nextmv-io/sdk/nextroute"
-)
-
 // Copier is the interface that all objects that can be copied must implement.
 type Copier interface {
 	// Copy returns a copy of the object.
@@ -135,9 +131,9 @@ type modelConstraintImpl struct {
 }
 
 func (m *modelConstraintImpl) EstimateIsViolated(
-	_ nextroute.SolutionMoveStops,
-	_ nextroute.Solution,
-) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	_ SolutionMoveStops,
+	_ Solution,
+) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	panic("implement me in derived class")
 }
 

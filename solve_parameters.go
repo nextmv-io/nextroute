@@ -2,12 +2,10 @@ package nextroute
 
 import (
 	"fmt"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewConstSolveParameter creates a new constant solve parameter.
-func NewConstSolveParameter(value int) nextroute.SolveParameter {
+func NewConstSolveParameter(value int) SolveParameter {
 	return &constParameterImpl{value: value}
 }
 
@@ -32,7 +30,7 @@ func NewSolveParameter(
 	maxValue int,
 	snapBackAfterImprovement bool,
 	zigzag bool,
-) (nextroute.SolveParameter, error) {
+) (SolveParameter, error) {
 	if deltaAfterIterations < 0 {
 		return nil,
 			fmt.Errorf(
@@ -93,7 +91,7 @@ func (i *intParameterImpl) Value() int {
 	return i.value
 }
 
-func (i *intParameterImpl) Update(solveInformation nextroute.SolveInformation) {
+func (i *intParameterImpl) Update(solveInformation SolveInformation) {
 	if solveInformation.DeltaScore() < 0.0 {
 		i.iterations = 0
 		if i.snapBackAfterImprovement && i.value != i.startValue {
@@ -123,7 +121,7 @@ type constParameterImpl struct {
 	value int
 }
 
-func (c *constParameterImpl) Update(_ nextroute.SolveInformation) {
+func (c *constParameterImpl) Update(_ SolveInformation) {
 }
 
 func (c *constParameterImpl) Value() int {

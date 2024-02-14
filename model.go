@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 	"golang.org/x/exp/slices"
 )
 
@@ -188,23 +187,23 @@ type Model interface {
 }
 
 // NewModel returns a new model.
-func NewModel() (nextroute.Model, error) {
+func NewModel() (Model, error) {
 	m := &modelImpl{
 		modelDataImpl:                  newModelDataImpl(),
-		constraintMap:                  make(map[nextroute.CheckedAt]nextroute.ModelConstraints),
-		constraints:                    make(nextroute.ModelConstraints, 0),
-		constraintsWithStopUpdater:     make(nextroute.ModelConstraints, 0),
-		constraintsWithSolutionUpdater: make(nextroute.ModelConstraints, 0),
-		vehicles:                       make(nextroute.ModelVehicles, 0),
-		vehicleTypes:                   make(nextroute.ModelVehicleTypes, 0),
+		constraintMap:                  make(map[CheckedAt]ModelConstraints),
+		constraints:                    make(ModelConstraints, 0),
+		constraintsWithStopUpdater:     make(ModelConstraints, 0),
+		constraintsWithSolutionUpdater: make(ModelConstraints, 0),
+		vehicles:                       make(ModelVehicles, 0),
+		vehicleTypes:                   make(ModelVehicleTypes, 0),
 		distanceUnit:                   common.Meters,
 		durationUnit:                   time.Second,
 		epoch:                          time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
-		expressions:                    make(map[int]nextroute.ModelExpression),
+		expressions:                    make(map[int]ModelExpression),
 		isLocked:                       false,
 		objective:                      nil,
-		objectivesWithStopUpdater:      make(nextroute.ModelObjectives, 0),
-		objectivesWithSolutionUpdater:  make(nextroute.ModelObjectives, 0),
+		objectivesWithStopUpdater:      make(ModelObjectives, 0),
+		objectivesWithSolutionUpdater:  make(ModelObjectives, 0),
 		random:                         rand.New(rand.NewSource(0)),
 		timeFormat:                     time.UnixDate,
 		stopVehicles:                   make(map[int]int),
@@ -227,8 +226,8 @@ func NewModel() (nextroute.Model, error) {
 
 	m.objective = newModelObjectiveSum(m)
 
-	for _, checkViolation := range nextroute.CheckViolations {
-		m.constraintMap[checkViolation] = make(nextroute.ModelConstraints, 0)
+	for _, checkViolation := range CheckViolations {
+		m.constraintMap[checkViolation] = make(ModelConstraints, 0)
 	}
 
 	return m, nil
@@ -237,22 +236,22 @@ func NewModel() (nextroute.Model, error) {
 type modelImpl struct {
 	epoch time.Time
 	modelDataImpl
-	objective                  nextroute.ModelObjectiveSum
+	objective                  ModelObjectiveSum
 	stopVehicles               map[int]int
 	random                     *rand.Rand
-	expressions                map[int]nextroute.ModelExpression
-	constraintMap              map[nextroute.CheckedAt]nextroute.ModelConstraints
+	expressions                map[int]ModelExpression
+	constraintMap              map[CheckedAt]ModelConstraints
 	timeFormat                 string
-	constraints                nextroute.ModelConstraints
-	vehicleTypes               nextroute.ModelVehicleTypes
-	constraintsWithStopUpdater nextroute.ModelConstraints
-	planUnits                  nextroute.ModelPlanUnits
+	constraints                ModelConstraints
+	vehicleTypes               ModelVehicleTypes
+	constraintsWithStopUpdater ModelConstraints
+	planUnits                  ModelPlanUnits
 	solutionObservedImpl
-	stops                          nextroute.ModelStops
-	vehicles                       nextroute.ModelVehicles
-	constraintsWithSolutionUpdater nextroute.ModelConstraints
-	objectivesWithStopUpdater      nextroute.ModelObjectives
-	objectivesWithSolutionUpdater  nextroute.ModelObjectives
+	stops                          ModelStops
+	vehicles                       ModelVehicles
+	constraintsWithSolutionUpdater ModelConstraints
+	objectivesWithStopUpdater      ModelObjectives
+	objectivesWithSolutionUpdater  ModelObjectives
 	distanceUnit                   common.DistanceUnit
 	durationUnit                   time.Duration
 	sequenceSampleSize             int
@@ -260,7 +259,7 @@ type modelImpl struct {
 	isLocked                       bool
 }
 
-func (m *modelImpl) Vehicles() nextroute.ModelVehicles {
+func (m *modelImpl) Vehicles() ModelVehicles {
 	return common.DefensiveCopy(m.vehicles)
 }
 
@@ -280,12 +279,12 @@ func (m *modelImpl) SetTimeFormat(timeFormat string) {
 	m.timeFormat = timeFormat
 }
 
-func (m *modelImpl) Expressions() nextroute.ModelExpressions {
-	expressions := make(nextroute.ModelExpressions, 0, len(m.expressions))
+func (m *modelImpl) Expressions() ModelExpressions {
+	expressions := make(ModelExpressions, 0, len(m.expressions))
 	for _, expression := range m.expressions {
 		expressions = append(expressions, expression)
 	}
-	slices.SortStableFunc(expressions, func(i, j nextroute.ModelExpression) int {
+	slices.SortStableFunc(expressions, func(i, j ModelExpression) int {
 		return i.Index() - j.Index()
 	})
 
@@ -293,11 +292,11 @@ func (m *modelImpl) Expressions() nextroute.ModelExpressions {
 }
 
 func (m *modelImpl) NewVehicle(
-	vehicleType nextroute.ModelVehicleType,
+	vehicleType ModelVehicleType,
 	start time.Time,
-	first nextroute.ModelStop,
-	last nextroute.ModelStop,
-) (nextroute.ModelVehicle, error) {
+	first ModelStop,
+	last ModelStop,
+) (ModelVehicle, error) {
 	if m.isLocked {
 		return nil,
 			fmt.Errorf("model is isLocked, a model is" +
@@ -329,9 +328,9 @@ func (m *modelImpl) NewVehicle(
 }
 
 func (m *modelImpl) NewVehicleType(
-	travelDuration nextroute.TimeDependentDurationExpression,
-	processDuration nextroute.DurationExpression,
-) (nextroute.ModelVehicleType, error) {
+	travelDuration TimeDependentDurationExpression,
+	processDuration DurationExpression,
+) (ModelVehicleType, error) {
 	if m.isLocked {
 		return nil,
 			fmt.Errorf("model is isLocked, a model is" +
@@ -350,7 +349,7 @@ func (m *modelImpl) NewVehicleType(
 	return vehicle, nil
 }
 
-func (m *modelImpl) addExpression(expression nextroute.ModelExpression) {
+func (m *modelImpl) addExpression(expression ModelExpression) {
 	if existingExpression, ok := m.expressions[expression.Index()]; ok {
 		if existingExpression.Name() != expression.Name() {
 			panic(fmt.Sprintf(
@@ -371,15 +370,15 @@ func (m *modelImpl) setConstraintEstimationOrder() {
 	sort.SliceStable(m.constraints, func(i, j int) bool {
 		ci := m.constraints[i]
 		cj := m.constraints[j]
-		if complexityOfI, ok := ci.(nextroute.Complexity); ok {
-			if complexityOfJ, ok := cj.(nextroute.Complexity); ok {
+		if complexityOfI, ok := ci.(Complexity); ok {
+			if complexityOfJ, ok := cj.(Complexity); ok {
 				return complexityOfI.EstimationCost() <
 					complexityOfJ.EstimationCost()
 			}
 			return true
 		}
 
-		if _, ok := cj.(nextroute.Complexity); ok {
+		if _, ok := cj.(Complexity); ok {
 			return false
 		}
 
@@ -387,14 +386,14 @@ func (m *modelImpl) setConstraintEstimationOrder() {
 	})
 }
 
-func (m *modelImpl) addToCheckAt(checkAt nextroute.CheckedAt, constraint nextroute.ModelConstraint) {
+func (m *modelImpl) addToCheckAt(checkAt CheckedAt, constraint ModelConstraint) {
 	if _, ok := m.constraintMap[checkAt]; !ok {
-		m.constraintMap[checkAt] = make(nextroute.ModelConstraints, 0, 1)
+		m.constraintMap[checkAt] = make(ModelConstraints, 0, 1)
 	}
 	m.constraintMap[checkAt] = append(m.constraintMap[checkAt], constraint)
 }
 
-func (m *modelImpl) AddConstraint(constraint nextroute.ModelConstraint) error {
+func (m *modelImpl) AddConstraint(constraint ModelConstraint) error {
 	if m.IsLocked() {
 		return fmt.Errorf("model is isLocked, a model is" +
 			" isLocked once a" +
@@ -410,39 +409,39 @@ func (m *modelImpl) AddConstraint(constraint nextroute.ModelConstraint) error {
 			)
 		}
 	}
-	if _, ok := constraint.(nextroute.ConstraintDataUpdater); ok {
+	if _, ok := constraint.(ConstraintDataUpdater); ok {
 		return fmt.Errorf(
-			"nextroute.ConstraintDataUpdater has been deprecated, "+
-				"please use nextroute.ConstraintStopDataUpdater instead, "+
+			"ConstraintDataUpdater has been deprecated, "+
+				"please use ConstraintStopDataUpdater instead, "+
 				"rename UpdateConstraintData to UpdateConstraintStopData for %s",
 			reflect.TypeOf(constraint).String(),
 		)
 	}
-	if _, ok := constraint.(nextroute.SolutionStopViolationCheck); ok {
-		m.addToCheckAt(nextroute.AtEachStop, constraint)
+	if _, ok := constraint.(SolutionStopViolationCheck); ok {
+		m.addToCheckAt(AtEachStop, constraint)
 	}
-	if _, ok := constraint.(nextroute.SolutionVehicleViolationCheck); ok {
-		m.addToCheckAt(nextroute.AtEachVehicle, constraint)
+	if _, ok := constraint.(SolutionVehicleViolationCheck); ok {
+		m.addToCheckAt(AtEachVehicle, constraint)
 	}
-	if _, ok := constraint.(nextroute.SolutionViolationCheck); ok {
-		m.addToCheckAt(nextroute.AtEachSolution, constraint)
+	if _, ok := constraint.(SolutionViolationCheck); ok {
+		m.addToCheckAt(AtEachSolution, constraint)
 	}
 
 	m.constraints = append(m.constraints, constraint)
 
-	if registered, ok := constraint.(nextroute.RegisteredModelExpressions); ok {
+	if registered, ok := constraint.(RegisteredModelExpressions); ok {
 		for _, expression := range registered.ModelExpressions() {
 			m.addExpression(expression)
 		}
 	}
 
-	if _, ok := constraint.(nextroute.ConstraintStopDataUpdater); ok {
+	if _, ok := constraint.(ConstraintStopDataUpdater); ok {
 		m.constraintsWithStopUpdater = append(
 			m.constraintsWithStopUpdater,
 			constraint,
 		)
 	}
-	if _, ok := constraint.(nextroute.ConstraintSolutionDataUpdater); ok {
+	if _, ok := constraint.(ConstraintSolutionDataUpdater); ok {
 		m.constraintsWithSolutionUpdater = append(
 			m.constraintsWithSolutionUpdater,
 			constraint,
@@ -456,28 +455,28 @@ func (m *modelImpl) Epoch() time.Time {
 	return m.epoch
 }
 
-func (m *modelImpl) Constraints() nextroute.ModelConstraints {
+func (m *modelImpl) Constraints() ModelConstraints {
 	return common.DefensiveCopy(m.constraints)
 }
 
-func (m *modelImpl) ConstraintsCheckedAt(violation nextroute.CheckedAt) nextroute.ModelConstraints {
+func (m *modelImpl) ConstraintsCheckedAt(violation CheckedAt) ModelConstraints {
 	if constraints, ok := m.constraintMap[violation]; ok {
 		return common.DefensiveCopy(constraints)
 	}
-	return make(nextroute.ModelConstraints, 0)
+	return make(ModelConstraints, 0)
 }
 
 func (m *modelImpl) Random() *rand.Rand {
 	return m.random
 }
 
-func (m *modelImpl) Objective() nextroute.ModelObjectiveSum {
+func (m *modelImpl) Objective() ModelObjectiveSum {
 	return m.objective
 }
 
 func (m *modelImpl) NewPlanOneOfPlanUnits(
-	planUnits ...nextroute.ModelPlanUnit,
-) (nextroute.ModelPlanUnitsUnit, error) {
+	planUnits ...ModelPlanUnit,
+) (ModelPlanUnitsUnit, error) {
 	if m.IsLocked() {
 		return nil,
 			fmt.Errorf("model is locked, can not create a plan," +
@@ -502,8 +501,8 @@ func (m *modelImpl) NewPlanOneOfPlanUnits(
 
 func (m *modelImpl) NewPlanAllPlanUnits(
 	sameVehicle bool,
-	planUnits ...nextroute.ModelPlanUnit,
-) (nextroute.ModelPlanUnitsUnit, error) {
+	planUnits ...ModelPlanUnit,
+) (ModelPlanUnitsUnit, error) {
 	if m.IsLocked() {
 		return nil,
 			fmt.Errorf("model is locked, can not create a plan all plan," +
@@ -526,7 +525,7 @@ func (m *modelImpl) NewPlanAllPlanUnits(
 	return plan, nil
 }
 
-func (m *modelImpl) NewPlanSingleStop(stop nextroute.ModelStop) (nextroute.ModelPlanStopsUnit, error) {
+func (m *modelImpl) NewPlanSingleStop(stop ModelStop) (ModelPlanStopsUnit, error) {
 	if m.IsLocked() {
 		return nil,
 			fmt.Errorf("model is locked, can not create a plan one of plan unit," +
@@ -545,7 +544,7 @@ func (m *modelImpl) NewPlanSingleStop(stop nextroute.ModelStop) (nextroute.Model
 	return planSingleStop, nil
 }
 
-func (m *modelImpl) NewPlanSequence(stops nextroute.ModelStops) (nextroute.ModelPlanStopsUnit, error) {
+func (m *modelImpl) NewPlanSequence(stops ModelStops) (ModelPlanStopsUnit, error) {
 	if m.IsLocked() {
 		return nil,
 			fmt.Errorf("model is locked, can not create a plan sequence," +
@@ -566,9 +565,9 @@ func (m *modelImpl) NewPlanSequence(stops nextroute.ModelStops) (nextroute.Model
 }
 
 func (m *modelImpl) NewPlanMultipleStops(
-	stops nextroute.ModelStops,
-	sequence nextroute.DirectedAcyclicGraph,
-) (nextroute.ModelPlanStopsUnit, error) {
+	stops ModelStops,
+	sequence DirectedAcyclicGraph,
+) (ModelPlanStopsUnit, error) {
 	if m.IsLocked() {
 		return nil,
 			fmt.Errorf("model is locked, can not create multiple stops plan," +
@@ -587,14 +586,14 @@ func (m *modelImpl) NewPlanMultipleStops(
 	return planUnit, nil
 }
 
-func (m *modelImpl) PlanUnits() nextroute.ModelPlanUnits {
+func (m *modelImpl) PlanUnits() ModelPlanUnits {
 	return common.DefensiveCopy(m.planUnits)
 }
 
-func (m *modelImpl) PlanStopsUnits() nextroute.ModelPlanStopsUnits {
-	planStopsUnits := make(nextroute.ModelPlanStopsUnits, 0, len(m.planUnits))
+func (m *modelImpl) PlanStopsUnits() ModelPlanStopsUnits {
+	planStopsUnits := make(ModelPlanStopsUnits, 0, len(m.planUnits))
 	for _, planUnit := range m.planUnits {
-		if planStopsUnit, ok := planUnit.(nextroute.ModelPlanStopsUnit); ok {
+		if planStopsUnit, ok := planUnit.(ModelPlanStopsUnit); ok {
 			planStopsUnits = append(planStopsUnits, planStopsUnit)
 		}
 	}
@@ -633,7 +632,7 @@ func (m *modelImpl) lock() error {
 	}
 	m.setConstraintEstimationOrder()
 	for _, constraint := range m.constraints {
-		if locker, ok := constraint.(nextroute.Locker); ok {
+		if locker, ok := constraint.(Locker); ok {
 			err := locker.Lock(m)
 			if err != nil {
 				return err
@@ -641,7 +640,7 @@ func (m *modelImpl) lock() error {
 		}
 	}
 	for _, term := range m.objective.Terms() {
-		if locker, ok := term.Objective().(nextroute.Locker); ok {
+		if locker, ok := term.Objective().(Locker); ok {
 			err := locker.Lock(m)
 			if err != nil {
 				return err
@@ -655,10 +654,10 @@ func (m *modelImpl) lock() error {
 	planUnits := common.UniqueDefined(
 		common.Map(
 			common.Keys(m.stopVehicles),
-			func(idx int) nextroute.ModelPlanStopsUnit {
+			func(idx int) ModelPlanStopsUnit {
 				return m.stops[idx].PlanStopsUnit()
 			},
-		), func(planUnit nextroute.ModelPlanStopsUnit) int {
+		), func(planUnit ModelPlanStopsUnit) int {
 			return planUnit.Index()
 		},
 	)
@@ -666,8 +665,8 @@ func (m *modelImpl) lock() error {
 		vehicleIndex := -1
 
 		modelStops := planUnit.Stops()
-		modelStopsInVehicle := make([]nextroute.ModelStop, 0, len(modelStops))
-		modelStopsNotInVehicle := make([]nextroute.ModelStop, 0, len(modelStops))
+		modelStopsInVehicle := make([]ModelStop, 0, len(modelStops))
+		modelStopsNotInVehicle := make([]ModelStop, 0, len(modelStops))
 		for _, modelStop := range modelStops {
 			modelStopImpl := modelStop.(*stopImpl)
 			if index, inVehicle := m.stopVehicles[modelStop.Index()]; inVehicle {
@@ -703,7 +702,7 @@ func (m *modelImpl) lock() error {
 				strings.Join(
 					common.MapSlice(
 						modelStopsInVehicle,
-						func(modelStop nextroute.ModelStop) []string {
+						func(modelStop ModelStop) []string {
 							return []string{modelStop.ID()}
 						}),
 					", ",
@@ -712,7 +711,7 @@ func (m *modelImpl) lock() error {
 				strings.Join(
 					common.MapSlice(
 						modelStopsNotInVehicle,
-						func(modelStop nextroute.ModelStop) []string {
+						func(modelStop ModelStop) []string {
 							return []string{modelStop.ID()}
 						}),
 					", ",
@@ -721,7 +720,7 @@ func (m *modelImpl) lock() error {
 		}
 
 		vehicle := m.Vehicles()[vehicleIndex]
-		sequence := make(nextroute.ModelStops, 0, len(modelStops))
+		sequence := make(ModelStops, 0, len(modelStops))
 		for _, stop := range vehicle.Stops() {
 			if stop.PlanStopsUnit().Index() == planUnit.Index() {
 				sequence = append(sequence, stop)
@@ -738,7 +737,7 @@ func (m *modelImpl) lock() error {
 				strings.Join(
 					common.MapSlice(
 						sequence,
-						func(modelStop nextroute.ModelStop) []string {
+						func(modelStop ModelStop) []string {
 							return []string{modelStop.ID()}
 						}),
 					", ",
@@ -760,17 +759,17 @@ func (m *modelImpl) IsLocked() bool {
 	return m.isLocked
 }
 
-func (m *modelImpl) VehicleTypes() nextroute.ModelVehicleTypes {
+func (m *modelImpl) VehicleTypes() ModelVehicleTypes {
 	return common.DefensiveCopy(m.vehicleTypes)
 }
 
-func (m *modelImpl) Vehicle(index int) nextroute.ModelVehicle {
+func (m *modelImpl) Vehicle(index int) ModelVehicle {
 	return m.vehicles[index]
 }
 
 func (m *modelImpl) NewStop(
 	location common.Location,
-) (nextroute.ModelStop, error) {
+) (ModelStop, error) {
 	if m.isLocked {
 		return nil,
 			fmt.Errorf("model is isLocked, a model is" +
@@ -788,7 +787,7 @@ func (m *modelImpl) NewStop(
 	return stop, nil
 }
 
-func (m *modelImpl) Stop(index int) (nextroute.ModelStop, error) {
+func (m *modelImpl) Stop(index int) (ModelStop, error) {
 	if index < 0 || index >= len(m.stops) {
 		return nil,
 			fmt.Errorf(
@@ -800,7 +799,7 @@ func (m *modelImpl) Stop(index int) (nextroute.ModelStop, error) {
 	return m.stops[index], nil
 }
 
-func (m *modelImpl) Stops() nextroute.ModelStops {
+func (m *modelImpl) Stops() ModelStops {
 	return common.DefensiveCopy(m.stops)
 }
 

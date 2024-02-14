@@ -1,27 +1,23 @@
 package nextroute
 
-import (
-	"github.com/nextmv-io/sdk/nextroute"
-)
-
 // NewVehiclesObjective returns a new VehiclesObjective.
 func NewVehiclesObjective(
-	expression nextroute.VehicleTypeExpression,
-) nextroute.VehiclesObjective {
+	expression VehicleTypeExpression,
+) VehiclesObjective {
 	return &vehiclesObjectiveImpl{
 		expression: expression,
 	}
 }
 
 type vehiclesObjectiveImpl struct {
-	expression nextroute.VehicleTypeExpression
+	expression VehicleTypeExpression
 }
 
-func (t *vehiclesObjectiveImpl) ModelExpressions() nextroute.ModelExpressions {
-	return nextroute.ModelExpressions{}
+func (t *vehiclesObjectiveImpl) ModelExpressions() ModelExpressions {
+	return ModelExpressions{}
 }
 
-func (t *vehiclesObjectiveImpl) EstimateDeltaValue(move nextroute.SolutionMoveStops) float64 {
+func (t *vehiclesObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float64 {
 	vehicle := move.(*solutionMoveStopsImpl).vehicle()
 
 	if vehicle.NumberOfStops() == 0 {
@@ -35,7 +31,7 @@ func (t *vehiclesObjectiveImpl) EstimateDeltaValue(move nextroute.SolutionMoveSt
 	return 0.0
 }
 
-func (t *vehiclesObjectiveImpl) Value(solution nextroute.Solution) float64 {
+func (t *vehiclesObjectiveImpl) Value(solution Solution) float64 {
 	vehicleCost := 0.0
 	for _, vehicle := range solution.(*solutionImpl).vehiclesMutable() {
 		if vehicle.NumberOfStops() > 0 {
@@ -53,6 +49,6 @@ func (t *vehiclesObjectiveImpl) String() string {
 	return "vehicle_activation_penalty"
 }
 
-func (t *vehiclesObjectiveImpl) ActivationPenalty() nextroute.VehicleTypeExpression {
+func (t *vehiclesObjectiveImpl) ActivationPenalty() VehicleTypeExpression {
 	return t.expression
 }

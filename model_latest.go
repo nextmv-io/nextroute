@@ -3,80 +3,78 @@ package nextroute
 import (
 	"math"
 	"time"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewLatestEnd returns a new LatestEnd construct.
 func NewLatestEnd(
-	latestEnd nextroute.StopTimeExpression,
-) (nextroute.LatestEnd, error) {
+	latestEnd StopTimeExpression,
+) (LatestEnd, error) {
 	return &latestImpl{
 		modelConstraintImpl: newModelConstraintImpl(
 			"late_end_penalty",
-			nextroute.ModelExpressions{},
+			ModelExpressions{},
 		),
 		latest:            latestEnd,
 		latenessFactor:    NewStopExpression("lateness_penalty_factor", 1.0),
-		temporalReference: nextroute.OnEnd,
+		temporalReference: OnEnd,
 	}, nil
 }
 
 // NewLatestStart returns a new LatestStart construct.
 func NewLatestStart(
-	latestStart nextroute.StopTimeExpression,
-) (nextroute.LatestStart, error) {
+	latestStart StopTimeExpression,
+) (LatestStart, error) {
 	return &latestImpl{
 		modelConstraintImpl: newModelConstraintImpl(
 			"late_start_penalty",
-			nextroute.ModelExpressions{},
+			ModelExpressions{},
 		),
 		latest:            latestStart,
 		latenessFactor:    NewStopExpression("lateness_penalty_factor", 1.0),
-		temporalReference: nextroute.OnStart,
+		temporalReference: OnStart,
 	}, nil
 }
 
 // NewLatestArrival returns a new LatestArrival construct.
 func NewLatestArrival(
-	latest nextroute.StopTimeExpression,
-) (nextroute.LatestArrival, error) {
+	latest StopTimeExpression,
+) (LatestArrival, error) {
 	return &latestImpl{
 		modelConstraintImpl: newModelConstraintImpl(
 			"late_arrival_penalty",
-			nextroute.ModelExpressions{},
+			ModelExpressions{},
 		),
 		latest:            latest,
 		latenessFactor:    NewStopExpression("lateness_penalty_factor", 1.0),
-		temporalReference: nextroute.OnArrival,
+		temporalReference: OnArrival,
 	}, nil
 }
 
 type latestImpl struct {
-	latest         nextroute.StopTimeExpression
-	latenessFactor nextroute.StopExpression
+	latest         StopTimeExpression
+	latenessFactor StopExpression
 	modelConstraintImpl
-	temporalReference nextroute.TemporalReference
+	temporalReference TemporalReference
 }
 
-func (l *latestImpl) SetFactor(factor float64, stop nextroute.ModelStop) {
+func (l *latestImpl) SetFactor(factor float64, stop ModelStop) {
 	if factor >= 0 {
 		l.latenessFactor.SetValue(stop, factor)
 	}
 }
 
-func (l *latestImpl) Factor(stop nextroute.ModelStop) float64 {
+func (l *latestImpl) Factor(stop ModelStop) float64 {
 	return l.latenessFactor.Value(nil, nil, stop)
 }
 
-func (l *latestImpl) ReportConstraint(stop nextroute.SolutionStop) map[string]any {
+func (l *latestImpl) ReportConstraint(stop SolutionStop) map[string]any {
 	var t time.Time
 	switch l.temporalReference {
-	case nextroute.OnArrival:
+	case OnArrival:
 		t = stop.Arrival()
-	case nextroute.OnStart:
+	case OnStart:
 		t = stop.Start()
-	case nextroute.OnEnd:
+	case OnEnd:
 		t = stop.End()
 	}
 
@@ -90,30 +88,30 @@ func (l *latestImpl) String() string {
 	return l.name
 }
 
-func (l *latestImpl) Latest() nextroute.StopTimeExpression {
+func (l *latestImpl) Latest() StopTimeExpression {
 	return l.latest
 }
 
-func (l *latestImpl) EstimationCost() nextroute.Cost {
-	return nextroute.LinearStop
+func (l *latestImpl) EstimationCost() Cost {
+	return LinearStop
 }
 
-func (l *latestImpl) Lateness(stop nextroute.SolutionStop) float64 {
+func (l *latestImpl) Lateness(stop SolutionStop) float64 {
 	latest := l.latest.Value(nil, nil, stop.ModelStop())
 	reference := 0.
 	switch l.temporalReference {
-	case nextroute.OnArrival:
+	case OnArrival:
 		reference = stop.ArrivalValue()
-	case nextroute.OnStart:
+	case OnStart:
 		reference = stop.StartValue()
-	case nextroute.OnEnd:
+	case OnEnd:
 		reference = stop.EndValue()
 	}
 
 	return math.Max(0, reference-latest)
 }
 
-func (l *latestImpl) Value(s nextroute.Solution) float64 {
+func (l *latestImpl) Value(s Solution) float64 {
 	solution := s.(*solutionImpl)
 	value := 0.0
 	for _, vehicle := range solution.vehicles {
@@ -139,8 +137,8 @@ func (l *latestImpl) Value(s nextroute.Solution) float64 {
 }
 
 func (l *latestImpl) EstimateIsViolated(
-	move nextroute.SolutionMoveStops,
-) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	move SolutionMoveStops,
+) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	score, hint := l.estimateDeltaScore(
 		move.(*solutionMoveStopsImpl),
 		true,
@@ -149,7 +147,7 @@ func (l *latestImpl) EstimateIsViolated(
 }
 
 func (l *latestImpl) EstimateDeltaValue(
-	move nextroute.SolutionMoveStops,
+	move SolutionMoveStops,
 ) float64 {
 	score, _ := l.estimateDeltaScore(
 		move.(*solutionMoveStopsImpl),
@@ -161,7 +159,7 @@ func (l *latestImpl) EstimateDeltaValue(
 func (l *latestImpl) estimateDeltaScore(
 	move *solutionMoveStopsImpl,
 	asConstraint bool,
-) (deltaScore float64, stopPositionsHint nextroute.StopPositionsHint) {
+) (deltaScore float64, stopPositionsHint StopPositionsHint) {
 	vehicle := move.vehicle()
 	vehicleType := vehicle.ModelVehicle().VehicleType()
 	deltaScore = 0.0
@@ -191,13 +189,13 @@ func (l *latestImpl) estimateDeltaScore(
 		reference, currentReference := 0.0, 0.0
 
 		switch l.temporalReference {
-		case nextroute.OnArrival:
+		case OnArrival:
 			reference = arrival
 			currentReference = solutionStop.ArrivalValue()
-		case nextroute.OnStart:
+		case OnStart:
 			reference = start
 			currentReference = solutionStop.StartValue()
-		case nextroute.OnEnd:
+		case OnEnd:
 			reference = end
 			currentReference = solutionStop.EndValue()
 		}
@@ -232,7 +230,7 @@ func (l *latestImpl) estimateDeltaScore(
 	return deltaScore, constNoPositionsHint
 }
 
-func (l *latestImpl) DoesStopHaveViolations(s nextroute.SolutionStop) bool {
+func (l *latestImpl) DoesStopHaveViolations(s SolutionStop) bool {
 	stop := s.(solutionStopImpl)
 	if !stop.
 		vehicle().
@@ -242,11 +240,11 @@ func (l *latestImpl) DoesStopHaveViolations(s nextroute.SolutionStop) bool {
 		SatisfiesTriangleInequality() {
 		latest := l.latest.Value(nil, nil, stop.modelStop())
 		switch l.temporalReference {
-		case nextroute.OnArrival:
+		case OnArrival:
 			return stop.ArrivalValue() > latest
-		case nextroute.OnStart:
+		case OnStart:
 			return stop.StartValue() > latest
-		case nextroute.OnEnd:
+		case OnEnd:
 			return stop.EndValue() > latest
 		}
 	}

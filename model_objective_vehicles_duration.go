@@ -2,16 +2,15 @@ package nextroute
 
 import (
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewVehiclesDurationObjective returns a new VehiclesDurationObjective.
-func NewVehiclesDurationObjective() nextroute.VehiclesDurationObjective {
+func NewVehiclesDurationObjective() VehiclesDurationObjective {
 	return &vehiclesDurationObjectiveImpl{}
 }
 
-func (t *vehiclesDurationObjectiveImpl) Lock(model nextroute.Model) error {
-	t.canIncurWaitingTime = common.HasTrue(model.Stops(), func(stop nextroute.ModelStop) bool {
+func (t *vehiclesDurationObjectiveImpl) Lock(model Model) error {
+	t.canIncurWaitingTime = common.HasTrue(model.Stops(), func(stop ModelStop) bool {
 		return stop.(*stopImpl).canIncurWaitingTime()
 	})
 	vehicleTypes := model.VehicleTypes()
@@ -22,7 +21,7 @@ func (t *vehiclesDurationObjectiveImpl) Lock(model nextroute.Model) error {
 			IsDependentOnTime()
 	}
 	// caching the vehicle type by index for performance
-	t.vehicleTypesByIndex = make([]nextroute.ModelVehicleType, len(vehicleTypes))
+	t.vehicleTypesByIndex = make([]ModelVehicleType, len(vehicleTypes))
 	for _, vehicle := range model.Vehicles() {
 		t.vehicleTypesByIndex[vehicle.Index()] = vehicle.VehicleType()
 	}
@@ -31,16 +30,16 @@ func (t *vehiclesDurationObjectiveImpl) Lock(model nextroute.Model) error {
 
 type vehiclesDurationObjectiveImpl struct {
 	isDependentOnTimeByVehicleType []bool
-	vehicleTypesByIndex            []nextroute.ModelVehicleType
+	vehicleTypesByIndex            []ModelVehicleType
 	canIncurWaitingTime            bool
 }
 
-func (t *vehiclesDurationObjectiveImpl) ModelExpressions() nextroute.ModelExpressions {
-	return nextroute.ModelExpressions{}
+func (t *vehiclesDurationObjectiveImpl) ModelExpressions() ModelExpressions {
+	return ModelExpressions{}
 }
 
 func (t *vehiclesDurationObjectiveImpl) EstimateDeltaValue(
-	move nextroute.SolutionMoveStops,
+	move SolutionMoveStops,
 ) float64 {
 	solutionMoveStops := move.(*solutionMoveStopsImpl)
 	vehicle := solutionMoveStops.vehicle()
@@ -105,7 +104,7 @@ func (t *vehiclesDurationObjectiveImpl) EstimateDeltaValue(
 }
 
 func (t *vehiclesDurationObjectiveImpl) Value(
-	solution nextroute.Solution,
+	solution Solution,
 ) float64 {
 	solutionImp := solution.(*solutionImpl)
 	score := 0.0

@@ -1,25 +1,21 @@
 package nextroute
 
-import (
-	"github.com/nextmv-io/sdk/nextroute"
-)
-
 // NewTravelDurationObjective returns a new TravelDurationObjective.
-func NewTravelDurationObjective() nextroute.TravelDurationObjective {
+func NewTravelDurationObjective() TravelDurationObjective {
 	return &travelDurationObjectiveImpl{}
 }
 
 type travelDurationObjectiveImpl struct{}
 
-func (t *travelDurationObjectiveImpl) ModelExpressions() nextroute.ModelExpressions {
-	return nextroute.ModelExpressions{}
+func (t *travelDurationObjectiveImpl) ModelExpressions() ModelExpressions {
+	return ModelExpressions{}
 }
 
-func (t *travelDurationObjectiveImpl) EstimateDeltaValue(move nextroute.SolutionMoveStops) float64 {
+func (t *travelDurationObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float64 {
 	return move.(*solutionMoveStopsImpl).deltaTravelDurationValue()
 }
 
-func (t *travelDurationObjectiveImpl) Value(solution nextroute.Solution) float64 {
+func (t *travelDurationObjectiveImpl) Value(solution Solution) float64 {
 	solutionImp := solution.(*solutionImpl)
 
 	score := 0.0

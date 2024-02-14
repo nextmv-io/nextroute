@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // ModelVehicle is a vehicle in the model. A vehicle is a sequence of stops.
@@ -53,19 +51,19 @@ type ModelVehicles []ModelVehicle
 type modelVehicleImpl struct {
 	start time.Time
 	modelDataImpl
-	vehicleType nextroute.ModelVehicleType
+	vehicleType ModelVehicleType
 	id          string
-	stops       nextroute.ModelStops
+	stops       ModelStops
 	index       int
 }
 
 func newModelVehicle(
 	index int,
-	vehicleType nextroute.ModelVehicleType,
+	vehicleType ModelVehicleType,
 	start time.Time,
-	first nextroute.ModelStop,
-	last nextroute.ModelStop,
-) (nextroute.ModelVehicle, error) {
+	first ModelStop,
+	last ModelStop,
+) (ModelVehicle, error) {
 	if first.HasPlanStopsUnit() {
 		return nil,
 			fmt.Errorf("first stop %s already has a plan unit", first)
@@ -85,12 +83,12 @@ func newModelVehicle(
 		modelDataImpl: newModelDataImpl(),
 		index:         index,
 		vehicleType:   vehicleType,
-		stops:         nextroute.ModelStops{first, last},
+		stops:         ModelStops{first, last},
 		start:         start,
 	}, nil
 }
 
-func (v *modelVehicleImpl) VehicleType() nextroute.ModelVehicleType {
+func (v *modelVehicleImpl) VehicleType() ModelVehicleType {
 	return v.vehicleType
 }
 
@@ -98,16 +96,16 @@ func (v *modelVehicleImpl) Index() int {
 	return v.index
 }
 
-func (v *modelVehicleImpl) First() nextroute.ModelStop {
+func (v *modelVehicleImpl) First() ModelStop {
 	return v.stops[0]
 }
 
-func (v *modelVehicleImpl) Last() nextroute.ModelStop {
+func (v *modelVehicleImpl) Last() ModelStop {
 	return v.stops[len(v.stops)-1]
 }
 
-func (v *modelVehicleImpl) Stops() nextroute.ModelStops {
-	result := make(nextroute.ModelStops, len(v.stops)-2)
+func (v *modelVehicleImpl) Stops() ModelStops {
+	result := make(ModelStops, len(v.stops)-2)
 	if len(v.stops) > 2 {
 		copy(result, v.stops[1:len(v.stops)-1])
 	}
@@ -115,7 +113,7 @@ func (v *modelVehicleImpl) Stops() nextroute.ModelStops {
 }
 
 func (v *modelVehicleImpl) AddStop(
-	stop nextroute.ModelStop,
+	stop ModelStop,
 	fixed bool,
 ) error {
 	if v.Model().IsLocked() {
@@ -163,7 +161,7 @@ func (v *modelVehicleImpl) AddStop(
 	return nil
 }
 
-func (v *modelVehicleImpl) Model() nextroute.Model {
+func (v *modelVehicleImpl) Model() Model {
 	return v.vehicleType.Model()
 }
 

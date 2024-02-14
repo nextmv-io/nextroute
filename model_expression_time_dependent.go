@@ -8,7 +8,6 @@ import (
 
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 const maxTimeDependentExpressionInterval = 24 * 7 * time.Hour
@@ -71,9 +70,9 @@ type TimeDependentDurationExpression interface {
 // NewTimeDependentDurationExpression returns a new
 // TimeDependentDurationExpression.
 func NewTimeDependentDurationExpression(
-	model nextroute.Model,
-	expression nextroute.DurationExpression,
-) (nextroute.TimeDependentDurationExpression, error) {
+	model Model,
+	expression DurationExpression,
+) (TimeDependentDurationExpression, error) {
 	if model.Epoch().Second() != 0 || model.Epoch().Nanosecond() != 0 {
 		return nil,
 			nmerror.NewArgumentMismatchError(fmt.Errorf(
@@ -94,7 +93,7 @@ func NewTimeDependentDurationExpression(
 		model:                       model,
 		index:                       NewModelExpressionIndex(),
 		defaultExpression:           expression,
-		expressions:                 []nextroute.DurationExpression{},
+		expressions:                 []DurationExpression{},
 		elements:                    make(map[int64]*expressionElement),
 		name:                        "time_dependent_expression",
 		satisfiesTriangleInequality: false,
@@ -104,8 +103,8 @@ func NewTimeDependentDurationExpression(
 // NewTimeIndependentDurationExpression returns a new
 // TimeInDependentDurationExpression.
 func NewTimeIndependentDurationExpression(
-	expression nextroute.DurationExpression,
-) nextroute.TimeDependentDurationExpression {
+	expression DurationExpression,
+) TimeDependentDurationExpression {
 	return &timeIndependentDurationExpressionImpl{
 		expression:                  expression,
 		name:                        "time_independent_expression",
@@ -114,7 +113,7 @@ func NewTimeIndependentDurationExpression(
 }
 
 type expressionElement struct {
-	expression nextroute.DurationExpression
+	expression DurationExpression
 	next       *expressionElement
 	previous   *expressionElement
 	start      float64
@@ -122,13 +121,13 @@ type expressionElement struct {
 }
 
 type timeDependentDurationExpressionImpl struct {
-	model                       nextroute.Model
-	defaultExpression           nextroute.DurationExpression
+	model                       Model
+	defaultExpression           DurationExpression
 	elements                    map[int64]*expressionElement
 	startElement                *expressionElement
 	endElement                  *expressionElement
 	name                        string
-	expressions                 []nextroute.DurationExpression
+	expressions                 []DurationExpression
 	earliest                    float64
 	latest                      float64
 	index                       int
@@ -179,13 +178,13 @@ func (t *timeDependentDurationExpressionImpl) Name() string {
 	return t.name
 }
 
-func (t *timeDependentDurationExpressionImpl) Expressions() []nextroute.DurationExpression {
+func (t *timeDependentDurationExpressionImpl) Expressions() []DurationExpression {
 	return common.DefensiveCopy(t.expressions)
 }
 
 func (t *timeDependentDurationExpressionImpl) Value(
-	vehicleType nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from, to ModelStop,
 ) float64 {
 	if t.IsDependentOnTime() {
 		panic("asking for a value on a time dependent expression, require a time to be passed in, use ValueAtTime")
@@ -194,8 +193,8 @@ func (t *timeDependentDurationExpressionImpl) Value(
 }
 
 func (t *timeDependentDurationExpressionImpl) Duration(
-	vehicleType nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from, to ModelStop,
 ) time.Duration {
 	if t.IsDependentOnTime() {
 		panic("asking for a duration on a time dependent expression," +
@@ -226,7 +225,7 @@ func (t *timeDependentDurationExpressionImpl) HasPositiveValues() bool {
 	return hasPositiveValues
 }
 
-func (t *timeDependentDurationExpressionImpl) DefaultExpression() nextroute.DurationExpression {
+func (t *timeDependentDurationExpressionImpl) DefaultExpression() DurationExpression {
 	return t.defaultExpression
 }
 
@@ -254,7 +253,7 @@ func (t *timeDependentDurationExpressionImpl) updateMap() {
 
 func (t *timeDependentDurationExpressionImpl) SetExpression(
 	start, end time.Time,
-	expression nextroute.DurationExpression,
+	expression DurationExpression,
 ) error {
 	if start.Before(t.model.Epoch()) {
 		return nmerror.NewArgumentMismatchError(fmt.Errorf(
@@ -282,7 +281,7 @@ func (t *timeDependentDurationExpressionImpl) SetExpression(
 	t.expressions = append(t.expressions, expression)
 	t.expressions = common.UniqueDefined(
 		t.expressions,
-		func(durationExpression nextroute.DurationExpression) int {
+		func(durationExpression DurationExpression) int {
 			return durationExpression.Index()
 		},
 	)
@@ -409,13 +408,13 @@ func (t *timeDependentDurationExpressionImpl) getElementAtValue(
 
 func (t *timeDependentDurationExpressionImpl) ExpressionAtTime(
 	atTime time.Time,
-) nextroute.DurationExpression {
+) DurationExpression {
 	return t.ExpressionAtValue(t.model.TimeToValue(atTime))
 }
 
 func (t *timeDependentDurationExpressionImpl) ExpressionAtValue(
 	value float64,
-) nextroute.DurationExpression {
+) DurationExpression {
 	if len(t.elements) == 0 {
 		return t.defaultExpression
 	}
@@ -429,8 +428,8 @@ func (t *timeDependentDurationExpressionImpl) ExpressionAtValue(
 
 func (t *timeDependentDurationExpressionImpl) ValueAtTime(
 	atTime time.Time,
-	vehicleType nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from, to ModelStop,
 ) float64 {
 	return t.ValueAtValue(
 		t.model.TimeToValue(atTime),
@@ -442,8 +441,8 @@ func (t *timeDependentDurationExpressionImpl) ValueAtTime(
 
 func (t *timeDependentDurationExpressionImpl) ValueAtValue(
 	value float64,
-	vehicleType nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from, to ModelStop,
 ) float64 {
 	if len(t.elements) == 0 {
 		return t.defaultExpression.Value(vehicleType, from, to)
@@ -498,7 +497,7 @@ func (t *timeDependentDurationExpressionImpl) IsDependentOnTime() bool {
 }
 
 type timeIndependentDurationExpressionImpl struct {
-	expression                  nextroute.DurationExpression
+	expression                  DurationExpression
 	name                        string
 	satisfiesTriangleInequality bool
 }
@@ -511,13 +510,13 @@ func (t *timeIndependentDurationExpressionImpl) SetSatisfiesTriangleInequality(s
 	t.satisfiesTriangleInequality = satisfies
 }
 
-func (t *timeIndependentDurationExpressionImpl) Expressions() []nextroute.DurationExpression {
-	return []nextroute.DurationExpression{}
+func (t *timeIndependentDurationExpressionImpl) Expressions() []DurationExpression {
+	return []DurationExpression{}
 }
 
 func (t *timeIndependentDurationExpressionImpl) Duration(
-	vehicleType nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from, to ModelStop,
 ) time.Duration {
 	return t.expression.Duration(vehicleType, from, to)
 }
@@ -531,8 +530,8 @@ func (t *timeIndependentDurationExpressionImpl) Name() string {
 }
 
 func (t *timeIndependentDurationExpressionImpl) Value(
-	vehicleType nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from, to ModelStop,
 ) float64 {
 	return t.expression.Value(vehicleType, from, to)
 }
@@ -549,13 +548,13 @@ func (t *timeIndependentDurationExpressionImpl) SetName(s string) {
 	t.name = s
 }
 
-func (t *timeIndependentDurationExpressionImpl) DefaultExpression() nextroute.DurationExpression {
+func (t *timeIndependentDurationExpressionImpl) DefaultExpression() DurationExpression {
 	return t.expression
 }
 
 func (t *timeIndependentDurationExpressionImpl) SetExpression(
 	_, _ time.Time,
-	_ nextroute.DurationExpression,
+	_ DurationExpression,
 ) error {
 	return nmerror.NewModelCustomizationError(
 		fmt.Errorf("should not be invoked on time in-dependent expression"),
@@ -564,28 +563,28 @@ func (t *timeIndependentDurationExpressionImpl) SetExpression(
 
 func (t *timeIndependentDurationExpressionImpl) ExpressionAtTime(
 	_ time.Time,
-) nextroute.DurationExpression {
+) DurationExpression {
 	return t.expression
 }
 
 func (t *timeIndependentDurationExpressionImpl) ExpressionAtValue(
 	_ float64,
-) nextroute.DurationExpression {
+) DurationExpression {
 	return t.expression
 }
 
 func (t *timeIndependentDurationExpressionImpl) ValueAtTime(
 	_ time.Time,
-	vehicleType nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from, to ModelStop,
 ) float64 {
 	return t.expression.Value(vehicleType, from, to)
 }
 
 func (t *timeIndependentDurationExpressionImpl) ValueAtValue(
 	_ float64,
-	vehicleType nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from, to ModelStop,
 ) float64 {
 	return t.expression.Value(vehicleType, from, to)
 }

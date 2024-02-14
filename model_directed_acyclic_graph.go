@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // Arc is a directed connection between two nodes ([ModelStops]) that specifies
@@ -48,23 +47,23 @@ type DirectedAcyclicGraph interface {
 	OutboundArcs(stop ModelStop) Arcs
 }
 
-// NewDirectedAcyclicGraph connects nextroute.NewDirectedAcyclicGraph.
-func NewDirectedAcyclicGraph() nextroute.DirectedAcyclicGraph {
+// NewDirectedAcyclicGraph connects NewDirectedAcyclicGraph.
+func NewDirectedAcyclicGraph() DirectedAcyclicGraph {
 	return &directedAcyclicGraphImpl{
-		arcs:          []nextroute.Arc{},
+		arcs:          []Arc{},
 		adjacencyList: map[int][]int{},
-		outboundArcs:  map[int]nextroute.Arcs{},
+		outboundArcs:  map[int]Arcs{},
 	}
 }
 
-// directedAcyclicGraphImpl implements nextroute.DirectedAcyclicGraph.
+// directedAcyclicGraphImpl implements DirectedAcyclicGraph.
 type directedAcyclicGraphImpl struct {
 	adjacencyList map[int][]int
-	outboundArcs  map[int]nextroute.Arcs
-	arcs          nextroute.Arcs
+	outboundArcs  map[int]Arcs
+	arcs          Arcs
 }
 
-func (d *directedAcyclicGraphImpl) AddArc(origin, destination nextroute.ModelStop) error {
+func (d *directedAcyclicGraphImpl) AddArc(origin, destination ModelStop) error {
 	for _, arc := range d.arcs {
 		if arc.Origin().Index() == origin.Index() && arc.Destination().Index() == destination.Index() {
 			return nil
@@ -90,12 +89,12 @@ func (d *directedAcyclicGraphImpl) AddArc(origin, destination nextroute.ModelSto
 	return nil
 }
 
-func (d *directedAcyclicGraphImpl) Arcs() nextroute.Arcs {
+func (d *directedAcyclicGraphImpl) Arcs() Arcs {
 	return common.DefensiveCopy(d.arcs)
 }
 
 func (d *directedAcyclicGraphImpl) updateColors(
-	dag nextroute.DirectedAcyclicGraph,
+	dag DirectedAcyclicGraph,
 	parent int,
 	colors map[int]bool,
 ) error {
@@ -116,13 +115,13 @@ func (d *directedAcyclicGraphImpl) updateColors(
 	return nil
 }
 
-func (d *directedAcyclicGraphImpl) IndependentDirectedAcyclicGraphs() ([]nextroute.DirectedAcyclicGraph, error) {
+func (d *directedAcyclicGraphImpl) IndependentDirectedAcyclicGraphs() ([]DirectedAcyclicGraph, error) {
 	if len(d.adjacencyList) == 0 {
-		return []nextroute.DirectedAcyclicGraph{}, nil
+		return []DirectedAcyclicGraph{}, nil
 	}
 	colors := make(map[int]bool)
 
-	dags := make([]nextroute.DirectedAcyclicGraph, 0)
+	dags := make([]DirectedAcyclicGraph, 0)
 
 	for key := range d.adjacencyList {
 		if _, ok := colors[key]; !ok {
@@ -139,12 +138,12 @@ func (d *directedAcyclicGraphImpl) IndependentDirectedAcyclicGraphs() ([]nextrou
 	return dags, nil
 }
 
-func (d *directedAcyclicGraphImpl) IsAllowed(stops nextroute.ModelStops) (bool, error) {
+func (d *directedAcyclicGraphImpl) IsAllowed(stops ModelStops) (bool, error) {
 	if len(stops) < 2 {
 		return true, nil
 	}
 
-	uniqueStops := common.UniqueDefined(stops, func(stop nextroute.ModelStop) int {
+	uniqueStops := common.UniqueDefined(stops, func(stop ModelStop) int {
 		return stop.Index()
 	})
 
@@ -154,8 +153,8 @@ func (d *directedAcyclicGraphImpl) IsAllowed(stops nextroute.ModelStops) (bool, 
 
 	c := directedAcyclicGraphImpl{
 		adjacencyList: make(map[int][]int),
-		outboundArcs:  make(map[int]nextroute.Arcs),
-		arcs:          make(nextroute.Arcs, 0, len(d.arcs)),
+		outboundArcs:  make(map[int]Arcs),
+		arcs:          make(Arcs, 0, len(d.arcs)),
 	}
 	for _, arc := range d.arcs {
 		err := c.AddArc(arc.Origin(), arc.Destination())
@@ -181,8 +180,8 @@ LoopStops:
 	return true, nil
 }
 
-func (d *directedAcyclicGraphImpl) ModelStops() nextroute.ModelStops {
-	modelStops := make(nextroute.ModelStops, 0)
+func (d *directedAcyclicGraphImpl) ModelStops() ModelStops {
+	modelStops := make(ModelStops, 0)
 	modelStopAdded := make(map[int]struct{})
 	for _, arc := range d.arcs {
 		if _, ok := modelStopAdded[arc.Origin().Index()]; !ok {
@@ -197,7 +196,7 @@ func (d *directedAcyclicGraphImpl) ModelStops() nextroute.ModelStops {
 	return modelStops
 }
 
-func (d *directedAcyclicGraphImpl) OutboundArcs(stop nextroute.ModelStop) nextroute.Arcs {
+func (d *directedAcyclicGraphImpl) OutboundArcs(stop ModelStop) Arcs {
 	return common.DefensiveCopy(d.outboundArcs[stop.Index()])
 }
 
@@ -238,16 +237,16 @@ func (d *directedAcyclicGraphImpl) isCyclicUtil(vertex int, visited map[int]bool
 	return false
 }
 
-// arcImpl implements nextroute.Arc.
+// arcImpl implements Arc.
 type arcImpl struct {
-	origin      nextroute.ModelStop
-	destination nextroute.ModelStop
+	origin      ModelStop
+	destination ModelStop
 }
 
-func (a arcImpl) Origin() nextroute.ModelStop {
+func (a arcImpl) Origin() ModelStop {
 	return a.origin
 }
 
-func (a arcImpl) Destination() nextroute.ModelStop {
+func (a arcImpl) Destination() ModelStop {
 	return a.destination
 }

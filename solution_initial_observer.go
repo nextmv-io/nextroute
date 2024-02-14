@@ -1,15 +1,13 @@
 package nextroute
 
-import "github.com/nextmv-io/sdk/nextroute"
-
 // InitialSolutionObserver is an observer that is used to detect the constraint
 // that is violated by the initial solution.
 type InitialSolutionObserver interface {
-	nextroute.SolutionObserver
+	SolutionObserver
 
 	// Constraint returns the constraint that is violated by the initial
 	// solution. Can be nil if no constraint is violated.
-	Constraint() nextroute.ModelConstraint
+	Constraint() ModelConstraint
 }
 
 // newInitialSolutionObserver creates a new initial solution observer.
@@ -18,12 +16,12 @@ func newInitialSolutionObserver() InitialSolutionObserver {
 }
 
 type initialSolutionObserver struct {
-	constraint nextroute.ModelConstraint
+	constraint ModelConstraint
 }
 
 // OnSolutionConstraintChecked implements InitialSolutionObserver.
 func (i *initialSolutionObserver) OnSolutionConstraintChecked(
-	constraint nextroute.ModelConstraint,
+	constraint ModelConstraint,
 	feasible bool,
 ) {
 	if !feasible {
@@ -33,8 +31,8 @@ func (i *initialSolutionObserver) OnSolutionConstraintChecked(
 
 // OnStopConstraintChecked implements InitialSolutionObserver.
 func (i *initialSolutionObserver) OnStopConstraintChecked(
-	_ nextroute.SolutionStop,
-	constraint nextroute.ModelConstraint,
+	_ SolutionStop,
+	constraint ModelConstraint,
 	feasible bool,
 ) {
 	if !feasible {
@@ -44,8 +42,8 @@ func (i *initialSolutionObserver) OnStopConstraintChecked(
 
 // OnVehicleConstraintChecked implements InitialSolutionObserver.
 func (i *initialSolutionObserver) OnVehicleConstraintChecked(
-	_ nextroute.SolutionVehicle,
-	constraint nextroute.ModelConstraint,
+	_ SolutionVehicle,
+	constraint ModelConstraint,
 	feasible bool,
 ) {
 	if !feasible {
@@ -53,35 +51,35 @@ func (i *initialSolutionObserver) OnVehicleConstraintChecked(
 	}
 }
 
-func (i *initialSolutionObserver) Constraint() nextroute.ModelConstraint {
+func (i *initialSolutionObserver) Constraint() ModelConstraint {
 	return i.constraint
 }
 
-func (i *initialSolutionObserver) OnNewSolution(_ nextroute.Model) {
+func (i *initialSolutionObserver) OnNewSolution(_ Model) {
 }
 
-func (i *initialSolutionObserver) OnNewSolutionCreated(_ nextroute.Solution) {
+func (i *initialSolutionObserver) OnNewSolutionCreated(_ Solution) {
 }
 
-func (i *initialSolutionObserver) OnCopySolution(_ nextroute.Solution) {
+func (i *initialSolutionObserver) OnCopySolution(_ Solution) {
 }
 
-func (i *initialSolutionObserver) OnCopiedSolution(_ nextroute.Solution) {
+func (i *initialSolutionObserver) OnCopiedSolution(_ Solution) {
 }
 
-func (i *initialSolutionObserver) OnCheckConstraint(_ nextroute.ModelConstraint, _ nextroute.CheckedAt) {
+func (i *initialSolutionObserver) OnCheckConstraint(_ ModelConstraint, _ CheckedAt) {
 
 }
 
-func (i *initialSolutionObserver) OnEstimateIsViolated(constraint nextroute.ModelConstraint) {
+func (i *initialSolutionObserver) OnEstimateIsViolated(constraint ModelConstraint) {
 	i.constraint = constraint
 }
 
 func (i *initialSolutionObserver) OnEstimatedIsViolated(
-	_ nextroute.SolutionMove,
-	_ nextroute.ModelConstraint,
+	_ SolutionMove,
+	_ ModelConstraint,
 	_ bool,
-	_ nextroute.StopPositionsHint,
+	_ StopPositionsHint,
 ) {
 }
 
@@ -91,17 +89,17 @@ func (i *initialSolutionObserver) OnEstimateDeltaObjectiveScore() {
 func (i *initialSolutionObserver) OnEstimatedDeltaObjectiveScore(_ float64) {
 }
 
-func (i *initialSolutionObserver) OnBestMove(_ nextroute.Solution) {
+func (i *initialSolutionObserver) OnBestMove(_ Solution) {
 }
 
-func (i *initialSolutionObserver) OnBestMoveFound(_ nextroute.SolutionMove) {
+func (i *initialSolutionObserver) OnBestMoveFound(_ SolutionMove) {
 }
 
-func (i *initialSolutionObserver) OnPlan(_ nextroute.SolutionMove) {
+func (i *initialSolutionObserver) OnPlan(_ SolutionMove) {
 }
 
-func (i *initialSolutionObserver) OnPlanFailed(_ nextroute.SolutionMove, _ nextroute.ModelConstraint) {
+func (i *initialSolutionObserver) OnPlanFailed(_ SolutionMove, _ ModelConstraint) {
 }
 
-func (i *initialSolutionObserver) OnPlanSucceeded(_ nextroute.SolutionMove) {
+func (i *initialSolutionObserver) OnPlanSucceeded(_ SolutionMove) {
 }

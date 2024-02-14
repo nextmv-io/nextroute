@@ -1,29 +1,25 @@
 package nextroute
 
-import (
-	"github.com/nextmv-io/sdk/nextroute"
-)
-
 // NewMaximumStopsConstraint returns a new MaximumStopsConstraint.
 func NewMaximumStopsConstraint(
-	maximumStops nextroute.VehicleTypeExpression,
-) (nextroute.MaximumStopsConstraint, error) {
+	maximumStops VehicleTypeExpression,
+) (MaximumStopsConstraint, error) {
 	return &maximumStopsConstraintImpl{
 		modelConstraintImpl: newModelConstraintImpl(
 			"maximum_stops",
-			nextroute.ModelExpressions{},
+			ModelExpressions{},
 		),
 		maximumStops: maximumStops,
 	}, nil
 }
 
 type maximumStopsConstraintImpl struct {
-	maximumStops              nextroute.VehicleTypeExpression
+	maximumStops              VehicleTypeExpression
 	maximumStopsByVehicleType []float64
 	modelConstraintImpl
 }
 
-func (l *maximumStopsConstraintImpl) Lock(model nextroute.Model) error {
+func (l *maximumStopsConstraintImpl) Lock(model Model) error {
 	vehicleTypes := model.VehicleTypes()
 	l.maximumStopsByVehicleType = make([]float64, len(vehicleTypes))
 	for _, vehicleType := range vehicleTypes {
@@ -41,8 +37,8 @@ func (l *maximumStopsConstraintImpl) String() string {
 }
 
 func (l *maximumStopsConstraintImpl) EstimateIsViolated(
-	move nextroute.SolutionMoveStops,
-) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	move SolutionMoveStops,
+) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
 	stopPositions := moveImpl.stopPositions
 	nrStopsToBeAddedToSolution := len(stopPositions)
@@ -61,10 +57,10 @@ func (l *maximumStopsConstraintImpl) EstimateIsViolated(
 	return false, constNoPositionsHint
 }
 
-func (l *maximumStopsConstraintImpl) EstimationCost() nextroute.Cost {
-	return nextroute.Constant
+func (l *maximumStopsConstraintImpl) EstimationCost() Cost {
+	return Constant
 }
 
-func (l *maximumStopsConstraintImpl) MaximumStops() nextroute.VehicleTypeExpression {
+func (l *maximumStopsConstraintImpl) MaximumStops() VehicleTypeExpression {
 	return l.maximumStops
 }

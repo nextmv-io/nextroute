@@ -12,7 +12,6 @@ import (
 
 	"github.com/nextmv-io/sdk/alns"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/run"
 )
 
@@ -29,7 +28,7 @@ const Iterations string = "iterations"
 // SolverFactory.
 
 // NewSkeletonParallelSolver creates a new parallel solver.
-func NewSkeletonParallelSolver(model nextroute.Model) (nextroute.ParallelSolver, error) {
+func NewSkeletonParallelSolver(model Model) (ParallelSolver, error) {
 	if model == nil {
 		return nil, fmt.Errorf("model cannot be nil")
 	}
@@ -37,7 +36,7 @@ func NewSkeletonParallelSolver(model nextroute.Model) (nextroute.ParallelSolver,
 		parallelSolverObservedImpl: parallelSolverObservedImpl{
 			observers: make([]ParallelSolverObserver, 0),
 		},
-		solveEvents: nextroute.NewSolveEvents(),
+		solveEvents: NewSolveEvents(),
 		model:       model,
 	}
 
@@ -45,7 +44,7 @@ func NewSkeletonParallelSolver(model nextroute.Model) (nextroute.ParallelSolver,
 }
 
 // newParallelSolveInformation is a factory for creating new solve information.
-func newParallelSolveInformation(cycle, run int, random *rand.Rand) nextroute.ParallelSolveInformation {
+func newParallelSolveInformation(cycle, run int, random *rand.Rand) ParallelSolveInformation {
 	return metaSolveInformationImpl{
 		cycle:  cycle,
 		run:    run,
@@ -75,18 +74,18 @@ func (s metaSolveInformationImpl) Random() *rand.Rand {
 type ParallelSolverObserver interface {
 	// OnStart is called when the parallel solver is started.
 	OnStart(
-		solver nextroute.ParallelSolver,
-		options nextroute.ParallelSolveOptions,
+		solver ParallelSolver,
+		options ParallelSolveOptions,
 		parallelRuns int,
 	)
 	// OnNewRun is called when a new run is started.
 	OnNewRun(
-		solver nextroute.ParallelSolver,
+		solver ParallelSolver,
 	)
 	// OnNewSolution is called when a new solution is found.
 	OnNewSolution(
-		solver nextroute.ParallelSolver,
-		solution nextroute.Solution,
+		solver ParallelSolver,
+		solution Solution,
 	)
 }
 
@@ -101,8 +100,8 @@ func (o *parallelSolverObservedImpl) AddMetaSearchObserver(
 }
 
 func (o *parallelSolverObservedImpl) OnStart(
-	solver nextroute.ParallelSolver,
-	options nextroute.ParallelSolveOptions,
+	solver ParallelSolver,
+	options ParallelSolveOptions,
 	parallelRuns int,
 ) {
 	for _, observer := range o.observers {
@@ -111,7 +110,7 @@ func (o *parallelSolverObservedImpl) OnStart(
 }
 
 func (o *parallelSolverObservedImpl) OnNewRun(
-	solver nextroute.ParallelSolver,
+	solver ParallelSolver,
 ) {
 	for _, observer := range o.observers {
 		observer.OnNewRun(solver)
@@ -119,8 +118,8 @@ func (o *parallelSolverObservedImpl) OnNewRun(
 }
 
 func (o *parallelSolverObservedImpl) OnNewSolution(
-	solver nextroute.ParallelSolver,
-	solution nextroute.Solution,
+	solver ParallelSolver,
+	solution Solution,
 ) {
 	for _, observer := range o.observers {
 		observer.OnNewSolution(solver, solution)
@@ -129,14 +128,14 @@ func (o *parallelSolverObservedImpl) OnNewSolution(
 
 type parallelSolverImpl struct {
 	parallelSolverObservedImpl
-	model               nextroute.Model
+	model               Model
 	progression         []alns.ProgressionEntry
-	solveEvents         nextroute.SolveEvents
-	solveOptionsFactory nextroute.SolveOptionsFactory
-	solverFactory       nextroute.SolverFactory
+	solveEvents         SolveEvents
+	solveOptionsFactory SolveOptionsFactory
+	solverFactory       SolverFactory
 }
 
-func (s *parallelSolverImpl) Model() nextroute.Model {
+func (s *parallelSolverImpl) Model() Model {
 	return s.model
 }
 
@@ -145,27 +144,27 @@ func (s *parallelSolverImpl) Progression() []alns.ProgressionEntry {
 }
 
 type solutionContainer struct {
-	solution   nextroute.Solution
+	solution   Solution
 	iterations int
 }
 
 func (s *parallelSolverImpl) SetSolverFactory(
-	solverFactory nextroute.SolverFactory,
+	solverFactory SolverFactory,
 ) {
 	s.solverFactory = solverFactory
 }
 
 func (s *parallelSolverImpl) SetSolveOptionsFactory(
-	solveOptionsFactory nextroute.SolveOptionsFactory,
+	solveOptionsFactory SolveOptionsFactory,
 ) {
 	s.solveOptionsFactory = solveOptionsFactory
 }
 
 func (s *parallelSolverImpl) Solve(
 	ctx context.Context,
-	options nextroute.ParallelSolveOptions,
-	startSolutions ...nextroute.Solution,
-) (nextroute.SolutionChannel, error) {
+	options ParallelSolveOptions,
+	startSolutions ...Solution,
+) (SolutionChannel, error) {
 	// TODO: check options
 	if s.solveOptionsFactory == nil {
 		return nil,
@@ -182,7 +181,7 @@ func (s *parallelSolverImpl) Solve(
 			)
 	}
 
-	interpretedParallelSolveOptions := nextroute.ParallelSolveOptions{
+	interpretedParallelSolveOptions := ParallelSolveOptions{
 		Iterations:           options.Iterations,
 		Duration:             options.Duration,
 		ParallelRuns:         options.ParallelRuns,
@@ -226,7 +225,7 @@ func (s *parallelSolverImpl) Solve(
 		start.Add(interpretedParallelSolveOptions.Duration),
 	)
 
-	solutions := make([]nextroute.Solution, len(startSolutions))
+	solutions := make([]Solution, len(startSolutions))
 	copy(solutions, startSolutions)
 
 	parallelRuns := interpretedParallelSolveOptions.ParallelRuns
@@ -250,7 +249,7 @@ func (s *parallelSolverImpl) Solve(
 	parallelCount := make(chan struct{}, parallelRuns)
 
 	syncResultChannel := make(chan solutionContainer)
-	resultChannel := make(chan nextroute.Solution, 1)
+	resultChannel := make(chan Solution, 1)
 
 	totalIterations := atomic.Int64{}
 
@@ -322,7 +321,7 @@ func (s *parallelSolverImpl) Solve(
 
 						s.RegisterEvents(solver.SolveEvents())
 
-						solver.SolveEvents().Iterated.Register(func(_ nextroute.SolveInformation) {
+						solver.SolveEvents().Iterated.Register(func(_ SolveInformation) {
 							if totalIterations.Add(1) >= int64(interpretedParallelSolveOptions.Iterations) {
 								cancel()
 							}
@@ -391,38 +390,38 @@ func (s *parallelSolverImpl) Solve(
 	return resultChannel, nil
 }
 
-func (s *parallelSolverImpl) SolveEvents() nextroute.SolveEvents {
+func (s *parallelSolverImpl) SolveEvents() SolveEvents {
 	return s.solveEvents
 }
 
 func (s *parallelSolverImpl) RegisterEvents(
-	events nextroute.SolveEvents,
+	events SolveEvents,
 ) {
-	events.ContextDone.Register(func(info nextroute.SolveInformation) {
+	events.ContextDone.Register(func(info SolveInformation) {
 		s.solveEvents.ContextDone.Trigger(info)
 	})
-	events.Iterated.Register(func(info nextroute.SolveInformation) {
+	events.Iterated.Register(func(info SolveInformation) {
 		s.solveEvents.Iterated.Trigger(info)
 	})
-	events.Iterating.Register(func(info nextroute.SolveInformation) {
+	events.Iterating.Register(func(info SolveInformation) {
 		s.solveEvents.Iterating.Trigger(info)
 	})
-	events.OperatorExecuted.Register(func(info nextroute.SolveInformation) {
+	events.OperatorExecuted.Register(func(info SolveInformation) {
 		s.solveEvents.OperatorExecuted.Trigger(info)
 	})
-	events.OperatorExecuting.Register(func(info nextroute.SolveInformation) {
+	events.OperatorExecuting.Register(func(info SolveInformation) {
 		s.solveEvents.OperatorExecuting.Trigger(info)
 	})
-	events.NewBestSolution.Register(func(info nextroute.SolveInformation) {
+	events.NewBestSolution.Register(func(info SolveInformation) {
 		s.solveEvents.NewBestSolution.Trigger(info)
 	})
-	events.Start.Register(func(info nextroute.SolveInformation) {
+	events.Start.Register(func(info SolveInformation) {
 		s.solveEvents.Start.Trigger(info)
 	})
-	events.Reset.Register(func(solution nextroute.Solution, info nextroute.SolveInformation) {
+	events.Reset.Register(func(solution Solution, info SolveInformation) {
 		s.solveEvents.Reset.Trigger(solution, info)
 	})
-	events.Done.Register(func(info nextroute.SolveInformation) {
+	events.Done.Register(func(info SolveInformation) {
 		s.solveEvents.Done.Trigger(info)
 	})
 }

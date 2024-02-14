@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"os"
 	"time"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewSolveObserver returns a new solve observer.
-func NewSolveObserver(fileName string) (nextroute.SolveObserver, error) {
+func NewSolveObserver(fileName string) (SolveObserver, error) {
 	file, err := os.Create(fileName)
 	if err != nil {
 		return nil, err
@@ -23,7 +21,7 @@ func NewSolveObserver(fileName string) (nextroute.SolveObserver, error) {
 }
 
 type solveObserverImpl struct {
-	solver       nextroute.Solver
+	solver       Solver
 	fileName     string
 	file         *os.File
 	start        time.Time
@@ -32,32 +30,32 @@ type solveObserverImpl struct {
 }
 
 func (s *solveObserverImpl) OnSolutionConstraintChecked(
-	_ nextroute.ModelConstraint,
+	_ ModelConstraint,
 	_ bool,
 ) {
 }
 
 func (s *solveObserverImpl) OnStopConstraintChecked(
-	_ nextroute.SolutionStop,
-	_ nextroute.ModelConstraint,
+	_ SolutionStop,
+	_ ModelConstraint,
 	_ bool,
 ) {
 }
 
 func (s *solveObserverImpl) OnVehicleConstraintChecked(
-	_ nextroute.SolutionVehicle,
-	_ nextroute.ModelConstraint,
+	_ SolutionVehicle,
+	_ ModelConstraint,
 	_ bool) {
 }
 
-func (s *solveObserverImpl) Register(solver nextroute.Solver) error {
+func (s *solveObserverImpl) Register(solver Solver) error {
 	if s.solver != nil {
 		return fmt.Errorf("solve observer already registered to a solver")
 	}
 	s.solver = solver
 
 	solver.SolveEvents().Start.Register(func(
-		info nextroute.SolveInformation,
+		info SolveInformation,
 	) {
 		solution := info.Solver().WorkSolution()
 		score := ""
@@ -95,8 +93,8 @@ func (s *solveObserverImpl) Register(solver nextroute.Solver) error {
 
 	solver.SolveEvents().Reset.Register(
 		func(
-			solution nextroute.Solution,
-			info nextroute.SolveInformation,
+			solution Solution,
+			info SolveInformation,
 		) {
 			_, err := s.file.WriteString(
 				fmt.Sprintf("r;%v;%v;%v;%f\n",
@@ -114,7 +112,7 @@ func (s *solveObserverImpl) Register(solver nextroute.Solver) error {
 	)
 	solver.SolveEvents().NewBestSolution.Register(
 		func(
-			info nextroute.SolveInformation,
+			info SolveInformation,
 		) {
 			score := ""
 			for _, term := range info.Solver().BestSolution().Model().Objective().Terms() {
@@ -141,7 +139,7 @@ func (s *solveObserverImpl) Register(solver nextroute.Solver) error {
 	solver.Model().RemoveSolutionUnPlanObserver(s)
 	solver.Model().AddSolutionUnPlanObserver(s)
 
-	solver.SolveEvents().Done.Register(func(_ nextroute.SolveInformation) {
+	solver.SolveEvents().Done.Register(func(_ SolveInformation) {
 		err := s.close()
 		if err != nil {
 			panic(err)
@@ -186,7 +184,7 @@ func (s *solveObserverImpl) close() error {
 	return s.file.Close()
 }
 
-func (s *solveObserverImpl) OnUnPlan(planUnit nextroute.SolutionPlanStopsUnit) {
+func (s *solveObserverImpl) OnUnPlan(planUnit SolutionPlanStopsUnit) {
 	if s.solver.WorkSolution() != planUnit.Solution() {
 		return
 	}
@@ -208,7 +206,7 @@ func (s *solveObserverImpl) OnUnPlan(planUnit nextroute.SolutionPlanStopsUnit) {
 }
 
 func (s *solveObserverImpl) OnUnPlanFailed(
-	planUnit nextroute.SolutionPlanStopsUnit,
+	planUnit SolutionPlanStopsUnit,
 ) {
 	if s.solver.WorkSolution() != planUnit.Solution() {
 		return
@@ -221,7 +219,7 @@ func (s *solveObserverImpl) OnUnPlanFailed(
 }
 
 func (s *solveObserverImpl) OnUnPlanSucceeded(
-	solutionPlanStopsUnit nextroute.SolutionPlanStopsUnit,
+	solutionPlanStopsUnit SolutionPlanStopsUnit,
 ) {
 	if s.solver.WorkSolution() != solutionPlanStopsUnit.Solution() {
 		return
@@ -249,10 +247,10 @@ func (s *solveObserverImpl) OnUnPlanSucceeded(
 	}
 }
 
-func (s *solveObserverImpl) OnNewSolution(_ nextroute.Model) {
+func (s *solveObserverImpl) OnNewSolution(_ Model) {
 }
 
-func (s *solveObserverImpl) OnNewSolutionCreated(solution nextroute.Solution) {
+func (s *solveObserverImpl) OnNewSolutionCreated(solution Solution) {
 	score := ""
 	for _, term := range solution.Model().Objective().Terms() {
 		score += fmt.Sprintf(";%f", solution.ObjectiveValue(term.Objective()))
@@ -286,34 +284,34 @@ func (s *solveObserverImpl) OnNewSolutionCreated(solution nextroute.Solution) {
 	}
 }
 
-func (s *solveObserverImpl) OnCopySolution(_ nextroute.Solution) {
+func (s *solveObserverImpl) OnCopySolution(_ Solution) {
 }
 
-func (s *solveObserverImpl) OnCopiedSolution(_ nextroute.Solution) {
+func (s *solveObserverImpl) OnCopiedSolution(_ Solution) {
 }
 
 func (s *solveObserverImpl) OnCheckConstraint(
-	_ nextroute.ModelConstraint,
-	_ nextroute.CheckedAt,
+	_ ModelConstraint,
+	_ CheckedAt,
 ) {
 }
 
 func (s *solveObserverImpl) OnCheckedConstraint(
-	_ nextroute.ModelConstraint,
+	_ ModelConstraint,
 	_ bool,
 ) {
 }
 
 func (s *solveObserverImpl) OnEstimateIsViolated(
-	_ nextroute.ModelConstraint,
+	_ ModelConstraint,
 ) {
 }
 
 func (s *solveObserverImpl) OnEstimatedIsViolated(
-	_ nextroute.SolutionMove,
-	_ nextroute.ModelConstraint,
+	_ SolutionMove,
+	_ ModelConstraint,
 	_ bool,
-	_ nextroute.StopPositionsHint,
+	_ StopPositionsHint,
 ) {
 }
 
@@ -326,29 +324,29 @@ func (s *solveObserverImpl) OnEstimatedDeltaObjectiveScore(
 }
 
 func (s *solveObserverImpl) OnBestMove(
-	_ nextroute.Solution,
+	_ Solution,
 ) {
 }
 
 func (s *solveObserverImpl) OnBestMoveFound(
-	_ nextroute.SolutionMove,
+	_ SolutionMove,
 ) {
 }
 
 func (s *solveObserverImpl) OnPlan(
-	_ nextroute.SolutionMove,
+	_ SolutionMove,
 ) {
 }
 
-func (s *solveObserverImpl) OnPlanFailed(move nextroute.SolutionMove, _ nextroute.ModelConstraint) {
+func (s *solveObserverImpl) OnPlanFailed(move SolutionMove, _ ModelConstraint) {
 	_, err := s.file.WriteString(fmt.Sprintf("~;plan failed: %v\n", move))
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (s *solveObserverImpl) OnPlanSucceeded(move nextroute.SolutionMove) {
-	solutionMoveStops := move.(nextroute.SolutionMoveStops)
+func (s *solveObserverImpl) OnPlanSucceeded(move SolutionMove) {
+	solutionMoveStops := move.(SolutionMoveStops)
 	solution := move.PlanUnit().Solution()
 
 	if s.solver.WorkSolution() != solution {

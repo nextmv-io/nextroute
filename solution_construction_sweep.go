@@ -6,13 +6,12 @@ import (
 	"math"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 	"golang.org/x/exp/slices"
 )
 
 // NewSweepSolution returns a solution for the given model using the sweep
 // heuristic.
-func NewSweepSolution(ctx context.Context, model nextroute.Model) (nextroute.Solution, error) {
+func NewSweepSolution(ctx context.Context, model Model) (Solution, error) {
 	solution, err := NewSolution(model)
 	if err != nil {
 		return nil, err
@@ -24,12 +23,12 @@ func NewSweepSolution(ctx context.Context, model nextroute.Model) (nextroute.Sol
 // in order of a radar sweep around the depot. Will raise an error if there is
 // more than one depot location either at the start or end of a vehicle.
 // The sweep starts at a random angle and continues clockwise.
-func SweepSolutionConstruction(ctx context.Context, s nextroute.Solution) (nextroute.Solution, error) {
+func SweepSolutionConstruction(ctx context.Context, s Solution) (Solution, error) {
 	solution := s.Copy()
 
 	emptyVehicles := common.Filter(
 		solution.Vehicles(),
-		func(vehicle nextroute.SolutionVehicle) bool {
+		func(vehicle SolutionVehicle) bool {
 			return vehicle.IsEmpty()
 		},
 	)
@@ -65,11 +64,11 @@ func SweepSolutionConstruction(ctx context.Context, s nextroute.Solution) (nextr
 	unplannedPlanUnits := solution.UnPlannedPlanUnits().SolutionPlanUnits()
 
 	slices.SortStableFunc(unplannedPlanUnits, func(
-		leftSolutionPlanUnit, rightSolutionPlanUnit nextroute.SolutionPlanUnit) int {
+		leftSolutionPlanUnit, rightSolutionPlanUnit SolutionPlanUnit) int {
 		if leftModelPlanStopsUnit, iOK :=
-			leftSolutionPlanUnit.ModelPlanUnit().(nextroute.ModelPlanStopsUnit); iOK {
+			leftSolutionPlanUnit.ModelPlanUnit().(ModelPlanStopsUnit); iOK {
 			if rightModelPlanStopsUnit, jOK :=
-				rightSolutionPlanUnit.ModelPlanUnit().(nextroute.ModelPlanStopsUnit); jOK {
+				rightSolutionPlanUnit.ModelPlanUnit().(ModelPlanStopsUnit); jOK {
 				leftCentroid, _ := leftModelPlanStopsUnit.Centroid()
 				rightCentroid, _ := rightModelPlanStopsUnit.Centroid()
 				if clockWise(depot, leftCentroid)-clockWise(depot, rightCentroid) < 0 {

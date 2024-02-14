@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 	"gonum.org/v1/gonum/spatial/kdtree"
 )
 
@@ -12,10 +11,10 @@ import (
 // All distances in this interface are calculated using the [common.Haversine]
 // formula.
 func NewModelStopsDistanceQueries(
-	stops nextroute.ModelStops,
-) (nextroute.ModelStopsDistanceQueries, error) {
+	stops ModelStops,
+) (ModelStopsDistanceQueries, error) {
 	wrappers := make(modelStopWrappers, len(stops))
-	present := make(map[nextroute.ModelStop]struct{})
+	present := make(map[ModelStop]struct{})
 	for i, stop := range stops {
 		if !stop.Location().IsValid() {
 			return nil,
@@ -33,14 +32,14 @@ func NewModelStopsDistanceQueries(
 
 type modelStopsDistanceQueryImpl struct {
 	stops   modelStopWrappers
-	present map[nextroute.ModelStop]struct{}
+	present map[ModelStop]struct{}
 	tree    *kdtree.Tree
 }
 
 func (m modelStopsDistanceQueryImpl) WithinDistanceStops(
-	stop nextroute.ModelStop,
+	stop ModelStop,
 	distance common.Distance,
-) (nextroute.ModelStops, error) {
+) (ModelStops, error) {
 	if _, ok := m.present[stop]; !ok {
 		return nil,
 			fmt.Errorf(
@@ -49,12 +48,12 @@ func (m modelStopsDistanceQueryImpl) WithinDistanceStops(
 			)
 	}
 	if distance.Value(common.Kilometers) < 0.0 {
-		return nextroute.ModelStops{}, nil
+		return ModelStops{}, nil
 	}
 	km := distance.Value(common.Kilometers)
 	keep := kdtree.NewDistKeeper(km * km)
 	m.tree.NearestSet(keep, modelStopWrapper{stop: stop})
-	stops := make(nextroute.ModelStops, 0)
+	stops := make(ModelStops, 0)
 	for _, c := range keep.Heap {
 		s := c.Comparable.(modelStopWrapper).stop
 		if s.Index() == stop.Index() {
@@ -65,8 +64,8 @@ func (m modelStopsDistanceQueryImpl) WithinDistanceStops(
 	return stops, nil
 }
 
-func (m modelStopsDistanceQueryImpl) ModelStops() nextroute.ModelStops {
-	stops := make(nextroute.ModelStops, len(m.stops))
+func (m modelStopsDistanceQueryImpl) ModelStops() ModelStops {
+	stops := make(ModelStops, len(m.stops))
 	for i, wrapper := range m.stops {
 		stops[i] = wrapper.stop
 	}
@@ -74,9 +73,9 @@ func (m modelStopsDistanceQueryImpl) ModelStops() nextroute.ModelStops {
 }
 
 func (m modelStopsDistanceQueryImpl) NearestStops(
-	stop nextroute.ModelStop,
+	stop ModelStop,
 	n int,
-) (nextroute.ModelStops, error) {
+) (ModelStops, error) {
 	if _, ok := m.present[stop]; !ok {
 		return nil,
 			fmt.Errorf(
@@ -85,11 +84,11 @@ func (m modelStopsDistanceQueryImpl) NearestStops(
 			)
 	}
 	if n <= 0 {
-		return nextroute.ModelStops{}, nil
+		return ModelStops{}, nil
 	}
 	keep := kdtree.NewNKeeper(n + 1)
 	m.tree.NearestSet(keep, modelStopWrapper{stop: stop})
-	stops := make(nextroute.ModelStops, 0, n)
+	stops := make(ModelStops, 0, n)
 	for _, c := range keep.Heap {
 		s := c.Comparable.(modelStopWrapper).stop
 		if s.Index() == stop.Index() {
@@ -101,7 +100,7 @@ func (m modelStopsDistanceQueryImpl) NearestStops(
 }
 
 type modelStopWrapper struct {
-	stop nextroute.ModelStop
+	stop ModelStop
 }
 
 func (p modelStopWrapper) Compare(

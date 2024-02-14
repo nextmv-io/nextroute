@@ -8,15 +8,14 @@ import (
 	"time"
 
 	"github.com/nextmv-io/sdk/alns"
-	"github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/run"
 )
 
 // NewSolver creates a new nextroute solver using the given model and options.
 func NewSolver(
-	model nextroute.Model,
-	options nextroute.SolverOptions,
-) (nextroute.Solver, error) {
+	model Model,
+	options SolverOptions,
+) (Solver, error) {
 	solver, err := NewSkeletonSolver(model)
 	if err != nil {
 		return nil, err
@@ -84,20 +83,20 @@ func NewSolver(
 }
 
 type solverWrapperImpl struct {
-	solver nextroute.Solver
+	solver Solver
 }
 
 func (s *solverWrapperImpl) Solve(
 	ctx context.Context,
-	solveOptions nextroute.SolveOptions,
-	startSolutions ...nextroute.Solution,
-) (nextroute.SolutionChannel, error) {
+	solveOptions SolveOptions,
+	startSolutions ...Solution,
+) (SolutionChannel, error) {
 	start := ctx.Value(run.Start).(time.Time)
 	ctx, _ = context.WithDeadline(
 		ctx,
 		start.Add(solveOptions.Duration),
 	)
-	interpretedSolveOptions := nextroute.SolveOptions{
+	interpretedSolveOptions := SolveOptions{
 		Iterations: solveOptions.Iterations,
 		Duration:   solveOptions.Duration,
 	}
@@ -111,11 +110,11 @@ func (s *solverWrapperImpl) Progression() []alns.ProgressionEntry {
 	return s.solver.Progression()
 }
 
-func (s *solverWrapperImpl) AddSolveOperators(operators ...nextroute.SolveOperator) {
+func (s *solverWrapperImpl) AddSolveOperators(operators ...SolveOperator) {
 	s.solver.AddSolveOperators(operators...)
 }
 
-func (s *solverWrapperImpl) SolveEvents() nextroute.SolveEvents {
+func (s *solverWrapperImpl) SolveEvents() SolveEvents {
 	return s.solver.SolveEvents()
 }
 
@@ -131,42 +130,42 @@ func (s *solverWrapperImpl) HasWorkSolution() bool {
 	return s.solver.HasWorkSolution()
 }
 
-func (s *solverWrapperImpl) BestSolution() nextroute.Solution {
+func (s *solverWrapperImpl) BestSolution() Solution {
 	return s.solver.BestSolution()
 }
 
-func (s *solverWrapperImpl) WorkSolution() nextroute.Solution {
+func (s *solverWrapperImpl) WorkSolution() Solution {
 	return s.solver.WorkSolution()
 }
 
-func (s *solverWrapperImpl) Model() nextroute.Model {
+func (s *solverWrapperImpl) Model() Model {
 	return s.solver.Model()
 }
 
 func (s *solverWrapperImpl) Reset(
-	solution nextroute.Solution,
-	solveInformation nextroute.SolveInformation,
+	solution Solution,
+	solveInformation SolveInformation,
 ) {
 	s.solver.Reset(solution, solveInformation)
 }
 
-func (s *solverWrapperImpl) SolveOperators() nextroute.SolveOperators {
+func (s *solverWrapperImpl) SolveOperators() SolveOperators {
 	return s.solver.SolveOperators()
 }
 
 // DefaultSolverFactory creates a new SolverFactory.
-func DefaultSolverFactory() nextroute.SolverFactory {
+func DefaultSolverFactory() SolverFactory {
 	return func(
-		_ nextroute.ParallelSolveInformation,
-		solution nextroute.Solution,
-	) (nextroute.Solver, error) {
+		_ ParallelSolveInformation,
+		solution Solution,
+	) (Solver, error) {
 		nrPlanUnits := len(solution.Model().PlanUnits())
 
 		unplanCount := 2
 		maxUnplanCount := int(math.Max(2.0, 0.05*float64(nrPlanUnits)))
 
-		options := nextroute.SolverOptions{
-			Unplan: nextroute.IntParameterOptions{
+		options := SolverOptions{
+			Unplan: IntParameterOptions{
 				StartValue:               unplanCount,
 				DeltaAfterIterations:     125,
 				Delta:                    unplanCount,
@@ -175,7 +174,7 @@ func DefaultSolverFactory() nextroute.SolverFactory {
 				SnapBackAfterImprovement: true,
 				Zigzag:                   true,
 			},
-			Plan: nextroute.IntParameterOptions{
+			Plan: IntParameterOptions{
 				StartValue:               2,
 				DeltaAfterIterations:     1000000000,
 				Delta:                    0,

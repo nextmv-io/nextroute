@@ -4,7 +4,6 @@ import (
 	"math/rand"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // ImmutableSolutionPlanUnitCollection is a collection of solution plan
@@ -55,8 +54,8 @@ type SolutionPlanUnitCollection interface {
 // NewSolutionPlanUnitCollection returns a new SolutionPlanUnitCollection.
 func NewSolutionPlanUnitCollection(
 	random *rand.Rand,
-	planUnits nextroute.SolutionPlanUnits,
-) nextroute.SolutionPlanUnitCollection {
+	planUnits SolutionPlanUnits,
+) SolutionPlanUnitCollection {
 	p := solutionPlanUnitCollectionImpl{
 		solutionPlanUnitCollectionBaseImpl: solutionPlanUnitCollectionBaseImpl{
 			random:            random,
@@ -74,11 +73,11 @@ type solutionPlanUnitCollectionImpl struct {
 	solutionPlanUnitCollectionBaseImpl
 }
 
-func (s *solutionPlanUnitCollectionImpl) Add(solutionPlanUnit nextroute.SolutionPlanUnit) {
+func (s *solutionPlanUnitCollectionImpl) Add(solutionPlanUnit SolutionPlanUnit) {
 	s.add(solutionPlanUnit)
 }
 
-func (s *solutionPlanUnitCollectionImpl) Remove(solutionPlanUnit nextroute.SolutionPlanUnit) {
+func (s *solutionPlanUnitCollectionImpl) Remove(solutionPlanUnit SolutionPlanUnit) {
 	s.remove(solutionPlanUnit)
 }
 
@@ -88,7 +87,7 @@ func newSolutionPlanUnitCollectionBaseImpl(
 ) solutionPlanUnitCollectionBaseImpl {
 	return solutionPlanUnitCollectionBaseImpl{
 		random:            random,
-		solutionPlanUnits: make(nextroute.SolutionPlanUnits, 0, initialCapacity),
+		solutionPlanUnits: make(SolutionPlanUnits, 0, initialCapacity),
 		indices:           make(map[int]int, initialCapacity),
 	}
 }
@@ -96,14 +95,14 @@ func newSolutionPlanUnitCollectionBaseImpl(
 type solutionPlanUnitCollectionBaseImpl struct {
 	random            *rand.Rand
 	indices           map[int]int
-	solutionPlanUnits nextroute.SolutionPlanUnits
+	solutionPlanUnits SolutionPlanUnits
 }
 
-func (p *solutionPlanUnitCollectionBaseImpl) SolutionPlanUnits() nextroute.SolutionPlanUnits {
+func (p *solutionPlanUnitCollectionBaseImpl) SolutionPlanUnits() SolutionPlanUnits {
 	return common.DefensiveCopy(p.solutionPlanUnits)
 }
 
-func (p *solutionPlanUnitCollectionBaseImpl) RandomElement() nextroute.SolutionPlanUnit {
+func (p *solutionPlanUnitCollectionBaseImpl) RandomElement() SolutionPlanUnit {
 	return common.RandomElement(p.random, p.solutionPlanUnits)
 }
 
@@ -111,11 +110,11 @@ func (p *solutionPlanUnitCollectionBaseImpl) Size() int {
 	return len(p.solutionPlanUnits)
 }
 
-func (p *solutionPlanUnitCollectionBaseImpl) RandomDraw(n int) nextroute.SolutionPlanUnits {
+func (p *solutionPlanUnitCollectionBaseImpl) RandomDraw(n int) SolutionPlanUnits {
 	return common.RandomElements(p.random, p.solutionPlanUnits, n)
 }
 
-func (p *solutionPlanUnitCollectionBaseImpl) add(solutionPlanUnit nextroute.SolutionPlanUnit) {
+func (p *solutionPlanUnitCollectionBaseImpl) add(solutionPlanUnit SolutionPlanUnit) {
 	if _, ok := p.indices[solutionPlanUnit.ModelPlanUnit().Index()]; ok {
 		return
 	}
@@ -123,7 +122,7 @@ func (p *solutionPlanUnitCollectionBaseImpl) add(solutionPlanUnit nextroute.Solu
 	p.solutionPlanUnits = append(p.solutionPlanUnits, solutionPlanUnit)
 }
 
-func (p *solutionPlanUnitCollectionBaseImpl) remove(solutionPlanUnit nextroute.SolutionPlanUnit) {
+func (p *solutionPlanUnitCollectionBaseImpl) remove(solutionPlanUnit SolutionPlanUnit) {
 	index, ok := p.indices[solutionPlanUnit.ModelPlanUnit().Index()]
 	if !ok {
 		return
@@ -137,8 +136,8 @@ func (p *solutionPlanUnitCollectionBaseImpl) remove(solutionPlanUnit nextroute.S
 	p.solutionPlanUnits = p.solutionPlanUnits[:lastIndex]
 }
 
-func (p *solutionPlanUnitCollectionBaseImpl) Iterator(quit <-chan struct{}) <-chan nextroute.SolutionPlanUnit {
-	ch := make(chan nextroute.SolutionPlanUnit)
+func (p *solutionPlanUnitCollectionBaseImpl) Iterator(quit <-chan struct{}) <-chan SolutionPlanUnit {
+	ch := make(chan SolutionPlanUnit)
 	go func() {
 		defer close(ch)
 		for _, solutionPlanUnit := range p.solutionPlanUnits {
@@ -153,8 +152,8 @@ func (p *solutionPlanUnitCollectionBaseImpl) Iterator(quit <-chan struct{}) <-ch
 }
 
 func (p *solutionPlanUnitCollectionBaseImpl) SolutionPlanUnit(
-	modelPlanUnit nextroute.ModelPlanUnit,
-) nextroute.SolutionPlanUnit {
+	modelPlanUnit ModelPlanUnit,
+) SolutionPlanUnit {
 	if index, ok := p.indices[modelPlanUnit.Index()]; ok {
 		return p.solutionPlanUnits[index]
 	}

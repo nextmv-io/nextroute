@@ -2,34 +2,32 @@ package nextroute
 
 import (
 	"context"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewSolveOperatorPlan creates a new SolveOperatorPlan.
 func NewSolveOperatorPlan(
-	groupSize nextroute.SolveParameter,
-) (nextroute.SolveOperatorPlan, error) {
+	groupSize SolveParameter,
+) (SolveOperatorPlan, error) {
 	return &solveOperatorPlanImpl{
 		SolveOperator: NewSolveOperator(
 			1.0,
 			true,
-			nextroute.SolveParameters{groupSize},
+			SolveParameters{groupSize},
 		),
 	}, nil
 }
 
 type solveOperatorPlanImpl struct {
-	nextroute.SolveOperator
+	SolveOperator
 }
 
-func (d *solveOperatorPlanImpl) GroupSize() nextroute.SolveParameter {
+func (d *solveOperatorPlanImpl) GroupSize() SolveParameter {
 	return d.Parameters()[0]
 }
 
 func (d *solveOperatorPlanImpl) Execute(
 	ctx context.Context,
-	runTimeInformation nextroute.SolveInformation,
+	runTimeInformation SolveInformation,
 ) error {
 	workSolution := runTimeInformation.
 		Solver().

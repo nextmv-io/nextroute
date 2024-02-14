@@ -1,7 +1,5 @@
 package nextroute
 
-import "github.com/nextmv-io/sdk/nextroute"
-
 // SolutionPlanUnit is a set of stops that are planned to be visited by
 // a vehicle.
 type SolutionPlanUnit interface {
@@ -34,22 +32,22 @@ type SolutionPlanUnit interface {
 type SolutionPlanUnits []SolutionPlanUnit
 
 func copySolutionPlanUnit(
-	solutionPlanUnit nextroute.SolutionPlanUnit,
+	solutionPlanUnit SolutionPlanUnit,
 	solution *solutionImpl,
-) nextroute.SolutionPlanUnit {
+) SolutionPlanUnit {
 	switch p := solutionPlanUnit.(type) {
-	case nextroute.SolutionPlanStopsUnit:
+	case SolutionPlanStopsUnit:
 		return copySolutionPlanStopsUnit(p, solution)
-	case nextroute.SolutionPlanUnitsUnit:
+	case SolutionPlanUnitsUnit:
 		return copySolutionPlanUnitsUnit(p, solution)
 	}
 	panic("unknown solution plan unit type")
 }
 
 func copySolutionPlanStopsUnit(
-	solutionPlanUnit nextroute.SolutionPlanStopsUnit,
+	solutionPlanUnit SolutionPlanStopsUnit,
 	solution *solutionImpl,
-) nextroute.SolutionPlanStopsUnit {
+) SolutionPlanStopsUnit {
 	solutionPlanUnitImpl := solutionPlanUnit.(*solutionPlanStopsUnitImpl)
 	copyOfSolutionPlanUnit := &solutionPlanStopsUnitImpl{
 		modelPlanStopsUnit: solutionPlanUnitImpl.modelPlanStopsUnit,
@@ -66,13 +64,13 @@ func copySolutionPlanStopsUnit(
 }
 
 func copySolutionPlanUnitsUnit(
-	solutionPlanUnit nextroute.SolutionPlanUnitsUnit,
+	solutionPlanUnit SolutionPlanUnitsUnit,
 	solution *solutionImpl,
-) nextroute.SolutionPlanUnitsUnit {
+) SolutionPlanUnitsUnit {
 	solutionPlanUnitImpl := solutionPlanUnit.(*solutionPlanUnitsUnitImpl)
 	copyOfSolutionPlanUnit := &solutionPlanUnitsUnitImpl{
 		modelPlanUnitsUnit: solutionPlanUnitImpl.modelPlanUnitsUnit,
-		solutionPlanUnits:  make(nextroute.SolutionPlanUnits, len(solutionPlanUnitImpl.solutionPlanUnits)),
+		solutionPlanUnits:  make(SolutionPlanUnits, len(solutionPlanUnitImpl.solutionPlanUnits)),
 	}
 	for idx, propositionSolutionPlanUnit := range solutionPlanUnitImpl.solutionPlanUnits {
 		copyOfSolutionPlanUnit.solutionPlanUnits[idx] =

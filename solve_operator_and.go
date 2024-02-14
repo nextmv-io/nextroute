@@ -5,21 +5,20 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewSolverOperatorAnd creates a new solve-and-operator.
 func NewSolverOperatorAnd(
 	probability float64,
-	operators nextroute.SolveOperators,
-) (nextroute.SolveOperatorAnd, error) {
+	operators SolveOperators,
+) (SolveOperatorAnd, error) {
 	if probability < 0 || probability > 1 {
 		return nil,
 			fmt.Errorf(
 				"the probability must be between 0 and 1",
 			)
 	}
-	operators = common.Filter(operators, func(operator nextroute.SolveOperator) bool {
+	operators = common.Filter(operators, func(operator SolveOperator) bool {
 		return operator.Probability() > 0
 	})
 	if len(operators) == 0 {
@@ -34,13 +33,13 @@ func NewSolverOperatorAnd(
 			probability,
 			common.Has(operators,
 				true,
-				func(operator nextroute.SolveOperator) bool {
+				func(operator SolveOperator) bool {
 					return operator.CanResultInImprovement()
 				},
 			),
 			common.MapSlice(
 				operators,
-				func(operator nextroute.SolveOperator) []nextroute.SolveParameter {
+				func(operator SolveOperator) []SolveParameter {
 					return operator.Parameters()
 				},
 			),
@@ -51,13 +50,13 @@ func NewSolverOperatorAnd(
 
 // solveOperatorAndImpl is the implementation of the SolveOperatorAnd interface.
 type solveOperatorAndImpl struct {
-	operators nextroute.SolveOperators
-	nextroute.SolveOperator
+	operators SolveOperators
+	SolveOperator
 }
 
 func (s *solveOperatorAndImpl) Execute(
 	ctx context.Context,
-	runTimeInformation nextroute.SolveInformation,
+	runTimeInformation SolveInformation,
 ) error {
 	random := runTimeInformation.Solver().Random()
 Loop:
@@ -77,30 +76,30 @@ Loop:
 	return nil
 }
 
-func (s *solveOperatorAndImpl) Parameters() nextroute.SolveParameters {
+func (s *solveOperatorAndImpl) Parameters() SolveParameters {
 	return common.MapSlice(
 		s.operators,
-		func(operator nextroute.SolveOperator) []nextroute.SolveParameter {
+		func(operator SolveOperator) []SolveParameter {
 			return operator.Parameters()
 		},
 	)
 }
 
-func (s *solveOperatorAndImpl) Operators() nextroute.SolveOperators {
+func (s *solveOperatorAndImpl) Operators() SolveOperators {
 	return s.operators
 }
 
-func (s *solveOperatorAndImpl) OnStartSolve(solveInformation nextroute.SolveInformation) {
+func (s *solveOperatorAndImpl) OnStartSolve(solveInformation SolveInformation) {
 	for _, operator := range s.operators {
-		if interested, ok := operator.(nextroute.InterestedInStartSolve); ok {
+		if interested, ok := operator.(InterestedInStartSolve); ok {
 			interested.OnStartSolve(solveInformation)
 		}
 	}
 }
 
-func (s *solveOperatorAndImpl) OnBetterSolution(solveInformation nextroute.SolveInformation) {
+func (s *solveOperatorAndImpl) OnBetterSolution(solveInformation SolveInformation) {
 	for _, operator := range s.operators {
-		if interested, ok := operator.(nextroute.InterestedInBetterSolution); ok {
+		if interested, ok := operator.(InterestedInBetterSolution); ok {
 			interested.OnBetterSolution(solveInformation)
 		}
 	}

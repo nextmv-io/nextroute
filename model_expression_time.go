@@ -5,14 +5,30 @@ import (
 	"time"
 
 	"github.com/nextmv-io/nextroute/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
+
+// TimeExpression is a ModelExpression that returns a time.
+type TimeExpression interface {
+	ModelExpression
+	// Time returns the time for the given parameters.
+	Time(ModelVehicleType, ModelStop, ModelStop) time.Time
+}
+
+// StopTimeExpression is a ModelExpression that returns a time per stop and
+// allows to set the time per stop.
+type StopTimeExpression interface {
+	ModelExpression
+	// Time returns the time for the given stop.
+	Time(stop ModelStop) time.Time
+	// SetTime sets the time for the given stop.
+	SetTime(ModelStop, time.Time)
+}
 
 // NewTimeExpression returns a new TimeExpression.
 func NewTimeExpression(
-	expression nextroute.ModelExpression,
+	expression ModelExpression,
 	epoch time.Time,
-) nextroute.TimeExpression {
+) TimeExpression {
 	name := expression.Name() + " since " + epoch.String()
 	return &timeExpressionImpl{
 		index:      NewModelExpressionIndex(),
@@ -26,7 +42,7 @@ func NewTimeExpression(
 func NewStopTimeExpression(
 	name string,
 	defaultTime time.Time,
-) nextroute.StopTimeExpression {
+) StopTimeExpression {
 	return &stopTimeExpressionImpl{
 		index:        NewModelExpressionIndex(),
 		name:         name,
@@ -37,7 +53,7 @@ func NewStopTimeExpression(
 
 type timeExpressionImpl struct {
 	epoch      time.Time
-	expression nextroute.ModelExpression
+	expression ModelExpression
 	name       string
 	index      int
 }
@@ -70,15 +86,15 @@ func (t *timeExpressionImpl) SetName(n string) {
 }
 
 func (t *timeExpressionImpl) Value(
-	vehicleType nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from, to ModelStop,
 ) float64 {
 	return t.expression.Value(vehicleType, from, to)
 }
 
 func (t *timeExpressionImpl) Time(
-	vehicleType nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from, to ModelStop,
 ) time.Time {
 	value := t.expression.Value(vehicleType, from, to)
 	return t.epoch.Add(
@@ -116,9 +132,9 @@ func (s *stopTimeExpressionImpl) SetName(n string) {
 }
 
 func (s *stopTimeExpressionImpl) Value(
-	_ nextroute.ModelVehicleType,
+	_ ModelVehicleType,
 	_,
-	to nextroute.ModelStop,
+	to ModelStop,
 ) float64 {
 	idx := to.Index()
 	if idx >= 0 && idx < len(s.hasValue) && s.hasValue[idx] {
@@ -127,7 +143,7 @@ func (s *stopTimeExpressionImpl) Value(
 	return s.defaultTimeValue(to.Model())
 }
 
-func (s *stopTimeExpressionImpl) defaultTimeValue(model nextroute.Model) float64 {
+func (s *stopTimeExpressionImpl) defaultTimeValue(model Model) float64 {
 	if s.defaultValue < 0 {
 		if s.defaultTime.Before(model.Epoch()) {
 			panic(
@@ -144,7 +160,7 @@ func (s *stopTimeExpressionImpl) defaultTimeValue(model nextroute.Model) float64
 	return s.defaultValue
 }
 
-func (s *stopTimeExpressionImpl) Time(stop nextroute.ModelStop) time.Time {
+func (s *stopTimeExpressionImpl) Time(stop ModelStop) time.Time {
 	idx := stop.Index()
 	if idx >= 0 && idx < len(s.hasValue) && s.hasValue[idx] {
 		value := s.values[idx]
@@ -153,7 +169,7 @@ func (s *stopTimeExpressionImpl) Time(stop nextroute.ModelStop) time.Time {
 	return s.defaultTime
 }
 
-func (s *stopTimeExpressionImpl) SetTime(stop nextroute.ModelStop, t time.Time) {
+func (s *stopTimeExpressionImpl) SetTime(stop ModelStop, t time.Time) {
 	if stop.Model().IsLocked() {
 		panic(
 			fmt.Sprintf(

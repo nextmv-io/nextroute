@@ -8,8 +8,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewPerformanceObserver returns a new performance observer. A performance
@@ -17,11 +15,11 @@ import (
 //
 // To use the observer, you need to register it with the model using the
 // AddSolutionObserver method.
-func NewPerformanceObserver(model nextroute.Model) nextroute.PerformanceObserver {
+func NewPerformanceObserver(model Model) PerformanceObserver {
 	observer := performanceObserverImpl{
 		model:          model,
 		start:          time.Now(),
-		constraintData: make(map[nextroute.ModelConstraint]constraintData),
+		constraintData: make(map[ModelConstraint]constraintData),
 		objectiveData: objectiveData{
 			lastStartTimestamp: make(map[string]time.Time),
 		},
@@ -74,16 +72,16 @@ type performanceObserverImpl struct {
 	objectiveMutex  sync.Mutex
 	moveMutex       sync.Mutex
 	solutionMutex   sync.Mutex
-	model           nextroute.Model
+	model           Model
 	start           time.Time
-	constraintData  map[nextroute.ModelConstraint]constraintData
+	constraintData  map[ModelConstraint]constraintData
 	objectiveData   objectiveData
 	solutionData    solutionData
 }
 
-// OnSolutionConstraintChecked implements nextroute.PerformanceObserver.
+// OnSolutionConstraintChecked implements PerformanceObserver.
 func (p *performanceObserverImpl) OnSolutionConstraintChecked(
-	constraint nextroute.ModelConstraint,
+	constraint ModelConstraint,
 	feasible bool,
 ) {
 	p.constraintMutex.Lock()
@@ -98,10 +96,10 @@ func (p *performanceObserverImpl) OnSolutionConstraintChecked(
 	}
 }
 
-// OnStopConstraintChecked implements nextroute.PerformanceObserver.
+// OnStopConstraintChecked implements PerformanceObserver.
 func (p *performanceObserverImpl) OnStopConstraintChecked(
-	_ nextroute.SolutionStop,
-	constraint nextroute.ModelConstraint,
+	_ SolutionStop,
+	constraint ModelConstraint,
 	feasible bool,
 ) {
 	p.constraintMutex.Lock()
@@ -116,10 +114,10 @@ func (p *performanceObserverImpl) OnStopConstraintChecked(
 	}
 }
 
-// OnVehicleConstraintChecked implements nextroute.PerformanceObserver.
+// OnVehicleConstraintChecked implements PerformanceObserver.
 func (p *performanceObserverImpl) OnVehicleConstraintChecked(
-	_ nextroute.SolutionVehicle,
-	constraint nextroute.ModelConstraint,
+	_ SolutionVehicle,
+	constraint ModelConstraint,
 	feasible bool,
 ) {
 	p.constraintMutex.Lock()
@@ -134,7 +132,7 @@ func (p *performanceObserverImpl) OnVehicleConstraintChecked(
 	}
 }
 
-func (p *performanceObserverImpl) OnBestMove(_ nextroute.Solution) {
+func (p *performanceObserverImpl) OnBestMove(_ Solution) {
 	p.moveMutex.Lock()
 	defer p.moveMutex.Unlock()
 
@@ -142,7 +140,7 @@ func (p *performanceObserverImpl) OnBestMove(_ nextroute.Solution) {
 	p.solutionData.lastBestMoveStart[p.routineName()] = time.Now()
 }
 
-func (p *performanceObserverImpl) OnBestMoveFound(move nextroute.SolutionMove) {
+func (p *performanceObserverImpl) OnBestMoveFound(move SolutionMove) {
 	p.moveMutex.Lock()
 	defer p.moveMutex.Unlock()
 
@@ -155,7 +153,7 @@ func (p *performanceObserverImpl) OnBestMoveFound(move nextroute.SolutionMove) {
 	}
 }
 
-func (p *performanceObserverImpl) OnPlanFailed(_ nextroute.SolutionMove, _ nextroute.ModelConstraint) {
+func (p *performanceObserverImpl) OnPlanFailed(_ SolutionMove, _ ModelConstraint) {
 	p.moveMutex.Lock()
 	defer p.moveMutex.Unlock()
 	p.solutionData.cumulativeMoves += time.Since(
@@ -164,7 +162,7 @@ func (p *performanceObserverImpl) OnPlanFailed(_ nextroute.SolutionMove, _ nextr
 	p.solutionData.movesFailed++
 }
 
-func (p *performanceObserverImpl) OnPlanSucceeded(_ nextroute.SolutionMove) {
+func (p *performanceObserverImpl) OnPlanSucceeded(_ SolutionMove) {
 	p.moveMutex.Lock()
 	defer p.moveMutex.Unlock()
 	p.solutionData.cumulativeMoves += time.Since(
@@ -172,7 +170,7 @@ func (p *performanceObserverImpl) OnPlanSucceeded(_ nextroute.SolutionMove) {
 	)
 }
 
-func (p *performanceObserverImpl) OnPlan(_ nextroute.SolutionMove) {
+func (p *performanceObserverImpl) OnPlan(_ SolutionMove) {
 	p.moveMutex.Lock()
 	defer p.moveMutex.Unlock()
 	p.solutionData.moves++
@@ -180,7 +178,7 @@ func (p *performanceObserverImpl) OnPlan(_ nextroute.SolutionMove) {
 	p.solutionData.lastMoveStart[p.routineName()] = time.Now()
 }
 
-func (p *performanceObserverImpl) OnNewSolution(_ nextroute.Model) {
+func (p *performanceObserverImpl) OnNewSolution(_ Model) {
 	p.solutionMutex.Lock()
 	defer p.solutionMutex.Unlock()
 
@@ -188,7 +186,7 @@ func (p *performanceObserverImpl) OnNewSolution(_ nextroute.Model) {
 	p.solutionData.lastNewStart[p.routineName()] = time.Now()
 }
 
-func (p *performanceObserverImpl) OnNewSolutionCreated(_ nextroute.Solution) {
+func (p *performanceObserverImpl) OnNewSolutionCreated(_ Solution) {
 	p.solutionMutex.Lock()
 	defer p.solutionMutex.Unlock()
 
@@ -197,7 +195,7 @@ func (p *performanceObserverImpl) OnNewSolutionCreated(_ nextroute.Solution) {
 	)
 }
 
-func (p *performanceObserverImpl) OnCopySolution(_ nextroute.Solution) {
+func (p *performanceObserverImpl) OnCopySolution(_ Solution) {
 	p.solutionMutex.Lock()
 	defer p.solutionMutex.Unlock()
 
@@ -205,7 +203,7 @@ func (p *performanceObserverImpl) OnCopySolution(_ nextroute.Solution) {
 	p.solutionData.lastCopyStart[p.routineName()] = time.Now()
 }
 
-func (p *performanceObserverImpl) OnCopiedSolution(_ nextroute.Solution) {
+func (p *performanceObserverImpl) OnCopiedSolution(_ Solution) {
 	p.solutionMutex.Lock()
 	defer p.solutionMutex.Unlock()
 
@@ -238,8 +236,8 @@ func (p *performanceObserverImpl) OnEstimatedDeltaObjectiveScore(_ float64) {
 }
 
 func (p *performanceObserverImpl) OnCheckConstraint(
-	constraint nextroute.ModelConstraint,
-	_ nextroute.CheckedAt,
+	constraint ModelConstraint,
+	_ CheckedAt,
 ) {
 	p.constraintMutex.Lock()
 	defer p.constraintMutex.Unlock()
@@ -261,7 +259,7 @@ func (p *performanceObserverImpl) OnCheckConstraint(
 }
 
 func (p *performanceObserverImpl) OnEstimateIsViolated(
-	constraint nextroute.ModelConstraint,
+	constraint ModelConstraint,
 ) {
 	p.constraintMutex.Lock()
 	defer p.constraintMutex.Unlock()
@@ -284,10 +282,10 @@ func (p *performanceObserverImpl) OnEstimateIsViolated(
 }
 
 func (p *performanceObserverImpl) OnEstimatedIsViolated(
-	_ nextroute.SolutionMove,
-	constraint nextroute.ModelConstraint,
+	_ SolutionMove,
+	constraint ModelConstraint,
 	violated bool,
-	_ nextroute.StopPositionsHint,
+	_ StopPositionsHint,
 ) {
 	p.constraintMutex.Lock()
 	defer p.constraintMutex.Unlock()

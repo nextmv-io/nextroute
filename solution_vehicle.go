@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 	"golang.org/x/exp/slices"
 )
 
@@ -91,9 +90,9 @@ type solutionVehicleImpl struct {
 }
 
 func toSolutionVehicle(
-	solution nextroute.Solution,
+	solution Solution,
 	index int,
-) nextroute.SolutionVehicle {
+) SolutionVehicle {
 	return solutionVehicleImpl{
 		index:    index,
 		solution: solution.(*solutionImpl),
@@ -103,13 +102,13 @@ func toSolutionVehicle(
 func (v solutionVehicleImpl) firstMovePlanStopsUnit(
 	planUnit *solutionPlanStopsUnitImpl,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
-) nextroute.SolutionMove {
+) SolutionMove {
 	stop := false
-	var bestMove nextroute.SolutionMove = newNotExecutableSolutionMoveStops(planUnit)
+	var bestMove SolutionMove = newNotExecutableSolutionMoveStops(planUnit)
 	SolutionMoveStopsGenerator(
 		v,
 		planUnit,
-		func(nextMove nextroute.SolutionMoveStops) {
+		func(nextMove SolutionMoveStops) {
 			value, allowed, hint := v.solution.checkConstraintsAndEstimateDeltaScore(nextMove)
 			if hint.SkipVehicle() {
 				stop = true
@@ -134,7 +133,7 @@ func (v solutionVehicleImpl) firstMovePlanStopsUnit(
 
 func (v solutionVehicleImpl) firstMovePlanUnitsUnit(
 	planUnit *solutionPlanUnitsUnitImpl,
-) nextroute.SolutionMove {
+) SolutionMove {
 	if planUnit.ModelPlanUnitsUnit().PlanOneOf() {
 		return v.firstMovePlanOneOfUnit(planUnit)
 	}
@@ -143,7 +142,7 @@ func (v solutionVehicleImpl) firstMovePlanUnitsUnit(
 
 func (v solutionVehicleImpl) firstMovePlanOneOfUnit(
 	planUnit *solutionPlanUnitsUnitImpl,
-) nextroute.SolutionMove {
+) SolutionMove {
 	planUnits := common.Shuffle(
 		v.solution.Random(),
 		planUnit.SolutionPlanUnits(),
@@ -159,14 +158,14 @@ func (v solutionVehicleImpl) firstMovePlanOneOfUnit(
 
 func (v solutionVehicleImpl) firstMovePlanAllUnit(
 	planUnit *solutionPlanUnitsUnitImpl,
-) nextroute.SolutionMove {
+) SolutionMove {
 	planUnits := common.Shuffle(
 		v.solution.model.Random(),
 		planUnit.SolutionPlanUnits(),
 	)
-	moves := make(nextroute.SolutionMoves, 0, len(planUnits))
+	moves := make(SolutionMoves, 0, len(planUnits))
 	for idx, propositionPlanUnit := range planUnits {
-		var move nextroute.SolutionMove
+		var move SolutionMove
 
 		if idx == 0 || planUnit.modelPlanUnitsUnit.SameVehicle() {
 			move = v.FirstMove(propositionPlanUnit)
@@ -221,7 +220,7 @@ func returnToMoveContainerPool(movesPtr *[]moveContainer) {
 	moveContainerPool.Put(movesPtr)
 }
 
-func updateMoveInPlace(move nextroute.SolutionMoveStops, moveContainer moveContainer) {
+func updateMoveInPlace(move SolutionMoveStops, moveContainer moveContainer) {
 	move.(*solutionMoveStopsImpl).stopPositions[0].previousStopIndex = moveContainer.previousIndex
 	move.(*solutionMoveStopsImpl).stopPositions[0].nextStopIndex = moveContainer.nextIndex
 	move.(*solutionMoveStopsImpl).value = moveContainer.value
@@ -231,7 +230,7 @@ func (v *solutionVehicleImpl) bestMovePlanSingleStop(
 	_ context.Context,
 	planUnit *solutionPlanStopsUnitImpl,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
-) nextroute.SolutionMoveStops {
+) SolutionMoveStops {
 	candidateStop := planUnit.solutionStops[0]
 	move := preAllocatedMoveContainer.singleStopPosSolutionMoveStop
 	move.(*solutionMoveStopsImpl).reset()
@@ -340,15 +339,15 @@ func (v *solutionVehicleImpl) bestMovePlanSingleStop(
 func (v solutionVehicleImpl) bestMoveSequence(
 	_ context.Context,
 	planUnit *solutionPlanStopsUnitImpl,
-	sequence nextroute.SolutionStops,
+	sequence SolutionStops,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
-) nextroute.SolutionMove {
-	var bestMove nextroute.SolutionMove = newNotExecutableSolutionMoveStops(planUnit)
+) SolutionMove {
+	var bestMove SolutionMove = newNotExecutableSolutionMoveStops(planUnit)
 	stop := false
 	SolutionMoveStopsGenerator(
 		v,
 		planUnit,
-		func(nextMove nextroute.SolutionMoveStops) {
+		func(nextMove SolutionMoveStops) {
 			value, allowed, hint := v.solution.checkConstraintsAndEstimateDeltaScore(nextMove)
 			if hint.SkipVehicle() {
 				stop = true
@@ -375,8 +374,8 @@ func (v solutionVehicleImpl) bestMovePlanMultipleStops(
 	ctx context.Context,
 	planUnit *solutionPlanStopsUnitImpl,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
-) nextroute.SolutionMove {
-	var bestMove nextroute.SolutionMove = newNotExecutableSolutionMoveStops(planUnit)
+) SolutionMove {
+	var bestMove SolutionMove = newNotExecutableSolutionMoveStops(planUnit)
 	quitSequenceGenerator := make(chan struct{})
 	defer close(quitSequenceGenerator)
 	for sequence := range SequenceGeneratorChannel(planUnit, quitSequenceGenerator) {
@@ -390,7 +389,7 @@ func (v *solutionVehicleImpl) bestMovePlanStopsUnit(
 	ctx context.Context,
 	planUnit *solutionPlanStopsUnitImpl,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
-) nextroute.SolutionMove {
+) SolutionMove {
 	if planUnit.ModelPlanStopsUnit().NumberOfStops() == 1 {
 		return v.bestMovePlanSingleStop(ctx, planUnit, preAllocatedMoveContainer)
 	}
@@ -401,7 +400,7 @@ func (v *solutionVehicleImpl) bestMovePlanStopsUnit(
 func (v *solutionVehicleImpl) bestMovePlanUnitsUnit(
 	ctx context.Context,
 	planUnit *solutionPlanUnitsUnitImpl,
-) nextroute.SolutionMove {
+) SolutionMove {
 	if planUnit.ModelPlanUnitsUnit().PlanOneOf() {
 		return v.bestMovePlanOneOfUnit(ctx, planUnit)
 	}
@@ -411,7 +410,7 @@ func (v *solutionVehicleImpl) bestMovePlanUnitsUnit(
 func (v solutionVehicleImpl) bestMovePlanOneOfUnit(
 	ctx context.Context,
 	planUnit *solutionPlanUnitsUnitImpl,
-) nextroute.SolutionMove {
+) SolutionMove {
 	move := NotExecutableMove
 
 	for _, planUnit := range planUnit.solutionPlanUnits {
@@ -422,7 +421,7 @@ func (v solutionVehicleImpl) bestMovePlanOneOfUnit(
 	return move
 }
 
-func revertMoves(moves nextroute.SolutionMoves) (bool, error) {
+func revertMoves(moves SolutionMoves) (bool, error) {
 	for i := len(moves) - 1; i >= 0; i-- {
 		if unplanned, err := moves[i].PlanUnit().UnPlan(); err != nil || !unplanned {
 			return false, err
@@ -434,15 +433,15 @@ func revertMoves(moves nextroute.SolutionMoves) (bool, error) {
 func (v solutionVehicleImpl) bestMovePlanAllUnit(
 	ctx context.Context,
 	planUnit *solutionPlanUnitsUnitImpl,
-) nextroute.SolutionMove {
+) SolutionMove {
 	planUnits := common.Shuffle(
 		v.solution.Random(),
 		planUnit.SolutionPlanUnits(),
 	)
 
-	moves := make(nextroute.SolutionMoves, 0, len(planUnits))
+	moves := make(SolutionMoves, 0, len(planUnits))
 	for idx, propositionPlanUnit := range planUnits {
-		var move nextroute.SolutionMove
+		var move SolutionMove
 
 		if idx == 0 || planUnit.modelPlanUnitsUnit.SameVehicle() {
 			move = v.BestMove(ctx, propositionPlanUnit)
@@ -477,13 +476,13 @@ func (v solutionVehicleImpl) bestMovePlanAllUnit(
 }
 
 func (v solutionVehicleImpl) FirstMove(
-	planUnit nextroute.SolutionPlanUnit,
-) nextroute.SolutionMove {
+	planUnit SolutionPlanUnit,
+) SolutionMove {
 	switch planUnit.(type) {
-	case nextroute.SolutionPlanStopsUnit:
+	case SolutionPlanStopsUnit:
 		allocations := NewPreAllocatedMoveContainer(planUnit)
 		return v.firstMovePlanStopsUnit(planUnit.(*solutionPlanStopsUnitImpl), allocations)
-	case nextroute.SolutionPlanUnitsUnit:
+	case SolutionPlanUnitsUnit:
 		return v.firstMovePlanUnitsUnit(planUnit.(*solutionPlanUnitsUnitImpl))
 	}
 	return NotExecutableMove
@@ -491,10 +490,10 @@ func (v solutionVehicleImpl) FirstMove(
 
 func (v solutionVehicleImpl) BestMove(
 	ctx context.Context,
-	planUnit nextroute.SolutionPlanUnit,
-) nextroute.SolutionMove {
+	planUnit SolutionPlanUnit,
+) SolutionMove {
 	var allocations *PreAllocatedMoveContainer
-	if _, ok := planUnit.(nextroute.SolutionPlanStopsUnit); ok {
+	if _, ok := planUnit.(SolutionPlanStopsUnit); ok {
 		allocations = NewPreAllocatedMoveContainer(planUnit)
 	}
 	return v.bestMove(ctx, planUnit, allocations)
@@ -502,9 +501,9 @@ func (v solutionVehicleImpl) BestMove(
 
 func (v solutionVehicleImpl) bestMove(
 	ctx context.Context,
-	planUnit nextroute.SolutionPlanUnit,
+	planUnit SolutionPlanUnit,
 	sharedMoveContainer *PreAllocatedMoveContainer,
-) nextroute.SolutionMove {
+) SolutionMove {
 	select {
 	case <-ctx.Done():
 		return NotExecutableMove
@@ -513,9 +512,9 @@ func (v solutionVehicleImpl) bestMove(
 			return NotExecutableMove
 		}
 		switch planUnit.(type) {
-		case nextroute.SolutionPlanStopsUnit:
+		case SolutionPlanStopsUnit:
 			return v.bestMovePlanStopsUnit(ctx, planUnit.(*solutionPlanStopsUnitImpl), sharedMoveContainer)
-		case nextroute.SolutionPlanUnitsUnit:
+		case SolutionPlanUnitsUnit:
 			return v.bestMovePlanUnitsUnit(ctx, planUnit.(*solutionPlanUnitsUnitImpl))
 		}
 		return NotExecutableMove
@@ -534,11 +533,11 @@ func (v solutionVehicleImpl) Index() int {
 	return v.index
 }
 
-func (v solutionVehicleImpl) First() nextroute.SolutionStop {
+func (v solutionVehicleImpl) First() SolutionStop {
 	return v.first()
 }
 
-func (v solutionVehicleImpl) Last() nextroute.SolutionStop {
+func (v solutionVehicleImpl) Last() SolutionStop {
 	return v.last()
 }
 
@@ -580,15 +579,15 @@ func (v solutionVehicleImpl) End() time.Time {
 	return v.last().End()
 }
 
-func (v solutionVehicleImpl) Next() nextroute.SolutionStop {
+func (v solutionVehicleImpl) Next() SolutionStop {
 	return solutionStopImpl{
 		index:    v.solution.model.NumberOfStops() + v.index*2 + 1,
 		solution: v.solution,
 	}
 }
 
-func (v solutionVehicleImpl) SolutionStops() nextroute.SolutionStops {
-	solutionStops := make(nextroute.SolutionStops, 0, v.NumberOfStops()+2)
+func (v solutionVehicleImpl) SolutionStops() SolutionStops {
+	solutionStops := make(SolutionStops, 0, v.NumberOfStops()+2)
 	solutionStop := v.First()
 	for !solutionStop.IsLast() {
 		solutionStops = append(solutionStops, solutionStop)
@@ -609,7 +608,7 @@ func (v solutionVehicleImpl) solutionStops() []solutionStopImpl {
 	return solutionStops
 }
 
-func (v solutionVehicleImpl) ModelVehicle() nextroute.ModelVehicle {
+func (v solutionVehicleImpl) ModelVehicle() ModelVehicle {
 	return v.solution.model.Vehicle(v.solution.vehicleIndices[v.index])
 }
 
@@ -631,7 +630,7 @@ func (v solutionVehicleImpl) Unplan() (bool, error) {
 		solution.unPlannedPlanUnits.add(planUnit)
 		solution.plannedPlanUnits.remove(planUnit)
 	}
-	stopPositions := common.Map(solutionStops, func(solutionStop solutionStopImpl) nextroute.StopPosition {
+	stopPositions := common.Map(solutionStops, func(solutionStop solutionStopImpl) StopPosition {
 		return newStopPosition(
 			solutionStop.previous(),
 			solutionStop,

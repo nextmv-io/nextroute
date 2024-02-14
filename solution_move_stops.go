@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // Move is a type alias for SolutionMoveStops. It is used to make the
@@ -133,11 +132,11 @@ func (m *solutionMoveStopsImpl) String() string {
 	)
 }
 
-func (m *solutionMoveStopsImpl) Solution() nextroute.Solution {
+func (m *solutionMoveStopsImpl) Solution() Solution {
 	return m.planUnit.solution()
 }
 
-func (m *solutionMoveStopsImpl) Vehicle() nextroute.SolutionVehicle {
+func (m *solutionMoveStopsImpl) Vehicle() SolutionVehicle {
 	if len(m.stopPositions) == 0 {
 		return nil
 	}
@@ -148,7 +147,7 @@ func (m *solutionMoveStopsImpl) vehicle() solutionVehicleImpl {
 	return m.stopPositions[len(m.stopPositions)-1].next().vehicle()
 }
 
-func (m *solutionMoveStopsImpl) Next() nextroute.SolutionStop {
+func (m *solutionMoveStopsImpl) Next() SolutionStop {
 	if next, ok := m.next(); ok {
 		return next
 	}
@@ -162,7 +161,7 @@ func (m *solutionMoveStopsImpl) next() (solutionStopImpl, bool) {
 	return m.stopPositions[len(m.stopPositions)-1].next(), true
 }
 
-func (m *solutionMoveStopsImpl) Previous() nextroute.SolutionStop {
+func (m *solutionMoveStopsImpl) Previous() SolutionStop {
 	previous, ok := m.previous()
 	if !ok {
 		return nil
@@ -254,11 +253,11 @@ func (m *solutionMoveStopsImpl) attach() (int, error) {
 	return startPropagate, nil
 }
 
-func (m *solutionMoveStopsImpl) PlanUnit() nextroute.SolutionPlanUnit {
+func (m *solutionMoveStopsImpl) PlanUnit() SolutionPlanUnit {
 	return m.planUnit
 }
 
-func (m *solutionMoveStopsImpl) PlanStopsUnit() nextroute.SolutionPlanStopsUnit {
+func (m *solutionMoveStopsImpl) PlanStopsUnit() SolutionPlanStopsUnit {
 	if m.planUnit == nil {
 		return nil
 	}
@@ -273,20 +272,20 @@ func (m *solutionMoveStopsImpl) ValueSeen() int {
 	return m.valueSeen
 }
 
-func (m solutionMoveStopsImpl) IncrementValueSeen(inc int) nextroute.SolutionMove {
+func (m solutionMoveStopsImpl) IncrementValueSeen(inc int) SolutionMove {
 	m.valueSeen += inc
 	return &m
 }
 
-func (m *solutionMoveStopsImpl) StopPositions() nextroute.StopPositions {
-	stopPositions := make(nextroute.StopPositions, len(m.stopPositions))
+func (m *solutionMoveStopsImpl) StopPositions() StopPositions {
+	stopPositions := make(StopPositions, len(m.stopPositions))
 	for i, stopPosition := range m.stopPositions {
 		stopPositions[i] = stopPosition
 	}
 	return stopPositions
 }
 
-func (m *solutionMoveStopsImpl) StopPositionAt(index int) nextroute.StopPosition {
+func (m *solutionMoveStopsImpl) StopPositionAt(index int) StopPosition {
 	return m.stopPositions[index]
 }
 
@@ -311,7 +310,7 @@ func (m *solutionMoveStopsImpl) IsImprovement() bool {
 	return m.IsExecutable() && m.value < 0
 }
 
-func (m *solutionMoveStopsImpl) TakeBest(that nextroute.SolutionMove) nextroute.SolutionMove {
+func (m *solutionMoveStopsImpl) TakeBest(that SolutionMove) SolutionMove {
 	if !that.IsExecutable() {
 		return m
 	}
@@ -336,7 +335,7 @@ func (m *solutionMoveStopsImpl) TakeBest(that nextroute.SolutionMove) nextroute.
 // This is more efficient than calling the two functions separately.
 // But only call it if the travel time is not dependent on time.
 func (m *solutionMoveStopsImpl) deltaStopTravelDurationValue(
-	vehicleType nextroute.ModelVehicleType,
+	vehicleType ModelVehicleType,
 ) float64 {
 	if len(m.stopPositions) == 0 || m.stopPositions[0].stop().IsPlanned() {
 		return 0
@@ -461,9 +460,9 @@ func (m *solutionMoveStopsImpl) deltaTravelDurationValue() float64 {
 // NewMoveStops creates a new move. Exported to be used in tests not be used in
 // SDK.
 func NewMoveStops(
-	planUnit nextroute.SolutionPlanStopsUnit,
-	stopPositions nextroute.StopPositions,
-) (nextroute.SolutionMoveStops, error) {
+	planUnit SolutionPlanStopsUnit,
+	stopPositions StopPositions,
+) (SolutionMoveStops, error) {
 	if planUnit == nil {
 		panic("planUnit must not be nil")
 	}
@@ -474,7 +473,7 @@ func NewMoveStops(
 		panic("first previous stop must be planned")
 	}
 
-	stops := common.Map(stopPositions, func(i nextroute.StopPosition) nextroute.ModelStop {
+	stops := common.Map(stopPositions, func(i StopPosition) ModelStop {
 		return i.Stop().ModelStop()
 	})
 
@@ -491,7 +490,7 @@ func NewMoveStops(
 
 	vehicle := stopPositions[0].(stopPositionImpl).previous().vehicle()
 
-	var lastPlannedPreviousStop nextroute.SolutionStop
+	var lastPlannedPreviousStop SolutionStop
 
 	for index, sp := range stopPositions {
 		stopPosition := sp.(stopPositionImpl)

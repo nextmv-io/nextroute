@@ -5,13 +5,12 @@ import (
 	"strings"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewSumExpression returns a new SumExpression.
 func NewSumExpression(
-	expressions nextroute.ModelExpressions,
-) nextroute.SumExpression {
+	expressions ModelExpressions,
+) SumExpression {
 	name := "sum("
 	for i, expression := range expressions {
 		if i > 0 {
@@ -30,18 +29,18 @@ func NewSumExpression(
 
 type sumExpressionImpl struct {
 	name        string
-	expressions nextroute.ModelExpressions
+	expressions ModelExpressions
 	index       int
 }
 
 func (n *sumExpressionImpl) HasNegativeValues() bool {
-	return common.HasTrue(n.expressions, func(expression nextroute.ModelExpression) bool {
+	return common.HasTrue(n.expressions, func(expression ModelExpression) bool {
 		return expression.HasNegativeValues()
 	})
 }
 
 func (n *sumExpressionImpl) HasPositiveValues() bool {
-	return common.HasTrue(n.expressions, func(expression nextroute.ModelExpression) bool {
+	return common.HasTrue(n.expressions, func(expression ModelExpression) bool {
 		return expression.HasPositiveValues()
 	})
 }
@@ -70,9 +69,9 @@ func (n *sumExpressionImpl) SetName(name string) {
 }
 
 func (n *sumExpressionImpl) Value(
-	vehicle nextroute.ModelVehicleType,
-	from nextroute.ModelStop,
-	to nextroute.ModelStop,
+	vehicle ModelVehicleType,
+	from ModelStop,
+	to ModelStop,
 ) float64 {
 	value := 0.0
 	for _, expression := range n.expressions {
@@ -81,12 +80,12 @@ func (n *sumExpressionImpl) Value(
 	return value
 }
 
-func (n *sumExpressionImpl) AddExpression(expression nextroute.ModelExpression) {
+func (n *sumExpressionImpl) AddExpression(expression ModelExpression) {
 	n.expressions = append(n.expressions, expression)
 }
 
-func (n *sumExpressionImpl) Expressions() nextroute.ModelExpressions {
-	expressions := make(nextroute.ModelExpressions, len(n.expressions))
+func (n *sumExpressionImpl) Expressions() ModelExpressions {
+	expressions := make(ModelExpressions, len(n.expressions))
 	copy(expressions, n.expressions)
 	return expressions
 }

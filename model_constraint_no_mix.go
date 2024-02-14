@@ -2,24 +2,22 @@ package nextroute
 
 import (
 	"fmt"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewNoMixConstraint returns a new NoMixConstraint.
 func NewNoMixConstraint(
-	deltas map[nextroute.ModelStop]nextroute.MixItem,
-) (nextroute.NoMixConstraint, error) {
-	insert := make(map[nextroute.ModelStop]nextroute.MixItem, len(deltas)/2)
-	remove := make(map[nextroute.ModelStop]nextroute.MixItem, len(deltas)/2)
+	deltas map[ModelStop]MixItem,
+) (NoMixConstraint, error) {
+	insert := make(map[ModelStop]MixItem, len(deltas)/2)
+	remove := make(map[ModelStop]MixItem, len(deltas)/2)
 	for stop, delta := range deltas {
 		if delta.Quantity > 0 {
-			insert[stop] = nextroute.MixItem{
+			insert[stop] = MixItem{
 				Name:     delta.Name,
 				Quantity: delta.Quantity,
 			}
 		} else {
-			remove[stop] = nextroute.MixItem{
+			remove[stop] = MixItem{
 				Name:     delta.Name,
 				Quantity: -delta.Quantity,
 			}
@@ -29,7 +27,7 @@ func NewNoMixConstraint(
 	return &noMixConstraintImpl{
 		modelConstraintImpl: newModelConstraintImpl(
 			"no_mix",
-			nextroute.ModelExpressions{},
+			ModelExpressions{},
 		),
 		insert: insert,
 		remove: remove,
@@ -37,8 +35,8 @@ func NewNoMixConstraint(
 }
 
 func validate(
-	insert map[nextroute.ModelStop]nextroute.MixItem,
-	remove map[nextroute.ModelStop]nextroute.MixItem,
+	insert map[ModelStop]MixItem,
+	remove map[ModelStop]MixItem,
 ) error {
 	if len(insert) == 0 && len(remove) == 0 {
 		return nil
@@ -51,9 +49,9 @@ func validate(
 			len(remove),
 		)
 	}
-	deltaPerPlanUnit := make(map[nextroute.ModelPlanStopsUnit]int)
-	namePerPlanUnit := make(map[nextroute.ModelPlanStopsUnit]string)
-	stops := make(map[nextroute.ModelStop]string, len(insert)+len(remove))
+	deltaPerPlanUnit := make(map[ModelPlanStopsUnit]int)
+	namePerPlanUnit := make(map[ModelPlanStopsUnit]string)
+	stops := make(map[ModelStop]string, len(insert)+len(remove))
 	for stop, i := range insert {
 		if t, ok := stops[stop]; ok {
 			return fmt.Errorf("no-mix constraint, stop %v has two items [%v, %v], a stop can only have one item",
@@ -77,7 +75,7 @@ func validate(
 		}
 		namePerPlanUnit[stop.PlanStopsUnit()] = i.Name
 	}
-	inRemove := make(map[nextroute.ModelStop]string, len(remove))
+	inRemove := make(map[ModelStop]string, len(remove))
 	for stop, r := range remove {
 		if t, ok := inRemove[stop]; ok {
 			return fmt.Errorf("no-mix constraint, stop %v has two items [%v, %v], a stop can only have one item",
@@ -156,19 +154,19 @@ func validate(
 
 type noMixConstraintImpl struct {
 	modelConstraintImpl
-	insert map[nextroute.ModelStop]nextroute.MixItem
-	remove map[nextroute.ModelStop]nextroute.MixItem
+	insert map[ModelStop]MixItem
+	remove map[ModelStop]MixItem
 }
 
 type noMixSolutionStopData struct {
-	content  nextroute.MixItem
+	content  MixItem
 	tour     int
 	removing bool
 }
 
-func (l *noMixSolutionStopData) Copy() nextroute.Copier {
+func (l *noMixSolutionStopData) Copy() Copier {
 	return &noMixSolutionStopData{
-		content: nextroute.MixItem{
+		content: MixItem{
 			Name:     l.content.Name,
 			Quantity: l.content.Quantity,
 		},
@@ -177,13 +175,13 @@ func (l *noMixSolutionStopData) Copy() nextroute.Copier {
 	}
 }
 
-func (l *noMixConstraintImpl) Lock(_ nextroute.Model) error {
+func (l *noMixConstraintImpl) Lock(_ Model) error {
 	return validate(l.insert, l.remove)
 }
 
-func (l *noMixConstraintImpl) Value(solutionStop nextroute.SolutionStop) nextroute.MixItem {
+func (l *noMixConstraintImpl) Value(solutionStop SolutionStop) MixItem {
 	if !solutionStop.IsPlanned() {
-		return nextroute.MixItem{
+		return MixItem{
 			Name:     "",
 			Quantity: 0,
 		}
@@ -194,13 +192,13 @@ func (l *noMixConstraintImpl) Value(solutionStop nextroute.SolutionStop) nextrou
 }
 
 func (l *noMixConstraintImpl) UpdateConstraintStopData(
-	solutionStop nextroute.SolutionStop,
-) (nextroute.Copier, error) {
+	solutionStop SolutionStop,
+) (Copier, error) {
 	solutionStopImp := solutionStop.(solutionStopImpl)
 
 	if solutionStopImp.IsFirst() {
 		return &noMixSolutionStopData{
-			content: nextroute.MixItem{
+			content: MixItem{
 				Name:     "",
 				Quantity: 0,
 			},
@@ -230,7 +228,7 @@ func (l *noMixConstraintImpl) UpdateConstraintStopData(
 			tour++
 		}
 		return &noMixSolutionStopData{
-			content: nextroute.MixItem{
+			content: MixItem{
 				Name:     insertMixIngredient.Name,
 				Quantity: previousNoMixData.content.Quantity + insertMixIngredient.Quantity,
 			},
@@ -260,7 +258,7 @@ func (l *noMixConstraintImpl) UpdateConstraintStopData(
 		}
 
 		return &noMixSolutionStopData{
-			content: nextroute.MixItem{
+			content: MixItem{
 				Name:     previousNoMixData.content.Name,
 				Quantity: previousNoMixData.content.Quantity - removeMixIngredient.Quantity,
 			},
@@ -275,7 +273,7 @@ func (l *noMixConstraintImpl) UpdateConstraintStopData(
 	}
 
 	return &noMixSolutionStopData{
-		content: nextroute.MixItem{
+		content: MixItem{
 			Name:     ingredientName,
 			Quantity: previousNoMixData.content.Quantity,
 		},
@@ -284,16 +282,16 @@ func (l *noMixConstraintImpl) UpdateConstraintStopData(
 	}, nil
 }
 
-func (l *noMixConstraintImpl) Insert() map[nextroute.ModelStop]nextroute.MixItem {
-	insert := make(map[nextroute.ModelStop]nextroute.MixItem, len(l.insert))
+func (l *noMixConstraintImpl) Insert() map[ModelStop]MixItem {
+	insert := make(map[ModelStop]MixItem, len(l.insert))
 	for stop, mixItem := range l.insert {
 		insert[stop] = mixItem
 	}
 	return insert
 }
 
-func (l *noMixConstraintImpl) Remove() map[nextroute.ModelStop]nextroute.MixItem {
-	remove := make(map[nextroute.ModelStop]nextroute.MixItem, len(l.remove))
+func (l *noMixConstraintImpl) Remove() map[ModelStop]MixItem {
+	remove := make(map[ModelStop]MixItem, len(l.remove))
 	for stop, mixItem := range l.remove {
 		remove[stop] = mixItem
 	}
@@ -312,13 +310,13 @@ func (l *noMixConstraintImpl) SetID(id string) {
 	l.name = id
 }
 
-func (l *noMixConstraintImpl) EstimationCost() nextroute.Cost {
-	return nextroute.LinearStop
+func (l *noMixConstraintImpl) EstimationCost() Cost {
+	return LinearStop
 }
 
 func (l *noMixConstraintImpl) EstimateIsViolated(
-	move nextroute.SolutionMoveStops,
-) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	move SolutionMoveStops,
+) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
 	_, hasRemoveMixItem := l.remove[moveImpl.stopPositions[0].stop().ModelStop()]
 	if hasRemoveMixItem {

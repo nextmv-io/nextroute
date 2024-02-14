@@ -1,11 +1,11 @@
-// Package schema provides the input and output schema for nextroute.
+// Package schema provides the input and output schema for
 package schema
 
 import (
 	"time"
 )
 
-// Input is the default input schema for nextroute.
+// Input is the default input schema for
 type Input struct {
 	// Options arbitrary options.
 	Options any `json:"options,omitempty"`

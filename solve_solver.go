@@ -8,14 +8,13 @@ import (
 
 	"github.com/nextmv-io/sdk/alns"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/run"
 )
 
 // NewSkeletonSolver creates a new solver for the given model.
-func NewSkeletonSolver(model nextroute.Model) (nextroute.Solver, error) {
+func NewSkeletonSolver(model Model) (Solver, error) {
 	solver := &solveImpl{
-		solveEvents: nextroute.NewSolveEvents(),
+		solveEvents: NewSolveEvents(),
 		model:       model,
 	}
 	solver.SolveEvents().NewBestSolution.Register(solver.OnImprovement)
@@ -23,17 +22,17 @@ func NewSkeletonSolver(model nextroute.Model) (nextroute.Solver, error) {
 }
 
 type solveImpl struct {
-	model          nextroute.Model
-	solveEvents    nextroute.SolveEvents
-	workSolution   nextroute.Solution
-	bestSolution   nextroute.Solution
+	model          Model
+	solveEvents    SolveEvents
+	workSolution   Solution
+	bestSolution   Solution
 	random         *rand.Rand
-	solveOperators nextroute.SolveOperators
-	parameters     nextroute.SolveParameters
+	solveOperators SolveOperators
+	parameters     SolveParameters
 	progression    []alns.ProgressionEntry
 }
 
-func (s *solveImpl) OnImprovement(solveInformation nextroute.SolveInformation) {
+func (s *solveImpl) OnImprovement(solveInformation SolveInformation) {
 	s.progression = append(s.progression, alns.ProgressionEntry{
 		ElapsedSeconds: time.Since(solveInformation.Start()).Seconds(),
 		Value:          solveInformation.Solver().BestSolution().Score(),
@@ -44,21 +43,21 @@ func (s *solveImpl) Progression() []alns.ProgressionEntry {
 	return common.DefensiveCopy(s.progression)
 }
 
-func (s *solveImpl) Model() nextroute.Model {
+func (s *solveImpl) Model() Model {
 	return s.model
 }
 
-func (s *solveImpl) AddSolveOperators(solveOperators ...nextroute.SolveOperator) {
+func (s *solveImpl) AddSolveOperators(solveOperators ...SolveOperator) {
 	for _, solveOperator := range solveOperators {
 		s.solveOperators = append(s.solveOperators, solveOperator)
 		for _, parameter := range solveOperator.Parameters() {
 			s.register(parameter)
 		}
 		for _, st := range s.SolveOperators() {
-			if interested, ok := st.(nextroute.InterestedInBetterSolution); ok {
+			if interested, ok := st.(InterestedInBetterSolution); ok {
 				s.SolveEvents().NewBestSolution.Register(interested.OnBetterSolution)
 			}
-			if interested, ok := solveOperator.(nextroute.InterestedInStartSolve); ok {
+			if interested, ok := solveOperator.(InterestedInStartSolve); ok {
 				s.SolveEvents().Start.Register(interested.OnStartSolve)
 			}
 		}
@@ -69,21 +68,21 @@ func (s *solveImpl) Random() *rand.Rand {
 	return s.random
 }
 
-func (s *solveImpl) SolveEvents() nextroute.SolveEvents {
+func (s *solveImpl) SolveEvents() SolveEvents {
 	return s.solveEvents
 }
 
-func (s *solveImpl) register(parameter nextroute.SolveParameter) {
+func (s *solveImpl) register(parameter SolveParameter) {
 	s.parameters = append(s.parameters, parameter)
 }
 
-func (s *solveImpl) SolveOperators() nextroute.SolveOperators {
-	solveOperators := make(nextroute.SolveOperators, len(s.solveOperators))
+func (s *solveImpl) SolveOperators() SolveOperators {
+	solveOperators := make(SolveOperators, len(s.solveOperators))
 	copy(solveOperators, s.solveOperators)
 	return solveOperators
 }
 
-func (s *solveImpl) Reset(solution nextroute.Solution, solveInformation nextroute.SolveInformation) {
+func (s *solveImpl) Reset(solution Solution, solveInformation SolveInformation) {
 	s.solveEvents.Reset.Trigger(solution, solveInformation)
 	s.workSolution = solution.Copy()
 	if s.workSolution.Score() < s.bestSolution.Score() {
@@ -101,18 +100,18 @@ func (s *solveImpl) HasWorkSolution() bool {
 	return s.workSolution != nil
 }
 
-func (s *solveImpl) BestSolution() nextroute.Solution {
+func (s *solveImpl) BestSolution() Solution {
 	return s.bestSolution
 }
 
-func (s *solveImpl) WorkSolution() nextroute.Solution {
+func (s *solveImpl) WorkSolution() Solution {
 	return s.workSolution
 }
 
 // invoke returns true if the best solution was improved.
 func (s *solveImpl) invoke(
 	ctx context.Context,
-	solveOperator nextroute.SolveOperator,
+	solveOperator SolveOperator,
 	solveInformation *solveInformationImpl,
 ) (bool, error) {
 	// Check if the solve-operator should be executed.
@@ -149,16 +148,16 @@ func (s *solveImpl) invoke(
 	return true, nil
 }
 
-func (s *solveImpl) newBestSolution(solution nextroute.Solution, solveInformation *solveInformationImpl) {
+func (s *solveImpl) newBestSolution(solution Solution, solveInformation *solveInformationImpl) {
 	s.bestSolution = solution.Copy()
 	s.solveEvents.NewBestSolution.Trigger(solveInformation)
 }
 
 func (s *solveImpl) Solve(
 	ctx context.Context,
-	solveOptions nextroute.SolveOptions,
-	startSolutions ...nextroute.Solution,
-) (nextroute.SolutionChannel, error) {
+	solveOptions SolveOptions,
+	startSolutions ...Solution,
+) (SolutionChannel, error) {
 	if len(startSolutions) == 0 {
 		startSolution, err := NewSolution(s.model)
 		if err != nil {
@@ -182,7 +181,7 @@ func (s *solveImpl) Solve(
 	solveInformation := &solveInformationImpl{
 		iteration:      0,
 		solver:         s,
-		solveOperators: make(nextroute.SolveOperators, 0, len(s.solveOperators)),
+		solveOperators: make(SolveOperators, 0, len(s.solveOperators)),
 		start:          start,
 	}
 
@@ -192,7 +191,7 @@ func (s *solveImpl) Solve(
 
 	// hard coding a size of 100 here. If we ever need to, we can make it
 	// configurable.
-	solutions := make(chan nextroute.Solution, 100)
+	solutions := make(chan Solution, 100)
 	solutions <- s.bestSolution
 	go func() {
 		defer close(solutions)
@@ -202,7 +201,7 @@ func (s *solveImpl) Solve(
 			solveInformation.iteration = iteration
 			solveInformation.deltaScore = 0.0
 			solveInformation.solveOperators = make(
-				nextroute.SolveOperators,
+				SolveOperators,
 				0,
 				len(s.solveOperators),
 			)

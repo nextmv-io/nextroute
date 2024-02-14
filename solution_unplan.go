@@ -2,7 +2,6 @@ package nextroute
 
 import (
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // UnplanIsland un-plans planUnit and all stops (with their plan-units)
@@ -10,10 +9,10 @@ import (
 // the given distance of the stops in planUnit not necessary on the same
 // vehicle. The function returns a list of un-planned plan-units.
 func UnplanIsland(
-	planUnit nextroute.SolutionPlanUnit,
+	planUnit SolutionPlanUnit,
 	distance common.Distance,
 ) error {
-	unplanUnits := nextroute.SolutionPlanUnits{planUnit}
+	unplanUnits := SolutionPlanUnits{planUnit}
 	for _, solutionStop := range planUnit.(*solutionPlanStopsUnitImpl).solutionStops {
 		location := solutionStop.ModelStop().Location()
 		stop := solutionStop.Next()
@@ -52,7 +51,7 @@ func UnplanIsland(
 // parameter is passed to UnplanIsland. The function returns a list of
 // un-planned plan-units.
 func UnplanVehicle(
-	vehicle nextroute.SolutionVehicle,
+	vehicle SolutionVehicle,
 	distance common.Distance,
 ) error {
 	// TODO: this can be optimized a lot, now we calculate everything for

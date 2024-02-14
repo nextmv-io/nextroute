@@ -2,15 +2,13 @@ package nextroute
 
 import (
 	"fmt"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewTermExpression returns a new TermExpression.
 func NewTermExpression(
 	factor float64,
-	expression nextroute.ModelExpression,
-) nextroute.TermExpression {
+	expression ModelExpression,
+) TermExpression {
 	return &termExpression{
 		index:      NewModelExpressionIndex(),
 		expression: expression,
@@ -20,7 +18,7 @@ func NewTermExpression(
 }
 
 type termExpression struct {
-	expression nextroute.ModelExpression
+	expression ModelExpression
 	name       string
 	index      int
 	factor     float64
@@ -64,13 +62,13 @@ func (t *termExpression) Factor() float64 {
 	return t.factor
 }
 
-func (t *termExpression) Expression() nextroute.ModelExpression {
+func (t *termExpression) Expression() ModelExpression {
 	return t.expression
 }
 
 func (t *termExpression) Value(
-	vehicle nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicle ModelVehicleType,
+	from, to ModelStop,
 ) float64 {
 	return t.factor * t.expression.Value(vehicle, from, to)
 }

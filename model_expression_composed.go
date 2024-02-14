@@ -2,14 +2,12 @@ package nextroute
 
 import (
 	"fmt"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewComposedPerVehicleTypeExpression returns a new ComposedPerVehicleTypeExpression.
 func NewComposedPerVehicleTypeExpression(
-	defaultExpression nextroute.ModelExpression,
-) nextroute.ComposedPerVehicleTypeExpression {
+	defaultExpression ModelExpression,
+) ComposedPerVehicleTypeExpression {
 	i := NewModelExpressionIndex()
 	return &composedPerVehicleTypeExpressionImpl{
 		index:             i,
@@ -21,13 +19,13 @@ func NewComposedPerVehicleTypeExpression(
 }
 
 type composedPerVehicleTypeExpressionImpl struct {
-	defaultExpression nextroute.ModelExpression
-	expressions       []nextroute.ModelExpression
+	defaultExpression ModelExpression
+	expressions       []ModelExpression
 	name              string
 	index             int
 }
 
-func (t *composedPerVehicleTypeExpressionImpl) Get(vehicleType nextroute.ModelVehicleType) nextroute.ModelExpression {
+func (t *composedPerVehicleTypeExpressionImpl) Get(vehicleType ModelVehicleType) ModelExpression {
 	idx := vehicleType.Index()
 	if idx >= 0 && idx < len(t.expressions) {
 		if expression := t.expressions[idx]; expression != nil {
@@ -38,13 +36,13 @@ func (t *composedPerVehicleTypeExpressionImpl) Get(vehicleType nextroute.ModelVe
 }
 
 func (t *composedPerVehicleTypeExpressionImpl) Set(
-	vehicleType nextroute.ModelVehicleType,
-	expression nextroute.ModelExpression,
+	vehicleType ModelVehicleType,
+	expression ModelExpression,
 ) {
 	idx := vehicleType.Index()
 	// we have to grow the slice in case the index is out of bounds
 	if idx >= len(t.expressions) {
-		newExpressions := make([]nextroute.ModelExpression, idx+1)
+		newExpressions := make([]ModelExpression, idx+1)
 		copy(newExpressions, t.expressions)
 		t.expressions = newExpressions
 	}
@@ -91,13 +89,13 @@ func (t *composedPerVehicleTypeExpressionImpl) SetName(n string) {
 	t.name = n
 }
 
-func (t *composedPerVehicleTypeExpressionImpl) DefaultExpression() nextroute.ModelExpression {
+func (t *composedPerVehicleTypeExpressionImpl) DefaultExpression() ModelExpression {
 	return t.defaultExpression
 }
 
 func (t *composedPerVehicleTypeExpressionImpl) Value(
-	vehicleType nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from, to ModelStop,
 ) float64 {
 	idx := vehicleType.Index()
 	if idx >= 0 && idx < len(t.expressions) {

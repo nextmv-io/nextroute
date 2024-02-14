@@ -1,25 +1,21 @@
 package nextroute
 
-import (
-	"github.com/nextmv-io/sdk/nextroute"
-)
-
 // NewExpressionObjective is the implementation of sdk.NewExpressionObjective.
-func NewExpressionObjective(e nextroute.ModelExpression) nextroute.ExpressionObjective {
+func NewExpressionObjective(e ModelExpression) ExpressionObjective {
 	return &expressionObjectiveImpl{
 		expression: e,
 		index:      NewModelExpressionIndex(),
 	}
 }
 
-// expressionObjectiveImpl implements the nextroute.ExpressionObjective
+// expressionObjectiveImpl implements the ExpressionObjective
 // interface.
 type expressionObjectiveImpl struct {
-	expression nextroute.ModelExpression
+	expression ModelExpression
 	index      int
 }
 
-func (e *expressionObjectiveImpl) Expression() nextroute.ModelExpression {
+func (e *expressionObjectiveImpl) Expression() ModelExpression {
 	return e.expression
 }
 
@@ -35,12 +31,12 @@ func (e *expressionObjectiveImpl) InternalValue(solution *solutionImpl) float64 
 	return score
 }
 
-func (e *expressionObjectiveImpl) Value(solution nextroute.Solution) float64 {
+func (e *expressionObjectiveImpl) Value(solution Solution) float64 {
 	return e.InternalValue(solution.(*solutionImpl))
 }
 
 func (e *expressionObjectiveImpl) EstimateDeltaValue(
-	move nextroute.SolutionMoveStops,
+	move SolutionMoveStops,
 ) float64 {
 	moveImpl := move.(*solutionMoveStopsImpl)
 	vehicle := moveImpl.vehicle()
@@ -76,8 +72,8 @@ func (e *expressionObjectiveImpl) EstimateDeltaValue(
 	return value - currentValue
 }
 
-func (e *expressionObjectiveImpl) ModelExpressions() nextroute.ModelExpressions {
-	return nextroute.ModelExpressions{e.expression}
+func (e *expressionObjectiveImpl) ModelExpressions() ModelExpressions {
+	return ModelExpressions{e.expression}
 }
 
 func (e *expressionObjectiveImpl) String() string {

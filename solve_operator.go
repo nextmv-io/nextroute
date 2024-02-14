@@ -3,16 +3,14 @@ package nextroute
 import (
 	"context"
 	"fmt"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewSolveOperator returns a new solve operator.
 func NewSolveOperator(
 	probability float64,
 	canResultInImprovement bool,
-	parameters nextroute.SolveParameters,
-) nextroute.SolveOperator {
+	parameters SolveParameters,
+) SolveOperator {
 	return &solveOperatorImpl{
 		probability:            probability,
 		canResultInImprovement: canResultInImprovement,
@@ -21,19 +19,19 @@ func NewSolveOperator(
 }
 
 type solveOperatorImpl struct {
-	parameters             nextroute.SolveParameters
+	parameters             SolveParameters
 	probability            float64
 	canResultInImprovement bool
 }
 
 func (s *solveOperatorImpl) Execute(
 	_ context.Context,
-	_ nextroute.SolveInformation,
+	_ SolveInformation,
 ) error {
 	panic("implement me")
 }
 
-func (s *solveOperatorImpl) Parameters() nextroute.SolveParameters {
+func (s *solveOperatorImpl) Parameters() SolveParameters {
 	return s.parameters
 }
 

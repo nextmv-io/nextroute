@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewSolveOperatorUnPlan creates a new SolveOperatorUnPlan.
@@ -16,28 +15,28 @@ import (
 // number of units is sampled from a uniform distribution. The number of units
 // is always an integer between 1 and the number of units.
 func NewSolveOperatorUnPlan(
-	numberOfUnits nextroute.SolveParameter,
-) (nextroute.SolveOperatorUnPlan, error) {
+	numberOfUnits SolveParameter,
+) (SolveOperatorUnPlan, error) {
 	return &solveOperatorUnPlanImpl{
 		SolveOperator: NewSolveOperator(
 			1.0,
 			false,
-			nextroute.SolveParameters{numberOfUnits},
+			SolveParameters{numberOfUnits},
 		),
 	}, nil
 }
 
 type solveOperatorUnPlanImpl struct {
-	nextroute.SolveOperator
+	SolveOperator
 }
 
-func (d *solveOperatorUnPlanImpl) NumberOfUnits() nextroute.SolveParameter {
+func (d *solveOperatorUnPlanImpl) NumberOfUnits() SolveParameter {
 	return d.Parameters()[0]
 }
 
 func (d *solveOperatorUnPlanImpl) Execute(
 	ctx context.Context,
-	runTimeInformation nextroute.SolveInformation,
+	runTimeInformation SolveInformation,
 ) error {
 	workSolution := runTimeInformation.
 		Solver().
@@ -88,7 +87,7 @@ Loop:
 }
 
 func (d *solveOperatorUnPlanImpl) unplanOneStopIsland(
-	solutionStop nextroute.SolutionStop,
+	solutionStop SolutionStop,
 	numberOfStops int,
 ) (int, error) {
 	if !solutionStop.IsPlanned() {
@@ -114,10 +113,10 @@ func (d *solveOperatorUnPlanImpl) unplanOneStopIsland(
 }
 
 func (d *solveOperatorUnPlanImpl) unplanClosestStops(
-	solutionStop nextroute.SolutionStop,
+	solutionStop SolutionStop,
 	numberOfStops int,
-) nextroute.SolutionPlanUnits {
-	planUnits := make(nextroute.SolutionPlanUnits, 0)
+) SolutionPlanUnits {
+	planUnits := make(SolutionPlanUnits, 0)
 
 	solution := solutionStop.Solution()
 
@@ -149,7 +148,7 @@ func (d *solveOperatorUnPlanImpl) unplanClosestStops(
 }
 
 func (d *solveOperatorUnPlanImpl) unplanOneIsland(
-	solution nextroute.Solution,
+	solution Solution,
 	numberOfStops int,
 ) (int, error) {
 	planUnit := solution.PlannedPlanUnits().RandomElement()
@@ -165,10 +164,10 @@ func (d *solveOperatorUnPlanImpl) unplanOneIsland(
 }
 
 func (d *solveOperatorUnPlanImpl) unplanSomeStopsOfOneVehicle(
-	solution nextroute.Solution,
+	solution Solution,
 	chance float64,
 ) (int, error) {
-	vehicles := common.Filter(solution.Vehicles(), func(vehicle nextroute.SolutionVehicle) bool {
+	vehicles := common.Filter(solution.Vehicles(), func(vehicle SolutionVehicle) bool {
 		return !vehicle.IsEmpty()
 	})
 
@@ -183,7 +182,7 @@ func (d *solveOperatorUnPlanImpl) unplanSomeStopsOfOneVehicle(
 				maxStops = vehicle.NumberOfStops()
 			}
 		}
-		weights := common.Map(vehicles, func(vehicle nextroute.SolutionVehicle) float64 {
+		weights := common.Map(vehicles, func(vehicle SolutionVehicle) float64 {
 			return float64(maxStops - vehicle.NumberOfStops() + 1)
 		})
 		alias, err := common.NewAlias(weights)
@@ -223,10 +222,10 @@ func (d *solveOperatorUnPlanImpl) unplanSomeStopsOfOneVehicle(
 }
 
 func (d *solveOperatorUnPlanImpl) unplanLocation(
-	planUnit nextroute.SolutionPlanUnit,
+	planUnit SolutionPlanUnit,
 ) (int, error) {
 	count := 0
-	unPlanUnits := make(nextroute.SolutionPlanUnits, 1, 64)
+	unPlanUnits := make(SolutionPlanUnits, 1, 64)
 	unPlanUnits[0] = planUnit
 	plannedPlanStopsUnits := planUnit.PlannedPlanStopsUnits()
 	for _, plannedPlanStopsUnit := range plannedPlanStopsUnits {

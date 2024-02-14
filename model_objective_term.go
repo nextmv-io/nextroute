@@ -2,14 +2,12 @@ package nextroute
 
 import (
 	"fmt"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 func newModelObjectiveTerm(
 	factor float64,
-	objective nextroute.ModelObjective,
-) nextroute.ModelObjectiveTerm {
+	objective ModelObjective,
+) ModelObjectiveTerm {
 	return modelObjectiveTermImpl{
 		factor:    factor,
 		objective: objective,
@@ -17,7 +15,7 @@ func newModelObjectiveTerm(
 }
 
 type modelObjectiveTermImpl struct {
-	objective nextroute.ModelObjective
+	objective ModelObjective
 	factor    float64
 }
 
@@ -25,7 +23,7 @@ func (m modelObjectiveTermImpl) Factor() float64 {
 	return m.factor
 }
 
-func (m modelObjectiveTermImpl) Objective() nextroute.ModelObjective {
+func (m modelObjectiveTermImpl) Objective() ModelObjective {
 	return m.objective
 }
 

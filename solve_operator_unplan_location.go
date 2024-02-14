@@ -2,8 +2,6 @@ package nextroute
 
 import (
 	"context"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewSolveOperatorUnPlanLocation creates a new NewSolveOperatorUnPlanLocation.
@@ -15,26 +13,26 @@ import (
 // number of units is sampled from a uniform distribution. The number of units
 // is always an integer between 1 and the number of units.
 func NewSolveOperatorUnPlanLocation(
-	numberOfUnits nextroute.SolveParameter,
-) (nextroute.SolveOperator, error) {
+	numberOfUnits SolveParameter,
+) (SolveOperator, error) {
 	return &solveOperatorUnPlanLocationImpl{
 		SolveOperator: NewSolveOperator(
 			1.0,
 			false,
-			nextroute.SolveParameters{numberOfUnits},
+			SolveParameters{numberOfUnits},
 		),
 	}, nil
 }
 
 type solveOperatorUnPlanLocationImpl struct {
-	nextroute.SolveOperator
+	SolveOperator
 }
 
 func (d *solveOperatorUnPlanLocationImpl) unplanLocation(
-	planUnit nextroute.SolutionPlanUnit,
+	planUnit SolutionPlanUnit,
 ) (int, error) {
 	count := 0
-	unPlanUnits := make(nextroute.SolutionPlanUnits, 1, 64)
+	unPlanUnits := make(SolutionPlanUnits, 1, 64)
 	unPlanUnits[0] = planUnit
 	plannedPlanStopsUnits := planUnit.PlannedPlanStopsUnits()
 	for _, plannedPlanStopsUnit := range plannedPlanStopsUnits {
@@ -65,13 +63,13 @@ func (d *solveOperatorUnPlanLocationImpl) unplanLocation(
 	return count, nil
 }
 
-func (d *solveOperatorUnPlanLocationImpl) NumberOfUnits() nextroute.SolveParameter {
+func (d *solveOperatorUnPlanLocationImpl) NumberOfUnits() SolveParameter {
 	return d.Parameters()[0]
 }
 
 func (d *solveOperatorUnPlanLocationImpl) Execute(
 	ctx context.Context,
-	runTimeInformation nextroute.SolveInformation,
+	runTimeInformation SolveInformation,
 ) error {
 	workSolution := runTimeInformation.
 		Solver().

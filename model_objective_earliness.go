@@ -2,16 +2,14 @@ package nextroute
 
 import (
 	"math"
-
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewEarlinessObjective returns a new EarliestObjective construct.
 func NewEarlinessObjective(
-	targetTime sdkNextRoute.StopTimeExpression,
-	earlinessFactor sdkNextRoute.StopExpression,
-	temporalReference sdkNextRoute.TemporalReference,
-) (sdkNextRoute.EarlinessObjective, error) {
+	targetTime StopTimeExpression,
+	earlinessFactor StopExpression,
+	temporalReference TemporalReference,
+) (EarlinessObjective, error) {
 	return &earlinessObjectiveImpl{
 			index:             NewModelExpressionIndex(),
 			targetTime:        targetTime,
@@ -22,29 +20,29 @@ func NewEarlinessObjective(
 }
 
 type earlinessObjectiveImpl struct {
-	targetTime        sdkNextRoute.StopTimeExpression
-	earlinessFactor   sdkNextRoute.StopExpression
+	targetTime        StopTimeExpression
+	earlinessFactor   StopExpression
 	index             int
-	temporalReference sdkNextRoute.TemporalReference
+	temporalReference TemporalReference
 }
 
-func (l *earlinessObjectiveImpl) TemporalReference() sdkNextRoute.TemporalReference {
+func (l *earlinessObjectiveImpl) TemporalReference() TemporalReference {
 	return l.temporalReference
 }
 
-func (l *earlinessObjectiveImpl) ModelExpressions() sdkNextRoute.ModelExpressions {
-	return sdkNextRoute.ModelExpressions{}
+func (l *earlinessObjectiveImpl) ModelExpressions() ModelExpressions {
+	return ModelExpressions{}
 }
 
 func (l *earlinessObjectiveImpl) Index() int {
 	return l.index
 }
 
-func (l *earlinessObjectiveImpl) TargetTime() sdkNextRoute.StopTimeExpression {
+func (l *earlinessObjectiveImpl) TargetTime() StopTimeExpression {
 	return l.targetTime
 }
 
-func (l *earlinessObjectiveImpl) Earliness(stop sdkNextRoute.SolutionStop) float64 {
+func (l *earlinessObjectiveImpl) Earliness(stop SolutionStop) float64 {
 	return l.earliness(stop.(solutionStopImpl))
 }
 
@@ -52,11 +50,11 @@ func (l *earlinessObjectiveImpl) earliness(stop solutionStopImpl) float64 {
 	targetTime := l.targetTime.Value(nil, nil, stop.modelStop())
 	compare := 0.
 	switch l.temporalReference {
-	case sdkNextRoute.OnStart:
+	case OnStart:
 		compare = stop.StartValue()
-	case sdkNextRoute.OnEnd:
+	case OnEnd:
 		compare = stop.EndValue()
-	case sdkNextRoute.OnArrival:
+	case OnArrival:
 		compare = stop.ArrivalValue()
 	}
 
@@ -79,12 +77,12 @@ func (l *earlinessObjectiveImpl) InternalValue(solution *solutionImpl) float64 {
 	return value
 }
 
-func (l *earlinessObjectiveImpl) Value(solution sdkNextRoute.Solution) float64 {
+func (l *earlinessObjectiveImpl) Value(solution Solution) float64 {
 	return l.InternalValue(solution.(*solutionImpl))
 }
 
 func (l *earlinessObjectiveImpl) EstimateDeltaValue(
-	move sdkNextRoute.SolutionMoveStops,
+	move SolutionMoveStops,
 ) float64 {
 	moveImpl := move.(*solutionMoveStopsImpl)
 	vehicle := moveImpl.vehicle()
@@ -122,13 +120,13 @@ func (l *earlinessObjectiveImpl) EstimateDeltaValue(
 		actualTime := 0.0
 		currentReference := 0.0
 		switch l.temporalReference {
-		case sdkNextRoute.OnArrival:
+		case OnArrival:
 			currentReference = solutionStop.ArrivalValue()
 			actualTime = arrival
-		case sdkNextRoute.OnStart:
+		case OnStart:
 			currentReference = solutionStop.StartValue()
 			actualTime = start
-		case sdkNextRoute.OnEnd:
+		case OnEnd:
 			currentReference = solutionStop.EndValue()
 			actualTime = end
 		}
@@ -183,11 +181,11 @@ func (l *earlinessObjectiveImpl) EstimateDeltaValue(
 
 func (l *earlinessObjectiveImpl) String() string {
 	switch l.temporalReference {
-	case sdkNextRoute.OnStart:
+	case OnStart:
 		return "early_start_penalty"
-	case sdkNextRoute.OnEnd:
+	case OnEnd:
 		return "early_end_penalty"
-	case sdkNextRoute.OnArrival:
+	case OnArrival:
 		return "early_arrival_penalty"
 	}
 	return "early_undefined_reference"

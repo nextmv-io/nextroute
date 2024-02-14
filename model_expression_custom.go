@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // ConstantExpression is an expression that always returns the same value.
@@ -97,7 +96,7 @@ type VehicleFromToExpression interface {
 func NewConstantExpression(
 	name string,
 	value float64,
-) nextroute.ConstantExpression {
+) ConstantExpression {
 	return &constantExpression{
 		index: NewModelExpressionIndex(),
 		name:  name,
@@ -109,7 +108,7 @@ func NewConstantExpression(
 func NewFromStopExpression(
 	name string,
 	defaultValue float64,
-) nextroute.FromStopExpression {
+) FromStopExpression {
 	return &fromExpression{
 		name:              name,
 		index:             NewModelExpressionIndex(),
@@ -124,7 +123,7 @@ func NewFromStopExpression(
 func NewStopExpression(
 	name string,
 	defaultValue float64,
-) nextroute.StopExpression {
+) StopExpression {
 	return &toExpression{
 		name:              name,
 		index:             NewModelExpressionIndex(),
@@ -139,7 +138,7 @@ func NewStopExpression(
 func NewVehicleTypeValueExpression(
 	name string,
 	defaultValue float64,
-) nextroute.VehicleTypeValueExpression {
+) VehicleTypeValueExpression {
 	return &vehicleTypeExpressionImpl{
 		name:              name,
 		index:             NewModelExpressionIndex(),
@@ -154,7 +153,7 @@ func NewVehicleTypeValueExpression(
 func NewVehicleTypeDistanceExpression(
 	name string,
 	defaultValue common.Distance,
-) nextroute.VehicleTypeDistanceExpression {
+) VehicleTypeDistanceExpression {
 	return &vehicleTypeDistanceExpressionImpl{
 		name:              name,
 		index:             NewModelExpressionIndex(),
@@ -169,7 +168,7 @@ func NewVehicleTypeDistanceExpression(
 func NewFromToExpression(
 	name string,
 	defaultValue float64,
-) nextroute.FromToExpression {
+) FromToExpression {
 	return &fromToExpression{
 		values:            map[int]map[int]float64{},
 		name:              name,
@@ -184,7 +183,7 @@ func NewFromToExpression(
 func NewVehicleTypeFromToExpression(
 	name string,
 	defaultValue float64,
-) nextroute.VehicleFromToExpression {
+) VehicleFromToExpression {
 	return &vehicleTypeFromToExpression{
 		name:              name,
 		index:             NewModelExpressionIndex(),
@@ -198,9 +197,9 @@ func NewVehicleTypeFromToExpression(
 // NewDistanceExpression returns a DistanceExpression.
 func NewDistanceExpression(
 	name string,
-	modelExpression nextroute.ModelExpression,
+	modelExpression ModelExpression,
 	unit common.DistanceUnit,
-) nextroute.DistanceExpression {
+) DistanceExpression {
 	return &distanceExpression{
 		name:            name,
 		modelExpression: modelExpression,
@@ -210,7 +209,7 @@ func NewDistanceExpression(
 }
 
 type distanceExpression struct {
-	modelExpression nextroute.ModelExpression
+	modelExpression ModelExpression
 	name            string
 	unit            common.DistanceUnit
 	index           int
@@ -245,11 +244,11 @@ func (d *distanceExpression) SetName(n string) {
 	d.name = n
 }
 
-func (d *distanceExpression) Value(v nextroute.ModelVehicleType, from, to nextroute.ModelStop) float64 {
+func (d *distanceExpression) Value(v ModelVehicleType, from, to ModelStop) float64 {
 	return d.modelExpression.Value(v, from, to)
 }
 
-func (d *distanceExpression) Distance(v nextroute.ModelVehicleType, from, to nextroute.ModelStop) common.Distance {
+func (d *distanceExpression) Distance(v ModelVehicleType, from, to ModelStop) common.Distance {
 	return common.NewDistance(d.Value(v, from, to), d.unit)
 }
 
@@ -296,7 +295,7 @@ func (s *fromExpression) DefaultValue() float64 {
 }
 
 func (s *fromExpression) SetValue(
-	stop nextroute.ModelStop,
+	stop ModelStop,
 	value float64,
 ) {
 	if stop.Model().IsLocked() {
@@ -320,9 +319,9 @@ func (s *fromExpression) SetValue(
 }
 
 func (s *fromExpression) Value(
-	_ nextroute.ModelVehicleType,
-	from nextroute.ModelStop,
-	_ nextroute.ModelStop,
+	_ ModelVehicleType,
+	from ModelStop,
+	_ ModelStop,
 ) float64 {
 	index := from.Index()
 	if index >= len(s.values) || index < 0 {
@@ -374,7 +373,7 @@ func (s *toExpression) DefaultValue() float64 {
 }
 
 func (s *toExpression) SetValue(
-	stop nextroute.ModelStop,
+	stop ModelStop,
 	value float64,
 ) {
 	if stop.Model().IsLocked() {
@@ -415,9 +414,9 @@ func expandSlice[T any](slice []T, defaultValue T, requiredLength, maxLength int
 }
 
 func (s *toExpression) Value(
-	_ nextroute.ModelVehicleType,
-	_ nextroute.ModelStop,
-	to nextroute.ModelStop,
+	_ ModelVehicleType,
+	_ ModelStop,
+	to ModelStop,
 ) float64 {
 	index := to.Index()
 	if index >= len(s.values) || index < 0 {
@@ -469,14 +468,14 @@ func (v *vehicleTypeExpressionImpl) DefaultValue() float64 {
 }
 
 func (v *vehicleTypeExpressionImpl) SetDistance(
-	vehicle nextroute.ModelVehicleType,
+	vehicle ModelVehicleType,
 	distance common.Distance,
 ) {
 	v.SetValue(vehicle, distance.Value(common.Meters))
 }
 
 func (v *vehicleTypeExpressionImpl) SetValue(
-	vehicle nextroute.ModelVehicleType,
+	vehicle ModelVehicleType,
 	value float64,
 ) {
 	if vehicle.Model().IsLocked() {
@@ -496,14 +495,14 @@ func (v *vehicleTypeExpressionImpl) SetValue(
 }
 
 func (v *vehicleTypeExpressionImpl) ValueForVehicleType(
-	vehicleType nextroute.ModelVehicleType,
+	vehicleType ModelVehicleType,
 ) float64 {
 	return v.Value(vehicleType, nil, nil)
 }
 
 func (v *vehicleTypeExpressionImpl) Value(
-	vehicleType nextroute.ModelVehicleType,
-	_, _ nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	_, _ ModelStop,
 ) float64 {
 	if vehicleType == nil {
 		panic("vehicle type is nil for vehicle type expression")
@@ -559,7 +558,7 @@ func (v *vehicleTypeDistanceExpressionImpl) DefaultValue() float64 {
 }
 
 func (v *vehicleTypeDistanceExpressionImpl) SetDistance(
-	vehicle nextroute.ModelVehicleType,
+	vehicle ModelVehicleType,
 	value common.Distance,
 ) {
 	if vehicle.Model().IsLocked() {
@@ -579,27 +578,27 @@ func (v *vehicleTypeDistanceExpressionImpl) SetDistance(
 }
 
 func (v *vehicleTypeDistanceExpressionImpl) ValueForVehicleType(
-	vehicleType nextroute.ModelVehicleType,
+	vehicleType ModelVehicleType,
 ) float64 {
 	return v.Value(vehicleType, nil, nil)
 }
 
 func (v *vehicleTypeDistanceExpressionImpl) DistanceForVehicleType(
-	vehicleType nextroute.ModelVehicleType,
+	vehicleType ModelVehicleType,
 ) common.Distance {
 	return v.Distance(vehicleType, nil, nil)
 }
 
 func (v *vehicleTypeDistanceExpressionImpl) Distance(
-	vehicleType nextroute.ModelVehicleType, _, _ nextroute.ModelStop,
+	vehicleType ModelVehicleType, _, _ ModelStop,
 ) common.Distance {
 	value := v.Value(vehicleType, nil, nil)
 	return common.NewDistance(value, common.Meters)
 }
 
 func (v *vehicleTypeDistanceExpressionImpl) Value(
-	vehicleType nextroute.ModelVehicleType,
-	_, _ nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	_, _ ModelStop,
 ) float64 {
 	if vehicleType == nil {
 		panic("vehicle type is nil for vehicle type expression")
@@ -660,8 +659,8 @@ func (m *fromToExpression) DefaultValue() float64 {
 }
 
 func (m *fromToExpression) SetValue(
-	from nextroute.ModelStop,
-	to nextroute.ModelStop,
+	from ModelStop,
+	to ModelStop,
 	value float64,
 ) {
 	if from.Model().IsLocked() {
@@ -683,9 +682,9 @@ func (m *fromToExpression) SetValue(
 }
 
 func (m *fromToExpression) Value(
-	_ nextroute.ModelVehicleType,
-	from nextroute.ModelStop,
-	to nextroute.ModelStop,
+	_ ModelVehicleType,
+	from ModelStop,
+	to ModelStop,
 ) float64 {
 	if _, ok := m.values[from.Index()]; ok {
 		if value, ok := m.values[from.Index()][to.Index()]; ok {
@@ -734,9 +733,9 @@ func (c *constantExpression) SetValue(value float64) {
 }
 
 func (c *constantExpression) Value(
-	_ nextroute.ModelVehicleType,
-	_ nextroute.ModelStop,
-	_ nextroute.ModelStop,
+	_ ModelVehicleType,
+	_ ModelStop,
+	_ ModelStop,
 ) float64 {
 	return c.value
 }
@@ -792,9 +791,9 @@ func (m *vehicleTypeFromToExpression) DefaultValue() float64 {
 }
 
 func (m *vehicleTypeFromToExpression) SetValue(
-	vehicle nextroute.ModelVehicleType,
-	from nextroute.ModelStop,
-	to nextroute.ModelStop,
+	vehicle ModelVehicleType,
+	from ModelStop,
+	to ModelStop,
 	value float64,
 ) {
 	if from.Model().IsLocked() {
@@ -819,9 +818,9 @@ func (m *vehicleTypeFromToExpression) SetValue(
 }
 
 func (m *vehicleTypeFromToExpression) Value(
-	vehicle nextroute.ModelVehicleType,
-	from nextroute.ModelStop,
-	to nextroute.ModelStop,
+	vehicle ModelVehicleType,
+	from ModelStop,
+	to ModelStop,
 ) float64 {
 	if _, ok := m.values[vehicle.Index()]; ok {
 		if _, ok := m.values[vehicle.Index()][from.Index()]; ok {

@@ -2,8 +2,6 @@ package nextroute
 
 import (
 	"errors"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // ModelVehicleType is a vehicle type. A vehicle type is a definition of a
@@ -62,16 +60,16 @@ type ModelVehicleTypes []ModelVehicleType
 
 type vehicleTypeImpl struct {
 	modelDataImpl
-	model          nextroute.Model
-	travelDuration nextroute.TimeDependentDurationExpression
-	duration       nextroute.DurationExpression
+	model          Model
+	travelDuration TimeDependentDurationExpression
+	duration       DurationExpression
 	id             string
-	vehicles       nextroute.ModelVehicles
+	vehicles       ModelVehicles
 	index          int
 }
 
-func (v *vehicleTypeImpl) Vehicles() nextroute.ModelVehicles {
-	vehicles := make(nextroute.ModelVehicles, len(v.vehicles))
+func (v *vehicleTypeImpl) Vehicles() ModelVehicles {
+	vehicles := make(ModelVehicles, len(v.vehicles))
 	copy(vehicles, v.vehicles)
 	return vehicles
 }
@@ -88,22 +86,22 @@ func (v *vehicleTypeImpl) SetID(id string) {
 	v.id = id
 }
 
-func (v *vehicleTypeImpl) Model() nextroute.Model {
+func (v *vehicleTypeImpl) Model() Model {
 	return v.model
 }
 
-func (v *vehicleTypeImpl) TravelDurationExpression() nextroute.TimeDependentDurationExpression {
+func (v *vehicleTypeImpl) TravelDurationExpression() TimeDependentDurationExpression {
 	return v.travelDuration
 }
 
-func (v *vehicleTypeImpl) DurationExpression() nextroute.DurationExpression {
+func (v *vehicleTypeImpl) DurationExpression() DurationExpression {
 	return v.duration
 }
 
 func (v *vehicleTypeImpl) TemporalValues(
 	departure float64,
-	from nextroute.ModelStop,
-	to nextroute.ModelStop,
+	from ModelStop,
+	to ModelStop,
 ) (travelDuration, arrival, start, end float64) {
 	if from.Location().IsValid() && to.Location().IsValid() {
 		travelDuration = v.travelDuration.ValueAtValue(
@@ -133,7 +131,7 @@ func (v *vehicleTypeImpl) TemporalValues(
 	return travelDuration, arrival, start, end
 }
 
-func (v *vehicleTypeImpl) SetTravelDurationExpression(e nextroute.TimeDependentDurationExpression) error {
+func (v *vehicleTypeImpl) SetTravelDurationExpression(e TimeDependentDurationExpression) error {
 	if v.model.IsLocked() {
 		return errors.New("cannot modify vehicle type (set travel duration expression) after model is locked")
 	}
@@ -146,7 +144,7 @@ func (v *vehicleTypeImpl) SetTravelDurationExpression(e nextroute.TimeDependentD
 	return nil
 }
 
-func (v *vehicleTypeImpl) SetDurationExpression(e nextroute.DurationExpression) error {
+func (v *vehicleTypeImpl) SetDurationExpression(e DurationExpression) error {
 	if v.model.IsLocked() {
 		return errors.New("cannot modify vehicle type (set process duration expression) after model is locked")
 	}

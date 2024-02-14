@@ -4,13 +4,12 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/sdk/measure"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewMeasureByPointExpression returns a new MeasureByPointExpression.
 // A MeasureByPointExpression is a ModelExpression that uses a measure.ByPoint to
 // calculate the cost between two stops.
-func NewMeasureByPointExpression(measure measure.ByPoint) nextroute.ModelExpression {
+func NewMeasureByPointExpression(measure measure.ByPoint) ModelExpression {
 	return &measureByPointExpression{
 		index:   NewModelExpressionIndex(),
 		measure: measure,
@@ -50,7 +49,7 @@ func (m *measureByPointExpression) SetName(n string) {
 	m.name = n
 }
 
-func (m *measureByPointExpression) Value(_ nextroute.ModelVehicleType, from, to nextroute.ModelStop) float64 {
+func (m *measureByPointExpression) Value(_ ModelVehicleType, from, to ModelStop) float64 {
 	locFrom := from.Location()
 	locTo := to.Location()
 	value := m.measure.Cost(

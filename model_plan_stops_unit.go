@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // ModelPlanStopsUnit is a set of stops. It is a set of stops
@@ -32,7 +31,7 @@ type ModelPlanStopsUnit interface {
 // ModelPlanStopsUnits is a slice of model plan stops units .
 type ModelPlanStopsUnits []ModelPlanStopsUnit
 
-func checkCanBeUsedInPlanUnit(stop nextroute.ModelStop) error {
+func checkCanBeUsedInPlanUnit(stop ModelStop) error {
 	if stop == nil {
 		return fmt.Errorf("stop cannot be nil")
 	}
@@ -58,8 +57,8 @@ func checkCanBeUsedInPlanUnit(stop nextroute.ModelStop) error {
 
 func newPlanSingleStop(
 	index int,
-	stop nextroute.ModelStop,
-) (nextroute.ModelPlanStopsUnit, error) {
+	stop ModelStop,
+) (ModelPlanStopsUnit, error) {
 	err := checkCanBeUsedInPlanUnit(stop)
 
 	if err != nil {
@@ -69,7 +68,7 @@ func newPlanSingleStop(
 	planUnit := &planMultipleStopsImpl{
 		modelDataImpl: newModelDataImpl(),
 		index:         index,
-		stops:         nextroute.ModelStops{stop},
+		stops:         ModelStops{stop},
 		dag:           NewDirectedAcyclicGraph(),
 	}
 	stop.(*stopImpl).planUnit = planUnit
@@ -79,9 +78,9 @@ func newPlanSingleStop(
 
 func newPlanMultipleStops(
 	index int,
-	modelStops nextroute.ModelStops,
-	sequence nextroute.DirectedAcyclicGraph,
-) (nextroute.ModelPlanStopsUnit, error) {
+	modelStops ModelStops,
+	sequence DirectedAcyclicGraph,
+) (ModelPlanStopsUnit, error) {
 	if len(modelStops) < 2 {
 		return nil, fmt.Errorf("multiple stops plan must have at least 2 stops")
 	}
@@ -93,7 +92,7 @@ func newPlanMultipleStops(
 		dag:           sequence,
 	}
 	inStops := make(map[int]bool)
-	stops := make([]nextroute.ModelStop, len(modelStops))
+	stops := make([]ModelStop, len(modelStops))
 	for s, modelStop := range modelStops {
 		err := checkCanBeUsedInPlanUnit(modelStop)
 
@@ -135,20 +134,20 @@ func newPlanMultipleStops(
 	return planUnit, nil
 }
 
-// planMultipleStopsImpl implements nextroute.ModelPlanMultipleStops.
+// planMultipleStopsImpl implements ModelPlanMultipleStops.
 type planMultipleStopsImpl struct {
-	dag nextroute.DirectedAcyclicGraph
+	dag DirectedAcyclicGraph
 	modelDataImpl
-	stops         nextroute.ModelStops
+	stops         ModelStops
 	index         int
-	planUnitsUnit nextroute.ModelPlanUnitsUnit
+	planUnitsUnit ModelPlanUnitsUnit
 }
 
-func (p *planMultipleStopsImpl) PlanUnitsUnit() (nextroute.ModelPlanUnitsUnit, bool) {
+func (p *planMultipleStopsImpl) PlanUnitsUnit() (ModelPlanUnitsUnit, bool) {
 	return p.planUnitsUnit, p.planUnitsUnit != nil
 }
 
-func (p *planMultipleStopsImpl) setPlanUnitsUnit(planUnitsUnit nextroute.ModelPlanUnitsUnit) error {
+func (p *planMultipleStopsImpl) setPlanUnitsUnit(planUnitsUnit ModelPlanUnitsUnit) error {
 	if p.planUnitsUnit != nil {
 		return fmt.Errorf("plan unit %v already has a plan units unit", p)
 	}
@@ -162,7 +161,7 @@ func (p *planMultipleStopsImpl) String() string {
 }
 
 func (p *planMultipleStopsImpl) Centroid() (common.Location, error) {
-	locations := common.Map(p.stops, func(stop nextroute.ModelStop) common.Location {
+	locations := common.Map(p.stops, func(stop ModelStop) common.Location {
 		return stop.Location()
 	})
 	return common.Locations(locations).Centroid()
@@ -185,10 +184,10 @@ func (p *planMultipleStopsImpl) NumberOfStops() int {
 	return len(p.stops)
 }
 
-func (p *planMultipleStopsImpl) Stops() nextroute.ModelStops {
+func (p *planMultipleStopsImpl) Stops() ModelStops {
 	return common.DefensiveCopy(p.stops)
 }
 
-func (p *planMultipleStopsImpl) DirectedAcyclicGraph() nextroute.DirectedAcyclicGraph {
+func (p *planMultipleStopsImpl) DirectedAcyclicGraph() DirectedAcyclicGraph {
 	return p.dag
 }

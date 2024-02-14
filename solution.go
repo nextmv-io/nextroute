@@ -10,7 +10,6 @@ import (
 	"sync"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // Solution is a solution to a model.
@@ -80,8 +79,8 @@ type Solutions []Solution
 
 // NewSolution returns a new Solution.
 func NewSolution(
-	m nextroute.Model,
-) (nextroute.Solution, error) {
+	m Model,
+) (Solution, error) {
 	model := m.(*modelImpl)
 
 	err := model.lock()
@@ -97,7 +96,7 @@ func NewSolution(
 	nrPropositionPlanUnits := 0
 
 	for _, planUnit := range model.PlanUnits() {
-		if planStopsUnit, ok := planUnit.(nextroute.ModelPlanStopsUnit); ok {
+		if planStopsUnit, ok := planUnit.(ModelPlanStopsUnit); ok {
 			nrStops += len(planStopsUnit.Stops())
 		}
 		if planUnit.IsFixed() {
@@ -122,11 +121,11 @@ func NewSolution(
 
 		vehicleIndices:           make([]int, 0, len(model.vehicles)),
 		vehicles:                 make([]solutionVehicleImpl, 0, len(model.vehicles)),
-		solutionVehicles:         make([]nextroute.SolutionVehicle, 0, len(model.vehicles)),
+		solutionVehicles:         make([]SolutionVehicle, 0, len(model.vehicles)),
 		first:                    make([]int, 0, len(model.vehicles)),
 		last:                     make([]int, 0, len(model.vehicles)),
 		stop:                     make([]int, 0, nrStops),
-		stopByIndexCache:         make([]nextroute.SolutionStop, 0, nrStops),
+		stopByIndexCache:         make([]SolutionStop, 0, nrStops),
 		inVehicle:                make([]int, 0, nrStops),
 		previous:                 make([]int, 0, nrStops),
 		next:                     make([]int, 0, nrStops),
@@ -139,10 +138,10 @@ func NewSolution(
 		values:                   make([][]float64, maxExpressionIndex+1),
 		cumulativeValues:         make([][]float64, maxExpressionIndex+1),
 		stopToPlanUnit:           make([]*solutionPlanStopsUnitImpl, nrStops),
-		constraintStopData:       make(map[nextroute.ModelConstraint][]nextroute.Copier),
-		objectiveStopData:        make(map[nextroute.ModelObjective][]nextroute.Copier),
-		constraintSolutionData:   make(map[nextroute.ModelConstraint]nextroute.Copier),
-		objectiveSolutionData:    make(map[nextroute.ModelObjective]nextroute.Copier),
+		constraintStopData:       make(map[ModelConstraint][]Copier),
+		objectiveStopData:        make(map[ModelObjective][]Copier),
+		constraintSolutionData:   make(map[ModelConstraint]Copier),
+		objectiveSolutionData:    make(map[ModelObjective]Copier),
 		random:                   random,
 		fixedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
 			random,
@@ -168,17 +167,17 @@ func NewSolution(
 	}
 
 	for _, constraint := range model.constraintsWithStopUpdater {
-		solution.constraintStopData[constraint] = make([]nextroute.Copier, nrStops)
+		solution.constraintStopData[constraint] = make([]Copier, nrStops)
 	}
 
 	for _, objective := range model.objectivesWithStopUpdater {
-		solution.objectiveStopData[objective] = make([]nextroute.Copier, nrStops)
+		solution.objectiveStopData[objective] = make([]Copier, nrStops)
 	}
 
 	stopsUsed := make(map[int]bool)
 
 	stopIdx := 0
-	idxToPlanUnit := make(map[int]nextroute.SolutionPlanUnit)
+	idxToPlanUnit := make(map[int]SolutionPlanUnit)
 
 	for _, planUnit := range model.PlanStopsUnits() {
 		solutionPlanUnit := &solutionPlanStopsUnitImpl{
@@ -259,11 +258,11 @@ func NewSolution(
 	}
 
 	for _, planUnit := range model.PlanUnits() {
-		if modelPlanUnitsUnit, ok := planUnit.(nextroute.ModelPlanUnitsUnit); ok {
+		if modelPlanUnitsUnit, ok := planUnit.(ModelPlanUnitsUnit); ok {
 			solutionPlanUnitsUnit := &solutionPlanUnitsUnitImpl{
 				modelPlanUnitsUnit: modelPlanUnitsUnit,
 				solutionPlanUnits: make(
-					nextroute.SolutionPlanUnits,
+					SolutionPlanUnits,
 					len(modelPlanUnitsUnit.PlanUnits()),
 				),
 			}
@@ -313,7 +312,7 @@ func NewSolution(
 	return solution, nil
 }
 
-func (s *solutionImpl) unwrapRootPlanUnit(planUnit nextroute.SolutionPlanUnit) nextroute.SolutionPlanUnit {
+func (s *solutionImpl) unwrapRootPlanUnit(planUnit SolutionPlanUnit) SolutionPlanUnit {
 	planUnitsUnit, isElementOfPlanUnitsUnit := planUnit.ModelPlanUnit().PlanUnitsUnit()
 	for isElementOfPlanUnitsUnit {
 		planUnit = s.solutionPlanUnitsUnit(planUnitsUnit)
@@ -323,12 +322,12 @@ func (s *solutionImpl) unwrapRootPlanUnit(planUnit nextroute.SolutionPlanUnit) n
 }
 
 func reportInfeasibleInitialSolution(
-	move nextroute.SolutionMoveStops,
-	constraint nextroute.ModelConstraint,
+	move SolutionMoveStops,
+	constraint ModelConstraint,
 ) string {
 	stopIds := common.MapSlice(
 		move.StopPositions(),
-		func(stopPosition nextroute.StopPosition) []string {
+		func(stopPosition StopPosition) []string {
 			return []string{stopPosition.Stop().ModelStop().ID()}
 		})
 
@@ -337,7 +336,7 @@ func reportInfeasibleInitialSolution(
 	if ok {
 		name = stringer.String()
 	}
-	identifier, ok := constraint.(nextroute.Identifier)
+	identifier, ok := constraint.(Identifier)
 	if ok {
 		name = identifier.ID()
 	}
@@ -349,7 +348,7 @@ func reportInfeasibleInitialSolution(
 	)
 }
 
-func (s *solutionImpl) addInitialSolution(m nextroute.Model) error {
+func (s *solutionImpl) addInitialSolution(m Model) error {
 	model := m.(*modelImpl)
 
 	solutionObserver := newInitialSolutionObserver()
@@ -376,20 +375,20 @@ func (s *solutionImpl) addInitialSolution(m nextroute.Model) error {
 		planUnits := common.UniqueDefined(
 			common.Map(
 				initialModelStops,
-				func(modelStop nextroute.ModelStop) nextroute.SolutionPlanStopsUnit {
+				func(modelStop ModelStop) SolutionPlanStopsUnit {
 					return s.solutionStop(modelStop).PlanStopsUnit()
 				}),
-			func(planUnit nextroute.SolutionPlanStopsUnit) int {
+			func(planUnit SolutionPlanStopsUnit) int {
 				return planUnit.ModelPlanStopsUnit().Index()
 			},
 		)
 
-		infeasiblePlanUnits := map[nextroute.SolutionPlanUnit]bool{}
-		allPlanUnits := map[nextroute.SolutionPlanUnit]bool{}
+		infeasiblePlanUnits := map[SolutionPlanUnit]bool{}
+		allPlanUnits := map[SolutionPlanUnit]bool{}
 
 	PlanUnitLoop:
 		for _, planUnit := range planUnits {
-			stopPositions := make(nextroute.StopPositions, 0, len(planUnit.SolutionStops()))
+			stopPositions := make(StopPositions, 0, len(planUnit.SolutionStops()))
 			previousStop := solutionVehicle.first()
 
 			solutionPlanUnit := s.unwrapRootPlanUnit(planUnit)
@@ -412,7 +411,7 @@ func (s *solutionImpl) addInitialSolution(m nextroute.Model) error {
 							strings.Join(
 								common.MapSlice(
 									planUnitsUnit.PlanUnits(),
-									func(stop nextroute.ModelPlanUnit) []string {
+									func(stop ModelPlanUnit) []string {
 										return []string{fmt.Sprintf("%v", stop)}
 									}),
 								", ",
@@ -570,13 +569,13 @@ func (s *solutionImpl) addInitialSolution(m nextroute.Model) error {
 }
 
 type solutionImpl struct {
-	model                  nextroute.Model
-	scores                 map[nextroute.ModelObjective]float64
+	model                  Model
+	scores                 map[ModelObjective]float64
 	values                 [][]float64
-	objectiveStopData      map[nextroute.ModelObjective][]nextroute.Copier
-	constraintStopData     map[nextroute.ModelConstraint][]nextroute.Copier
-	objectiveSolutionData  map[nextroute.ModelObjective]nextroute.Copier
-	constraintSolutionData map[nextroute.ModelConstraint]nextroute.Copier
+	objectiveStopData      map[ModelObjective][]Copier
+	constraintStopData     map[ModelConstraint][]Copier
+	objectiveSolutionData  map[ModelObjective]Copier
+	constraintSolutionData map[ModelConstraint]Copier
 	cumulativeValues       [][]float64
 
 	// TODO: explore if stopToPlanUnit should rather contain interfaces
@@ -590,7 +589,7 @@ type solutionImpl struct {
 
 	// TODO: explore if vehicles should rather be interfaces, then we can avoid creating new vehices on the fly
 	vehicles         []solutionVehicleImpl
-	solutionVehicles []nextroute.SolutionVehicle
+	solutionVehicles []SolutionVehicle
 	start            []float64
 	slack            []float64
 	arrival          []float64
@@ -600,7 +599,7 @@ type solutionImpl struct {
 	stop             []int
 	// solutionStopImpl holds solutionStopImpl indexed by stop index with
 	// a pointer to the current solution.
-	stopByIndexCache         []nextroute.SolutionStop
+	stopByIndexCache         []SolutionStop
 	cumulativeTravelDuration []float64
 	end                      []float64
 	previous                 []int
@@ -609,21 +608,21 @@ type solutionImpl struct {
 	randomMutex              sync.Mutex
 }
 
-func (s *solutionImpl) SolutionPlanStopsUnit(planUnit nextroute.ModelPlanStopsUnit) nextroute.SolutionPlanStopsUnit {
+func (s *solutionImpl) SolutionPlanStopsUnit(planUnit ModelPlanStopsUnit) SolutionPlanStopsUnit {
 	if planUnit == nil {
 		return nil
 	}
 	return s.solutionPlanStopsUnit(planUnit)
 }
 
-func (s *solutionImpl) SolutionPlanUnit(planUnit nextroute.ModelPlanUnit) nextroute.SolutionPlanUnit {
+func (s *solutionImpl) SolutionPlanUnit(planUnit ModelPlanUnit) SolutionPlanUnit {
 	if planUnit == nil {
 		return nil
 	}
 	return s.solutionPlanUnit(planUnit)
 }
 
-func (s *solutionImpl) solutionPlanUnit(planUnit nextroute.ModelPlanUnit) nextroute.SolutionPlanUnit {
+func (s *solutionImpl) solutionPlanUnit(planUnit ModelPlanUnit) SolutionPlanUnit {
 	solutionPlanUnit := s.plannedPlanUnits.SolutionPlanUnit(planUnit)
 	if solutionPlanUnit != nil {
 		return solutionPlanUnit
@@ -643,22 +642,22 @@ func (s *solutionImpl) solutionPlanUnit(planUnit nextroute.ModelPlanUnit) nextro
 	return nil
 }
 
-func (s *solutionImpl) solutionPlanStopsUnit(planUnit nextroute.ModelPlanStopsUnit) *solutionPlanStopsUnitImpl {
+func (s *solutionImpl) solutionPlanStopsUnit(planUnit ModelPlanStopsUnit) *solutionPlanStopsUnitImpl {
 	return s.solutionPlanUnit(planUnit).(*solutionPlanStopsUnitImpl)
 }
 
-func (s *solutionImpl) solutionPlanUnitsUnit(planUnit nextroute.ModelPlanUnitsUnit) *solutionPlanUnitsUnitImpl {
+func (s *solutionImpl) solutionPlanUnitsUnit(planUnit ModelPlanUnitsUnit) *solutionPlanUnitsUnitImpl {
 	return s.solutionPlanUnit(planUnit).(*solutionPlanUnitsUnitImpl)
 }
 
-func (s *solutionImpl) SolutionStop(stop nextroute.ModelStop) nextroute.SolutionStop {
+func (s *solutionImpl) SolutionStop(stop ModelStop) SolutionStop {
 	if stop != nil && stop.HasPlanStopsUnit() {
 		return s.SolutionPlanStopsUnit(stop.PlanStopsUnit()).SolutionStop(stop)
 	}
 	return nil
 }
 
-func (s *solutionImpl) solutionStop(stop nextroute.ModelStop) solutionStopImpl {
+func (s *solutionImpl) solutionStop(stop ModelStop) solutionStopImpl {
 	if stop != nil && stop.HasPlanStopsUnit() {
 		return s.solutionPlanStopsUnit(stop.PlanStopsUnit()).solutionStop(stop)
 	}
@@ -666,14 +665,14 @@ func (s *solutionImpl) solutionStop(stop nextroute.ModelStop) solutionStopImpl {
 	return solutionStopImpl{}
 }
 
-func (s *solutionImpl) SolutionVehicle(vehicle nextroute.ModelVehicle) nextroute.SolutionVehicle {
+func (s *solutionImpl) SolutionVehicle(vehicle ModelVehicle) SolutionVehicle {
 	if solutionVehicle, ok := s.solutionVehicle(vehicle); ok {
 		return solutionVehicle
 	}
 	return nil
 }
 
-func (s *solutionImpl) solutionVehicle(vehicle nextroute.ModelVehicle) (solutionVehicleImpl, bool) {
+func (s *solutionImpl) solutionVehicle(vehicle ModelVehicle) (solutionVehicleImpl, bool) {
 	if vehicle != nil {
 		return solutionVehicleImpl{
 			index:    vehicle.Index(),
@@ -683,7 +682,7 @@ func (s *solutionImpl) solutionVehicle(vehicle nextroute.ModelVehicle) (solution
 	return solutionVehicleImpl{}, false
 }
 
-func (s *solutionImpl) Copy() nextroute.Solution {
+func (s *solutionImpl) Copy() Solution {
 	model := s.model.(*modelImpl)
 
 	model.OnCopySolution(s)
@@ -693,10 +692,10 @@ func (s *solutionImpl) Copy() nextroute.Solution {
 	solution := &solutionImpl{
 		arrival:                common.DefensiveCopy(s.arrival),
 		slack:                  common.DefensiveCopy(s.slack),
-		constraintStopData:     make(map[nextroute.ModelConstraint][]nextroute.Copier, len(s.constraintStopData)),
-		objectiveStopData:      make(map[nextroute.ModelObjective][]nextroute.Copier, len(s.objectiveStopData)),
-		constraintSolutionData: make(map[nextroute.ModelConstraint]nextroute.Copier, len(s.constraintSolutionData)),
-		objectiveSolutionData:  make(map[nextroute.ModelObjective]nextroute.Copier, len(s.objectiveSolutionData)),
+		constraintStopData:     make(map[ModelConstraint][]Copier, len(s.constraintStopData)),
+		objectiveStopData:      make(map[ModelObjective][]Copier, len(s.objectiveStopData)),
+		constraintSolutionData: make(map[ModelConstraint]Copier, len(s.constraintSolutionData)),
+		objectiveSolutionData:  make(map[ModelObjective]Copier, len(s.objectiveSolutionData)),
 		cumulativeTravelDuration: common.DefensiveCopy(
 			s.cumulativeTravelDuration,
 		),
@@ -727,7 +726,7 @@ func (s *solutionImpl) Copy() nextroute.Solution {
 		propositionPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
 			random, s.propositionPlanUnits.Size(),
 		),
-		scores: make(map[nextroute.ModelObjective]float64, len(s.scores)),
+		scores: make(map[ModelObjective]float64, len(s.scores)),
 	}
 
 	solution.vehicles = common.DefensiveCopy(s.vehicles)
@@ -747,7 +746,7 @@ func (s *solutionImpl) Copy() nextroute.Solution {
 
 	for _, constraint := range model.constraintsWithStopUpdater {
 		solution.constraintStopData[constraint] = make(
-			[]nextroute.Copier,
+			[]Copier,
 			len(s.constraintStopData[constraint]),
 		)
 		for idx, data := range s.constraintStopData[constraint] {
@@ -767,7 +766,7 @@ func (s *solutionImpl) Copy() nextroute.Solution {
 
 	for _, objective := range model.objectivesWithStopUpdater {
 		solution.objectiveStopData[objective] = make(
-			[]nextroute.Copier,
+			[]Copier,
 			len(s.objectiveStopData[objective]),
 		)
 		for idx, data := range s.objectiveStopData[objective] {
@@ -811,7 +810,7 @@ func (s *solutionImpl) Copy() nextroute.Solution {
 // to avoid allocations.
 func resetStopInterfaceCache(solution *solutionImpl) {
 	solution.stopByIndexCache = make(
-		[]nextroute.SolutionStop,
+		[]SolutionStop,
 		len(solution.stop),
 	)
 	for idx := range solution.stop {
@@ -834,8 +833,8 @@ func (s *solutionImpl) Random() *rand.Rand {
 }
 
 func (s *solutionImpl) newVehicle(
-	modelVehicle nextroute.ModelVehicle,
-) (nextroute.SolutionVehicle, error) {
+	modelVehicle ModelVehicle,
+) (SolutionVehicle, error) {
 	if modelVehicle == nil {
 		return nil, fmt.Errorf("modelVehicle is nil")
 	}
@@ -917,8 +916,8 @@ func (s *solutionImpl) newVehicle(
 }
 
 func (s *solutionImpl) checkConstraintsAndEstimateDeltaScore(
-	m nextroute.SolutionMoveStops,
-) (deltaScore float64, feasible bool, planPositionsHint nextroute.StopPositionsHint) {
+	m SolutionMoveStops,
+) (deltaScore float64, feasible bool, planPositionsHint StopPositionsHint) {
 	model := s.model.(*modelImpl)
 	for _, constraint := range model.constraints {
 		s.model.OnEstimateIsViolated(
@@ -964,7 +963,7 @@ func (s *solutionImpl) checkConstraintsAndEstimateDeltaScore(
 var constNoPositionsHintImpl = noPositionsHint()
 
 func (s *solutionImpl) checkConstraints(
-	m nextroute.SolutionMoveStops,
+	m SolutionMoveStops,
 ) (feasible bool, planPositionsHint *stopPositionHintImpl) {
 	model := s.model.(*modelImpl)
 	for _, constraint := range model.constraints {
@@ -1001,7 +1000,7 @@ func (s *solutionImpl) checkConstraints(
 }
 
 func (s *solutionImpl) estimateDeltaScore(
-	m nextroute.SolutionMoveStops,
+	m SolutionMoveStops,
 ) (deltaScore float64) {
 	s.model.OnEstimateDeltaObjectiveScore()
 
@@ -1012,15 +1011,15 @@ func (s *solutionImpl) estimateDeltaScore(
 	return objectiveEstimate
 }
 
-func (s *solutionImpl) ConstraintData(constraint nextroute.ModelConstraint) any {
+func (s *solutionImpl) ConstraintData(constraint ModelConstraint) any {
 	return s.constraintSolutionData[constraint]
 }
 
-func (s *solutionImpl) ObjectiveData(objective nextroute.ModelObjective) any {
+func (s *solutionImpl) ObjectiveData(objective ModelObjective) any {
 	return s.objectiveSolutionData[objective]
 }
 
-func (s *solutionImpl) ObjectiveValue(objective nextroute.ModelObjective) float64 {
+func (s *solutionImpl) ObjectiveValue(objective ModelObjective) float64 {
 	if value, ok := s.scores[objective]; ok {
 		return value
 	}
@@ -1031,15 +1030,15 @@ func (s *solutionImpl) Score() float64 {
 	return s.scores[s.model.Objective()]
 }
 
-func (s *solutionImpl) FixedPlanUnits() nextroute.ImmutableSolutionPlanUnitCollection {
+func (s *solutionImpl) FixedPlanUnits() ImmutableSolutionPlanUnitCollection {
 	return &s.fixedPlanUnits
 }
 
-func (s *solutionImpl) PlannedPlanUnits() nextroute.ImmutableSolutionPlanUnitCollection {
+func (s *solutionImpl) PlannedPlanUnits() ImmutableSolutionPlanUnitCollection {
 	return &s.plannedPlanUnits
 }
 
-func (s *solutionImpl) UnPlannedPlanUnits() nextroute.ImmutableSolutionPlanUnitCollection {
+func (s *solutionImpl) UnPlannedPlanUnits() ImmutableSolutionPlanUnitCollection {
 	return &s.unPlannedPlanUnits
 }
 
@@ -1048,34 +1047,34 @@ func (s *solutionImpl) UnPlannedPlanUnits() nextroute.ImmutableSolutionPlanUnitC
 type PreAllocatedMoveContainer struct {
 	// singleStopPosSolutionMoveStop has the underlying type *solutionMoveStopsImpl.
 	// and has a length 1 stopPositions slice.
-	singleStopPosSolutionMoveStop nextroute.SolutionMoveStops
+	singleStopPosSolutionMoveStop SolutionMoveStops
 }
 
 // NewPreAllocatedMoveContainer creates a new PreAllocatedMoveContainer.
 // The PreAllocatedMoveContainer is initialized with concreate values depending on the planUnit type at runtime.
-func NewPreAllocatedMoveContainer(planUnit nextroute.SolutionPlanUnit) *PreAllocatedMoveContainer {
+func NewPreAllocatedMoveContainer(planUnit SolutionPlanUnit) *PreAllocatedMoveContainer {
 	allocations := PreAllocatedMoveContainer{}
 	switch planUnit.(type) {
-	case nextroute.SolutionPlanStopsUnit:
+	case SolutionPlanStopsUnit:
 		m := newNotExecutableSolutionMoveStops(planUnit.(*solutionPlanStopsUnitImpl))
 		m.stopPositions = make([]stopPositionImpl, 1, 2)
 		allocations.singleStopPosSolutionMoveStop = m
-	case nextroute.SolutionPlanUnitsUnit:
+	case SolutionPlanUnitsUnit:
 	}
 	return &allocations
 }
 
-func (s *solutionImpl) BestMove(ctx context.Context, planUnit nextroute.SolutionPlanUnit) nextroute.SolutionMove {
+func (s *solutionImpl) BestMove(ctx context.Context, planUnit SolutionPlanUnit) SolutionMove {
 	if planUnit.Solution().(*solutionImpl) != s {
 		panic("plan planUnit does not belong to this solution")
 	}
 
-	var bestMove nextroute.SolutionMove
+	var bestMove SolutionMove
 	// we initialize bestMove with the most likely type the moves will have
 	switch planUnit.(type) {
-	case nextroute.SolutionPlanStopsUnit:
+	case SolutionPlanStopsUnit:
 		bestMove = newNotExecutableSolutionMoveStops(planUnit.(*solutionPlanStopsUnitImpl))
-	case nextroute.SolutionPlanUnitsUnit:
+	case SolutionPlanUnitsUnit:
 		bestMove = newNotExecutableSolutionMoveUnits(planUnit.(*solutionPlanUnitsUnitImpl))
 	default:
 		bestMove = NotExecutableMove
@@ -1112,34 +1111,34 @@ func (s *solutionImpl) BestMove(ctx context.Context, planUnit nextroute.Solution
 	return bestMove
 }
 
-func (s *solutionImpl) Model() nextroute.Model {
+func (s *solutionImpl) Model() Model {
 	return s.model
 }
 
-func (s *solutionImpl) Vehicles() nextroute.SolutionVehicles {
+func (s *solutionImpl) Vehicles() SolutionVehicles {
 	return common.DefensiveCopy(s.solutionVehicles)
 }
 
-func (s *solutionImpl) vehiclesMutable() nextroute.SolutionVehicles {
+func (s *solutionImpl) vehiclesMutable() SolutionVehicles {
 	return s.solutionVehicles
 }
 
 func (s *solutionImpl) value(
-	expression nextroute.ModelExpression,
+	expression ModelExpression,
 	index int,
 ) float64 {
 	return s.values[expression.Index()][index]
 }
 
 func (s *solutionImpl) cumulativeValue(
-	expression nextroute.ModelExpression,
+	expression ModelExpression,
 	index int,
 ) float64 {
 	return s.cumulativeValues[expression.Index()][index]
 }
 
 func (s *solutionImpl) constraintValue(
-	constraint nextroute.ModelConstraint,
+	constraint ModelConstraint,
 	index int,
 ) any {
 	if data, ok := s.constraintStopData[constraint]; ok {
@@ -1149,7 +1148,7 @@ func (s *solutionImpl) constraintValue(
 }
 
 func (s *solutionImpl) objectiveValue(
-	objective nextroute.ModelObjective,
+	objective ModelObjective,
 	index int,
 ) any {
 	if data, ok := s.objectiveStopData[objective]; ok {
@@ -1158,11 +1157,11 @@ func (s *solutionImpl) objectiveValue(
 	return nil
 }
 
-func filterConstraint(constraint nextroute.ModelConstraint, includeTemporal bool) bool {
+func filterConstraint(constraint ModelConstraint, includeTemporal bool) bool {
 	if includeTemporal {
 		return false
 	}
-	if constraintTemporal, ok := constraint.(nextroute.ConstraintTemporal); ok && constraintTemporal.IsTemporal() {
+	if constraintTemporal, ok := constraint.(ConstraintTemporal); ok && constraintTemporal.IsTemporal() {
 		return true
 	}
 	return false
@@ -1172,7 +1171,7 @@ func filterConstraint(constraint nextroute.ModelConstraint, includeTemporal bool
 // constraints are feasible. Furthermore, it returns the index of the stop
 // causing the violation.
 func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
-	violatedConstraint nextroute.ModelConstraint,
+	violatedConstraint ModelConstraint,
 	violatedIndex int,
 	err error,
 ) {
@@ -1183,7 +1182,7 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 	solutionStop := s.stopByIndexCache[index]
 
 	for _, constraint := range model.constraintsWithStopUpdater {
-		value, err := constraint.(nextroute.ConstraintStopDataUpdater).
+		value, err := constraint.(ConstraintStopDataUpdater).
 			UpdateConstraintStopData(
 				solutionStop,
 			)
@@ -1194,7 +1193,7 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 	}
 
 	for _, objective := range model.objectivesWithStopUpdater {
-		value, err := objective.(nextroute.ObjectiveStopDataUpdater).
+		value, err := objective.(ObjectiveStopDataUpdater).
 			UpdateObjectiveStopData(
 				solutionStop,
 			)
@@ -1233,7 +1232,7 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 
 		solutionStop = s.stopByIndexCache[next]
 		for _, constraint := range model.constraintsWithStopUpdater {
-			value, err := constraint.(nextroute.ConstraintStopDataUpdater).
+			value, err := constraint.(ConstraintStopDataUpdater).
 				UpdateConstraintStopData(
 					solutionStop,
 				)
@@ -1244,7 +1243,7 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 		}
 
 		for _, objective := range model.objectivesWithStopUpdater {
-			value, err := objective.(nextroute.ObjectiveStopDataUpdater).
+			value, err := objective.(ObjectiveStopDataUpdater).
 				UpdateObjectiveStopData(
 					solutionStop,
 				)
@@ -1256,7 +1255,7 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 
 		index = next
 
-		for _, constraint := range model.constraintMap[nextroute.AtEachStop] {
+		for _, constraint := range model.constraintMap[AtEachStop] {
 			if filterConstraint(constraint, includeTemporal) {
 				continue
 			}
@@ -1265,7 +1264,7 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 			}
 		}
 		if s.next[index] == index {
-			for _, constraint := range model.constraintMap[nextroute.AtEachVehicle] {
+			for _, constraint := range model.constraintMap[AtEachVehicle] {
 				if filterConstraint(constraint, includeTemporal) {
 					continue
 				}
@@ -1275,7 +1274,7 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 			}
 		}
 	}
-	for _, constraint := range model.constraintMap[nextroute.AtEachSolution] {
+	for _, constraint := range model.constraintMap[AtEachSolution] {
 		if filterConstraint(constraint, includeTemporal) {
 			continue
 		}
@@ -1285,7 +1284,7 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 	}
 
 	for _, constraint := range model.constraintsWithSolutionUpdater {
-		value, err := constraint.(nextroute.ConstraintSolutionDataUpdater).
+		value, err := constraint.(ConstraintSolutionDataUpdater).
 			UpdateConstraintSolutionData(s)
 		if err != nil {
 			return nil, -1, err
@@ -1294,7 +1293,7 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 	}
 
 	for _, objective := range model.objectivesWithSolutionUpdater {
-		value, err := objective.(nextroute.ObjectiveSolutionDataUpdater).
+		value, err := objective.(ObjectiveSolutionDataUpdater).
 			UpdateObjectiveSolutionData(s)
 		if err != nil {
 			return nil, -1, err
@@ -1316,7 +1315,7 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 	terms := model.objective.Terms()
 	// TODO: do we always have to init the map?
 	if s.scores == nil {
-		s.scores = make(map[nextroute.ModelObjective]float64, len(terms)+1)
+		s.scores = make(map[ModelObjective]float64, len(terms)+1)
 	}
 	totalScore := 0.0
 	for _, term := range terms {
@@ -1330,21 +1329,21 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 }
 
 func (s *solutionImpl) isStopNotFeasible(
-	constraint nextroute.ModelConstraint,
-	stop nextroute.SolutionStop,
+	constraint ModelConstraint,
+	stop SolutionStop,
 ) bool {
-	s.model.OnCheckConstraint(constraint, nextroute.AtEachStop)
-	violated := constraint.(nextroute.SolutionStopViolationCheck).DoesStopHaveViolations(stop)
+	s.model.OnCheckConstraint(constraint, AtEachStop)
+	violated := constraint.(SolutionStopViolationCheck).DoesStopHaveViolations(stop)
 	s.model.OnStopConstraintChecked(stop, constraint, !violated)
 	return violated
 }
 
 func (s *solutionImpl) isVehicleNotFeasible(
-	constraint nextroute.ModelConstraint,
+	constraint ModelConstraint,
 	vehicleIndex int,
 ) bool {
-	s.model.OnCheckConstraint(constraint, nextroute.AtEachVehicle)
-	violated := constraint.(nextroute.SolutionVehicleViolationCheck).
+	s.model.OnCheckConstraint(constraint, AtEachVehicle)
+	violated := constraint.(SolutionVehicleViolationCheck).
 		DoesVehicleHaveViolations(
 			toSolutionVehicle(s, vehicleIndex),
 		)
@@ -1353,10 +1352,10 @@ func (s *solutionImpl) isVehicleNotFeasible(
 }
 
 func (s *solutionImpl) isSolutionNotFeasible(
-	constraint nextroute.ModelConstraint,
+	constraint ModelConstraint,
 ) bool {
-	s.model.OnCheckConstraint(constraint, nextroute.AtEachSolution)
-	violated := constraint.(nextroute.SolutionViolationCheck).
+	s.model.OnCheckConstraint(constraint, AtEachSolution)
+	violated := constraint.(SolutionViolationCheck).
 		DoesSolutionHaveViolations(s)
 	s.model.OnSolutionConstraintChecked(constraint, !violated)
 	return violated

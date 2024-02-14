@@ -4,13 +4,12 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/sdk/measure"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewMeasureByIndexExpression returns a new MeasureByIndexExpression.
 // A MeasureByIndexExpression is a ModelExpression that uses a measure.ByIndex to
 // calculate the cost between two stops.
-func NewMeasureByIndexExpression(measure measure.ByIndex) nextroute.ModelExpression {
+func NewMeasureByIndexExpression(measure measure.ByIndex) ModelExpression {
 	return &measureByIndexExpression{
 		index:   NewModelExpressionIndex(),
 		measure: measure,
@@ -50,6 +49,6 @@ func (m *measureByIndexExpression) SetName(n string) {
 	m.name = n
 }
 
-func (m *measureByIndexExpression) Value(_ nextroute.ModelVehicleType, from, to nextroute.ModelStop) float64 {
+func (m *measureByIndexExpression) Value(_ ModelVehicleType, from, to ModelStop) float64 {
 	return m.measure.Cost(from.(*stopImpl).measureIndex, to.(*stopImpl).measureIndex)
 }

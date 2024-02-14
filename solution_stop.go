@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // A SolutionStop is a stop that is planned to be visited by a vehicle. It is
@@ -160,7 +158,7 @@ type solutionStopImpl struct {
 	index    int
 }
 
-func toSolutionStop(solution nextroute.Solution, index int) solutionStopImpl {
+func toSolutionStop(solution Solution, index int) solutionStopImpl {
 	return solutionStopImpl{
 		index:    index,
 		solution: solution.(*solutionImpl),
@@ -188,34 +186,34 @@ func (v solutionStopImpl) String() string {
 }
 
 func (v solutionStopImpl) ConstraintData(
-	constraint nextroute.ModelConstraint,
+	constraint ModelConstraint,
 ) any {
 	return v.solution.constraintValue(constraint, v.index)
 }
 
 func (v solutionStopImpl) ObjectiveData(
-	objective nextroute.ModelObjective,
+	objective ModelObjective,
 ) any {
 	return v.solution.objectiveValue(objective, v.index)
 }
 
 func (v solutionStopImpl) Value(
-	expression nextroute.ModelExpression,
+	expression ModelExpression,
 ) float64 {
 	return v.solution.value(expression, v.index)
 }
 
 func (v solutionStopImpl) CumulativeValue(
-	expression nextroute.ModelExpression,
+	expression ModelExpression,
 ) float64 {
 	return v.solution.cumulativeValue(expression, v.index)
 }
 
-func (v solutionStopImpl) Solution() nextroute.Solution {
+func (v solutionStopImpl) Solution() Solution {
 	return v.solution
 }
 
-func (v solutionStopImpl) PlanStopsUnit() nextroute.SolutionPlanStopsUnit {
+func (v solutionStopImpl) PlanStopsUnit() SolutionPlanStopsUnit {
 	return v.planStopsUnit()
 }
 
@@ -227,7 +225,7 @@ func (v solutionStopImpl) Index() int {
 	return v.index
 }
 
-func (v solutionStopImpl) Next() nextroute.SolutionStop {
+func (v solutionStopImpl) Next() SolutionStop {
 	return v.solution.stopByIndexCache[v.solution.next[v.index]]
 }
 
@@ -246,7 +244,7 @@ func (v solutionStopImpl) IsPlanned() bool {
 	return v.solution.next[v.index] != v.solution.previous[v.index]
 }
 
-func (v solutionStopImpl) Previous() nextroute.SolutionStop {
+func (v solutionStopImpl) Previous() SolutionStop {
 	return v.solution.stopByIndexCache[v.solution.previous[v.index]]
 }
 
@@ -338,7 +336,7 @@ func (v solutionStopImpl) CumulativeTravelDuration() time.Duration {
 		v.solution.model.DurationUnit()
 }
 
-func (v solutionStopImpl) Vehicle() nextroute.SolutionVehicle {
+func (v solutionStopImpl) Vehicle() SolutionVehicle {
 	if v.solution.next[v.index] == v.solution.previous[v.index] {
 		panic("cannot get route of unplanned visit")
 	}
@@ -380,7 +378,7 @@ func (v solutionStopImpl) IsFirst() bool {
 		v.solution.next[v.index] != v.index
 }
 
-func (v solutionStopImpl) ModelStop() nextroute.ModelStop {
+func (v solutionStopImpl) ModelStop() ModelStop {
 	return v.solution.model.(*modelImpl).stops[v.solution.stop[v.index]]
 }
 

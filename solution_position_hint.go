@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 var (
@@ -43,7 +41,7 @@ type StopPositionsHint interface {
 // NoPositionsHint returns a new StopPositionsHint that does not skip
 // the vehicle and does not contain a next stop. The solver will try to find
 // the next stop.
-func NoPositionsHint() nextroute.StopPositionsHint {
+func NoPositionsHint() StopPositionsHint {
 	return noPositionsHint()
 }
 
@@ -59,7 +57,7 @@ func noPositionsHint() *stopPositionHintImpl {
 // SkipVehiclePositionsHint returns a new StopPositionsHint that skips the
 // vehicle if skipVehicle is true. Is skipVehicle is false the solver will try
 // to find the next stop.
-func SkipVehiclePositionsHint() nextroute.StopPositionsHint {
+func SkipVehiclePositionsHint() StopPositionsHint {
 	return skipVehiclePositionsHint()
 }
 
@@ -80,21 +78,21 @@ func (n *stopPositionHintImpl) HasNextStopPositions() bool {
 	return false
 }
 
-func (n *stopPositionHintImpl) NextStopPositions() nextroute.StopPositions {
-	return nextroute.StopPositions{}
+func (n *stopPositionHintImpl) NextStopPositions() StopPositions {
+	return StopPositions{}
 }
 
 func (n *stopPositionHintImpl) SkipVehicle() bool {
 	return n.skipVehicle
 }
 
-func newErrorOnNilHint(constraint nextroute.ModelConstraint) error {
+func newErrorOnNilHint(constraint ModelConstraint) error {
 	name := reflect.TypeOf(constraint).Name()
 	stringer, ok := constraint.(fmt.Stringer)
 	if ok {
 		name = stringer.String()
 	}
-	identifier, ok := constraint.(nextroute.Identifier)
+	identifier, ok := constraint.(Identifier)
 	if ok {
 		name = identifier.ID()
 	}

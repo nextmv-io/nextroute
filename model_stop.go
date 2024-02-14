@@ -7,7 +7,6 @@ import (
 
 	common_internal "github.com/nextmv-io/nextroute/common"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // ModelStop is a stop to be assigned to a vehicle.
@@ -96,13 +95,13 @@ type ModelStops []ModelStop
 
 type stopImpl struct {
 	windowChecker common_internal.IntervalChecker
-	planUnit      nextroute.ModelPlanStopsUnit
+	planUnit      ModelPlanStopsUnit
 	location      common.Location
 	modelDataImpl
 	vehicle           *modelVehicleImpl
 	model             *modelImpl
 	id                string
-	closest           nextroute.ModelStops
+	closest           ModelStops
 	windows           [][2]float64
 	earliestStartTime float64
 	index             int
@@ -111,11 +110,11 @@ type stopImpl struct {
 	fixed             bool
 }
 
-func (s *stopImpl) Model() nextroute.Model {
+func (s *stopImpl) Model() Model {
 	return s.model
 }
 
-func (s *stopImpl) Vehicle() nextroute.ModelVehicle {
+func (s *stopImpl) Vehicle() ModelVehicle {
 	return s.vehicle
 }
 
@@ -138,7 +137,7 @@ func (s *stopImpl) cacheClosestStops() {
 	if s.HasPlanStopsUnit() {
 		n := 20
 		modelStopsDistanceQueries, err := NewModelStopsDistanceQueries(
-			common.Filter(s.model.Stops(), func(stop nextroute.ModelStop) bool {
+			common.Filter(s.model.Stops(), func(stop ModelStop) bool {
 				return stop.Location().IsValid()
 			}),
 		)
@@ -152,7 +151,7 @@ func (s *stopImpl) cacheClosestStops() {
 	}
 }
 
-func (s *stopImpl) closestStops() nextroute.ModelStops {
+func (s *stopImpl) closestStops() ModelStops {
 	if s.closest == nil {
 		s.model.mutex.Lock()
 		defer s.model.mutex.Unlock()
@@ -163,8 +162,8 @@ func (s *stopImpl) closestStops() nextroute.ModelStops {
 	return s.closest
 }
 
-func (s *stopImpl) ClosestStops() nextroute.ModelStops {
-	closest := make(nextroute.ModelStops, len(s.closestStops()))
+func (s *stopImpl) ClosestStops() ModelStops {
+	closest := make(ModelStops, len(s.closestStops()))
 	copy(closest, s.closestStops())
 	return s.closest
 }
@@ -173,7 +172,7 @@ func (s *stopImpl) HasPlanStopsUnit() bool {
 	return s.planUnit != nil
 }
 
-func (s *stopImpl) PlanStopsUnit() nextroute.ModelPlanStopsUnit {
+func (s *stopImpl) PlanStopsUnit() ModelPlanStopsUnit {
 	return s.planUnit
 }
 

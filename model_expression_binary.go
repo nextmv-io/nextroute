@@ -2,18 +2,16 @@ package nextroute
 
 import (
 	"fmt"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewOperatorExpression returns a new BinaryExpression that uses the given
 // operator function.
 func NewOperatorExpression(
 	name string,
-	left nextroute.ModelExpression,
-	right nextroute.ModelExpression,
-	operator nextroute.BinaryFunction,
-) nextroute.BinaryExpression {
+	left ModelExpression,
+	right ModelExpression,
+	operator BinaryFunction,
+) BinaryExpression {
 	return &binaryExpression{
 		index:    NewModelExpressionIndex(),
 		left:     left,
@@ -24,9 +22,9 @@ func NewOperatorExpression(
 }
 
 type binaryExpression struct {
-	left     nextroute.ModelExpression
-	right    nextroute.ModelExpression
-	operator nextroute.BinaryFunction
+	left     ModelExpression
+	right    ModelExpression
+	operator BinaryFunction
 	name     string
 	index    int
 }
@@ -64,17 +62,17 @@ func (b *binaryExpression) SetName(n string) {
 	b.name = n
 }
 
-func (b *binaryExpression) Left() nextroute.ModelExpression {
+func (b *binaryExpression) Left() ModelExpression {
 	return b.left
 }
 
-func (b *binaryExpression) Right() nextroute.ModelExpression {
+func (b *binaryExpression) Right() ModelExpression {
 	return b.right
 }
 
 func (b *binaryExpression) Value(
-	vehicle nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicle ModelVehicleType,
+	from, to ModelStop,
 ) float64 {
 	return b.operator(
 		b.left.Value(vehicle, from, to),

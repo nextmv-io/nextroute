@@ -2,15 +2,14 @@ package nextroute
 
 import (
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewAttributesConstraint returns a new AttributesConstraint.
-func NewAttributesConstraint() (nextroute.AttributesConstraint, error) {
+func NewAttributesConstraint() (AttributesConstraint, error) {
 	return &attributesConstraintImpl{
 		modelConstraintImpl: newModelConstraintImpl(
 			"attributes",
-			nextroute.ModelExpressions{},
+			ModelExpressions{},
 		),
 		stopAttributes:        make(map[int][]string),
 		vehicleTypeAttributes: make(map[int][]string),
@@ -25,7 +24,7 @@ type attributesConstraintImpl struct {
 	vehicleTypes int
 }
 
-func (l *attributesConstraintImpl) Lock(model nextroute.Model) error {
+func (l *attributesConstraintImpl) Lock(model Model) error {
 	vehicleTypeAttributes := make(map[int]map[string]bool)
 	vehicleTypes := model.VehicleTypes()
 	l.vehicleTypes = len(vehicleTypes)
@@ -77,14 +76,14 @@ func (l *attributesConstraintImpl) String() string {
 	return l.name
 }
 
-func (l *attributesConstraintImpl) StopAttributes(stop nextroute.ModelStop) []string {
+func (l *attributesConstraintImpl) StopAttributes(stop ModelStop) []string {
 	if attributes, hasAttributes := l.stopAttributes[stop.Index()]; hasAttributes {
 		return common.DefensiveCopy(attributes)
 	}
 	return []string{}
 }
 
-func (l *attributesConstraintImpl) VehicleTypeAttributes(vehicle nextroute.ModelVehicleType) []string {
+func (l *attributesConstraintImpl) VehicleTypeAttributes(vehicle ModelVehicleType) []string {
 	if attributes, hasAttributes := l.vehicleTypeAttributes[vehicle.Index()]; hasAttributes {
 		return common.DefensiveCopy(attributes)
 	}
@@ -92,7 +91,7 @@ func (l *attributesConstraintImpl) VehicleTypeAttributes(vehicle nextroute.Model
 }
 
 func (l *attributesConstraintImpl) SetStopAttributes(
-	stop nextroute.ModelStop,
+	stop ModelStop,
 	stopAttributes []string,
 ) {
 	if stop.Model().IsLocked() {
@@ -102,7 +101,7 @@ func (l *attributesConstraintImpl) SetStopAttributes(
 }
 
 func (l *attributesConstraintImpl) SetVehicleTypeAttributes(
-	vehicleType nextroute.ModelVehicleType,
+	vehicleType ModelVehicleType,
 	vehicleAttributes []string,
 ) {
 	if vehicleType.Model().IsLocked() {
@@ -111,17 +110,17 @@ func (l *attributesConstraintImpl) SetVehicleTypeAttributes(
 	l.vehicleTypeAttributes[vehicleType.Index()] = common.Unique(vehicleAttributes)
 }
 
-func (l *attributesConstraintImpl) CheckCost() nextroute.Cost {
-	return nextroute.Constant
+func (l *attributesConstraintImpl) CheckCost() Cost {
+	return Constant
 }
 
-func (l *attributesConstraintImpl) EstimationCost() nextroute.Cost {
-	return nextroute.Constant
+func (l *attributesConstraintImpl) EstimationCost() Cost {
+	return Constant
 }
 
 func (l *attributesConstraintImpl) EstimateIsViolated(
-	move nextroute.SolutionMoveStops,
-) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	move SolutionMoveStops,
+) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
 	planUnitIdx := moveImpl.planUnit.modelPlanStopsUnit.Index()
 	vehicleType := moveImpl.vehicle().ModelVehicle().VehicleType()

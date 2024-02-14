@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // Cluster is both a constraint and an objective that limits/prefers the
@@ -96,26 +95,26 @@ func (l *clusterImpl) String() string {
 	return fmt.Sprintf("%v", l.name)
 }
 
-func (l *clusterImpl) EstimationCost() nextroute.Cost {
-	return nextroute.LinearVehicle
+func (l *clusterImpl) EstimationCost() Cost {
+	return LinearVehicle
 }
 
 func (l *clusterImpl) UpdateObjectiveStopData(
-	solutionStop nextroute.SolutionStop,
-) (nextroute.Copier, error) {
+	solutionStop SolutionStop,
+) (Copier, error) {
 	return l.updateData(solutionStop.(solutionStopImpl), true)
 }
 
 func (l *clusterImpl) UpdateConstraintStopData(
-	solutionStop nextroute.SolutionStop,
-) (nextroute.Copier, error) {
+	solutionStop SolutionStop,
+) (Copier, error) {
 	return l.updateData(solutionStop.(solutionStopImpl), false)
 }
 
 func (l *clusterImpl) updateData(
 	solutionStop solutionStopImpl,
 	asObjective bool,
-) (nextroute.Copier, error) {
+) (Copier, error) {
 	if solutionStop.IsFirst() {
 		location, err := common.NewLocation(0, 0)
 		if err != nil {
@@ -191,7 +190,7 @@ func compactness(
 }
 
 func (l *clusterImpl) EstimateDeltaValue(
-	move nextroute.SolutionMoveStops,
+	move SolutionMoveStops,
 ) float64 {
 	score, _ := l.estimateDeltaScore(
 		move,
@@ -201,8 +200,8 @@ func (l *clusterImpl) EstimateDeltaValue(
 }
 
 func (l *clusterImpl) EstimateIsViolated(
-	move nextroute.SolutionMoveStops,
-) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	move SolutionMoveStops,
+) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	score, hint := l.estimateDeltaScore(
 		move,
 		true,
@@ -211,9 +210,9 @@ func (l *clusterImpl) EstimateIsViolated(
 }
 
 func (l *clusterImpl) estimateDeltaScore(
-	move nextroute.SolutionMoveStops,
+	move SolutionMoveStops,
 	asConstraint bool,
-) (deltaScore float64, stopPositionsHint nextroute.StopPositionsHint) {
+) (deltaScore float64, stopPositionsHint StopPositionsHint) {
 	solutionImpl := move.Solution().(*solutionImpl)
 	moveImpl := move.(*solutionMoveStopsImpl)
 	stopPositions := moveImpl.stopPositionsImpl()
@@ -269,7 +268,7 @@ func (l *clusterImpl) estimateDeltaScore(
 	return deltaScore, constNoPositionsHint
 }
 
-func (l *clusterImpl) getSolutionStops(vehicle nextroute.SolutionVehicle) []solutionStopImpl {
+func (l *clusterImpl) getSolutionStops(vehicle SolutionVehicle) []solutionStopImpl {
 	stops := make([]solutionStopImpl, 0, vehicle.NumberOfStops())
 	for _, stop := range vehicle.SolutionStops() {
 		if stop.IsFirst() && !l.includeFirst {
@@ -282,7 +281,7 @@ func (l *clusterImpl) getSolutionStops(vehicle nextroute.SolutionVehicle) []solu
 	}
 	return stops
 }
-func (l *clusterImpl) Value(solutionStop nextroute.Solution) float64 {
+func (l *clusterImpl) Value(solutionStop Solution) float64 {
 	sum := 0.0
 	for _, v := range solutionStop.(*solutionImpl).vehiclesMutable() {
 		vehicle := v.(solutionVehicleImpl)

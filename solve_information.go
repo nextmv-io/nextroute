@@ -2,14 +2,12 @@ package nextroute
 
 import (
 	"time"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 type solveInformationImpl struct {
 	start          time.Time
-	solver         nextroute.Solver
-	solveOperators nextroute.SolveOperators
+	solver         Solver
+	solveOperators SolveOperators
 	deltaScore     float64
 	iteration      int
 }
@@ -18,11 +16,11 @@ func (s *solveInformationImpl) Iteration() int {
 	return s.iteration
 }
 
-func (s *solveInformationImpl) Solver() nextroute.Solver {
+func (s *solveInformationImpl) Solver() Solver {
 	return s.solver
 }
 
-func (s *solveInformationImpl) SolveOperators() nextroute.SolveOperators {
+func (s *solveInformationImpl) SolveOperators() SolveOperators {
 	return s.solveOperators
 }
 

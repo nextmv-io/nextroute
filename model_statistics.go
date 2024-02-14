@@ -6,25 +6,24 @@ import (
 	"strings"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewModelStatistics returns a new model statistics implementation.
-func NewModelStatistics(model nextroute.Model) nextroute.ModelStatistics {
+func NewModelStatistics(model Model) ModelStatistics {
 	return modelStatisticsImpl{
 		model: model,
 	}
 }
 
 // NewVehicleStatistics returns a new vehicle statistics implementation.
-func NewVehicleStatistics(vehicle nextroute.ModelVehicle) nextroute.VehicleStatistics {
+func NewVehicleStatistics(vehicle ModelVehicle) VehicleStatistics {
 	return vehicleStatisticsImpl{
 		vehicle: vehicle,
 	}
 }
 
 type vehicleStatisticsImpl struct {
-	vehicle nextroute.ModelVehicle
+	vehicle ModelVehicle
 }
 
 func (v vehicleStatisticsImpl) FirstToLastSeconds() float64 {
@@ -36,13 +35,13 @@ func (v vehicleStatisticsImpl) FirstToLastSeconds() float64 {
 }
 
 func (v vehicleStatisticsImpl) FromFirstSeconds() common.Statistics {
-	stops := make(nextroute.ModelStops, 0)
+	stops := make(ModelStops, 0)
 	for _, planUnit := range v.vehicle.Model().PlanStopsUnits() {
 		stops = append(stops, planUnit.Stops()...)
 	}
 	return common.NewStatistics(
 		stops,
-		func(stop nextroute.ModelStop) float64 {
+		func(stop ModelStop) float64 {
 			return v.vehicle.VehicleType().TravelDurationExpression().Duration(
 				v.vehicle.VehicleType(),
 				v.vehicle.First(),
@@ -53,13 +52,13 @@ func (v vehicleStatisticsImpl) FromFirstSeconds() common.Statistics {
 }
 
 func (v vehicleStatisticsImpl) ToLastSeconds() common.Statistics {
-	stops := make(nextroute.ModelStops, 0)
+	stops := make(ModelStops, 0)
 	for _, planUnit := range v.vehicle.Model().PlanStopsUnits() {
 		stops = append(stops, planUnit.Stops()...)
 	}
 	return common.NewStatistics(
 		stops,
-		func(stop nextroute.ModelStop) float64 {
+		func(stop ModelStop) float64 {
 			return v.vehicle.VehicleType().TravelDurationExpression().Duration(
 				v.vehicle.VehicleType(),
 				stop,
@@ -89,7 +88,7 @@ func (v vehicleStatisticsImpl) Report() string {
 }
 
 type modelStatisticsImpl struct {
-	model nextroute.Model
+	model Model
 }
 
 func (m modelStatisticsImpl) PlanUnits() int {
@@ -115,7 +114,7 @@ func (m modelStatisticsImpl) LastLocations() int {
 		common.UniqueDefined(
 			common.Map(
 				m.model.Vehicles(),
-				func(vehicle nextroute.ModelVehicle) common.Location {
+				func(vehicle ModelVehicle) common.Location {
 					return vehicle.Last().Location()
 				},
 			),
@@ -125,7 +124,7 @@ func (m modelStatisticsImpl) LastLocations() int {
 }
 
 func (m modelStatisticsImpl) Locations() int {
-	stops := make(nextroute.ModelStops, 0)
+	stops := make(ModelStops, 0)
 	for _, planUnit := range m.model.PlanStopsUnits() {
 		stops = append(stops, planUnit.Stops()...)
 	}
@@ -133,7 +132,7 @@ func (m modelStatisticsImpl) Locations() int {
 		common.UniqueDefined(
 			common.Map(
 				stops,
-				func(stop nextroute.ModelStop) common.Location {
+				func(stop ModelStop) common.Location {
 					return stop.Location()
 				},
 			),
@@ -147,7 +146,7 @@ func (m modelStatisticsImpl) FirstLocations() int {
 		common.UniqueDefined(
 			common.Map(
 				m.model.Vehicles(),
-				func(vehicle nextroute.ModelVehicle) common.Location {
+				func(vehicle ModelVehicle) common.Location {
 					return vehicle.First().Location()
 				},
 			),
@@ -207,7 +206,7 @@ func (m modelStatisticsImpl) Report() string {
 		line)
 
 	uniqueVehicles := common.GroupBy(m.model.Vehicles(),
-		func(t nextroute.ModelVehicle) string {
+		func(t ModelVehicle) string {
 			return fmt.Sprintf("%v-%v-%v-%v",
 				t.VehicleType().Index(),
 				t.First().Index(),
@@ -216,7 +215,7 @@ func (m modelStatisticsImpl) Report() string {
 			)
 		},
 	)
-	common.RangeMap(uniqueVehicles, func(_ string, uniqueVehicle []nextroute.ModelVehicle) bool {
+	common.RangeMap(uniqueVehicles, func(_ string, uniqueVehicle []ModelVehicle) bool {
 		fmt.Fprintf(&sb, "Vehicle type index          : %v\n",
 			uniqueVehicle[0].VehicleType().Index())
 		fmt.Fprintf(&sb, "Travel duration expression  : %v\n",

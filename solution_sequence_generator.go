@@ -5,7 +5,6 @@ import (
 	"sync/atomic"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // SequenceGeneratorChannel generates all possible sequences of solution stops
@@ -15,19 +14,19 @@ import (
 //
 //	quit := make(chan struct{})
 //	defer close(quit)
-//	sequences := make([]sdkNextRoute.SolutionStops, 0)
-//	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanUnit(planUnit), quit) {
+//	sequences := make([]SolutionStops, 0)
+//	for solutionStops := range SequenceGeneratorChannel(solution.SolutionPlanUnit(planUnit), quit) {
 //		sequences = append(sequences, solutionStops)
 //	}
 func SequenceGeneratorChannel(
-	pu nextroute.SolutionPlanUnit,
+	pu SolutionPlanUnit,
 	quit <-chan struct{},
-) chan nextroute.SolutionStops {
+) chan SolutionStops {
 	planUnit := pu.(*solutionPlanStopsUnitImpl)
 	solution := planUnit.solution()
 	maxSequences := int64(solution.Model().SequenceSampleSize())
 	solutionStops := planUnit.SolutionStops()
-	ch := make(chan nextroute.SolutionStops)
+	ch := make(chan SolutionStops)
 	go func() {
 		defer close(ch)
 		switch planUnit.ModelPlanStopsUnit().NumberOfStops() {
@@ -45,13 +44,13 @@ func SequenceGeneratorChannel(
 
 			sequenceGenerator(
 				solutionStops,
-				make([]nextroute.SolutionStop, 0, len(solutionStops)),
+				make([]SolutionStop, 0, len(solutionStops)),
 				used,
 				counter,
 				dag,
 				solution.Random(),
 				&maxSequences,
-				func(solutionStops nextroute.SolutionStops) {
+				func(solutionStops SolutionStops) {
 					select {
 					case <-quit:
 						return
@@ -66,13 +65,13 @@ func SequenceGeneratorChannel(
 }
 
 func sequenceGenerator(
-	stops, sequence nextroute.SolutionStops,
+	stops, sequence SolutionStops,
 	used []bool,
 	counter map[int]int,
-	dag nextroute.DirectedAcyclicGraph,
+	dag DirectedAcyclicGraph,
 	random *rand.Rand,
 	maxSequences *int64,
-	yield func(nextroute.SolutionStops),
+	yield func(SolutionStops),
 ) {
 	if len(sequence) == len(stops) {
 		if atomic.AddInt64(maxSequences, -1) >= 0 {

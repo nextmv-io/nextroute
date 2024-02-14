@@ -2,8 +2,6 @@ package nextroute
 
 import (
 	"context"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewSolveOperatorRestart creates a new solve-operator that restarts the solver
@@ -13,39 +11,39 @@ import (
 // invoking the Restart method on the solver and replaces the current work
 // solution with the best solution found so far.
 func NewSolveOperatorRestart(
-	maximumIterations nextroute.SolveParameter,
-) (nextroute.SolveOperatorRestart, error) {
+	maximumIterations SolveParameter,
+) (SolveOperatorRestart, error) {
 	return &solveOperatorRestartImpl{
 		SolveOperator: NewSolveOperator(
 			1.0,
 			true,
-			nextroute.SolveParameters{maximumIterations},
+			SolveParameters{maximumIterations},
 		),
 	}, nil
 }
 
 type solveOperatorRestartImpl struct {
-	nextroute.SolveOperator
+	SolveOperator
 	lastImprovement int
 }
 
-func (d *solveOperatorRestartImpl) MaximumIterations() nextroute.SolveParameter {
+func (d *solveOperatorRestartImpl) MaximumIterations() SolveParameter {
 	return d.Parameters()[0]
 }
 
-func (d *solveOperatorRestartImpl) OnStartSolve(_ nextroute.SolveInformation) {
+func (d *solveOperatorRestartImpl) OnStartSolve(_ SolveInformation) {
 	d.lastImprovement = 0
 }
 
 func (d *solveOperatorRestartImpl) OnBetterSolution(
-	solveRunInformation nextroute.SolveInformation,
+	solveRunInformation SolveInformation,
 ) {
 	d.lastImprovement = solveRunInformation.Iteration()
 }
 
 func (d *solveOperatorRestartImpl) Execute(
 	_ context.Context,
-	solveRunInformation nextroute.SolveInformation,
+	solveRunInformation SolveInformation,
 ) error {
 	if solveRunInformation.Solver().WorkSolution().Score() == solveRunInformation.Solver().BestSolution().Score() {
 		d.lastImprovement = solveRunInformation.Iteration()

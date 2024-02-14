@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // ModelPlanUnitsUnit is a set of plan units. A plan unit is a set of stops
@@ -38,16 +37,16 @@ type ModelPlanUnitsUnits []ModelPlanUnitsUnit
 
 func newPlanUnitsUnit(
 	index int,
-	planUnits nextroute.ModelPlanUnits,
+	planUnits ModelPlanUnits,
 	planOneOf bool,
 	sameVehicle bool,
-) (nextroute.ModelPlanUnitsUnit, error) {
+) (ModelPlanUnitsUnit, error) {
 	if len(planUnits) == 0 {
 		return nil,
 			fmt.Errorf("plan units unit must have at least one plan unit")
 	}
 
-	uniquePlanUnits := common.UniqueDefined(planUnits, func(t nextroute.ModelPlanUnit) int {
+	uniquePlanUnits := common.UniqueDefined(planUnits, func(t ModelPlanUnit) int {
 		return t.Index()
 	})
 
@@ -72,12 +71,12 @@ func newPlanUnitsUnit(
 			return nil, fmt.Errorf("plan unit cannot be a member of two plan units units")
 		}
 		switch planUnit.(type) {
-		case nextroute.ModelPlanStopsUnit:
+		case ModelPlanStopsUnit:
 			err := planUnit.(*planMultipleStopsImpl).setPlanUnitsUnit(planUnitsUnit)
 			if err != nil {
 				return nil, err
 			}
-		case nextroute.ModelPlanUnitsUnit:
+		case ModelPlanUnitsUnit:
 			err := planUnit.(*planUnitsUnitImpl).setPlanUnitsUnit(planUnitsUnit)
 			if err != nil {
 				return nil, err
@@ -90,13 +89,13 @@ func newPlanUnitsUnit(
 	return planUnitsUnit, nil
 }
 
-// planUnitsUnitImpl implements nextroute.ModelPlanUnitsUnit.
+// planUnitsUnitImpl implements ModelPlanUnitsUnit.
 type planUnitsUnitImpl struct {
 	modelDataImpl
-	planUnits     nextroute.ModelPlanUnits
+	planUnits     ModelPlanUnits
 	planOneOf     bool
 	index         int
-	planUnitsUnit nextroute.ModelPlanUnitsUnit
+	planUnitsUnit ModelPlanUnitsUnit
 	sameVehicle   bool
 }
 
@@ -104,11 +103,11 @@ func (p *planUnitsUnitImpl) SameVehicle() bool {
 	return p.sameVehicle
 }
 
-func (p *planUnitsUnitImpl) PlanUnitsUnit() (nextroute.ModelPlanUnitsUnit, bool) {
+func (p *planUnitsUnitImpl) PlanUnitsUnit() (ModelPlanUnitsUnit, bool) {
 	return p.planUnitsUnit, p.planUnitsUnit != nil
 }
 
-func (p *planUnitsUnitImpl) setPlanUnitsUnit(planUnitsUnit nextroute.ModelPlanUnitsUnit) error {
+func (p *planUnitsUnitImpl) setPlanUnitsUnit(planUnitsUnit ModelPlanUnitsUnit) error {
 	if p.planUnitsUnit != nil {
 		return fmt.Errorf("plan unit %v already has a plan units unit", p)
 	}
@@ -125,7 +124,7 @@ func (p *planUnitsUnitImpl) Index() int {
 	return p.index
 }
 
-func (p *planUnitsUnitImpl) PlanUnits() nextroute.ModelPlanUnits {
+func (p *planUnitsUnitImpl) PlanUnits() ModelPlanUnits {
 	return p.planUnits
 }
 

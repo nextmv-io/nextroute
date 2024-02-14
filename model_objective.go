@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // ObjectiveStopDataUpdater is the interface than can be used by an objective if
@@ -82,17 +81,17 @@ func newModelObjectiveImpl() modelObjectiveImpl {
 type modelObjectiveSumImpl struct {
 	modelObjectiveImpl
 	model *modelImpl
-	terms nextroute.ModelObjectiveTerms
+	terms ModelObjectiveTerms
 }
 
-func (m *modelObjectiveSumImpl) ModelExpressions() nextroute.ModelExpressions {
-	return nextroute.ModelExpressions{}
+func (m *modelObjectiveSumImpl) ModelExpressions() ModelExpressions {
+	return ModelExpressions{}
 }
 
-func newModelObjectiveSum(m *modelImpl) nextroute.ModelObjectiveSum {
+func newModelObjectiveSum(m *modelImpl) ModelObjectiveSum {
 	return &modelObjectiveSumImpl{
 		modelObjectiveImpl: newModelObjectiveImpl(),
-		terms:              make(nextroute.ModelObjectiveTerms, 0, 1),
+		terms:              make(ModelObjectiveTerms, 0, 1),
 		model:              m,
 	}
 }
@@ -111,7 +110,7 @@ func (m *modelObjectiveSumImpl) String() string {
 	return sb.String()
 }
 
-func (m *modelObjectiveSumImpl) EstimateDeltaValue(move nextroute.SolutionMoveStops) float64 {
+func (m *modelObjectiveSumImpl) EstimateDeltaValue(move SolutionMoveStops) float64 {
 	estimateDeltaScore := 0.0
 	for _, term := range m.terms {
 		estimateDeltaScore += term.Factor() * term.Objective().EstimateDeltaValue(move)
@@ -123,18 +122,18 @@ func (m *modelObjectiveSumImpl) InternalValue(_ *solutionImpl) float64 {
 	panic("use Solution.ObjectiveValue or solution.Score to query objective value")
 }
 
-func (m *modelObjectiveSumImpl) Value(_ nextroute.Solution) float64 {
+func (m *modelObjectiveSumImpl) Value(_ Solution) float64 {
 	panic("use Solution.ObjectiveValue or solution.Score to query objective value")
 }
 
-func (m *modelObjectiveSumImpl) Terms() nextroute.ModelObjectiveTerms {
+func (m *modelObjectiveSumImpl) Terms() ModelObjectiveTerms {
 	return m.terms
 }
 
 func (m *modelObjectiveSumImpl) NewTerm(
 	factor float64,
-	objective nextroute.ModelObjective,
-) (nextroute.ModelObjectiveTerm, error) {
+	objective ModelObjective,
+) (ModelObjectiveTerm, error) {
 	term := newModelObjectiveTerm(factor, objective)
 	for _, existingTerm := range m.terms {
 		if &existingTerm == &term {
@@ -146,10 +145,10 @@ func (m *modelObjectiveSumImpl) NewTerm(
 			))
 		}
 	}
-	if _, ok := objective.(nextroute.ObjectiveDataUpdater); ok {
+	if _, ok := objective.(ObjectiveDataUpdater); ok {
 		return nil, nmerror.NewModelCustomizationError(fmt.Errorf(
-			"nextroute.ObjectiveDataUpdater has been deprecated, "+
-				"please use nextroute.ObjectiveStopDataUpdater instead, "+
+			"ObjectiveDataUpdater has been deprecated, "+
+				"please use ObjectiveStopDataUpdater instead, "+
 				"rename UpdateObjectiveData to UpdateObjectiveStopData for %s",
 			reflect.TypeOf(objective).String(),
 		))
@@ -157,18 +156,18 @@ func (m *modelObjectiveSumImpl) NewTerm(
 	if factor != 0 {
 		m.terms = append(m.terms, term)
 
-		if registered, ok := term.Objective().(nextroute.RegisteredModelExpressions); ok {
+		if registered, ok := term.Objective().(RegisteredModelExpressions); ok {
 			for _, expression := range registered.ModelExpressions() {
 				m.model.addExpression(expression)
 			}
 		}
-		if _, ok := term.Objective().(nextroute.ObjectiveStopDataUpdater); ok {
+		if _, ok := term.Objective().(ObjectiveStopDataUpdater); ok {
 			m.model.objectivesWithStopUpdater = append(
 				m.model.objectivesWithStopUpdater,
 				term.Objective(),
 			)
 		}
-		if _, ok := term.Objective().(nextroute.ObjectiveSolutionDataUpdater); ok {
+		if _, ok := term.Objective().(ObjectiveSolutionDataUpdater); ok {
 			m.model.objectivesWithSolutionUpdater = append(
 				m.model.objectivesWithSolutionUpdater,
 				term.Objective(),

@@ -2,17 +2,15 @@ package nextroute
 
 import (
 	"fmt"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewStopPosition returns a new StopPosition. Exposed for testing, should not
 // be exposed in SDK.
 func NewStopPosition(
-	p nextroute.SolutionStop,
-	s nextroute.SolutionStop,
-	n nextroute.SolutionStop,
-) nextroute.StopPosition {
+	p SolutionStop,
+	s SolutionStop,
+	n SolutionStop,
+) StopPosition {
 	previous := p.(solutionStopImpl)
 	stop := s.(solutionStopImpl)
 	next := n.(solutionStopImpl)
@@ -74,15 +72,15 @@ func (v stopPositionImpl) String() string {
 	)
 }
 
-func (v stopPositionImpl) Previous() nextroute.SolutionStop {
+func (v stopPositionImpl) Previous() SolutionStop {
 	return v.solution.stopByIndexCache[v.previousStopIndex]
 }
 
-func (v stopPositionImpl) Next() nextroute.SolutionStop {
+func (v stopPositionImpl) Next() SolutionStop {
 	return v.solution.stopByIndexCache[v.nextStopIndex]
 }
 
-func (v stopPositionImpl) Stop() nextroute.SolutionStop {
+func (v stopPositionImpl) Stop() SolutionStop {
 	return v.solution.stopByIndexCache[v.stopIndex]
 }
 

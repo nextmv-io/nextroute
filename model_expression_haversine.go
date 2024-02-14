@@ -4,11 +4,10 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewHaversineExpression returns a new HaversineExpression.
-func NewHaversineExpression() nextroute.DistanceExpression {
+func NewHaversineExpression() DistanceExpression {
 	return &haversineExpression{
 		index: NewModelExpressionIndex(),
 		name:  "haversine",
@@ -35,8 +34,8 @@ func (h *haversineExpression) String() string {
 }
 
 func (h *haversineExpression) Distance(
-	vehicleType nextroute.ModelVehicleType,
-	from, to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from, to ModelStop,
 ) common.Distance {
 	return common.NewDistance(h.Value(vehicleType, from, to), common.Meters)
 }
@@ -54,9 +53,9 @@ func (h *haversineExpression) SetName(n string) {
 }
 
 func (h *haversineExpression) Value(
-	vehicle nextroute.ModelVehicleType,
-	from nextroute.ModelStop,
-	to nextroute.ModelStop,
+	vehicle ModelVehicleType,
+	from ModelStop,
+	to ModelStop,
 ) float64 {
 	return haversineDistance(from.Location(), to.Location()).
 		Value(vehicle.Model().DistanceUnit())

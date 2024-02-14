@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // SolvePerformanceObserver is an interface for observing the performance of an
@@ -31,12 +29,12 @@ type OperatorObserver interface {
 
 // NewSolvePerformanceObserver returns a new SolvePerformanceObserver.
 func NewSolvePerformanceObserver(
-	solver nextroute.Solver,
+	solver Solver,
 ) SolvePerformanceObserver {
 	performanceObserver := &solvePerformanceObserverImpl{
-		operatorData: make(map[nextroute.SolveOperator]operatorDataImpl),
+		operatorData: make(map[SolveOperator]operatorDataImpl),
 	}
-	solver.SolveEvents().OperatorExecuting.Register(func(info nextroute.SolveInformation) {
+	solver.SolveEvents().OperatorExecuting.Register(func(info SolveInformation) {
 		operators := info.SolveOperators()
 		operator := operators[len(operators)-1]
 		if _, ok := performanceObserver.operatorData[operator]; !ok {
@@ -51,14 +49,14 @@ func NewSolvePerformanceObserver(
 		data.lastStart = time.Now()
 		performanceObserver.operatorData[operator] = data
 	})
-	solver.SolveEvents().OperatorExecuted.Register(func(info nextroute.SolveInformation) {
+	solver.SolveEvents().OperatorExecuted.Register(func(info SolveInformation) {
 		operators := info.SolveOperators()
 		operator := operators[len(operators)-1]
 		data := performanceObserver.operatorData[operator]
 		data.cumulativeTime += time.Since(data.lastStart)
 		performanceObserver.operatorData[operator] = data
 	})
-	solver.SolveEvents().Done.Register(func(_ nextroute.SolveInformation) {
+	solver.SolveEvents().Done.Register(func(_ SolveInformation) {
 		fmt.Println(performanceObserver.Report())
 	})
 	return performanceObserver
@@ -112,7 +110,7 @@ func (o *operatorDataImpl) Invocations() int {
 }
 
 type solvePerformanceObserverImpl struct {
-	operatorData map[nextroute.SolveOperator]operatorDataImpl
+	operatorData map[SolveOperator]operatorDataImpl
 }
 
 func (p *solvePerformanceObserverImpl) OperatorObservers() []OperatorObserver {

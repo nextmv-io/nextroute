@@ -1,7 +1,5 @@
 package nextroute
 
-import "github.com/nextmv-io/sdk/nextroute"
-
 // SolutionObserver is an interface that can be implemented to observe the
 // solution manipulation process.
 type SolutionObserver interface {
@@ -122,19 +120,19 @@ type SolutionObserved interface {
 }
 
 type solutionObservedImpl struct {
-	observers       nextroute.SolutionObservers
-	unplanObservers nextroute.SolutionUnPlanObservers
+	observers       SolutionObservers
+	unplanObservers SolutionUnPlanObservers
 }
 
-func (s *solutionObservedImpl) AddSolutionObserver(observer nextroute.SolutionObserver) {
+func (s *solutionObservedImpl) AddSolutionObserver(observer SolutionObserver) {
 	s.observers = append(s.observers, observer)
 }
 
-func (s *solutionObservedImpl) AddSolutionUnPlanObserver(observer nextroute.SolutionUnPlanObserver) {
+func (s *solutionObservedImpl) AddSolutionUnPlanObserver(observer SolutionUnPlanObserver) {
 	s.unplanObservers = append(s.unplanObservers, observer)
 }
 
-func (s *solutionObservedImpl) RemoveSolutionUnPlanObserver(observer nextroute.SolutionUnPlanObserver) {
+func (s *solutionObservedImpl) RemoveSolutionUnPlanObserver(observer SolutionUnPlanObserver) {
 	for i := 0; i < len(s.unplanObservers); i++ {
 		if s.unplanObservers[i] == observer {
 			s.unplanObservers = append(s.unplanObservers[:i], s.unplanObservers[i+1:]...)
@@ -143,13 +141,13 @@ func (s *solutionObservedImpl) RemoveSolutionUnPlanObserver(observer nextroute.S
 	}
 }
 
-func (s *solutionObservedImpl) SolutionUnPlanObservers() nextroute.SolutionUnPlanObservers {
-	observers := make(nextroute.SolutionUnPlanObservers, len(s.unplanObservers))
+func (s *solutionObservedImpl) SolutionUnPlanObservers() SolutionUnPlanObservers {
+	observers := make(SolutionUnPlanObservers, len(s.unplanObservers))
 	copy(observers, s.unplanObservers)
 	return observers
 }
 
-func (s *solutionObservedImpl) RemoveSolutionObserver(observer nextroute.SolutionObserver) {
+func (s *solutionObservedImpl) RemoveSolutionObserver(observer SolutionObserver) {
 	for i := 0; i < len(s.observers); i++ {
 		if s.observers[i] == observer {
 			s.observers = append(s.observers[:i], s.observers[i+1:]...)
@@ -159,7 +157,7 @@ func (s *solutionObservedImpl) RemoveSolutionObserver(observer nextroute.Solutio
 }
 
 func (s *solutionObservedImpl) OnUnPlan(
-	planUnit nextroute.SolutionPlanStopsUnit,
+	planUnit SolutionPlanStopsUnit,
 ) {
 	if len(s.unplanObservers) == 0 {
 		return
@@ -170,7 +168,7 @@ func (s *solutionObservedImpl) OnUnPlan(
 }
 
 func (s *solutionObservedImpl) OnUnPlanFailed(
-	planUnit nextroute.SolutionPlanStopsUnit,
+	planUnit SolutionPlanStopsUnit,
 ) {
 	if len(s.unplanObservers) == 0 {
 		return
@@ -180,7 +178,7 @@ func (s *solutionObservedImpl) OnUnPlanFailed(
 	}
 }
 
-func (s *solutionObservedImpl) OnUnPlanSucceeded(planUnit nextroute.SolutionPlanStopsUnit) {
+func (s *solutionObservedImpl) OnUnPlanSucceeded(planUnit SolutionPlanStopsUnit) {
 	if len(s.unplanObservers) == 0 {
 		return
 	}
@@ -189,13 +187,13 @@ func (s *solutionObservedImpl) OnUnPlanSucceeded(planUnit nextroute.SolutionPlan
 	}
 }
 
-func (s *solutionObservedImpl) SolutionObservers() nextroute.SolutionObservers {
-	observers := make(nextroute.SolutionObservers, len(s.observers))
+func (s *solutionObservedImpl) SolutionObservers() SolutionObservers {
+	observers := make(SolutionObservers, len(s.observers))
 	copy(observers, s.observers)
 	return observers
 }
 
-func (s *solutionObservedImpl) OnBestMove(solution nextroute.Solution) {
+func (s *solutionObservedImpl) OnBestMove(solution Solution) {
 	if len(s.observers) == 0 {
 		return
 	}
@@ -204,7 +202,7 @@ func (s *solutionObservedImpl) OnBestMove(solution nextroute.Solution) {
 	}
 }
 
-func (s *solutionObservedImpl) OnBestMoveFound(move nextroute.SolutionMove) {
+func (s *solutionObservedImpl) OnBestMoveFound(move SolutionMove) {
 	if len(s.observers) == 0 {
 		return
 	}
@@ -213,7 +211,7 @@ func (s *solutionObservedImpl) OnBestMoveFound(move nextroute.SolutionMove) {
 	}
 }
 
-func (s *solutionObservedImpl) OnNewSolution(model nextroute.Model) {
+func (s *solutionObservedImpl) OnNewSolution(model Model) {
 	if len(s.observers) == 0 {
 		return
 	}
@@ -222,7 +220,7 @@ func (s *solutionObservedImpl) OnNewSolution(model nextroute.Model) {
 	}
 }
 
-func (s *solutionObservedImpl) OnNewSolutionCreated(solution nextroute.Solution) {
+func (s *solutionObservedImpl) OnNewSolutionCreated(solution Solution) {
 	if len(s.observers) == 0 {
 		return
 	}
@@ -231,7 +229,7 @@ func (s *solutionObservedImpl) OnNewSolutionCreated(solution nextroute.Solution)
 	}
 }
 
-func (s *solutionObservedImpl) OnCopySolution(solution nextroute.Solution) {
+func (s *solutionObservedImpl) OnCopySolution(solution Solution) {
 	if len(s.observers) == 0 {
 		return
 	}
@@ -240,7 +238,7 @@ func (s *solutionObservedImpl) OnCopySolution(solution nextroute.Solution) {
 	}
 }
 
-func (s *solutionObservedImpl) OnCopiedSolution(solution nextroute.Solution) {
+func (s *solutionObservedImpl) OnCopiedSolution(solution Solution) {
 	if len(s.observers) == 0 {
 		return
 	}
@@ -250,8 +248,8 @@ func (s *solutionObservedImpl) OnCopiedSolution(solution nextroute.Solution) {
 }
 
 func (s *solutionObservedImpl) OnCheckConstraint(
-	constraint nextroute.ModelConstraint,
-	checkViolationAt nextroute.CheckedAt,
+	constraint ModelConstraint,
+	checkViolationAt CheckedAt,
 ) {
 	if len(s.observers) == 0 {
 		return
@@ -262,8 +260,8 @@ func (s *solutionObservedImpl) OnCheckConstraint(
 }
 
 func (s *solutionObservedImpl) OnStopConstraintChecked(
-	stop nextroute.SolutionStop,
-	constraint nextroute.ModelConstraint,
+	stop SolutionStop,
+	constraint ModelConstraint,
 	violated bool,
 ) {
 	if len(s.observers) == 0 {
@@ -275,8 +273,8 @@ func (s *solutionObservedImpl) OnStopConstraintChecked(
 }
 
 func (s *solutionObservedImpl) OnVehicleConstraintChecked(
-	vehicle nextroute.SolutionVehicle,
-	constraint nextroute.ModelConstraint,
+	vehicle SolutionVehicle,
+	constraint ModelConstraint,
 	violated bool,
 ) {
 	if len(s.observers) == 0 {
@@ -288,7 +286,7 @@ func (s *solutionObservedImpl) OnVehicleConstraintChecked(
 }
 
 func (s *solutionObservedImpl) OnSolutionConstraintChecked(
-	constraint nextroute.ModelConstraint,
+	constraint ModelConstraint,
 	violated bool,
 ) {
 	if len(s.observers) == 0 {
@@ -300,7 +298,7 @@ func (s *solutionObservedImpl) OnSolutionConstraintChecked(
 }
 
 func (s *solutionObservedImpl) OnEstimateIsViolated(
-	constraint nextroute.ModelConstraint,
+	constraint ModelConstraint,
 ) {
 	if len(s.observers) == 0 {
 		return
@@ -311,10 +309,10 @@ func (s *solutionObservedImpl) OnEstimateIsViolated(
 }
 
 func (s *solutionObservedImpl) OnEstimatedIsViolated(
-	move nextroute.SolutionMove,
-	constraint nextroute.ModelConstraint,
+	move SolutionMove,
+	constraint ModelConstraint,
 	isViolated bool,
-	planPositionsHint nextroute.StopPositionsHint,
+	planPositionsHint StopPositionsHint,
 ) {
 	if len(s.observers) == 0 {
 		return
@@ -349,7 +347,7 @@ func (s *solutionObservedImpl) OnEstimatedDeltaObjectiveScore(
 	}
 }
 
-func (s *solutionObservedImpl) OnPlan(move nextroute.SolutionMove) {
+func (s *solutionObservedImpl) OnPlan(move SolutionMove) {
 	if len(s.observers) == 0 {
 		return
 	}
@@ -359,8 +357,8 @@ func (s *solutionObservedImpl) OnPlan(move nextroute.SolutionMove) {
 }
 
 func (s *solutionObservedImpl) OnPlanFailed(
-	move nextroute.SolutionMove,
-	constraint nextroute.ModelConstraint,
+	move SolutionMove,
+	constraint ModelConstraint,
 ) {
 	if len(s.observers) == 0 {
 		return
@@ -370,7 +368,7 @@ func (s *solutionObservedImpl) OnPlanFailed(
 	}
 }
 
-func (s *solutionObservedImpl) OnPlanSucceeded(move nextroute.SolutionMove) {
+func (s *solutionObservedImpl) OnPlanSucceeded(move SolutionMove) {
 	if len(s.observers) == 0 {
 		return
 	}

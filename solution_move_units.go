@@ -3,13 +3,11 @@ package nextroute
 import (
 	"context"
 	"fmt"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 func newSolutionMoveUnits(
 	planUnit *solutionPlanUnitsUnitImpl,
-	moves nextroute.SolutionMoves,
+	moves SolutionMoves,
 ) solutionMoveUnitsImpl {
 	if len(moves) != len(planUnit.SolutionPlanUnits()) {
 		panic(
@@ -47,7 +45,7 @@ func newNotExecutableSolutionMoveUnits(planUnit *solutionPlanUnitsUnitImpl) *sol
 type solutionMoveUnitsImpl struct {
 	planUnit  *solutionPlanUnitsUnitImpl
 	solution  *solutionImpl
-	moves     nextroute.SolutionMoves
+	moves     SolutionMoves
 	valueSeen int
 	value     float64
 	allowed   bool
@@ -95,11 +93,11 @@ func (m solutionMoveUnitsImpl) Execute(ctx context.Context) (bool, error) {
 	return true, nil
 }
 
-func (m solutionMoveUnitsImpl) PlanUnit() nextroute.SolutionPlanUnit {
+func (m solutionMoveUnitsImpl) PlanUnit() SolutionPlanUnit {
 	return m.planUnit
 }
 
-func (m solutionMoveUnitsImpl) PlanUnitsUnit() nextroute.SolutionPlanUnitsUnit {
+func (m solutionMoveUnitsImpl) PlanUnitsUnit() SolutionPlanUnitsUnit {
 	if m.planUnit == nil {
 		return nil
 	}
@@ -114,7 +112,7 @@ func (m solutionMoveUnitsImpl) ValueSeen() int {
 	return m.valueSeen
 }
 
-func (m solutionMoveUnitsImpl) IncrementValueSeen(inc int) nextroute.SolutionMove {
+func (m solutionMoveUnitsImpl) IncrementValueSeen(inc int) SolutionMove {
 	m.valueSeen += inc
 	return m
 }
@@ -130,7 +128,7 @@ func (m solutionMoveUnitsImpl) IsImprovement() bool {
 	return m.IsExecutable() && m.value < 0
 }
 
-func (m solutionMoveUnitsImpl) TakeBest(that nextroute.SolutionMove) nextroute.SolutionMove {
+func (m solutionMoveUnitsImpl) TakeBest(that SolutionMove) SolutionMove {
 	if !that.IsExecutable() {
 		return m
 	}

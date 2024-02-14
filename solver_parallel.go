@@ -8,14 +8,13 @@ import (
 	"time"
 
 	"github.com/nextmv-io/sdk/alns"
-	"github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/run"
 )
 
 // NewParallelSolver creates a new parallel solver.
 func NewParallelSolver(
-	model nextroute.Model,
-) (nextroute.ParallelSolver, error) {
+	model Model,
+) (ParallelSolver, error) {
 	parallelSolver, err := NewSkeletonParallelSolver(model)
 	if err != nil {
 		return nil, err
@@ -28,11 +27,11 @@ func NewParallelSolver(
 }
 
 // DefaultSolveOptionsFactory creates a new SolveOptionsFactory.
-func DefaultSolveOptionsFactory() nextroute.SolveOptionsFactory {
+func DefaultSolveOptionsFactory() SolveOptionsFactory {
 	return func(
-		solveInformation nextroute.ParallelSolveInformation,
-	) (nextroute.SolveOptions, error) {
-		solveOptions := nextroute.SolveOptions{
+		solveInformation ParallelSolveInformation,
+	) (SolveOptions, error) {
+		solveOptions := SolveOptions{
 			Iterations: -1,
 			Duration:   30 * time.Second,
 		}
@@ -42,22 +41,22 @@ func DefaultSolveOptionsFactory() nextroute.SolveOptionsFactory {
 }
 
 type parallelSolverWrapperImpl struct {
-	solver nextroute.ParallelSolver
+	solver ParallelSolver
 }
 
-func (p *parallelSolverWrapperImpl) Model() nextroute.Model {
+func (p *parallelSolverWrapperImpl) Model() Model {
 	return p.solver.Model()
 }
 
-func (p *parallelSolverWrapperImpl) SetSolverFactory(factory nextroute.SolverFactory) {
+func (p *parallelSolverWrapperImpl) SetSolverFactory(factory SolverFactory) {
 	p.solver.SetSolverFactory(factory)
 }
 
-func (p *parallelSolverWrapperImpl) SetSolveOptionsFactory(factory nextroute.SolveOptionsFactory) {
+func (p *parallelSolverWrapperImpl) SetSolveOptionsFactory(factory SolveOptionsFactory) {
 	p.solver.SetSolveOptionsFactory(factory)
 }
 
-func (p *parallelSolverWrapperImpl) SolveEvents() nextroute.SolveEvents {
+func (p *parallelSolverWrapperImpl) SolveEvents() SolveEvents {
 	return p.solver.SolveEvents()
 }
 
@@ -67,16 +66,16 @@ func (p *parallelSolverWrapperImpl) Progression() []alns.ProgressionEntry {
 
 func (p *parallelSolverWrapperImpl) Solve(
 	ctx context.Context,
-	solveOptions nextroute.ParallelSolveOptions,
-	startSolutions ...nextroute.Solution,
-) (nextroute.SolutionChannel, error) {
+	solveOptions ParallelSolveOptions,
+	startSolutions ...Solution,
+) (SolutionChannel, error) {
 	start := ctx.Value(run.Start).(time.Time)
 	ctx, _ = context.WithDeadline(
 		ctx,
 		start.Add(solveOptions.Duration),
 	)
 
-	interpretedParallelSolveOptions := nextroute.ParallelSolveOptions{
+	interpretedParallelSolveOptions := ParallelSolveOptions{
 		Iterations:           solveOptions.Iterations,
 		Duration:             solveOptions.Duration,
 		ParallelRuns:         solveOptions.ParallelRuns,
@@ -100,7 +99,7 @@ func (p *parallelSolverWrapperImpl) Solve(
 		interpretedParallelSolveOptions.StartSolutions = runtime.NumCPU()
 	}
 
-	initialSolutions := make(nextroute.Solutions, interpretedParallelSolveOptions.StartSolutions)
+	initialSolutions := make(Solutions, interpretedParallelSolveOptions.StartSolutions)
 	if interpretedParallelSolveOptions.StartSolutions > 0 {
 		var wg sync.WaitGroup
 		wg.Add(interpretedParallelSolveOptions.StartSolutions)
@@ -109,7 +108,7 @@ func (p *parallelSolverWrapperImpl) Solve(
 			return nil, err
 		}
 		for idx := 0; idx < interpretedParallelSolveOptions.StartSolutions; idx++ {
-			go func(idx int, sol nextroute.Solution) {
+			go func(idx int, sol Solution) {
 				defer wg.Done()
 				randomSolution, err := RandomSolutionConstruction(ctx, sol)
 				if err != nil {

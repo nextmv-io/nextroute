@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewSolveOperatorUnPlanVehicles creates a new SolveOperatorUnPlan. .
@@ -15,7 +14,7 @@ import (
 // haversine distance). The probability of un-planning a vehicle is determined
 // inversely proportional to the number of stops in the vehicle.
 func NewSolveOperatorUnPlanVehicles(
-	numberOfVehicles nextroute.SolveParameter,
+	numberOfVehicles SolveParameter,
 	distance common.Distance,
 	probability float64,
 ) SolveOperatorUnPlanVehicles {
@@ -23,7 +22,7 @@ func NewSolveOperatorUnPlanVehicles(
 		SolveOperator: NewSolveOperator(
 			probability,
 			false,
-			nextroute.SolveParameters{numberOfVehicles},
+			SolveParameters{numberOfVehicles},
 		),
 		distance: distance,
 	}
@@ -32,22 +31,22 @@ func NewSolveOperatorUnPlanVehicles(
 // SolveOperatorUnPlanVehicles is a solve-operator which un-plans all the
 // stops of a vehicle.
 type SolveOperatorUnPlanVehicles interface {
-	nextroute.SolveOperator
+	SolveOperator
 
 	// Distance returns the distance to use for the un-planning.
 	Distance() common.Distance
 
 	// NumberOfVehicles returns the number of vehicles to unplan as a solve-parameter.
 	// Solve-parameters can change value during the solve run.
-	NumberOfVehicles() nextroute.SolveParameter
+	NumberOfVehicles() SolveParameter
 }
 
 type solveOperatorUnPlanVehiclesImpl struct {
-	nextroute.SolveOperator
+	SolveOperator
 	distance common.Distance
 }
 
-func (d *solveOperatorUnPlanVehiclesImpl) NumberOfVehicles() nextroute.SolveParameter {
+func (d *solveOperatorUnPlanVehiclesImpl) NumberOfVehicles() SolveParameter {
 	return d.Parameters()[0]
 }
 
@@ -57,7 +56,7 @@ func (d *solveOperatorUnPlanVehiclesImpl) Distance() common.Distance {
 
 func (d *solveOperatorUnPlanVehiclesImpl) Execute(
 	ctx context.Context,
-	runTimeInformation nextroute.SolveInformation,
+	runTimeInformation SolveInformation,
 ) error {
 	workSolution := runTimeInformation.
 		Solver().

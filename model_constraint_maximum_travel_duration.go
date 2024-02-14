@@ -1,14 +1,10 @@
 package nextroute
 
-import (
-	"github.com/nextmv-io/sdk/nextroute"
-)
-
 // NewMaximumTravelDurationConstraint returns a new
 // MaximumTravelDurationConstraint.
 func NewMaximumTravelDurationConstraint(
-	maximum nextroute.VehicleTypeDurationExpression,
-) (nextroute.MaximumTravelDurationConstraint, error) {
+	maximum VehicleTypeDurationExpression,
+) (MaximumTravelDurationConstraint, error) {
 	return &maximumTravelDurationConstraintImpl{
 		modelConstraintImpl: newModelConstraintImpl(
 			"maximum_travel_duration",
@@ -19,7 +15,7 @@ func NewMaximumTravelDurationConstraint(
 }
 
 type maximumTravelDurationConstraintImpl struct {
-	maximum nextroute.VehicleTypeDurationExpression
+	maximum VehicleTypeDurationExpression
 	modelConstraintImpl
 }
 
@@ -27,17 +23,17 @@ func (l *maximumTravelDurationConstraintImpl) String() string {
 	return l.name
 }
 
-func (l *maximumTravelDurationConstraintImpl) EstimationCost() nextroute.Cost {
-	return nextroute.Constant
+func (l *maximumTravelDurationConstraintImpl) EstimationCost() Cost {
+	return Constant
 }
 
-func (l *maximumTravelDurationConstraintImpl) Maximum() nextroute.VehicleTypeDurationExpression {
+func (l *maximumTravelDurationConstraintImpl) Maximum() VehicleTypeDurationExpression {
 	return l.maximum
 }
 
 func (l *maximumTravelDurationConstraintImpl) EstimateIsViolated(
-	move nextroute.SolutionMoveStops,
-) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	move SolutionMoveStops,
+) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
 	vehicle := moveImpl.vehicle()
 	vehicleType := vehicle.ModelVehicle().VehicleType()
@@ -85,7 +81,7 @@ func (l *maximumTravelDurationConstraintImpl) EstimateIsViolated(
 	return false, constNoPositionsHint
 }
 
-func (l *maximumTravelDurationConstraintImpl) DoesVehicleHaveViolations(vehicle nextroute.SolutionVehicle) bool {
+func (l *maximumTravelDurationConstraintImpl) DoesVehicleHaveViolations(vehicle SolutionVehicle) bool {
 	vehicleImpl := vehicle.(solutionVehicleImpl)
 	return vehicleImpl.last().CumulativeTravelDurationValue() >
 		l.maximum.Value(vehicleImpl.ModelVehicle().VehicleType(), nil, nil)

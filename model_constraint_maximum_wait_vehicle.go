@@ -2,8 +2,6 @@ package nextroute
 
 import (
 	"fmt"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewMaximumWaitVehicleConstraint returns a new MaximumWaitVehicleConstraint.
@@ -12,22 +10,22 @@ import (
 // stop and starting to do whatever you need to do,
 // [SolutionStop.StartValue()] - [SolutionStop.ArrivalValue()].
 func NewMaximumWaitVehicleConstraint(
-	maxima nextroute.VehicleTypeDurationExpression,
-) (nextroute.MaximumWaitVehicleConstraint, error) {
+	maxima VehicleTypeDurationExpression,
+) (MaximumWaitVehicleConstraint, error) {
 	if maxima == nil {
 		return nil, fmt.Errorf("maxima must not be nil")
 	}
 	return &maximumWaitVehicleConstraintImpl{
 		modelConstraintImpl: newModelConstraintImpl(
 			"maximum_vehicle_wait",
-			nextroute.ModelExpressions{},
+			ModelExpressions{},
 		),
 		maxima: maxima,
 	}, nil
 }
 
 type maximumWaitVehicleConstraintImpl struct {
-	maxima nextroute.VehicleTypeDurationExpression
+	maxima VehicleTypeDurationExpression
 	modelConstraintImpl
 }
 
@@ -35,7 +33,7 @@ type maximumWaitVehicleConstraintData struct {
 	accumulatedWait float64
 }
 
-func (c *maximumWaitVehicleConstraintData) Copy() nextroute.Copier {
+func (c *maximumWaitVehicleConstraintData) Copy() Copier {
 	return &maximumWaitVehicleConstraintData{
 		accumulatedWait: c.accumulatedWait,
 	}
@@ -45,17 +43,17 @@ func (l *maximumWaitVehicleConstraintImpl) String() string {
 	return l.name
 }
 
-func (l *maximumWaitVehicleConstraintImpl) EstimationCost() nextroute.Cost {
-	return nextroute.LinearStop
+func (l *maximumWaitVehicleConstraintImpl) EstimationCost() Cost {
+	return LinearStop
 }
 
-func (l *maximumWaitVehicleConstraintImpl) Maximum() nextroute.VehicleTypeDurationExpression {
+func (l *maximumWaitVehicleConstraintImpl) Maximum() VehicleTypeDurationExpression {
 	return l.maxima
 }
 
 func (l *maximumWaitVehicleConstraintImpl) UpdateConstraintStopData(
-	solutionStop nextroute.SolutionStop,
-) (nextroute.Copier, error) {
+	solutionStop SolutionStop,
+) (Copier, error) {
 	if solutionStop.IsFirst() {
 		// First stop, no waiting time - we immediately start driving.
 		return &maximumWaitVehicleConstraintData{accumulatedWait: 0.0}, nil
@@ -79,8 +77,8 @@ func (l *maximumWaitVehicleConstraintImpl) UpdateConstraintStopData(
 }
 
 func (l *maximumWaitVehicleConstraintImpl) EstimateIsViolated(
-	move nextroute.SolutionMoveStops,
-) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	move SolutionMoveStops,
+) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
 	vehicle := moveImpl.vehicle()
 	stopPositionsCount := len(moveImpl.planUnit.solutionStopsImpl())
@@ -126,7 +124,7 @@ func (l *maximumWaitVehicleConstraintImpl) EstimateIsViolated(
 	return false, constNoPositionsHint
 }
 
-func (l *maximumWaitVehicleConstraintImpl) DoesStopHaveViolations(solution nextroute.SolutionStop) bool {
+func (l *maximumWaitVehicleConstraintImpl) DoesStopHaveViolations(solution SolutionStop) bool {
 	stop := solution.(solutionStopImpl)
 	return stop.ConstraintData(l).(*maximumWaitVehicleConstraintData).accumulatedWait >
 		l.maxima.Value(stop.vehicle().ModelVehicle().VehicleType(), nil, nil)

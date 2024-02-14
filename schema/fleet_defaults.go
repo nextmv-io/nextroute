@@ -1,4 +1,4 @@
-// Package schema provides the input and output schema for nextroute.
+// Package schema provides the input and output schema for
 package schema
 
 func (fleetInput *FleetInput) applyVehicleDefaults() {

@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // StopDurationExpression is a ModelExpression that returns a duration per stop
@@ -66,9 +65,9 @@ type TravelDurationExpression interface {
 // expression are interpreted as durations in units of the given duration unit.
 func NewDurationExpression(
 	name string,
-	expression nextroute.ModelExpression,
+	expression ModelExpression,
 	unit common.DurationUnit,
-) nextroute.DurationExpression {
+) DurationExpression {
 	return &scaledDurationExpressionImpl{
 		index:      NewModelExpressionIndex(),
 		expression: expression,
@@ -80,9 +79,9 @@ func NewDurationExpression(
 // NewScaledDurationExpression returns a new DurationExpression scaled by the
 // given multiplier.
 func NewScaledDurationExpression(
-	expression nextroute.DurationExpression,
+	expression DurationExpression,
 	multiplier float64,
-) nextroute.DurationExpression {
+) DurationExpression {
 	return &scaledDurationExpressionImpl{
 		index:      NewModelExpressionIndex(),
 		expression: expression,
@@ -93,9 +92,9 @@ func NewScaledDurationExpression(
 
 // NewTravelDurationExpression returns a new TravelDurationExpression.
 func NewTravelDurationExpression(
-	distanceExpression nextroute.DistanceExpression,
+	distanceExpression DistanceExpression,
 	speed common.Speed,
-) nextroute.TravelDurationExpression {
+) TravelDurationExpression {
 	return &travelDurationExpression{
 		distanceExpression: distanceExpression,
 		speed:              speed,
@@ -108,7 +107,7 @@ func NewTravelDurationExpression(
 func NewConstantDurationExpression(
 	name string,
 	duration time.Duration,
-) nextroute.DurationExpression {
+) DurationExpression {
 	return &constantDurationExpressionImpl{
 		index:    NewModelExpressionIndex(),
 		name:     name,
@@ -120,7 +119,7 @@ func NewConstantDurationExpression(
 func NewStopDurationExpression(
 	name string,
 	duration time.Duration,
-) nextroute.StopDurationExpression {
+) StopDurationExpression {
 	return &stopDurationExpressionImpl{
 		index:             NewModelExpressionIndex(),
 		name:              name,
@@ -135,7 +134,7 @@ func NewStopDurationExpression(
 func NewVehicleTypeDurationExpression(
 	name string,
 	duration time.Duration,
-) nextroute.VehicleTypeDurationExpression {
+) VehicleTypeDurationExpression {
 	return &vehicleTypeDurationExpressionImpl{
 		index:             NewModelExpressionIndex(),
 		name:              name,
@@ -147,7 +146,7 @@ func NewVehicleTypeDurationExpression(
 }
 
 type scaledDurationExpressionImpl struct {
-	expression nextroute.ModelExpression
+	expression ModelExpression
 	name       string
 	index      int
 	multiplier float64
@@ -183,7 +182,7 @@ func (s *scaledDurationExpressionImpl) SetName(n string) {
 	s.name = n
 }
 
-func (s *scaledDurationExpressionImpl) ScaledExpression() nextroute.ModelExpression {
+func (s *scaledDurationExpressionImpl) ScaledExpression() ModelExpression {
 	return s.expression
 }
 
@@ -196,9 +195,9 @@ func (s *scaledDurationExpressionImpl) Index() int {
 }
 
 func (s *scaledDurationExpressionImpl) Value(
-	vehicleType nextroute.ModelVehicleType,
-	from nextroute.ModelStop,
-	to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from ModelStop,
+	to ModelStop,
 ) float64 {
 	return s.expression.Value(
 		vehicleType,
@@ -208,9 +207,9 @@ func (s *scaledDurationExpressionImpl) Value(
 }
 
 func (s *scaledDurationExpressionImpl) Duration(
-	vehicleType nextroute.ModelVehicleType,
-	from nextroute.ModelStop,
-	to nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	from ModelStop,
+	to ModelStop,
 ) time.Duration {
 	return time.Duration(
 		s.Value(vehicleType, from, to),
@@ -256,9 +255,9 @@ func (s *stopDurationExpressionImpl) SetName(n string) {
 }
 
 func (s *stopDurationExpressionImpl) Value(
-	_ nextroute.ModelVehicleType,
-	_ nextroute.ModelStop,
-	stop nextroute.ModelStop,
+	_ ModelVehicleType,
+	_ ModelStop,
+	stop ModelStop,
 ) float64 {
 	index := stop.Index()
 
@@ -269,16 +268,16 @@ func (s *stopDurationExpressionImpl) Value(
 }
 
 func (s *stopDurationExpressionImpl) Duration(
-	_ nextroute.ModelVehicleType,
-	_ nextroute.ModelStop,
-	stop nextroute.ModelStop,
+	_ ModelVehicleType,
+	_ ModelStop,
+	stop ModelStop,
 ) time.Duration {
 	return stop.Model().DurationUnit() *
 		time.Duration(s.Value(nil, nil, stop))
 }
 
 func (s *stopDurationExpressionImpl) SetDuration(
-	stop nextroute.ModelStop,
+	stop ModelStop,
 	duration time.Duration,
 ) {
 	if stop == nil {
@@ -341,9 +340,9 @@ func (v *vehicleTypeDurationExpressionImpl) DefaultValue() float64 {
 }
 
 func (v *vehicleTypeDurationExpressionImpl) Value(
-	vehicleType nextroute.ModelVehicleType,
-	_ nextroute.ModelStop,
-	_ nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	_ ModelStop,
+	_ ModelStop,
 ) float64 {
 	index := vehicleType.Index()
 
@@ -354,28 +353,28 @@ func (v *vehicleTypeDurationExpressionImpl) Value(
 }
 
 func (v *vehicleTypeDurationExpressionImpl) ValueForVehicleType(
-	vehicleType nextroute.ModelVehicleType,
+	vehicleType ModelVehicleType,
 ) float64 {
 	return v.Duration(vehicleType, nil, nil).Seconds()
 }
 
 func (v *vehicleTypeDurationExpressionImpl) DurationForVehicleType(
-	vehicleType nextroute.ModelVehicleType,
+	vehicleType ModelVehicleType,
 ) time.Duration {
 	return v.Duration(vehicleType, nil, nil)
 }
 
 func (v *vehicleTypeDurationExpressionImpl) Duration(
-	vehicleType nextroute.ModelVehicleType,
-	_ nextroute.ModelStop,
-	_ nextroute.ModelStop,
+	vehicleType ModelVehicleType,
+	_ ModelStop,
+	_ ModelStop,
 ) time.Duration {
 	return vehicleType.Model().DurationUnit() *
 		time.Duration(v.Value(vehicleType, nil, nil))
 }
 
 func (v *vehicleTypeDurationExpressionImpl) SetDuration(
-	vehicleType nextroute.ModelVehicleType,
+	vehicleType ModelVehicleType,
 	duration time.Duration,
 ) {
 	if vehicleType == nil {
@@ -431,22 +430,22 @@ func (c *constantDurationExpressionImpl) SetName(n string) {
 }
 
 func (c *constantDurationExpressionImpl) Value(
-	_ nextroute.ModelVehicleType,
-	_, _ nextroute.ModelStop,
+	_ ModelVehicleType,
+	_, _ ModelStop,
 ) float64 {
 	return c.duration.Seconds()
 }
 
 func (c *constantDurationExpressionImpl) Duration(
-	_ nextroute.ModelVehicleType,
-	_ nextroute.ModelStop,
-	_ nextroute.ModelStop,
+	_ ModelVehicleType,
+	_ ModelStop,
+	_ ModelStop,
 ) time.Duration {
 	return c.duration
 }
 
 type travelDurationExpression struct {
-	distanceExpression nextroute.DistanceExpression
+	distanceExpression DistanceExpression
 	speed              common.Speed
 	name               string
 	index              int
@@ -480,7 +479,7 @@ func (d *travelDurationExpression) SetName(n string) {
 	d.name = n
 }
 
-func (d *travelDurationExpression) DistanceExpression() nextroute.DistanceExpression {
+func (d *travelDurationExpression) DistanceExpression() DistanceExpression {
 	return d.distanceExpression
 }
 
@@ -489,9 +488,9 @@ func (d *travelDurationExpression) Speed() common.Speed {
 }
 
 func (d *travelDurationExpression) Duration(
-	vehicle nextroute.ModelVehicleType,
-	from nextroute.ModelStop,
-	to nextroute.ModelStop,
+	vehicle ModelVehicleType,
+	from ModelStop,
+	to ModelStop,
 ) time.Duration {
 	return time.Second *
 		time.Duration(
@@ -505,9 +504,9 @@ func (d *travelDurationExpression) Duration(
 }
 
 func (d *travelDurationExpression) Value(
-	vehicle nextroute.ModelVehicleType,
-	from nextroute.ModelStop,
-	to nextroute.ModelStop,
+	vehicle ModelVehicleType,
+	from ModelStop,
+	to ModelStop,
 ) float64 {
 	return common.DurationValue(
 		common.NewDistance(

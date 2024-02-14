@@ -2,25 +2,23 @@ package nextroute
 
 import (
 	"fmt"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewMaximumDurationConstraint returns a new MaximumDurationConstraint.
 func NewMaximumDurationConstraint(
-	maximum nextroute.VehicleTypeDurationExpression,
-) (nextroute.MaximumDurationConstraint, error) {
+	maximum VehicleTypeDurationExpression,
+) (MaximumDurationConstraint, error) {
 	return &maximumDurationConstraintImpl{
 		modelConstraintImpl: newModelConstraintImpl(
 			"maximum_duration",
-			nextroute.ModelExpressions{},
+			ModelExpressions{},
 		),
 		maximum: maximum,
 	}, nil
 }
 
 type maximumDurationConstraintImpl struct {
-	maximum nextroute.VehicleTypeDurationExpression
+	maximum VehicleTypeDurationExpression
 	modelConstraintImpl
 }
 
@@ -31,17 +29,17 @@ func (l *maximumDurationConstraintImpl) String() string {
 	)
 }
 
-func (l *maximumDurationConstraintImpl) EstimationCost() nextroute.Cost {
-	return nextroute.Constant
+func (l *maximumDurationConstraintImpl) EstimationCost() Cost {
+	return Constant
 }
 
-func (l *maximumDurationConstraintImpl) Maximum() nextroute.VehicleTypeDurationExpression {
+func (l *maximumDurationConstraintImpl) Maximum() VehicleTypeDurationExpression {
 	return l.maximum
 }
 
 func (l *maximumDurationConstraintImpl) EstimateIsViolated(
-	move nextroute.SolutionMoveStops,
-) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	move SolutionMoveStops,
+) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
 	vehicle := moveImpl.vehicle()
 	vehicleType := vehicle.ModelVehicle().VehicleType()
@@ -86,7 +84,7 @@ func (l *maximumDurationConstraintImpl) EstimateIsViolated(
 	return false, constNoPositionsHint
 }
 
-func (l *maximumDurationConstraintImpl) DoesVehicleHaveViolations(vehicle nextroute.SolutionVehicle) bool {
+func (l *maximumDurationConstraintImpl) DoesVehicleHaveViolations(vehicle SolutionVehicle) bool {
 	return vehicle.DurationValue() >
 		l.maximum.Value(vehicle.ModelVehicle().VehicleType(), nil, nil)
 }

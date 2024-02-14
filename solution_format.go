@@ -9,7 +9,6 @@ import (
 
 	"github.com/nextmv-io/sdk/alns"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/run"
 	"github.com/nextmv-io/sdk/run/schema"
 	"github.com/nextmv-io/sdk/run/statistics"
@@ -20,13 +19,13 @@ import (
 func Format(
 	ctx context.Context,
 	options any,
-	progressioner nextroute.Progressioner,
-	toSolutionOutputFn func(nextroute.Solution) any,
-	inputSolutions ...nextroute.Solution,
+	progressioner Progressioner,
+	toSolutionOutputFn func(Solution) any,
+	inputSolutions ...Solution,
 ) schema.Output {
 	solutions := common.Filter(
 		inputSolutions,
-		func(solution nextroute.Solution) bool {
+		func(solution Solution) bool {
 			return solution != nil
 		},
 	)
@@ -98,7 +97,7 @@ func Format(
 	r := reflect.ValueOf(options)
 	f := reflect.Indirect(r).FieldByName("Format")
 	if f.IsValid() && f.CanInterface() {
-		if format, ok := f.Interface().(nextroute.FormatOptions); ok {
+		if format, ok := f.Interface().(FormatOptions); ok {
 			if format.Disable.Progression {
 				return output
 			}

@@ -2,8 +2,6 @@ package nextroute
 
 import (
 	"fmt"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewMaximumWaitStopConstraint returns a new MaximumWaitStopConstraint. The
@@ -11,8 +9,8 @@ import (
 // stop.  Wait is defined as the time between arriving at a
 // stop and starting to do whatever you need to do,
 // [SolutionStop.StartValue()] - [SolutionStop.ArrivalValue()].
-func NewMaximumWaitStopConstraint(maxima nextroute.StopDurationExpression) (
-	nextroute.MaximumWaitStopConstraint,
+func NewMaximumWaitStopConstraint(maxima StopDurationExpression) (
+	MaximumWaitStopConstraint,
 	error,
 ) {
 	if maxima == nil {
@@ -21,14 +19,14 @@ func NewMaximumWaitStopConstraint(maxima nextroute.StopDurationExpression) (
 	return &maximumWaitStopConstraintImpl{
 		modelConstraintImpl: newModelConstraintImpl(
 			"maximum_stop_wait",
-			nextroute.ModelExpressions{},
+			ModelExpressions{},
 		),
 		maxima: maxima,
 	}, nil
 }
 
 type maximumWaitStopConstraintImpl struct {
-	maxima nextroute.StopDurationExpression
+	maxima StopDurationExpression
 	modelConstraintImpl
 }
 
@@ -36,17 +34,17 @@ func (l *maximumWaitStopConstraintImpl) String() string {
 	return l.name
 }
 
-func (l *maximumWaitStopConstraintImpl) EstimationCost() nextroute.Cost {
-	return nextroute.LinearStop
+func (l *maximumWaitStopConstraintImpl) EstimationCost() Cost {
+	return LinearStop
 }
 
-func (l *maximumWaitStopConstraintImpl) Maximum() nextroute.StopDurationExpression {
+func (l *maximumWaitStopConstraintImpl) Maximum() StopDurationExpression {
 	return l.maxima
 }
 
 func (l *maximumWaitStopConstraintImpl) EstimateIsViolated(
-	move nextroute.SolutionMoveStops,
-) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	move SolutionMoveStops,
+) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	solutionMoveStops := move.(*solutionMoveStopsImpl)
 
 	vehicle := solutionMoveStops.vehicle()
@@ -91,7 +89,7 @@ func (l *maximumWaitStopConstraintImpl) EstimateIsViolated(
 	return false, constNoPositionsHint
 }
 
-func (l *maximumWaitStopConstraintImpl) DoesStopHaveViolations(s nextroute.SolutionStop) bool {
+func (l *maximumWaitStopConstraintImpl) DoesStopHaveViolations(s SolutionStop) bool {
 	stop := s.(solutionStopImpl)
 	return stop.StartValue()-stop.ArrivalValue() >
 		l.maxima.Value(nil, nil, stop.modelStop())

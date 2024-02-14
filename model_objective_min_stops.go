@@ -1,11 +1,7 @@
 package nextroute
 
-import (
-	"github.com/nextmv-io/sdk/nextroute"
-)
-
 // NewMinStopsObjective returns a new MinStopsObjective.
-func NewMinStopsObjective(minStops, minStopsPenalty nextroute.VehicleTypeExpression) nextroute.ModelObjective {
+func NewMinStopsObjective(minStops, minStopsPenalty VehicleTypeExpression) ModelObjective {
 	return &minStopsObjectiveImpl{
 		minStops:        minStops,
 		minStopsPenalty: minStopsPenalty,
@@ -13,11 +9,11 @@ func NewMinStopsObjective(minStops, minStopsPenalty nextroute.VehicleTypeExpress
 }
 
 type minStopsObjectiveImpl struct {
-	minStops        nextroute.VehicleTypeExpression
-	minStopsPenalty nextroute.VehicleTypeExpression
+	minStops        VehicleTypeExpression
+	minStopsPenalty VehicleTypeExpression
 }
 
-func (t *minStopsObjectiveImpl) EstimateDeltaValue(move nextroute.SolutionMoveStops) float64 {
+func (t *minStopsObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float64 {
 	moveImpl := move.(*solutionMoveStopsImpl)
 	vehicle := moveImpl.vehicle()
 	modelVehicle := vehicle.ModelVehicle().(*modelVehicleImpl)
@@ -51,7 +47,7 @@ func (t *minStopsObjectiveImpl) EstimateDeltaValue(move nextroute.SolutionMoveSt
 		-float64(oldDelta) * float64(oldDelta)
 }
 
-func (t *minStopsObjectiveImpl) Value(solution nextroute.Solution) float64 {
+func (t *minStopsObjectiveImpl) Value(solution Solution) float64 {
 	solutionImpl := solution.(*solutionImpl)
 	penaltySum := 0.0
 	for _, vehicle := range solutionImpl.vehicles {

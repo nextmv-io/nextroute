@@ -4,12 +4,11 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 type solutionPlanUnitsUnitImpl struct {
-	modelPlanUnitsUnit nextroute.ModelPlanUnitsUnit
-	solutionPlanUnits  nextroute.SolutionPlanUnits
+	modelPlanUnitsUnit ModelPlanUnitsUnit
+	solutionPlanUnits  SolutionPlanUnits
 	sameVehicle        bool
 }
 
@@ -20,9 +19,9 @@ func (p *solutionPlanUnitsUnitImpl) String() string {
 	)
 }
 
-func (p *solutionPlanUnitsUnitImpl) PlannedPlanStopsUnits() nextroute.SolutionPlanStopsUnits {
+func (p *solutionPlanUnitsUnitImpl) PlannedPlanStopsUnits() SolutionPlanStopsUnits {
 	if p.modelPlanUnitsUnit.PlanAll() {
-		solutionPlanStopsUnits := make(nextroute.SolutionPlanStopsUnits, 0, len(p.solutionPlanUnits))
+		solutionPlanStopsUnits := make(SolutionPlanStopsUnits, 0, len(p.solutionPlanUnits))
 		for _, solutionPlanUnit := range p.solutionPlanUnits {
 			solutionPlanStopsUnits = append(solutionPlanStopsUnits,
 				solutionPlanUnit.PlannedPlanStopsUnits()...,
@@ -36,10 +35,10 @@ func (p *solutionPlanUnitsUnitImpl) PlannedPlanStopsUnits() nextroute.SolutionPl
 			return solutionPlanStopsUnits
 		}
 	}
-	return nextroute.SolutionPlanStopsUnits{}
+	return SolutionPlanStopsUnits{}
 }
 
-func (p *solutionPlanUnitsUnitImpl) SolutionPlanUnit(planUnit nextroute.ModelPlanUnit) nextroute.SolutionPlanUnit {
+func (p *solutionPlanUnitsUnitImpl) SolutionPlanUnit(planUnit ModelPlanUnit) SolutionPlanUnit {
 	for _, solutionPlanUnit := range p.solutionPlanUnits {
 		if solutionPlanUnit.ModelPlanUnit().Index() == planUnit.Index() {
 			return solutionPlanUnit
@@ -58,22 +57,22 @@ func (p *solutionPlanUnitsUnitImpl) SameVehicle() bool {
 	return p.sameVehicle
 }
 
-func (p *solutionPlanUnitsUnitImpl) ModelPlanUnit() nextroute.ModelPlanUnit {
+func (p *solutionPlanUnitsUnitImpl) ModelPlanUnit() ModelPlanUnit {
 	return p.modelPlanUnitsUnit
 }
 
-func (p *solutionPlanUnitsUnitImpl) ModelPlanUnitsUnit() nextroute.ModelPlanUnitsUnit {
+func (p *solutionPlanUnitsUnitImpl) ModelPlanUnitsUnit() ModelPlanUnitsUnit {
 	return p.modelPlanUnitsUnit
 }
 func (p *solutionPlanUnitsUnitImpl) Index() int {
 	return p.modelPlanUnitsUnit.Index()
 }
 
-func (p *solutionPlanUnitsUnitImpl) Solution() nextroute.Solution {
+func (p *solutionPlanUnitsUnitImpl) Solution() Solution {
 	return p.solutionPlanUnits[0].Solution()
 }
 
-func (p *solutionPlanUnitsUnitImpl) SolutionPlanUnits() nextroute.SolutionPlanUnits {
+func (p *solutionPlanUnitsUnitImpl) SolutionPlanUnits() SolutionPlanUnits {
 	return common.DefensiveCopy(p.solutionPlanUnits)
 }
 

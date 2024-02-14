@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // SolutionPlanStopsUnit is a set of stops that are planned to be visited by
@@ -32,7 +31,7 @@ type SolutionPlanStopsUnit interface {
 type SolutionPlanStopsUnits []SolutionPlanStopsUnit
 
 type solutionPlanStopsUnitImpl struct {
-	modelPlanStopsUnit nextroute.ModelPlanStopsUnit
+	modelPlanStopsUnit ModelPlanStopsUnit
 	solutionStops      []solutionStopImpl
 }
 
@@ -43,11 +42,11 @@ func (p *solutionPlanStopsUnitImpl) String() string {
 	)
 }
 
-func (p *solutionPlanStopsUnitImpl) SolutionStop(stop nextroute.ModelStop) nextroute.SolutionStop {
+func (p *solutionPlanStopsUnitImpl) SolutionStop(stop ModelStop) SolutionStop {
 	return p.solutionStop(stop)
 }
 
-func (p *solutionPlanStopsUnitImpl) solutionStop(stop nextroute.ModelStop) solutionStopImpl {
+func (p *solutionPlanStopsUnitImpl) solutionStop(stop ModelStop) solutionStopImpl {
 	for _, solutionStop := range p.solutionStops {
 		if solutionStop.ModelStop().Index() == stop.Index() {
 			return solutionStop
@@ -62,18 +61,18 @@ func (p *solutionPlanStopsUnitImpl) solutionStop(stop nextroute.ModelStop) solut
 	)
 }
 
-func (p *solutionPlanStopsUnitImpl) PlannedPlanStopsUnits() nextroute.SolutionPlanStopsUnits {
+func (p *solutionPlanStopsUnitImpl) PlannedPlanStopsUnits() SolutionPlanStopsUnits {
 	if p.IsPlanned() {
-		return nextroute.SolutionPlanStopsUnits{p}
+		return SolutionPlanStopsUnits{p}
 	}
-	return nextroute.SolutionPlanStopsUnits{}
+	return SolutionPlanStopsUnits{}
 }
 
-func (p *solutionPlanStopsUnitImpl) ModelPlanUnit() nextroute.ModelPlanUnit {
+func (p *solutionPlanStopsUnitImpl) ModelPlanUnit() ModelPlanUnit {
 	return p.modelPlanStopsUnit
 }
 
-func (p *solutionPlanStopsUnitImpl) ModelPlanStopsUnit() nextroute.ModelPlanStopsUnit {
+func (p *solutionPlanStopsUnitImpl) ModelPlanStopsUnit() ModelPlanStopsUnit {
 	return p.modelPlanStopsUnit
 }
 
@@ -81,7 +80,7 @@ func (p *solutionPlanStopsUnitImpl) Index() int {
 	return p.modelPlanStopsUnit.Index()
 }
 
-func (p *solutionPlanStopsUnitImpl) Solution() nextroute.Solution {
+func (p *solutionPlanStopsUnitImpl) Solution() Solution {
 	return p.solutionStops[0].Solution()
 }
 
@@ -89,12 +88,12 @@ func (p *solutionPlanStopsUnitImpl) solution() *solutionImpl {
 	return p.solutionStops[0].solution
 }
 
-func (p *solutionPlanStopsUnitImpl) Stops() nextroute.ModelStops {
+func (p *solutionPlanStopsUnitImpl) Stops() ModelStops {
 	return p.modelPlanStopsUnit.Stops()
 }
 
-func (p *solutionPlanStopsUnitImpl) SolutionStops() nextroute.SolutionStops {
-	solutionStops := make(nextroute.SolutionStops, len(p.solutionStops))
+func (p *solutionPlanStopsUnitImpl) SolutionStops() SolutionStops {
+	solutionStops := make(SolutionStops, len(p.solutionStops))
 	for i, solutionStop := range p.solutionStops {
 		solutionStops[i] = solutionStop
 	}
@@ -167,9 +166,9 @@ func (p *solutionPlanStopsUnitImpl) UnPlan() (bool, error) {
 	return success, err
 }
 
-func (p *solutionPlanStopsUnitImpl) StopPositions() nextroute.StopPositions {
+func (p *solutionPlanStopsUnitImpl) StopPositions() StopPositions {
 	if p.IsPlanned() {
-		return common.Map(p.solutionStops, func(solutionStop solutionStopImpl) nextroute.StopPosition {
+		return common.Map(p.solutionStops, func(solutionStop solutionStopImpl) StopPosition {
 			return newStopPosition(
 				solutionStop.previous(),
 				solutionStop,
@@ -177,7 +176,7 @@ func (p *solutionPlanStopsUnitImpl) StopPositions() nextroute.StopPositions {
 			)
 		})
 	}
-	return nextroute.StopPositions{}
+	return StopPositions{}
 }
 
 var unplanSolutionMove = sync.Pool{

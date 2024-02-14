@@ -3,20 +3,18 @@ package nextroute
 import (
 	"fmt"
 	"math"
-
-	"github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewMaximum creates a new maximum construct which can be used as constraint
 // or as objective.
 func NewMaximum(
-	expression nextroute.ModelExpression,
-	maximum nextroute.VehicleTypeExpression,
-) (nextroute.Maximum, error) {
+	expression ModelExpression,
+	maximum VehicleTypeExpression,
+) (Maximum, error) {
 	return &maximumImpl{
 		modelConstraintImpl: newModelConstraintImpl(
 			"maximum",
-			nextroute.ModelExpressions{expression},
+			ModelExpressions{expression},
 		),
 		maximum:       maximum,
 		penaltyOffset: 0.0,
@@ -24,7 +22,7 @@ func NewMaximum(
 }
 
 type maximumImpl struct {
-	maximum nextroute.VehicleTypeExpression
+	maximum VehicleTypeExpression
 	deltas  []float64
 	modelConstraintImpl
 	// hasNegativeValues is true if the expression has negative values.
@@ -35,7 +33,7 @@ type maximumImpl struct {
 	hasPositiveValues                    bool
 	hasConstantExpression                bool
 	hasStopExpressionAndNoNegativeValues bool
-	resourceExpression                   nextroute.ModelExpression
+	resourceExpression                   ModelExpression
 	maximumByVehicleType                 []float64
 	penaltyOffset                        float64
 }
@@ -57,13 +55,13 @@ func (l *maximumImpl) SetPenaltyOffset(penaltyOffset float64) error {
 	return nil
 }
 
-func (l *maximumImpl) Lock(model nextroute.Model) error {
+func (l *maximumImpl) Lock(model Model) error {
 	l.hasNegativeValues = l.Expression().HasNegativeValues()
 	l.hasPositiveValues = l.Expression().HasPositiveValues()
-	if _, ok := l.Expression().(nextroute.ConstantExpression); ok {
+	if _, ok := l.Expression().(ConstantExpression); ok {
 		l.hasConstantExpression = true
 	}
-	if _, ok := l.Expression().(nextroute.StopExpression); ok &&
+	if _, ok := l.Expression().(StopExpression); ok &&
 		!l.hasNegativeValues {
 		l.hasStopExpressionAndNoNegativeValues = true
 	}
@@ -107,31 +105,31 @@ func (l *maximumImpl) SetID(id string) {
 	l.name = id
 }
 
-func (l *maximumImpl) EstimationCost() nextroute.Cost {
+func (l *maximumImpl) EstimationCost() Cost {
 	if l.hasNegativeValues && !l.hasPositiveValues {
-		return nextroute.Constant
+		return Constant
 	}
 
 	if l.hasConstantExpression {
-		return nextroute.Constant
+		return Constant
 	}
 
 	if l.hasStopExpressionAndNoNegativeValues {
-		return nextroute.Constant
+		return Constant
 	}
 
-	return nextroute.LinearStop
+	return LinearStop
 }
 
-func (l *maximumImpl) Expression() nextroute.ModelExpression {
+func (l *maximumImpl) Expression() ModelExpression {
 	return l.expressions[0]
 }
 
-func (l *maximumImpl) Maximum() nextroute.VehicleTypeExpression {
+func (l *maximumImpl) Maximum() VehicleTypeExpression {
 	return l.maximum
 }
 
-func (l *maximumImpl) DoesStopHaveViolations(s nextroute.SolutionStop) bool {
+func (l *maximumImpl) DoesStopHaveViolations(s SolutionStop) bool {
 	stop := s.(solutionStopImpl)
 	// We check if the cumulative value is below zero or above the maximum.
 	// If there are stops with negative values, the cumulative value can be
@@ -149,8 +147,8 @@ func (l *maximumImpl) DoesStopHaveViolations(s nextroute.SolutionStop) bool {
 }
 
 func (l *maximumImpl) EstimateIsViolated(
-	move nextroute.SolutionMoveStops,
-) (isViolated bool, stopPositionsHint nextroute.StopPositionsHint) {
+	move SolutionMoveStops,
+) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	// All contributions to the level are negative, no need to check
 	// it will always be below the implied minimum level of zero.
 	if l.hasNegativeValues && !l.hasPositiveValues {
@@ -240,15 +238,15 @@ type maximumObjectiveDate struct {
 	hasViolation bool
 }
 
-func (m *maximumObjectiveDate) Copy() nextroute.Copier {
+func (m *maximumObjectiveDate) Copy() Copier {
 	return &maximumObjectiveDate{
 		hasViolation: m.hasViolation,
 	}
 }
 
 func (l *maximumImpl) UpdateObjectiveStopData(
-	solutionStop nextroute.SolutionStop,
-) (nextroute.Copier, error) {
+	solutionStop SolutionStop,
+) (Copier, error) {
 	if solutionStop.IsFirst() {
 		return &maximumObjectiveDate{
 			hasViolation: false,
@@ -269,7 +267,7 @@ func (l *maximumImpl) UpdateObjectiveStopData(
 }
 
 func (l *maximumImpl) EstimateDeltaValue(
-	move nextroute.SolutionMoveStops,
+	move SolutionMoveStops,
 ) (deltaValue float64) {
 	moveImpl := move.(*solutionMoveStopsImpl)
 
@@ -354,7 +352,7 @@ func (l *maximumImpl) EstimateDeltaValue(
 }
 
 func (l *maximumImpl) Value(
-	solution nextroute.Solution,
+	solution Solution,
 ) (value float64) {
 	solutionImp := solution.(*solutionImpl)
 
