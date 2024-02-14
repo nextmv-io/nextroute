@@ -13,6 +13,61 @@ import (
 
 const maxTimeDependentExpressionInterval = 24 * 7 * time.Hour
 
+// TimeDependentDurationExpression is a DurationExpression that returns a value
+// based on time on top of a base expression.
+type TimeDependentDurationExpression interface {
+	DurationExpression
+
+	// DefaultExpression returns the default expression.
+	DefaultExpression() DurationExpression
+
+	// IsDependentOnTime returns true if the expression is dependent on time.
+	// The expression is dependent on time if the expression is not the same
+	// for all time intervals.
+	IsDependentOnTime() bool
+
+	// SatisfiesTriangleInequality returns true if the expression satisfies
+	// the triangle inequality. The triangular inequality states that for any
+	// three points A, B, and C, the distance from A to C cannot be greater
+	// than the sum of the distances from A to B and from B to C.
+	SatisfiesTriangleInequality() bool
+
+	// SetExpression sets the expression for the given time interval
+	// [start, end). If the interval overlaps with an existing interval,
+	// the existing interval is replaced. Both start and end must be on the
+	// minute boundary. Expression is not allowed to contain negative values.
+	SetExpression(start, end time.Time, expression DurationExpression) error
+
+	// SetSatisfiesTriangleInequality sets whether the expression satisfies
+	// the triangle inequality. The triangular inequality states that for any
+	// three points A, B, and C, the distance from A to C cannot be greater
+	// than the sum of the distances from A to B and from B to C.
+	SetSatisfiesTriangleInequality(satisfies bool)
+
+	// Expressions returns all expressions defined to be valid in a time
+	// interval. The returned slice is a defensive copy of the internal slice,
+	// so modifying it will not affect the collection.
+	Expressions() []DurationExpression
+
+	// ExpressionAtTime returns the expression for the given time.
+	ExpressionAtTime(time.Time) DurationExpression
+	// ExpressionAtValue returns the expression for the given value.
+	ExpressionAtValue(float64) DurationExpression
+
+	// ValueAtTime returns the value for the given time.
+	ValueAtTime(
+		time time.Time,
+		vehicleType ModelVehicleType,
+		from, to ModelStop,
+	) float64
+	// ValueAtValue returns the value for the given value.
+	ValueAtValue(
+		value float64,
+		vehicleType ModelVehicleType,
+		from, to ModelStop,
+	) float64
+}
+
 // NewTimeDependentDurationExpression returns a new
 // TimeDependentDurationExpression.
 func NewTimeDependentDurationExpression(

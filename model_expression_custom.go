@@ -7,6 +7,91 @@ import (
 	"github.com/nextmv-io/sdk/nextroute"
 )
 
+// ConstantExpression is an expression that always returns the same value.
+type ConstantExpression interface {
+	ModelExpression
+
+	// SetValue sets the value of the expression.
+	SetValue(value float64)
+}
+
+// DefaultExpression is an expression that has a default value if no other
+// values are defined.
+type DefaultExpression interface {
+	ModelExpression
+	// DefaultValue returns the default value of the expression.
+	DefaultValue() float64
+}
+
+// FromStopExpression is an expression that has a value for each from stop.
+type FromStopExpression interface {
+	DefaultExpression
+
+	// SetValue sets the value of the expression for the given from stop.
+	SetValue(
+		stop ModelStop,
+		value float64,
+	)
+}
+
+// StopExpression is an expression that has a value for each to stop.
+type StopExpression interface {
+	DefaultExpression
+
+	// SetValue sets the value of the expression for the given to stop.
+	SetValue(
+		stop ModelStop,
+		value float64,
+	)
+}
+
+// VehicleTypeExpression is the base expression for
+// VehicleTypeExpressions.
+type VehicleTypeExpression interface {
+	DefaultExpression
+	ValueForVehicleType(ModelVehicleType) float64
+}
+
+// VehicleTypeValueExpression is a ModelExpression that returns a value per
+// vehicle type and allows to set the value per vehicle type.
+type VehicleTypeValueExpression interface {
+	VehicleTypeExpression
+	// SetValue sets the value of the expression for the given vehicle type.
+	SetValue(
+		vehicle ModelVehicleType,
+		value float64,
+	)
+}
+
+// FromToExpression is an expression that has a value for each combination
+// of from and to stop.
+type FromToExpression interface {
+	DefaultExpression
+
+	// SetValue sets the value of the expression for the given
+	// from and to stops.
+	SetValue(
+		from ModelStop,
+		to ModelStop,
+		value float64,
+	)
+}
+
+// VehicleFromToExpression is an expression that has a value for each
+// combination of vehicle type, from and to stop.
+type VehicleFromToExpression interface {
+	DefaultExpression
+
+	// SetValue sets the value of the expression for the given vehicle type,
+	// from and to stops.
+	SetValue(
+		vehicle ModelVehicleType,
+		from ModelStop,
+		to ModelStop,
+		value float64,
+	)
+}
+
 // NewConstantExpression returns an expression that always returns the same
 // value.
 func NewConstantExpression(

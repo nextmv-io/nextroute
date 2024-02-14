@@ -12,7 +12,7 @@ func NewMaximumTravelDurationConstraint(
 	return &maximumTravelDurationConstraintImpl{
 		modelConstraintImpl: newModelConstraintImpl(
 			"maximum_travel_duration",
-			nextroute.ModelExpressions{},
+			ModelExpressions{},
 		),
 		maximum: maximum,
 	}, nil
