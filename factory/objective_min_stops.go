@@ -2,7 +2,6 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -11,9 +10,9 @@ import (
 // Model.
 func addMinStopsObjective(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	options factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	minStops := nextroute.NewVehicleTypeValueExpression("min_stops", 0)
 	minStopsPenalty := nextroute.NewVehicleTypeValueExpression("min_stops_penalty", 0)
 	present := false

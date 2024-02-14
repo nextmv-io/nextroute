@@ -4,7 +4,6 @@ import (
 	"math"
 
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -12,9 +11,9 @@ import (
 // addMaximumStopsConstraint adds a MaximumStopsConstraint to the model.
 func addMaximumStopsConstraint(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	limit := nextroute.NewVehicleTypeValueExpression(
 		"stopsLimit",
 		math.MaxFloat64,

@@ -2,7 +2,6 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -11,9 +10,9 @@ import (
 // objective to the Model.
 func addActivationPenaltyObjective(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	options factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	activationPenalty := nextroute.NewVehicleTypeValueExpression("activation_penalty", 0.0)
 	present := false
 	for v, vehicle := range input.Vehicles {

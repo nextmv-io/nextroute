@@ -5,15 +5,14 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 type groupedStopsTest struct {
-	model sdkNextRoute.Model
-	s1    sdkNextRoute.ModelStop
-	s2    sdkNextRoute.ModelStop
-	s3    sdkNextRoute.ModelStop
-	s4    sdkNextRoute.ModelStop
+	model nextroute.Model
+	s1    nextroute.ModelStop
+	s2    nextroute.ModelStop
+	s3    nextroute.ModelStop
+	s4    nextroute.ModelStop
 }
 
 func groupStopsTestBenchmark(b *testing.B) groupedStopsTest {
@@ -213,25 +212,25 @@ func TestIsAllowed(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if allowed, err := dag.IsAllowed(sdkNextRoute.ModelStops{s1, s2}); err != nil || !allowed {
+	if allowed, err := dag.IsAllowed(nextroute.ModelStops{s1, s2}); err != nil || !allowed {
 		if err != nil {
 			t.Fatal(err)
 		}
 		t.Errorf("expected allowed true, got false")
 	}
-	if allowed, err := dag.IsAllowed(sdkNextRoute.ModelStops{s2, s1}); err != nil || allowed {
+	if allowed, err := dag.IsAllowed(nextroute.ModelStops{s2, s1}); err != nil || allowed {
 		if err != nil {
 			t.Fatal(err)
 		}
 		t.Errorf("expected allowed false, got true")
 	}
-	if allowed, err := dag.IsAllowed(sdkNextRoute.ModelStops{s1, s3}); err != nil || !allowed {
+	if allowed, err := dag.IsAllowed(nextroute.ModelStops{s1, s3}); err != nil || !allowed {
 		if err != nil {
 			t.Fatal(err)
 		}
 		t.Errorf("expected allowed true, got false")
 	}
-	if allowed, err := dag.IsAllowed(sdkNextRoute.ModelStops{s3, s1}); err != nil || allowed {
+	if allowed, err := dag.IsAllowed(nextroute.ModelStops{s3, s1}); err != nil || allowed {
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 // Simply test that we can add a new earliness objective to the model.
@@ -40,7 +39,7 @@ func TestAddEarlinessObjective(t *testing.T) {
 	earlinessObjective, err := nextroute.NewEarlinessObjective(
 		targetTimeExpression,
 		factorExpression,
-		sdkNextRoute.OnArrival,
+		nextroute.OnArrival,
 	)
 	if err != nil {
 		t.Error(err)

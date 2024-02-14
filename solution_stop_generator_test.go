@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 func TestSolutionStopGeneratorSingleStop(t *testing.T) {
@@ -28,11 +27,11 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 	}
 
 	move, err := nextroute.NewMoveStops(
-		unplannedPlanUnits[0].(sdkNextRoute.SolutionPlanStopsUnit),
-		[]sdkNextRoute.StopPosition{
+		unplannedPlanUnits[0].(nextroute.SolutionPlanStopsUnit),
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
-				unplannedPlanUnits[0].(sdkNextRoute.SolutionPlanStopsUnit).SolutionStops()[0],
+				unplannedPlanUnits[0].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
 				solution.Vehicles()[0].Last(),
 			),
 		},
@@ -48,7 +47,7 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 				move,
 				true,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().Last(),
@@ -69,11 +68,11 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 	t.Run("next single stop, startAtFirst=true, endAtLast=true",
 		func(t *testing.T) {
 			move, err = nextroute.NewMoveStops(
-				unplannedPlanUnits[1].(sdkNextRoute.SolutionPlanStopsUnit),
-				[]sdkNextRoute.StopPosition{
+				unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit),
+				[]nextroute.StopPosition{
 					nextroute.NewStopPosition(
 						move.Vehicle().First(),
-						unplannedPlanUnits[1].(sdkNextRoute.SolutionPlanStopsUnit).SolutionStops()[0],
+						unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
 						move.Vehicle().First().Next(),
 					),
 				},
@@ -86,7 +85,7 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 				move,
 				true,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().Last().Previous(),
@@ -108,11 +107,11 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 	t.Run("next single stop, 2 stops on vehicle, first position",
 		func(t *testing.T) {
 			move, err = nextroute.NewMoveStops(
-				unplannedPlanUnits[2].(sdkNextRoute.SolutionPlanStopsUnit),
-				[]sdkNextRoute.StopPosition{
+				unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit),
+				[]nextroute.StopPosition{
 					nextroute.NewStopPosition(
 						move.Vehicle().First(),
-						unplannedPlanUnits[2].(sdkNextRoute.SolutionPlanStopsUnit).SolutionStops()[0],
+						unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
 						move.Vehicle().First().Next(),
 					),
 				},
@@ -126,7 +125,7 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 				move,
 				false,
 				false,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().First().Next(),
@@ -137,7 +136,7 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 				move,
 				false,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().First().Next(),
@@ -150,7 +149,7 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 				move,
 				true,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().First().Next(),
@@ -164,11 +163,11 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 	t.Run("next single stop, 2 stops on vehicle, second position",
 		func(t *testing.T) {
 			move, err = nextroute.NewMoveStops(
-				unplannedPlanUnits[2].(sdkNextRoute.SolutionPlanStopsUnit),
-				[]sdkNextRoute.StopPosition{
+				unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit),
+				[]nextroute.StopPosition{
 					nextroute.NewStopPosition(
 						move.Vehicle().First().Next(),
-						unplannedPlanUnits[2].(sdkNextRoute.SolutionPlanStopsUnit).SolutionStops()[0],
+						unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
 						move.Vehicle().First().Next().Next(),
 					),
 				},
@@ -181,7 +180,7 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 				move,
 				false,
 				false,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First().Next(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().First().Next().Next(),
@@ -192,7 +191,7 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 				move,
 				false,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First().Next(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().First().Next().Next(),
@@ -204,7 +203,7 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 				move,
 				true,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.Vehicle().First().Next(),
 					move.PlanStopsUnit().SolutionStops()[0],
@@ -218,11 +217,11 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 	t.Run("next single stop, 2 stops on vehicle, last position",
 		func(t *testing.T) {
 			move, err = nextroute.NewMoveStops(
-				unplannedPlanUnits[2].(sdkNextRoute.SolutionPlanStopsUnit),
-				[]sdkNextRoute.StopPosition{
+				unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit),
+				[]nextroute.StopPosition{
 					nextroute.NewStopPosition(
 						move.Vehicle().Last().Previous(),
-						unplannedPlanUnits[2].(sdkNextRoute.SolutionPlanStopsUnit).SolutionStops()[0],
+						unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
 						move.Vehicle().Last(),
 					),
 				},
@@ -235,7 +234,7 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 				move,
 				false,
 				false,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().Last().Previous(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().Last(),
@@ -246,7 +245,7 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 				move,
 				false,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().Last().Previous(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().Last(),
@@ -257,7 +256,7 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 				move,
 				true,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.Vehicle().First().Next(),
 					move.Vehicle().First().Next().Next(),
@@ -282,11 +281,11 @@ func BenchmarkSolutionStopGenerator(b *testing.B) {
 	}
 	unplannedPlanUnits := solution.UnPlannedPlanUnits().SolutionPlanUnits()
 	move, err := nextroute.NewMoveStops(
-		unplannedPlanUnits[0].(sdkNextRoute.SolutionPlanStopsUnit),
-		[]sdkNextRoute.StopPosition{
+		unplannedPlanUnits[0].(nextroute.SolutionPlanStopsUnit),
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
-				unplannedPlanUnits[0].(sdkNextRoute.SolutionPlanStopsUnit).SolutionStops()[0],
+				unplannedPlanUnits[0].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
 				solution.Vehicles()[0].Last(),
 			),
 		},
@@ -303,11 +302,11 @@ func BenchmarkSolutionStopGenerator(b *testing.B) {
 		b.Fatal("move should be planned")
 	}
 	move, err = nextroute.NewMoveStops(
-		unplannedPlanUnits[1].(sdkNextRoute.SolutionPlanStopsUnit),
-		[]sdkNextRoute.StopPosition{
+		unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit),
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				move.Vehicle().First(),
-				unplannedPlanUnits[1].(sdkNextRoute.SolutionPlanStopsUnit).SolutionStops()[0],
+				unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
 				move.Vehicle().First().Next(),
 			),
 		},
@@ -324,11 +323,11 @@ func BenchmarkSolutionStopGenerator(b *testing.B) {
 		b.Fatal("move should be planned")
 	}
 	move, err = nextroute.NewMoveStops(
-		unplannedPlanUnits[2].(sdkNextRoute.SolutionPlanStopsUnit),
-		[]sdkNextRoute.StopPosition{
+		unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit),
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				move.Vehicle().First(),
-				unplannedPlanUnits[2].(sdkNextRoute.SolutionPlanStopsUnit).SolutionStops()[0],
+				unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
 				move.Vehicle().First().Next(),
 			),
 		},
@@ -370,10 +369,10 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 
 	vehicle := solution.Vehicles()[0]
 
-	upu := unplannedPlanUnits[0].(sdkNextRoute.SolutionPlanStopsUnit)
+	upu := unplannedPlanUnits[0].(nextroute.SolutionPlanStopsUnit)
 	move, err := nextroute.NewMoveStops(
 		upu,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				vehicle.First(),
 				upu.SolutionStops()[0],
@@ -396,7 +395,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				false,
 				false,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.PlanStopsUnit().SolutionStops()[1],
@@ -413,7 +412,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				true,
 				false,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.PlanStopsUnit().SolutionStops()[1],
@@ -430,7 +429,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				true,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.PlanStopsUnit().SolutionStops()[1],
@@ -447,10 +446,10 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 	if !planned {
 		t.Fatal("move is not planned")
 	}
-	upu = unplannedPlanUnits[1].(sdkNextRoute.SolutionPlanStopsUnit)
+	upu = unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit)
 	move, err = nextroute.NewMoveStops(
 		upu,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				move.Vehicle().First(),
 				upu.SolutionStops()[0],
@@ -474,7 +473,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				true,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.PlanStopsUnit().SolutionStops()[1],
@@ -493,7 +492,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				false,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.PlanStopsUnit().SolutionStops()[1],
@@ -512,7 +511,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				false,
 				false,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.PlanStopsUnit().SolutionStops()[1],
@@ -521,10 +520,10 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 			)
 		},
 	)
-	upu = unplannedPlanUnits[1].(sdkNextRoute.SolutionPlanStopsUnit)
+	upu = unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit)
 	move, err = nextroute.NewMoveStops(
 		upu,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				vehicle.First(),
 				upu.SolutionStops()[0],
@@ -548,7 +547,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				true,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().First().Next(),
@@ -567,7 +566,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				false,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().First().Next(),
@@ -586,7 +585,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				false,
 				false,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().First().Next(),
@@ -597,10 +596,10 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 			)
 		},
 	)
-	upu = unplannedPlanUnits[1].(sdkNextRoute.SolutionPlanStopsUnit)
+	upu = unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit)
 	move, err = nextroute.NewMoveStops(
 		upu,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				move.Vehicle().First().Next(),
 				upu.SolutionStops()[0],
@@ -624,7 +623,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				true,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.Vehicle().First().Next(),
 					move.PlanStopsUnit().SolutionStops()[0],
@@ -643,7 +642,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				false,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First().Next(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().Last().Previous(),
@@ -661,7 +660,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				false,
 				false,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First().Next(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.Vehicle().Last().Previous(),
@@ -672,10 +671,10 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 		},
 	)
 
-	upu = unplannedPlanUnits[1].(sdkNextRoute.SolutionPlanStopsUnit)
+	upu = unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit)
 	move, err = nextroute.NewMoveStops(
 		upu,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				move.Vehicle().Last().Previous(),
 				upu.SolutionStops()[0],
@@ -699,7 +698,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				true,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().First(),
 					move.Vehicle().First().Next(),
 					move.Vehicle().Last().Previous(),
@@ -718,7 +717,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				false,
 				true,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().Last().Previous(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.PlanStopsUnit().SolutionStops()[1],
@@ -735,7 +734,7 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 				move,
 				false,
 				false,
-				sdkNextRoute.SolutionStops{
+				nextroute.SolutionStops{
 					move.Vehicle().Last().Previous(),
 					move.PlanStopsUnit().SolutionStops()[0],
 					move.PlanStopsUnit().SolutionStops()[1],
@@ -748,10 +747,10 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 
 func testMove(
 	t *testing.T,
-	move sdkNextRoute.SolutionMoveStops,
+	move nextroute.SolutionMoveStops,
 	startAtFirst bool,
 	endAtLast bool,
-	expected sdkNextRoute.SolutionStops,
+	expected nextroute.SolutionStops,
 ) {
 	count := 0
 

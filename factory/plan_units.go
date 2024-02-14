@@ -6,22 +6,21 @@ import (
 	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
 
 func addPlanUnits(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err
 	}
 
-	stop2Unit := make(map[int]sdkNextRoute.ModelPlanUnit, model.NumberOfStops())
+	stop2Unit := make(map[int]nextroute.ModelPlanUnit, model.NumberOfStops())
 
 	sequences := allSequences(data)
 
@@ -60,7 +59,7 @@ func addPlanUnits(
 		if vehicle.AlternateStops == nil {
 			continue
 		}
-		planUnits := make([]sdkNextRoute.ModelPlanUnit, len(*vehicle.AlternateStops))
+		planUnits := make([]nextroute.ModelPlanUnit, len(*vehicle.AlternateStops))
 		for idx, alternateID := range *vehicle.AlternateStops {
 			stop, err := model.Stop(data.stopIDToIndex[alternateStopID(alternateID, vehicle)])
 			if err != nil {
@@ -79,10 +78,10 @@ func addPlanUnits(
 	}
 
 	for _, group := range data.groups {
-		units := make([]sdkNextRoute.ModelPlanUnit, 0, len(group.stops))
+		units := make([]nextroute.ModelPlanUnit, 0, len(group.stops))
 
 		common.RangeMap(group.stops, func(id string, _ struct{}) bool {
-			var stop sdkNextRoute.ModelStop
+			var stop nextroute.ModelStop
 			stop, err = model.Stop(data.stopIDToIndex[id])
 			if err != nil {
 				return true
@@ -216,10 +215,10 @@ func toExistingUnit(
 // buildDirectedAcyclicGraph return the Directed Acyclic Graph
 // that make up a ModelPlanUnit.
 func buildDirectedAcyclicGraph(
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	sequences []sequence,
 ) (
-	sdkNextRoute.DirectedAcyclicGraph,
+	nextroute.DirectedAcyclicGraph,
 	error,
 ) {
 	data, err := getModelData(model)

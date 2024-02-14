@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 func TestSequenceGenerator1(t *testing.T) {
@@ -25,8 +24,8 @@ func TestSequenceGenerator1(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	stops := []sdkNextRoute.ModelStop{s1, s2, s3, s4}
-	solutionStops := make(sdkNextRoute.SolutionStops, len(stops))
+	stops := []nextroute.ModelStop{s1, s2, s3, s4}
+	solutionStops := make(nextroute.SolutionStops, len(stops))
 	planUnit, err := model.NewPlanMultipleStops(stops, dag)
 	if err != nil {
 		t.Fatal(err)
@@ -43,7 +42,7 @@ func TestSequenceGenerator1(t *testing.T) {
 
 	quit := make(chan struct{})
 	defer close(quit)
-	sequences := make([]sdkNextRoute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0)
 	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanStopsUnit(planUnit), quit) {
 		sequences = append(sequences, solutionStops)
 	}
@@ -74,8 +73,8 @@ func TestSequenceGenerator2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	stops := []sdkNextRoute.ModelStop{s1, s2, s3, s4}
-	solutionStops := make(sdkNextRoute.SolutionStops, len(stops))
+	stops := []nextroute.ModelStop{s1, s2, s3, s4}
+	solutionStops := make(nextroute.SolutionStops, len(stops))
 	planUnit, err := model.NewPlanMultipleStops(stops, dag)
 	if err != nil {
 		t.Fatal(err)
@@ -93,7 +92,7 @@ func TestSequenceGenerator2(t *testing.T) {
 	quit := make(chan struct{})
 	defer close(quit)
 
-	sequences := make([]sdkNextRoute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0)
 	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanStopsUnit(planUnit), quit) {
 		sequences = append(sequences, solutionStops)
 	}
@@ -112,8 +111,8 @@ func TestSequenceGenerator3(t *testing.T) {
 	model := groupedStopsTest.model
 	dag := nextroute.NewDirectedAcyclicGraph()
 
-	stops := []sdkNextRoute.ModelStop{s1, s2, s3, s4}
-	solutionStops := make(sdkNextRoute.SolutionStops, len(stops))
+	stops := []nextroute.ModelStop{s1, s2, s3, s4}
+	solutionStops := make(nextroute.SolutionStops, len(stops))
 	planUnit, err := model.NewPlanMultipleStops(stops, dag)
 	if err != nil {
 		t.Fatal(err)
@@ -130,7 +129,7 @@ func TestSequenceGenerator3(t *testing.T) {
 
 	quit := make(chan struct{})
 	defer close(quit)
-	sequences := make([]sdkNextRoute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0)
 	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanStopsUnit(planUnit), quit) {
 		sequences = append(sequences, solutionStops)
 	}
@@ -149,8 +148,8 @@ func TestSequenceGenerator4(t *testing.T) {
 	model := groupedStopsTest.model
 	dag := nextroute.NewDirectedAcyclicGraph()
 
-	stops := []sdkNextRoute.ModelStop{s1, s2, s3, s4}
-	solutionStops := make(sdkNextRoute.SolutionStops, len(stops))
+	stops := []nextroute.ModelStop{s1, s2, s3, s4}
+	solutionStops := make(nextroute.SolutionStops, len(stops))
 	planUnit, err := model.NewPlanMultipleStops(stops, dag)
 	if err != nil {
 		t.Fatal(err)
@@ -167,7 +166,7 @@ func TestSequenceGenerator4(t *testing.T) {
 
 	quit := make(chan struct{})
 	defer close(quit)
-	sequences := make([]sdkNextRoute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0)
 	model.SetSequenceSampleSize(10)
 	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanStopsUnit(planUnit), quit) {
 		sequences = append(sequences, solutionStops)
@@ -182,8 +181,8 @@ func TestSequenceGeneratorSingleStop(t *testing.T) {
 	groupedStopsTest := groupStopsTest(t)
 	s1 := groupedStopsTest.s1
 	model := groupedStopsTest.model
-	stops := []sdkNextRoute.ModelStop{s1}
-	solutionStops := make(sdkNextRoute.SolutionStops, len(stops))
+	stops := []nextroute.ModelStop{s1}
+	solutionStops := make(nextroute.SolutionStops, len(stops))
 	planUnit, err := model.NewPlanSingleStop(s1)
 	if err != nil {
 		t.Fatal(err)
@@ -200,7 +199,7 @@ func TestSequenceGeneratorSingleStop(t *testing.T) {
 
 	quit := make(chan struct{})
 	defer close(quit)
-	sequences := make([]sdkNextRoute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0)
 	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanStopsUnit(planUnit), quit) {
 		sequences = append(sequences, solutionStops)
 	}
@@ -215,8 +214,8 @@ func TestSequenceGeneratorSequence(t *testing.T) {
 	s1 := groupedStopsTest.s1
 	s2 := groupedStopsTest.s2
 	model := groupedStopsTest.model
-	stops := []sdkNextRoute.ModelStop{s1, s2}
-	solutionStops := make(sdkNextRoute.SolutionStops, len(stops))
+	stops := []nextroute.ModelStop{s1, s2}
+	solutionStops := make(nextroute.SolutionStops, len(stops))
 	planUnit, err := model.NewPlanSequence(stops)
 	if err != nil {
 		t.Fatal(err)
@@ -233,7 +232,7 @@ func TestSequenceGeneratorSequence(t *testing.T) {
 
 	quit := make(chan struct{})
 	defer close(quit)
-	sequences := make([]sdkNextRoute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0)
 	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanStopsUnit(planUnit), quit) {
 		sequences = append(sequences, solutionStops)
 	}
@@ -248,8 +247,8 @@ func BenchmarkSequenceGeneratorSequence(b *testing.B) {
 	s1 := groupedStopsTest.s1
 	s2 := groupedStopsTest.s2
 	model := groupedStopsTest.model
-	stops := []sdkNextRoute.ModelStop{s1, s2}
-	solutionStops := make(sdkNextRoute.SolutionStops, len(stops))
+	stops := []nextroute.ModelStop{s1, s2}
+	solutionStops := make(nextroute.SolutionStops, len(stops))
 	planUnit, err := model.NewPlanSequence(stops)
 	if err != nil {
 		b.Fatal(err)
@@ -266,7 +265,7 @@ func BenchmarkSequenceGeneratorSequence(b *testing.B) {
 
 	quit := make(chan struct{})
 	defer close(quit)
-	sequences := make([]sdkNextRoute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0)
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanUnit(planUnit), quit) {
@@ -285,8 +284,8 @@ func BenchmarkSequenceGenerator3(b *testing.B) {
 	model := groupedStopsTest.model
 	dag := nextroute.NewDirectedAcyclicGraph()
 
-	stops := []sdkNextRoute.ModelStop{s1, s2, s3, s4}
-	solutionStops := make(sdkNextRoute.SolutionStops, len(stops))
+	stops := []nextroute.ModelStop{s1, s2, s3, s4}
+	solutionStops := make(nextroute.SolutionStops, len(stops))
 	planUnit, err := model.NewPlanMultipleStops(stops, dag)
 	if err != nil {
 		b.Fatal(err)
@@ -303,7 +302,7 @@ func BenchmarkSequenceGenerator3(b *testing.B) {
 
 	quit := make(chan struct{})
 	defer close(quit)
-	sequences := make([]sdkNextRoute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0)
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanUnit(planUnit), quit) {

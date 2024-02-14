@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -14,16 +14,16 @@ import (
 // addServiceDurations sets the time it takes them to service a stop.
 func addServiceDurations(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	durationExpressions := common.UniqueDefined(
 		common.Map(
 			model.VehicleTypes(),
-			func(vt sdkNextRoute.ModelVehicleType) sdkNextRoute.DurationExpression {
+			func(vt nextroute.ModelVehicleType) nextroute.DurationExpression {
 				return vt.DurationExpression()
 			}),
-		func(e sdkNextRoute.DurationExpression) int {
+		func(e nextroute.DurationExpression) int {
 			return e.Index()
 		},
 	)
@@ -43,8 +43,8 @@ func addServiceDurations(
 
 func addServiceDurationsStops(
 	input schema.Input,
-	model sdkNextRoute.Model,
-	durationExpressions []sdkNextRoute.DurationExpression) error {
+	model nextroute.Model,
+	durationExpressions []nextroute.DurationExpression) error {
 	for s, inputStop := range input.Stops {
 		if inputStop.Duration == nil || *inputStop.Duration == 0 {
 			continue
@@ -73,8 +73,8 @@ func addServiceDurationsStops(
 
 func addServiceDurationsAlternateStops(
 	input schema.Input,
-	model sdkNextRoute.Model,
-	durationExpressions []sdkNextRoute.DurationExpression) error {
+	model nextroute.Model,
+	durationExpressions []nextroute.DurationExpression) error {
 	if input.AlternateStops == nil {
 		return nil
 	}
@@ -119,13 +119,13 @@ func addServiceDurationsAlternateStops(
 	return nil
 }
 
-func groupToStops(ids []string, model sdkNextRoute.Model) (sdkNextRoute.ModelStops, error) {
+func groupToStops(ids []string, model nextroute.Model) (nextroute.ModelStops, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err
 	}
 
-	modelStops := make(sdkNextRoute.ModelStops, len(ids))
+	modelStops := make(nextroute.ModelStops, len(ids))
 	for idx, id := range ids {
 		index, ok := data.stopIDToIndex[id]
 		if !ok {
@@ -142,19 +142,19 @@ func groupToStops(ids []string, model sdkNextRoute.Model) (sdkNextRoute.ModelSto
 // addDurationGroups sets the time it takes them to service a stop.
 func addDurationGroups(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	if input.DurationGroups == nil {
 		return model, nil
 	}
 	durationExpressions := common.UniqueDefined(
 		common.Map(
 			model.VehicleTypes(),
-			func(vt sdkNextRoute.ModelVehicleType) sdkNextRoute.DurationExpression {
+			func(vt nextroute.ModelVehicleType) nextroute.DurationExpression {
 				return vt.DurationExpression()
 			}),
-		func(e sdkNextRoute.DurationExpression) int {
+		func(e nextroute.DurationExpression) int {
 			return e.Index()
 		},
 	)
@@ -191,20 +191,20 @@ func addDurationGroups(
 // addServiceDurations sets the time it takes them to service a stop.
 func addDurationMultipliers(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	// containerType struct with a field called durationExpression and a field called
 	// inputVehicle
 	type containerType struct {
-		durationExpression sdkNextRoute.DurationExpression
+		durationExpression nextroute.DurationExpression
 		multiplier         float64
 	}
 
 	container :=
 		common.Map(
 			model.VehicleTypes(),
-			func(vt sdkNextRoute.ModelVehicleType) containerType {
+			func(vt nextroute.ModelVehicleType) containerType {
 				multiplier := 1.0
 				if input.Vehicles[vt.Index()].StopDurationMultiplier != nil {
 					multiplier = *input.Vehicles[vt.Index()].StopDurationMultiplier

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -14,9 +14,9 @@ import (
 // "precedes" or "succeeds" field is not nil.
 func addPrecedenceInformation(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	present := false
 	var sequences []sequence
 	stopIDToIndex := map[string]int{}

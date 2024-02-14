@@ -1,7 +1,7 @@
 package factory
 
 import (
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
+	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -11,9 +11,9 @@ import (
 // in a particular order.
 func addGroupInformation(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	if input.StopGroups == nil || len(*input.StopGroups) == 0 {
 		return model, nil
 	}

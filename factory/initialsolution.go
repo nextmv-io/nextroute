@@ -3,8 +3,8 @@ package factory
 import (
 	"fmt"
 
+	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -12,9 +12,9 @@ import (
 // addInitialSolution sets the initial solution.
 func addInitialSolution(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func addInitialSolution(
 		modelVehicle := model.Vehicles()[idx]
 
 		for _, initialStop := range *inputVehicle.InitialStops {
-			var modelStop sdkNextRoute.ModelStop
+			var modelStop nextroute.ModelStop
 
 			if _, defined := inputStopIDToModelStopIndex[initialStop.ID]; defined {
 				modelStop = modelStops[inputStopIDToModelStopIndex[initialStop.ID]]

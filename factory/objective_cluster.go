@@ -2,7 +2,6 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -10,9 +9,9 @@ import (
 // addClusterObjective adds an objective which prefers clustered routes.
 func addClusterObjective(
 	_ schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	options factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	cluster, err := nextroute.NewCluster()
 	if err != nil {
 		return model, err

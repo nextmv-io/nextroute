@@ -3,9 +3,9 @@ package factory
 import (
 	"fmt"
 
+	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -13,9 +13,9 @@ import (
 // addAlternates adds the alternate stops to the Model.
 func addAlternates(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	if input.AlternateStops == nil {
 		return model, nil
 	}

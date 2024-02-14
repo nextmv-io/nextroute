@@ -4,6 +4,35 @@ import (
 	"fmt"
 )
 
+// NoMixConstraint limits the order in which stops are assigned to a vehicle
+// based upon the items the stops insert or remove from a vehicle.
+type NoMixConstraint interface {
+	Identifier
+	ModelConstraint
+
+	// Insert returns the mix items that are associated with a stop that
+	// inserts items into a vehicle.
+	Insert() map[ModelStop]MixItem
+	// Remove returns the mix items that are associated with a stop that
+	// removes items from a vehicle.
+	Remove() map[ModelStop]MixItem
+	// Value returns the value of the constraint for a stop. The value is
+	// the amount of items on the vehicle at the moment of the stop. If
+	// the stop is unplanned, the value has no semantic meaning.
+	Value(solutionStop SolutionStop) MixItem
+}
+
+// MixItem is an item that is used to specify the type of mix.
+// The type defines the type of each item. The count is the number units of
+// the item are inserted or removed from a vehicle.
+type MixItem struct {
+	// Name is the name of the mix item.
+	Name string `json:"name"`
+	// Quantity is the number units of the mix items are inserted or removed from a
+	// vehicle.
+	Quantity int `json:"quantity"`
+}
+
 // NewNoMixConstraint returns a new NoMixConstraint.
 func NewNoMixConstraint(
 	deltas map[ModelStop]MixItem,

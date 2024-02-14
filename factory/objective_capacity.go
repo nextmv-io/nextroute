@@ -7,7 +7,6 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -110,9 +109,9 @@ func parseCapacityObjectives(capacities string) ([]capacityObjective, error) {
 // to create a new objective and add it to the model.
 func addCapacityObjective(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	options factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	if options.Objectives.Capacities == "" {
 		return model, nil
 	}
@@ -192,15 +191,15 @@ func addCapacityObjective(
 // expressions that the Model uses. Because it receives and returns a Model, it
 // mutates it to add maximum as a constraint.
 func addMaximumObjectives(
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	names map[string]bool,
 	options factory.Options,
 	capacityObjectives []capacityObjective,
 ) (
-	sdkNextRoute.Model,
+	nextroute.Model,
 	map[string]bool,
-	map[string]sdkNextRoute.StopExpression,
-	map[string]sdkNextRoute.VehicleTypeValueExpression,
+	map[string]nextroute.StopExpression,
+	map[string]nextroute.VehicleTypeValueExpression,
 	error,
 ) {
 	disabledResources := map[string]bool{}
@@ -208,8 +207,8 @@ func addMaximumObjectives(
 		disabledResources[name] = true
 	}
 
-	requirements := map[string]sdkNextRoute.StopExpression{}
-	limits := map[string]sdkNextRoute.VehicleTypeValueExpression{}
+	requirements := map[string]nextroute.StopExpression{}
+	limits := map[string]nextroute.VehicleTypeValueExpression{}
 	postedNames := map[string]bool{}
 
 	for _, capacityObjective := range capacityObjectives {
@@ -240,7 +239,7 @@ func addMaximumObjectives(
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
-		maximum.(sdkNextRoute.Identifier).SetID("capacity_" + name)
+		maximum.(nextroute.Identifier).SetID("capacity_" + name)
 		_, err = model.Objective().NewTerm(capacityObjective.Factor, maximum)
 		if err != nil {
 			return nil, nil, nil, nil, err

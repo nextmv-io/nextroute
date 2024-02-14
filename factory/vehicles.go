@@ -6,7 +6,6 @@ import (
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
 	"github.com/nextmv-io/sdk/measure"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -14,9 +13,9 @@ import (
 // addVehicles adds the vehicle types to the Model.
 func addVehicles(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	options factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err
@@ -83,11 +82,11 @@ func addVehicles(
 // newVehicleType returns the VehicleType that the Model needs.
 func newVehicleType(
 	vehicle schema.Vehicle,
-	model sdkNextRoute.Model,
-	distanceExpression sdkNextRoute.DistanceExpression,
-	durationExpression sdkNextRoute.DurationExpression,
+	model nextroute.Model,
+	distanceExpression nextroute.DistanceExpression,
+	durationExpression nextroute.DurationExpression,
 	durationGroupsExpression DurationGroupsExpression,
-) (sdkNextRoute.ModelVehicleType, error) {
+) (nextroute.ModelVehicleType, error) {
 	if durationExpression == nil {
 		s := common.NewSpeed(*vehicle.Speed, common.MetersPerSecond)
 		durationExpression = nextroute.NewTravelDurationExpression(distanceExpression, s)
@@ -117,10 +116,10 @@ func newVehicleType(
 
 func newVehicle(
 	inputVehicle schema.Vehicle,
-	vehicleType sdkNextRoute.ModelVehicleType,
-	model sdkNextRoute.Model,
+	vehicleType nextroute.ModelVehicleType,
+	model nextroute.Model,
 	options factory.Options,
-) (sdkNextRoute.ModelVehicle, error) {
+) (nextroute.ModelVehicle, error) {
 	startLocation := common.NewInvalidLocation()
 	var err error
 	if inputVehicle.StartLocation != nil {
@@ -178,8 +177,8 @@ func newVehicle(
 // travelDurationExpressions returns the expressions that define how vehicles
 // travel from one stop to another and the time it takes them to process a stop
 // (service it).
-func travelDurationExpression(input schema.Input) sdkNextRoute.DurationExpression {
-	var travelDuration sdkNextRoute.DurationExpression
+func travelDurationExpression(input schema.Input) nextroute.DurationExpression {
+	var travelDuration nextroute.DurationExpression
 	if input.DurationMatrix != nil {
 		travelDuration = nextroute.NewDurationExpression(
 			"travelDuration",
@@ -192,7 +191,7 @@ func travelDurationExpression(input schema.Input) sdkNextRoute.DurationExpressio
 }
 
 // distanceExpression creates a distance expression for later use.
-func distanceExpression(distanceMatrix *[][]float64) sdkNextRoute.DistanceExpression {
+func distanceExpression(distanceMatrix *[][]float64) nextroute.DistanceExpression {
 	distanceExpression := nextroute.NewHaversineExpression()
 	if distanceMatrix != nil {
 		distanceExpression = nextroute.NewDistanceExpression(

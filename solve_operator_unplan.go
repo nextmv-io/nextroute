@@ -6,6 +6,14 @@ import (
 	"github.com/nextmv-io/sdk/common"
 )
 
+// SolveOperatorUnPlan is a solve operator that un-plans units.
+type SolveOperatorUnPlan interface {
+	SolveOperator
+
+	// NumberOfUnits returns the number of units of the solve operator.
+	NumberOfUnits() SolveParameter
+}
+
 // NewSolveOperatorUnPlan creates a new SolveOperatorUnPlan.
 // SolveOperatorUnPlan is a solve-operator which un-plans planned plan-units.
 // It is used to remove planned plan-units. from the solution.

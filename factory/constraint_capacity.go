@@ -7,7 +7,6 @@ import (
 	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -17,9 +16,9 @@ import (
 // expressions to add a new maximum constraint to the model.
 func addCapacityConstraint(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	options factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	quantities, names, quantitiesPresent, err := stopQuantities(input.Stops)
 	if err != nil {
 		return nil, err
@@ -125,7 +124,7 @@ func stopQuantities(stops []schema.Stop) (
 
 func alternateStopQuantities(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	requirements map[int]map[string]float64,
 	names map[string]bool,
 ) (
@@ -335,16 +334,16 @@ func stringAnyMap[T anyOrInt](
 // expressions that the Model uses. Because it receives and returns a Model, it
 // mutates it to add maximum as a constraint.
 func addMaximumConstraint(
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	names map[string]bool,
 ) (
-	sdkNextRoute.Model,
-	map[string]sdkNextRoute.StopExpression,
-	map[string]sdkNextRoute.VehicleTypeValueExpression,
+	nextroute.Model,
+	map[string]nextroute.StopExpression,
+	map[string]nextroute.VehicleTypeValueExpression,
 	error,
 ) {
-	requirements := map[string]sdkNextRoute.StopExpression{}
-	limits := map[string]sdkNextRoute.VehicleTypeValueExpression{}
+	requirements := map[string]nextroute.StopExpression{}
+	limits := map[string]nextroute.VehicleTypeValueExpression{}
 	for name := range names {
 		requirement := nextroute.NewStopExpression(name, 0.)
 		limit := nextroute.NewVehicleTypeValueExpression(name, 0.)
@@ -352,7 +351,7 @@ func addMaximumConstraint(
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		maximum.(sdkNextRoute.Identifier).SetID("capacity_" + name)
+		maximum.(nextroute.Identifier).SetID("capacity_" + name)
 		err = model.AddConstraint(maximum)
 		if err != nil {
 			return nil, nil, nil, err
@@ -369,10 +368,10 @@ func addMaximumConstraint(
 func setExpressionValues(
 	names map[string]bool,
 	quantities, capacities, startLevels map[int]map[string]float64,
-	stops sdkNextRoute.ModelStops,
-	vehicles sdkNextRoute.ModelVehicles,
-	quantityExpressions map[string]sdkNextRoute.StopExpression,
-	capacityExpressions map[string]sdkNextRoute.VehicleTypeValueExpression,
+	stops nextroute.ModelStops,
+	vehicles nextroute.ModelVehicles,
+	quantityExpressions map[string]nextroute.StopExpression,
+	capacityExpressions map[string]nextroute.VehicleTypeValueExpression,
 ) {
 	for s, stop := range stops {
 		for name := range names {

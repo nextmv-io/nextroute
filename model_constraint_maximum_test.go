@@ -6,7 +6,6 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 func TestMaximumConstraint_EstimateIsViolated1(t *testing.T) {
@@ -46,7 +45,7 @@ func TestMaximumConstraint_EstimateIsViolated1(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	cnstr.(sdkNextRoute.Identifier).SetID("maximum_constraint")
+	cnstr.(nextroute.Identifier).SetID("maximum_constraint")
 
 	err = model.AddConstraint(cnstr)
 
@@ -54,7 +53,7 @@ func TestMaximumConstraint_EstimateIsViolated1(t *testing.T) {
 		t.Error(err)
 	}
 
-	singleStopPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit sdkNextRoute.ModelPlanStopsUnit) bool {
+	singleStopPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() == 1
 	})
 
@@ -74,7 +73,7 @@ func TestMaximumConstraint_EstimateIsViolated1(t *testing.T) {
 
 	moveSingleOnVehicle0, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit0,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSingleStopPlanUnit0.SolutionStops()[0],
@@ -101,7 +100,7 @@ func TestMaximumConstraint_EstimateIsViolated1(t *testing.T) {
 
 	moveSingleOnVehicle1, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit1,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSingleStopPlanUnit1.SolutionStops()[0],
@@ -162,7 +161,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	cnstr.(sdkNextRoute.Identifier).SetID("maximum_constraint")
+	cnstr.(nextroute.Identifier).SetID("maximum_constraint")
 
 	err = model.AddConstraint(cnstr)
 
@@ -170,7 +169,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 		t.Error(err)
 	}
 
-	singleStopPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit sdkNextRoute.ModelPlanStopsUnit) bool {
+	singleStopPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() == 1
 	})
 
@@ -178,7 +177,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 	delta.SetValue(singleStopPlanUnits[1].Stops()[0], -1)
 	delta.SetValue(singleStopPlanUnits[2].Stops()[0], 2)
 
-	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit sdkNextRoute.ModelPlanStopsUnit) bool {
+	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() > 1
 	})
 
@@ -197,7 +196,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 
 	moveSingleOnVehicle0, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit2,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSingleStopPlanUnit2.SolutionStops()[0],
@@ -211,7 +210,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 
 	moveSingleOnVehicle1, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit2,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[1].First(),
 				solutionSingleStopPlanUnit2.SolutionStops()[0],
@@ -244,7 +243,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 
 	moveSequenceOnVehicle0, err := nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSequencePlanUnit.SolutionStops()[0],
@@ -263,7 +262,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 
 	moveSequenceOnVehicle1, err := nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[1].First(),
 				solutionSequencePlanUnit.SolutionStops()[0],
@@ -302,7 +301,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 
 	moveSingleOnVehicle0AtStart, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit0,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSingleStopPlanUnit0.SolutionStops()[0],
@@ -323,7 +322,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 
 	moveSingleOnVehicle0AtEnd, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit0,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].Last().Previous(),
 				solutionSingleStopPlanUnit0.SolutionStops()[0],
@@ -342,7 +341,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 
 	moveSingleOnVehicle1AtStart, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit0,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[1].First(),
 				solutionSingleStopPlanUnit0.SolutionStops()[0],
@@ -363,7 +362,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 
 	moveSingleOnVehicle1AtEnd, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit0,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[1].Last().Previous(),
 				solutionSingleStopPlanUnit0.SolutionStops()[0],
@@ -384,7 +383,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 
 	moveSequenceOnVehicle0AtStart, err := nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSequencePlanUnit.SolutionStops()[0],
@@ -403,7 +402,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 
 	moveSequenceOnVehicle0AtEnd, err := nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].Last().Previous(),
 				solutionSequencePlanUnit.SolutionStops()[0],
@@ -422,7 +421,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 
 	moveSequenceOnVehicle0Wrapped, err := nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSequencePlanUnit.SolutionStops()[0],
@@ -457,7 +456,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 
 	moveSequenceOnVehicle1AtEnd, err := nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[1].Last().Previous(),
 				solutionSequencePlanUnit.SolutionStops()[0],

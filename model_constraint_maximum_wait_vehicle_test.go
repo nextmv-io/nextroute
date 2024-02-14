@@ -7,7 +7,6 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 func TestMaximumWaitVehicleConstraint_EstimateIsViolated(t *testing.T) {
@@ -70,10 +69,10 @@ func TestMaximumWaitVehicleConstraint_EstimateIsViolated(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	modelPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit sdkNextRoute.ModelPlanStopsUnit) bool {
+	modelPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() == 1
 	})
-	solutionPlanUnits := []sdkNextRoute.SolutionPlanStopsUnit{}
+	solutionPlanUnits := []nextroute.SolutionPlanStopsUnit{}
 	for _, planUnit := range modelPlanUnits {
 		solutionPlanUnits = append(solutionPlanUnits, solution.SolutionPlanStopsUnit(planUnit))
 	}
@@ -82,7 +81,7 @@ func TestMaximumWaitVehicleConstraint_EstimateIsViolated(t *testing.T) {
 	for i, solutionPlanUnit := range solutionPlanUnits {
 		move, err := nextroute.NewMoveStops(
 			solutionPlanUnit,
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					solution.Vehicles()[0].Last().Previous(),
 					solutionPlanUnit.SolutionStops()[0],

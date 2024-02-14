@@ -4,6 +4,18 @@ import (
 	"fmt"
 )
 
+// TermExpression is an expression that returns the product of the given factor
+// and the value of the given expression.
+type TermExpression interface {
+	ModelExpression
+
+	// Expression returns the expression.
+	Expression() ModelExpression
+
+	// Factor returns the factor.
+	Factor() float64
+}
+
 // NewTermExpression returns a new TermExpression.
 func NewTermExpression(
 	factor float64,

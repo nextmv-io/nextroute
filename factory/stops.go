@@ -1,8 +1,8 @@
 package factory
 
 import (
+	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -10,9 +10,9 @@ import (
 // addStops adds the stops to the Model.
 func addStops(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err

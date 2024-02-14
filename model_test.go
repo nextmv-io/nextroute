@@ -8,7 +8,6 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 func TestModel(t *testing.T) {
@@ -57,7 +56,7 @@ func TestModel(t *testing.T) {
 	}
 }
 
-func createModel(input Input) (sdkNextRoute.Model, error) {
+func createModel(input Input) (nextroute.Model, error) {
 	model, err := nextroute.NewModel()
 	if err != nil {
 		return nil, err
@@ -91,7 +90,7 @@ func createModel(input Input) (sdkNextRoute.Model, error) {
 	}
 
 	for _, planSequence := range input.PlanSequences {
-		stops := make(sdkNextRoute.ModelStops, len(planSequence.Stops))
+		stops := make(nextroute.ModelStops, len(planSequence.Stops))
 		for idx, s := range planSequence.Stops {
 			location, err := common.NewLocation(
 				s.Location.Lon,
@@ -116,7 +115,7 @@ func createModel(input Input) (sdkNextRoute.Model, error) {
 		}
 	}
 
-	vehicleTypes := make(map[string]sdkNextRoute.ModelVehicleType)
+	vehicleTypes := make(map[string]nextroute.ModelVehicleType)
 
 	for _, vt := range input.VehicleTypes {
 		if vt.Speed.MetersPerSecond < 0 {

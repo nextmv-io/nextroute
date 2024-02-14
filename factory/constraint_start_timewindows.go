@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -15,9 +15,9 @@ import (
 // addWindowsConstraint adds the time windows to the Model.
 func addWindowsConstraint(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	latestStartExpression, model, err := latestStartExpression(model)
 	if err != nil {
 		return nil, err
@@ -46,8 +46,8 @@ func addWindowsConstraint(
 
 func addWindowsStops(
 	input schema.Input,
-	model sdkNextRoute.Model,
-	latestStartExpression sdkNextRoute.StopTimeExpression,
+	model nextroute.Model,
+	latestStartExpression nextroute.StopTimeExpression,
 ) (bool, error) {
 	hasTimeWindow := false
 	for index, inputStop := range input.Stops {
@@ -83,8 +83,8 @@ func addWindowsStops(
 
 func addWindowsAlternateStops(
 	input schema.Input,
-	model sdkNextRoute.Model,
-	latestStartExpression sdkNextRoute.StopTimeExpression,
+	model nextroute.Model,
+	latestStartExpression nextroute.StopTimeExpression,
 ) (bool, error) {
 	if input.AlternateStops == nil {
 		return false, nil

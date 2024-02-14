@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 func TestNonExecutableMove(t *testing.T) {
@@ -112,7 +111,7 @@ func TestVehicleBestMoveSinglePlanUnit(t *testing.T) {
 	if !move1.IsExecutable() {
 		t.Error("move1 is not executable")
 	}
-	moveStops := move1.(sdkNextRoute.SolutionMoveStops)
+	moveStops := move1.(nextroute.SolutionMoveStops)
 	if moveStops.Vehicle().Index() != solutionVehicle.Index() {
 		t.Error("vehicle index is not correct")
 	}
@@ -156,7 +155,7 @@ func TestVehicleBestMoveSinglePlanUnit(t *testing.T) {
 		t.Error("move2 is not executable")
 	}
 
-	move2Stops := move2.(sdkNextRoute.SolutionMoveStops)
+	move2Stops := move2.(nextroute.SolutionMoveStops)
 
 	if move2Stops.Vehicle().Index() != solutionVehicle.Index() {
 		t.Error("vehicle index is not correct")
@@ -191,15 +190,15 @@ func TestVehicleBestMoveSequencePlanUnit(t *testing.T) {
 		t.Error("solutionVehicle is nil")
 	}
 
-	spss1s2 := solution.UnPlannedPlanUnits().SolutionPlanUnits()[0].(sdkNextRoute.SolutionPlanStopsUnit)
-	spss3s4 := solution.UnPlannedPlanUnits().SolutionPlanUnits()[1].(sdkNextRoute.SolutionPlanStopsUnit)
+	spss1s2 := solution.UnPlannedPlanUnits().SolutionPlanUnits()[0].(nextroute.SolutionPlanStopsUnit)
+	spss3s4 := solution.UnPlannedPlanUnits().SolutionPlanUnits()[1].(nextroute.SolutionPlanStopsUnit)
 
 	move1 := solutionVehicle.BestMove(context.Background(), spss1s2)
 
 	if !move1.IsExecutable() {
 		t.Error("move1 is not executable")
 	}
-	move1Stops := move1.(sdkNextRoute.SolutionMoveStops)
+	move1Stops := move1.(nextroute.SolutionMoveStops)
 
 	if move1Stops.Vehicle().Index() != solutionVehicle.Index() {
 		t.Error("vehicle index is not correct")
@@ -246,7 +245,7 @@ func TestVehicleBestMoveSequencePlanUnit(t *testing.T) {
 		t.Error("move2 is not executable")
 	}
 
-	move2Stops := move2.(sdkNextRoute.SolutionMoveStops)
+	move2Stops := move2.(nextroute.SolutionMoveStops)
 
 	if move2Stops.Vehicle().Index() != solutionVehicle.Index() {
 		t.Error("vehicle index is not correct")

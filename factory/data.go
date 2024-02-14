@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 // modelData represents custom data at the Model level that can be used across
@@ -12,11 +11,11 @@ import (
 type modelData struct {
 	// Expression and constraint to represent the latest end time at a stop,
 	// including the vehicle's ending location.
-	latestEndExpression   sdkNextRoute.StopTimeExpression
-	latestStartConstraint sdkNextRoute.LatestStart
-	latestStartExpression sdkNextRoute.StopTimeExpression
-	latestEndConstraint   sdkNextRoute.LatestEnd
-	targetTime            sdkNextRoute.StopTimeExpression
+	latestEndExpression   nextroute.StopTimeExpression
+	latestStartConstraint nextroute.LatestStart
+	latestStartExpression nextroute.StopTimeExpression
+	latestEndConstraint   nextroute.LatestEnd
+	targetTime            nextroute.StopTimeExpression
 
 	// Stop ID -> index in the input stops array.
 	stopIDToIndex map[string]int
@@ -30,7 +29,7 @@ type modelData struct {
 // vehicleTypeData represents custom data for a VehicleType that can be used
 // across different modifier functions.
 type vehicleTypeData struct {
-	DistanceExpression sdkNextRoute.DistanceExpression
+	DistanceExpression nextroute.DistanceExpression
 }
 
 // group represents a group of stops that must be assigned to a vehicle as a
@@ -51,9 +50,9 @@ type sequence struct {
 // latest start time at a stop. If the expression hasn't been added to the Model
 // data, it is added. On the other hand, if the expression already exists, it
 // is returned, as opposed to being created again.
-func latestStartExpression(model sdkNextRoute.Model) (
-	sdkNextRoute.StopTimeExpression,
-	sdkNextRoute.Model,
+func latestStartExpression(model nextroute.Model) (
+	nextroute.StopTimeExpression,
+	nextroute.Model,
 	error,
 ) {
 	data, err := getModelData(model)
@@ -76,9 +75,9 @@ func latestStartExpression(model sdkNextRoute.Model) (
 // added to the model. If there is, it does nothing. If there isn't, it adds it
 // to the model.
 func addLatestStartConstraint(
-	model sdkNextRoute.Model,
-	expression sdkNextRoute.StopTimeExpression,
-) (sdkNextRoute.Model, error) {
+	model nextroute.Model,
+	expression nextroute.StopTimeExpression,
+) (nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err
@@ -108,9 +107,9 @@ func addLatestStartConstraint(
 // latest end time at a stop. If the expression hasn't been added to the Model
 // data, it is added. On the other hand, if the expression already exists, it
 // is returned, as opposed to being created again.
-func latestEndExpression(model sdkNextRoute.Model) (
-	sdkNextRoute.StopTimeExpression,
-	sdkNextRoute.Model,
+func latestEndExpression(model nextroute.Model) (
+	nextroute.StopTimeExpression,
+	nextroute.Model,
 	error,
 ) {
 	data, err := getModelData(model)
@@ -133,9 +132,9 @@ func latestEndExpression(model sdkNextRoute.Model) (
 // added to the model. If there is, it does nothing. If there isn't, it adds it
 // to the model.
 func addLatestEndConstraint(
-	model sdkNextRoute.Model,
-	expression sdkNextRoute.StopTimeExpression,
-) (sdkNextRoute.Model, error) {
+	model nextroute.Model,
+	expression nextroute.StopTimeExpression,
+) (nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err
@@ -165,9 +164,9 @@ func addLatestEndConstraint(
 // target time at a stop. If the expression hasn't been added to the Model
 // data, it is added. On the other hand, if the expression already exists, it
 // is returned, as opposed to being created again.
-func targetTimeExpression(model sdkNextRoute.Model) (
-	sdkNextRoute.StopTimeExpression,
-	sdkNextRoute.Model,
+func targetTimeExpression(model nextroute.Model) (
+	nextroute.StopTimeExpression,
+	nextroute.Model,
 	error,
 ) {
 	data, err := getModelData(model)
@@ -188,7 +187,7 @@ func targetTimeExpression(model sdkNextRoute.Model) (
 
 // getModelData safely accesses the custom Model data and parses it to the type
 // that is used across the model modifier functions.
-func getModelData(model sdkNextRoute.Model) (modelData, error) {
+func getModelData(model nextroute.Model) (modelData, error) {
 	data := modelData{
 		groups:        make([]group, 0),
 		stopIDToIndex: make(map[string]int),

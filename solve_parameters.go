@@ -4,6 +4,21 @@ import (
 	"fmt"
 )
 
+// SolveParameter is an interface for a parameter that can change
+// during the solving. The parameter can be used to control the
+// behavior of the solver and it's operators.
+type SolveParameter interface {
+	// Update updates the parameter based on the given solve information.
+	// Update is invoked after each iteration of the solver.
+	Update(SolveInformation)
+
+	// Value returns the current value of the parameter.
+	Value() int
+}
+
+// SolveParameters is a slice of solve parameters.
+type SolveParameters []SolveParameter
+
 // NewConstSolveParameter creates a new constant solve parameter.
 func NewConstSolveParameter(value int) SolveParameter {
 	return &constParameterImpl{value: value}

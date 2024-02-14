@@ -9,7 +9,6 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 	runSchema "github.com/nextmv-io/sdk/run/schema"
 )
@@ -19,14 +18,14 @@ import (
 func Format(
 	ctx context.Context,
 	options any,
-	progressioner sdkNextRoute.Progressioner,
-	solutions ...sdkNextRoute.Solution,
+	progressioner nextroute.Progressioner,
+	solutions ...nextroute.Solution,
 ) runSchema.Output {
 	return nextroute.Format(
 		ctx,
 		options,
 		progressioner,
-		func(solution sdkNextRoute.Solution) any {
+		func(solution nextroute.Solution) any {
 			return ToSolutionOutput(solution)
 		},
 		solutions...,
@@ -35,16 +34,16 @@ func Format(
 
 // toSolutionOutputStops converts a solution plan unit to a slice of
 // [schema.StopOutput].
-func toSolutionOutputStops(solutionPlanUnit sdkNextRoute.SolutionPlanUnit) []schema.StopOutput {
+func toSolutionOutputStops(solutionPlanUnit nextroute.SolutionPlanUnit) []schema.StopOutput {
 	switch v := solutionPlanUnit.(type) {
-	case sdkNextRoute.SolutionPlanStopsUnit:
+	case nextroute.SolutionPlanStopsUnit:
 		return common.Map(
 			v.SolutionStops(),
-			func(s sdkNextRoute.SolutionStop) schema.StopOutput {
+			func(s nextroute.SolutionStop) schema.StopOutput {
 				return toStopOutput(s.ModelStop())
 			},
 		)
-	case sdkNextRoute.SolutionPlanUnitsUnit:
+	case nextroute.SolutionPlanUnitsUnit:
 		if v.ModelPlanUnitsUnit().PlanAll() {
 			return common.MapSlice(
 				v.SolutionPlanUnits(),
@@ -56,7 +55,7 @@ func toSolutionOutputStops(solutionPlanUnit sdkNextRoute.SolutionPlanUnit) []sch
 }
 
 // ToSolutionOutput converts a solution to a [schema.SolutionOutput].
-func ToSolutionOutput(solution sdkNextRoute.Solution) schema.SolutionOutput {
+func ToSolutionOutput(solution nextroute.Solution) schema.SolutionOutput {
 	unplannedStops := common.MapSlice(
 		solution.UnPlannedPlanUnits().SolutionPlanUnits(),
 		toSolutionOutputStops,
@@ -75,7 +74,7 @@ func ToSolutionOutput(solution sdkNextRoute.Solution) schema.SolutionOutput {
 	}
 }
 
-func toStopOutput(modelStop sdkNextRoute.ModelStop) schema.StopOutput {
+func toStopOutput(modelStop nextroute.ModelStop) schema.StopOutput {
 	var customData any
 	if inputStop, ok := modelStop.Data().(schema.Stop); ok {
 		customData = inputStop.CustomData
@@ -90,7 +89,7 @@ func toStopOutput(modelStop sdkNextRoute.ModelStop) schema.StopOutput {
 	}
 }
 
-func toPlannedStopOutput(solutionStop sdkNextRoute.SolutionStop) schema.PlannedStopOutput {
+func toPlannedStopOutput(solutionStop nextroute.SolutionStop) schema.PlannedStopOutput {
 	timezoneLocation := solutionStop.
 		Vehicle().
 		ModelVehicle().
@@ -133,9 +132,9 @@ func toPlannedStopOutput(solutionStop sdkNextRoute.SolutionStop) schema.PlannedS
 		}
 
 		if inputStop.MixingItems != nil {
-			mixItems := make(map[string]sdkNextRoute.MixItem)
+			mixItems := make(map[string]nextroute.MixItem)
 			for _, constraint := range solutionStop.Vehicle().ModelVehicle().Model().Constraints() {
-				if noMixConstraint, ok := constraint.(sdkNextRoute.NoMixConstraint); ok {
+				if noMixConstraint, ok := constraint.(nextroute.NoMixConstraint); ok {
 					mixItems[strings.TrimPrefix(noMixConstraint.ID(), "no_mix_")] = noMixConstraint.Value(solutionStop)
 				}
 			}
@@ -157,10 +156,10 @@ func toPlannedStopOutput(solutionStop sdkNextRoute.SolutionStop) schema.PlannedS
 	return plannedStopOutput
 }
 
-func toVehicleOutput(vehicle sdkNextRoute.SolutionVehicle) schema.VehicleOutput {
+func toVehicleOutput(vehicle nextroute.SolutionVehicle) schema.VehicleOutput {
 	solutionStops := common.Filter(
 		vehicle.SolutionStops(),
-		func(solutionStop sdkNextRoute.SolutionStop) bool {
+		func(solutionStop nextroute.SolutionStop) bool {
 			return solutionStop.ModelStop().Location().IsValid()
 		},
 	)
@@ -226,12 +225,12 @@ func toVehicleOutput(vehicle sdkNextRoute.SolutionVehicle) schema.VehicleOutput 
 	return vehicleOutput
 }
 
-func toObjectiveOutput(solution sdkNextRoute.Solution) schema.ObjectiveOutput {
+func toObjectiveOutput(solution nextroute.Solution) schema.ObjectiveOutput {
 	return schema.ObjectiveOutput{
 		Name: fmt.Sprintf("%v", solution.Model().Objective()),
 		Objectives: common.Map(
 			solution.Model().Objective().Terms(),
-			func(modelObjectiveTerm sdkNextRoute.ModelObjectiveTerm) schema.ObjectiveOutput {
+			func(modelObjectiveTerm nextroute.ModelObjectiveTerm) schema.ObjectiveOutput {
 				return schema.ObjectiveOutput{
 					Name:   fmt.Sprintf("%v", modelObjectiveTerm.Objective()),
 					Factor: modelObjectiveTerm.Factor(),

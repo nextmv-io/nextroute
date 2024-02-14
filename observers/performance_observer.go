@@ -10,6 +10,20 @@ import (
 	"time"
 )
 
+// PerformanceObserver is an interface that is used to observe the performance
+// of the model, and it's subsequent use.
+type PerformanceObserver interface {
+	SolutionObserver
+
+	// Duration returns the duration since the creation of the
+	// PerformanceObserver.
+	Duration() time.Duration
+
+	// Report creates a report of the performance of the model, and it's
+	// subsequent use.
+	Report() string
+}
+
 // NewPerformanceObserver returns a new performance observer. A performance
 // observer can be used to report the speed performance of moves.
 //

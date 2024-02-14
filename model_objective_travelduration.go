@@ -1,5 +1,11 @@
 package nextroute
 
+// TravelDurationObjective is an objective that uses the travel duration as an
+// objective.
+type TravelDurationObjective interface {
+	ModelObjective
+}
+
 // NewTravelDurationObjective returns a new TravelDurationObjective.
 func NewTravelDurationObjective() TravelDurationObjective {
 	return &travelDurationObjectiveImpl{}

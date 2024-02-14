@@ -2,7 +2,6 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -11,9 +10,9 @@ import (
 // to the vehicle whose centroid is closest.
 func addClusterConstraint(
 	_ schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	cluster, err := nextroute.NewCluster()
 	if err != nil {
 		return model, err

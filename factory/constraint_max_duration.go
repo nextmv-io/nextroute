@@ -3,7 +3,7 @@ package factory
 import (
 	"time"
 
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
+	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -15,9 +15,9 @@ import (
 // earlier time than what is already set, then the value is changed.
 func addMaximumDurationConstraint(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	latestEndExpression, model, err := latestEndExpression(model)
 	if err != nil {
 		return nil, err

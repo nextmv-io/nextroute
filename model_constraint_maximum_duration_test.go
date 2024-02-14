@@ -7,7 +7,6 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 func TestMaximumDurationConstraint_EstimateIsViolated(t *testing.T) {
@@ -48,11 +47,11 @@ func TestMaximumDurationConstraint_EstimateIsViolated(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	singleStopPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit sdkNextRoute.ModelPlanStopsUnit) bool {
+	singleStopPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() == 1
 	})
 
-	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit sdkNextRoute.ModelPlanStopsUnit) bool {
+	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() > 1
 	})
 
@@ -62,7 +61,7 @@ func TestMaximumDurationConstraint_EstimateIsViolated(t *testing.T) {
 
 	moveSingleOnVehicle, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit0,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSingleStopPlanUnit0.SolutionStops()[0],
@@ -89,7 +88,7 @@ func TestMaximumDurationConstraint_EstimateIsViolated(t *testing.T) {
 
 	moveSingleOnVehicle, err = nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit0,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSingleStopPlanUnit1.SolutionStops()[0],

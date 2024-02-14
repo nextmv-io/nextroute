@@ -7,7 +7,6 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 // NewDurationGroupsExpression returns a duration group expression.
@@ -17,7 +16,7 @@ func NewDurationGroupsExpression(numberOfStops, numberOfVehicles int) DurationGr
 		durations:       make([]float64, numberOfStops+2*numberOfVehicles),
 		groupDuration:   make([]float64, numberOfStops+2*numberOfVehicles),
 		toGroupIndex:    make([]int64, numberOfStops+2*numberOfVehicles),
-		stopIndexToStop: make([]sdkNextRoute.ModelStop, numberOfStops+2*numberOfVehicles),
+		stopIndexToStop: make([]nextroute.ModelStop, numberOfStops+2*numberOfVehicles),
 		groupCount:      0,
 	}
 	for i := 0; i < len(durationGroupExpression.toGroupIndex); i++ {
@@ -28,32 +27,32 @@ func NewDurationGroupsExpression(numberOfStops, numberOfVehicles int) DurationGr
 
 // DurationGroup is a group of stops with a duration.
 type DurationGroup struct {
-	Stops    sdkNextRoute.ModelStops
+	Stops    nextroute.ModelStops
 	Duration time.Duration
 }
 
 // DurationGroupsExpression is an interface implementing semantics of duration
 // groups.
 type DurationGroupsExpression interface {
-	sdkNextRoute.DurationExpression
+	nextroute.DurationExpression
 
 	// SetStopDuration sets the process duration for a stop.
-	SetStopDuration(sdkNextRoute.ModelStop, time.Duration)
+	SetStopDuration(nextroute.ModelStop, time.Duration)
 	// SetGroupDuration sets the process duration for a group.
-	SetGroupDuration(sdkNextRoute.ModelStops, time.Duration) error
+	SetGroupDuration(nextroute.ModelStops, time.Duration) error
 	// AddGroup adds a group of stops and their duration to the expression.
-	AddGroup(sdkNextRoute.ModelStops, time.Duration) error
+	AddGroup(nextroute.ModelStops, time.Duration) error
 	// Groups returns the groups of stops.
 	Groups() []DurationGroup
 	// Durations returns the durations of all stops.
-	Durations() map[sdkNextRoute.ModelStop]time.Duration
+	Durations() map[nextroute.ModelStop]time.Duration
 }
 
 type durationGroupDurationImpl struct {
 	groupDuration   []float64
 	toGroupIndex    []int64
 	durations       []float64
-	stopIndexToStop []sdkNextRoute.ModelStop
+	stopIndexToStop []nextroute.ModelStop
 	index           int
 	groupCount      int64
 }
@@ -74,7 +73,7 @@ func (d *durationGroupDurationImpl) Groups() []DurationGroup {
 }
 
 // SetGroupDuration implements DurationGroupsExpression.
-func (d *durationGroupDurationImpl) SetGroupDuration(stops sdkNextRoute.ModelStops, duration time.Duration) error {
+func (d *durationGroupDurationImpl) SetGroupDuration(stops nextroute.ModelStops, duration time.Duration) error {
 	if len(stops) == 0 {
 		return nmerror.NewInputDataError(fmt.Errorf("cannot set duration for empty group"))
 	}
@@ -98,9 +97,9 @@ func (d *durationGroupDurationImpl) SetGroupDuration(stops sdkNextRoute.ModelSto
 
 // Duration implements DurationGroupsExpression.
 func (d *durationGroupDurationImpl) Duration(
-	_ sdkNextRoute.ModelVehicleType,
-	from sdkNextRoute.ModelStop,
-	to sdkNextRoute.ModelStop,
+	_ nextroute.ModelVehicleType,
+	from nextroute.ModelStop,
+	to nextroute.ModelStop,
 ) time.Duration {
 	return time.Duration(d.Value(nil, from, to)) * time.Second
 }
@@ -127,7 +126,7 @@ func (d *durationGroupDurationImpl) Name() string {
 
 // SetStopDuration implements DurationGroupsExpression.
 func (d *durationGroupDurationImpl) SetStopDuration(
-	stop sdkNextRoute.ModelStop,
+	stop nextroute.ModelStop,
 	duration time.Duration,
 ) {
 	d.durations[stop.Index()] = duration.Seconds()
@@ -135,8 +134,8 @@ func (d *durationGroupDurationImpl) SetStopDuration(
 }
 
 // Durations returns the durations of all stops.
-func (d *durationGroupDurationImpl) Durations() map[sdkNextRoute.ModelStop]time.Duration {
-	copiedMap := make(map[sdkNextRoute.ModelStop]time.Duration, len(d.durations))
+func (d *durationGroupDurationImpl) Durations() map[nextroute.ModelStop]time.Duration {
+	copiedMap := make(map[nextroute.ModelStop]time.Duration, len(d.durations))
 	for k, v := range d.durations {
 		stop := d.stopIndexToStop[k]
 		if stop == nil {
@@ -159,7 +158,7 @@ func (d *durationGroupDurationImpl) GroupDurations() map[int]time.Duration {
 }
 
 // AddGroup implements DurationGroupsExpression.
-func (d *durationGroupDurationImpl) AddGroup(stops sdkNextRoute.ModelStops, duration time.Duration) error {
+func (d *durationGroupDurationImpl) AddGroup(stops nextroute.ModelStops, duration time.Duration) error {
 	groupCount := atomic.AddInt64(&d.groupCount, 1) - 1
 	for _, stop := range stops {
 		if d.toGroupIndex[stop.Index()] >= 0 {
@@ -179,9 +178,9 @@ func (d *durationGroupDurationImpl) SetName(string) {
 
 // Value implements DurationGroupsExpression.
 func (d *durationGroupDurationImpl) Value(
-	_ sdkNextRoute.ModelVehicleType,
-	from sdkNextRoute.ModelStop,
-	to sdkNextRoute.ModelStop,
+	_ nextroute.ModelVehicleType,
+	from nextroute.ModelStop,
+	to nextroute.ModelStop,
 ) float64 {
 	toIndex := to.Index()
 	toGroup := d.toGroupIndex[toIndex]

@@ -1,5 +1,15 @@
 package nextroute
 
+// VehiclesObjective is an objective that uses the number of vehicles as an
+// objective. Each vehicle that is not empty is scored by the given expression.
+// A vehicle is empty if it has no stops assigned to it (except for the first
+// and last visit).
+type VehiclesObjective interface {
+	ModelObjective
+	// ActivationPenalty returns the activation penalty expression.
+	ActivationPenalty() VehicleTypeExpression
+}
+
 // NewVehiclesObjective returns a new VehiclesObjective.
 func NewVehiclesObjective(
 	expression VehicleTypeExpression,

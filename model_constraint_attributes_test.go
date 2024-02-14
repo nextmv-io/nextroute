@@ -5,7 +5,6 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
@@ -50,7 +49,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 	attribute1 := "attribute-1"
 	attribute2 := "attribute-2"
 
-	singleStopPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit sdkNextRoute.ModelPlanStopsUnit) bool {
+	singleStopPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() == 1
 	})
 
@@ -58,7 +57,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 	cnstr.SetStopAttributes(singleStopPlanUnits[1].Stops()[0], []string{attribute1})
 	cnstr.SetStopAttributes(singleStopPlanUnits[2].Stops()[0], []string{})
 
-	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit sdkNextRoute.ModelPlanStopsUnit) bool {
+	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() > 1
 	})
 
@@ -77,7 +76,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 		t.Error(err)
 	}
 
-	truckIndex := common.FindIndex(solution.Vehicles(), func(solutionVehicle sdkNextRoute.SolutionVehicle) bool {
+	truckIndex := common.FindIndex(solution.Vehicles(), func(solutionVehicle nextroute.SolutionVehicle) bool {
 		return solutionVehicle.ModelVehicle().VehicleType().ID() == "truck"
 	})
 	if truckIndex == -1 {
@@ -85,7 +84,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 	}
 	truck := solution.Vehicles()[truckIndex]
 
-	carIndex := common.FindIndex(solution.Vehicles(), func(solutionVehicle sdkNextRoute.SolutionVehicle) bool {
+	carIndex := common.FindIndex(solution.Vehicles(), func(solutionVehicle nextroute.SolutionVehicle) bool {
 		return solutionVehicle.ModelVehicle().VehicleType().ID() == "car"
 	})
 	if carIndex == -1 {
@@ -93,7 +92,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 	}
 	car := solution.Vehicles()[carIndex]
 
-	bikeIndex := common.FindIndex(solution.Vehicles(), func(solutionVehicle sdkNextRoute.SolutionVehicle) bool {
+	bikeIndex := common.FindIndex(solution.Vehicles(), func(solutionVehicle nextroute.SolutionVehicle) bool {
 		return solutionVehicle.ModelVehicle().VehicleType().ID() == "bike"
 	})
 	if bikeIndex == -1 {
@@ -104,7 +103,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 	{
 		moveSingle0OnTruck, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[0]),
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					truck.First(),
 					solution.SolutionStop(singleStopPlanUnits[0].Stops()[0]),
@@ -123,7 +122,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 
 		moveSingle0OnCar, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[0]),
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					car.First(),
 					solution.SolutionStop(singleStopPlanUnits[0].Stops()[0]),
@@ -142,7 +141,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 
 		moveSingle0OnBike, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[0]),
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					bike.First(),
 					solution.SolutionStop(singleStopPlanUnits[0].Stops()[0]),
@@ -162,7 +161,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 	{
 		moveSingle1OnTruck, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[1]),
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					truck.First(),
 					solution.SolutionStop(singleStopPlanUnits[1].Stops()[0]),
@@ -181,7 +180,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 
 		moveSingle1OnCar, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[1]),
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					car.First(),
 					solution.SolutionStop(singleStopPlanUnits[1].Stops()[0]),
@@ -200,7 +199,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 
 		moveSingle1OnBike, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[1]),
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					bike.First(),
 					solution.SolutionStop(singleStopPlanUnits[1].Stops()[0]),
@@ -220,7 +219,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 	{
 		moveSingle2OnTruck, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[2]),
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					truck.First(),
 					solution.SolutionStop(singleStopPlanUnits[2].Stops()[0]),
@@ -239,7 +238,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 
 		moveSingle2OnCar, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[2]),
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					car.First(),
 					solution.SolutionStop(singleStopPlanUnits[2].Stops()[0]),
@@ -258,7 +257,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 
 		moveSingle2OnBike, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[2]),
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					bike.First(),
 					solution.SolutionStop(singleStopPlanUnits[2].Stops()[0]),
@@ -281,7 +280,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 
 		moveSequence0OnTruck, err := nextroute.NewMoveStops(
 			sequencePlanUnit,
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					truck.First(),
 					sequencePlanUnit.SolutionStops()[0],
@@ -305,7 +304,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 
 		moveSequence0OnCar, err := nextroute.NewMoveStops(
 			sequencePlanUnit,
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					car.First(),
 					sequencePlanUnit.SolutionStops()[0],
@@ -329,7 +328,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 
 		moveSequence0OnBike, err := nextroute.NewMoveStops(
 			sequencePlanUnit,
-			[]sdkNextRoute.StopPosition{
+			[]nextroute.StopPosition{
 				nextroute.NewStopPosition(
 					bike.First(),
 					sequencePlanUnit.SolutionStops()[0],

@@ -6,7 +6,6 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
@@ -43,7 +42,7 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 		t.Error(err)
 	}
 
-	singleStopPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit sdkNextRoute.ModelPlanStopsUnit) bool {
+	singleStopPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() == 1
 	})
 
@@ -55,7 +54,7 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 	solutionSingleStopPlanUnit0 := solution.SolutionPlanStopsUnit(singleStopPlanUnits[0])
 	moveSingleOnVehicle0, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit0,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSingleStopPlanUnit0.SolutionStops()[0],
@@ -83,7 +82,7 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 	solutionSingleStopPlanUnit1 := solution.SolutionPlanStopsUnit(singleStopPlanUnits[1])
 	moveSingleOnVehicle1, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit1,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[1].First(),
 				solutionSingleStopPlanUnit1.SolutionStops()[0],
@@ -111,7 +110,7 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 	solutionSingleStopPlanUnit2 := solution.SolutionPlanStopsUnit(singleStopPlanUnits[2])
 	moveSingleOnVehicle2, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit2,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSingleStopPlanUnit2.SolutionStops()[0],
@@ -131,7 +130,7 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 
 	moveSingleOnVehicle3, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit2,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[1].First(),
 				solutionSingleStopPlanUnit2.SolutionStops()[0],
@@ -147,14 +146,14 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 		t.Error("constraint is violated")
 	}
 
-	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit sdkNextRoute.ModelPlanStopsUnit) bool {
+	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() > 1
 	})
 	solutionSequencePlanUnit := solution.SolutionPlanStopsUnit(sequencePlanUnits[0])
 
 	moveSequenceOnVehicle0, err := nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSequencePlanUnit.SolutionStops()[0],
@@ -187,7 +186,7 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 
 	moveSequenceOnVehicle0, err = nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionSequencePlanUnit.SolutionStops()[0],

@@ -4,6 +4,16 @@ import (
 	"fmt"
 )
 
+// MaximumDurationConstraint is a constraint that limits the
+// duration of a vehicle.
+type MaximumDurationConstraint interface {
+	ModelConstraint
+
+	// Maximum returns the maximum expression which defines the maximum
+	// duration of a vehicle type.
+	Maximum() VehicleTypeDurationExpression
+}
+
 // NewMaximumDurationConstraint returns a new MaximumDurationConstraint.
 func NewMaximumDurationConstraint(
 	maximum VehicleTypeDurationExpression,

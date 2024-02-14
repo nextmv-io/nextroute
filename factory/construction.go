@@ -13,25 +13,24 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	sdkFactory "github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 	"github.com/nextmv-io/sdk/run"
 )
 
-// ClusterSolutionOptions configure how the [NewGreedySolution] function builds [sdkNextRoute.Solution].
+// ClusterSolutionOptions configure how the [NewGreedySolution] function builds [nextroute.Solution].
 type ClusterSolutionOptions struct {
 	Depth int     `json:"depth" usage:"maximum failed tries to add a cluster to a vehicle" default:"10" minimum:"0"`
 	Speed float64 `json:"speed" usage:"speed of the vehicle in meters per second" default:"10" minimum:"0"`
 }
 
-// FilterAreaOptions configure how the [NewGreedySolution] function builds [sdkNextRoute.Solution]. It limits the area
+// FilterAreaOptions configure how the [NewGreedySolution] function builds [nextroute.Solution]. It limits the area
 // one vehicle can cover during construction. This limit is only applied during the construction of the solution.
 type FilterAreaOptions struct {
 	MaximumSide float64 `json:"maximum_side" usage:"maximum side of the square area in meters" default:"100000" minimum:"0"`
 }
 
-// GreedySolutionOptions configure how the [NewGreedySolution] function builds [sdkNextRoute.Solution].
+// GreedySolutionOptions configure how the [NewGreedySolution] function builds [nextroute.Solution].
 type GreedySolutionOptions struct {
 	ClusterSolutionOptions ClusterSolutionOptions `json:"cluster_solution_options" usage:"options for the cluster solution"`
 	FilterAreaOptions      FilterAreaOptions      `json:"filter_area_options" usage:"options for the filter area"`
@@ -82,7 +81,7 @@ type StopClusterFilter interface {
 // ModelFactory returns a new model for the given input and options.
 type ModelFactory interface {
 	// NewModel returns a new model for the given input and options.
-	NewModel(schema.Input, Options) (sdkNextRoute.Model, error)
+	NewModel(schema.Input, Options) (nextroute.Model, error)
 }
 
 // NewStartSolution returns a start solution. It uses input, factoryOptions and
@@ -96,9 +95,9 @@ func NewStartSolution(
 	input schema.Input,
 	factoryOptions sdkFactory.Options,
 	modelFactory sdkFactory.ModelFactory,
-	solveOptions sdkNextRoute.ParallelSolveOptions,
+	solveOptions nextroute.ParallelSolveOptions,
 	clusterSolutionOptions sdkFactory.ClusterSolutionOptions,
-) (sdkNextRoute.Solution, error) {
+) (nextroute.Solution, error) {
 	if cont.Value(run.Start) == nil {
 		cont = context.WithValue(cont, run.Start, time.Now())
 	}
@@ -128,7 +127,7 @@ func NewStartSolution(
 	for _, planUnit := range model.PlanUnits() {
 		stops := getStops(planUnit)
 		boundingBox := common.NewBoundingBox(
-			common.Map(stops, func(stop sdkNextRoute.ModelStop) common.Location {
+			common.Map(stops, func(stop nextroute.ModelStop) common.Location {
 				return stop.Location()
 			}),
 		)
@@ -199,7 +198,7 @@ func NewStartSolution(
 
 			type experimentResult struct {
 				side     float64
-				solution sdkNextRoute.Solution
+				solution nextroute.Solution
 			}
 
 			experimentResults := make(chan experimentResult, n)
@@ -265,7 +264,7 @@ func NewGreedySolution(
 	options sdkFactory.Options,
 	greedySolutionOptions sdkFactory.GreedySolutionOptions,
 	modelFactory sdkFactory.ModelFactory,
-) (sdkNextRoute.Solution, error) {
+) (nextroute.Solution, error) {
 	return NewClusterSolution(
 		ctx,
 		input,
@@ -296,7 +295,7 @@ type defaultModelFactoryImpl struct{}
 func (d defaultModelFactoryImpl) NewModel(
 	input schema.Input,
 	options sdkFactory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	return NewModel(input, options)
 }
 
@@ -540,7 +539,7 @@ func NewClusterSolution(
 	stopClusterFilter sdkFactory.StopClusterFilter,
 	stopClusterOptions sdkFactory.ClusterSolutionOptions,
 	modelFactory sdkFactory.ModelFactory,
-) (sdkNextRoute.Solution, error) {
+) (nextroute.Solution, error) {
 	if modelFactory == nil {
 		modelFactory = NewDefaultModelFactory()
 	}
@@ -632,7 +631,7 @@ VehicleLoop:
 		ctx,
 		copyInput,
 		options,
-		sdkNextRoute.ParallelSolveOptions{
+		nextroute.ParallelSolveOptions{
 			Iterations:     1,
 			StartSolutions: 0,
 			ParallelRuns:   1,
@@ -649,27 +648,27 @@ VehicleLoop:
 }
 
 // getStops returns the stops of the given plan unit.
-func getStops(planUnit sdkNextRoute.ModelPlanUnit) []sdkNextRoute.ModelStop {
-	return getStopsImpl(planUnit, []sdkNextRoute.ModelStop{})
+func getStops(planUnit nextroute.ModelPlanUnit) []nextroute.ModelStop {
+	return getStopsImpl(planUnit, []nextroute.ModelStop{})
 }
 
 // getInputStops returns the stops of the given plan unit.
-func getInputStops(planUnit sdkNextRoute.ModelPlanUnit) []schema.Stop {
+func getInputStops(planUnit nextroute.ModelPlanUnit) []schema.Stop {
 	return common.Map(
 		getStops(planUnit),
-		func(stop sdkNextRoute.ModelStop) schema.Stop {
+		func(stop nextroute.ModelStop) schema.Stop {
 			return stop.Data().(schema.Stop)
 		},
 	)
 }
 
-func getStopsImpl(planUnit sdkNextRoute.ModelPlanUnit, stops []sdkNextRoute.ModelStop) []sdkNextRoute.ModelStop {
-	if planStopsUnit, ok := planUnit.(sdkNextRoute.ModelPlanStopsUnit); ok {
+func getStopsImpl(planUnit nextroute.ModelPlanUnit, stops []nextroute.ModelStop) []nextroute.ModelStop {
+	if planStopsUnit, ok := planUnit.(nextroute.ModelPlanStopsUnit); ok {
 		for _, stop := range planStopsUnit.Stops() {
 			stops = append(stops, stop)
 		}
 	}
-	if planUnitsUnit, ok := planUnit.(sdkNextRoute.ModelPlanUnitsUnit); ok {
+	if planUnitsUnit, ok := planUnit.(nextroute.ModelPlanUnitsUnit); ok {
 		if planUnitsUnit.PlanAll() {
 			for _, childPlanUnit := range planUnitsUnit.PlanUnits() {
 				stops = getStopsImpl(childPlanUnit, stops)
@@ -688,9 +687,9 @@ func newSolution(
 	ctx context.Context,
 	input schema.Input,
 	options sdkFactory.Options,
-	parallelSolveOptions sdkNextRoute.ParallelSolveOptions,
+	parallelSolveOptions nextroute.ParallelSolveOptions,
 	modelFactory sdkFactory.ModelFactory,
-) (sdkNextRoute.Solution, error) {
+) (nextroute.Solution, error) {
 	model, err := modelFactory.NewModel(input, options)
 	if err != nil {
 		return nil, err
@@ -821,7 +820,7 @@ func populateVehicle(
 					ctx,
 					input,
 					options,
-					sdkNextRoute.ParallelSolveOptions{
+					nextroute.ParallelSolveOptions{
 						Iterations:     1,
 						StartSolutions: 0,
 						ParallelRuns:   1,
@@ -901,7 +900,7 @@ func populateVehicle(
 				ctx,
 				newInput,
 				options,
-				sdkNextRoute.ParallelSolveOptions{
+				nextroute.ParallelSolveOptions{
 					Iterations:     1,
 					StartSolutions: 0,
 					ParallelRuns:   1,

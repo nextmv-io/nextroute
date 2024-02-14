@@ -7,7 +7,6 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 func TestPlanMultipleStops(t *testing.T) {
@@ -58,7 +57,7 @@ func TestPlanMultipleStops(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ms1, err := model.NewPlanMultipleStops(sdkNextRoute.ModelStops{
+	ms1, err := model.NewPlanMultipleStops(nextroute.ModelStops{
 		s1,
 		s2,
 		s3,
@@ -74,22 +73,22 @@ func TestPlanMultipleStops(t *testing.T) {
 	if len(ms1.Stops()) != 4 {
 		t.Fatal("ms1 should have 4 stops")
 	}
-	if common.FindIndex(ms1.Stops(), func(stop sdkNextRoute.ModelStop) bool {
+	if common.FindIndex(ms1.Stops(), func(stop nextroute.ModelStop) bool {
 		return stop == s1
 	}) == -1 {
 		t.Fatal("ms1 should have s1")
 	}
-	if common.FindIndex(ms1.Stops(), func(stop sdkNextRoute.ModelStop) bool {
+	if common.FindIndex(ms1.Stops(), func(stop nextroute.ModelStop) bool {
 		return stop == s2
 	}) == -1 {
 		t.Fatal("ms1 should have s2")
 	}
-	if common.FindIndex(ms1.Stops(), func(stop sdkNextRoute.ModelStop) bool {
+	if common.FindIndex(ms1.Stops(), func(stop nextroute.ModelStop) bool {
 		return stop == s3
 	}) == -1 {
 		t.Fatal("ms1 should have s3")
 	}
-	if common.FindIndex(ms1.Stops(), func(stop sdkNextRoute.ModelStop) bool {
+	if common.FindIndex(ms1.Stops(), func(stop nextroute.ModelStop) bool {
 		return stop == s4
 	}) == -1 {
 		t.Fatal("ms1 should have s4")

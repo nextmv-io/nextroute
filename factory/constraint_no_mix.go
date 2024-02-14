@@ -6,7 +6,6 @@ import (
 	"reflect"
 
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -14,10 +13,10 @@ import (
 // addNoMixConstraint.
 func addNoMixConstraint(
 	input schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	_ factory.Options,
-) (sdkNextRoute.Model, error) {
-	mixingItems := make(map[string]map[sdkNextRoute.ModelStop]sdkNextRoute.MixItem)
+) (nextroute.Model, error) {
+	mixingItems := make(map[string]map[nextroute.ModelStop]nextroute.MixItem)
 
 	for index, inputStop := range input.Stops {
 		if inputStop.MixingItems == nil {
@@ -39,10 +38,10 @@ func addNoMixConstraint(
 			if err != nil {
 				return nil, err
 			}
-		case map[string]sdkNextRoute.MixItem:
+		case map[string]nextroute.MixItem:
 			for t, mixingItem := range typeValue {
 				if _, ok := mixingItems[t]; !ok {
-					mixingItems[t] = make(map[sdkNextRoute.ModelStop]sdkNextRoute.MixItem)
+					mixingItems[t] = make(map[nextroute.ModelStop]nextroute.MixItem)
 				}
 				mixingItems[t][stop] = mixingItem
 			}
@@ -71,8 +70,8 @@ func addNoMixConstraint(
 }
 
 func addMixingItems(
-	items map[string]map[sdkNextRoute.ModelStop]sdkNextRoute.MixItem,
-	stop sdkNextRoute.ModelStop,
+	items map[string]map[nextroute.ModelStop]nextroute.MixItem,
+	stop nextroute.ModelStop,
 	parsed map[string]any,
 ) error {
 	for t, anyValue := range parsed {
@@ -123,11 +122,11 @@ func addMixingItems(
 				)
 			}
 			if _, ok := items[t]; !ok {
-				items[t] = make(map[sdkNextRoute.ModelStop]sdkNextRoute.MixItem)
+				items[t] = make(map[nextroute.ModelStop]nextroute.MixItem)
 			}
 
 			stopsItems := items[t]
-			stopsItems[stop] = sdkNextRoute.MixItem{
+			stopsItems[stop] = nextroute.MixItem{
 				Name:     mixingItem["name"].(string),
 				Quantity: int(mixingItem["quantity"].(float64)),
 			}

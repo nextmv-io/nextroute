@@ -2,7 +2,6 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	"github.com/nextmv-io/sdk/nextroute/factory"
 	"github.com/nextmv-io/sdk/nextroute/schema"
 )
@@ -11,9 +10,9 @@ import (
 // duration to the model.
 func addVehiclesDurationObjective(
 	_ schema.Input,
-	model sdkNextRoute.Model,
+	model nextroute.Model,
 	options factory.Options,
-) (sdkNextRoute.Model, error) {
+) (nextroute.Model, error) {
 	o := nextroute.NewVehiclesDurationObjective()
 	_, err := model.Objective().NewTerm(options.Objectives.VehiclesDuration, o)
 	if err != nil {

@@ -5,7 +5,6 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/nextroute/factory"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 	sdkCheck "github.com/nextmv-io/sdk/nextroute/check"
 	runSchema "github.com/nextmv-io/sdk/run/schema"
 )
@@ -17,14 +16,14 @@ func Format(
 	ctx context.Context,
 	options any,
 	checkOptions sdkCheck.Options,
-	progressioner sdkNextRoute.Progressioner,
-	solutions ...sdkNextRoute.Solution,
+	progressioner nextroute.Progressioner,
+	solutions ...nextroute.Solution,
 ) (runSchema.Output, error) {
 	return nextroute.Format(
 		ctx,
 		options,
 		progressioner,
-		func(solution sdkNextRoute.Solution) any {
+		func(solution nextroute.Solution) any {
 			solutionOutput := factory.ToSolutionOutput(solution)
 			if checkOptions.Duration > 0 &&
 				sdkCheck.ToVerbosity(checkOptions.Verbosity) != sdkCheck.Off {

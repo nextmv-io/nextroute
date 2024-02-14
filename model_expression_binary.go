@@ -4,6 +4,20 @@ import (
 	"fmt"
 )
 
+// BinaryFunction is a function that takes two float64 values and returns a
+// float64 value.
+type BinaryFunction func(float64, float64) float64
+
+// BinaryExpression is an expression that takes two expressions as input and
+// returns a value.
+type BinaryExpression interface {
+	ModelExpression
+	// Left returns the left expression.
+	Left() ModelExpression
+	// Right returns the right expression.
+	Right() ModelExpression
+}
+
 // NewOperatorExpression returns a new BinaryExpression that uses the given
 // operator function.
 func NewOperatorExpression(

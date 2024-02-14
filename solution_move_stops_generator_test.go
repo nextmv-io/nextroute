@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/nextmv-io/nextroute"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 func TestMoveGeneratorSingleStops(t *testing.T) {
@@ -20,11 +19,11 @@ func TestMoveGeneratorSingleStops(t *testing.T) {
 	}
 
 	v := solution.Vehicles()[0]
-	planUnit0 := solution.UnPlannedPlanUnits().RandomElement().(sdkNextRoute.SolutionPlanStopsUnit)
+	planUnit0 := solution.UnPlannedPlanUnits().RandomElement().(nextroute.SolutionPlanStopsUnit)
 
 	move0, err := nextroute.NewMoveStops(
 		planUnit0,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				v.First(),
 				planUnit0.SolutionStops()[0],
@@ -39,12 +38,12 @@ func TestMoveGeneratorSingleStops(t *testing.T) {
 		t,
 		v,
 		planUnit0,
-		[]sdkNextRoute.SolutionMoveStops{move0},
+		[]nextroute.SolutionMoveStops{move0},
 	)
 
 	move, err := nextroute.NewMoveStops(
 		planUnit0,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				v.First(),
 				planUnit0.SolutionStops()[0],
@@ -65,10 +64,10 @@ func TestMoveGeneratorSingleStops(t *testing.T) {
 		t.Error("move should be planned")
 	}
 
-	planUnit1 := solution.UnPlannedPlanUnits().RandomElement().(sdkNextRoute.SolutionPlanStopsUnit)
+	planUnit1 := solution.UnPlannedPlanUnits().RandomElement().(nextroute.SolutionPlanStopsUnit)
 	move10, err := nextroute.NewMoveStops(
 		planUnit1,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				v.First(),
 				planUnit1.SolutionStops()[0],
@@ -81,7 +80,7 @@ func TestMoveGeneratorSingleStops(t *testing.T) {
 	}
 	move11, err := nextroute.NewMoveStops(
 		planUnit1,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				planUnit0.SolutionStops()[0],
 				planUnit1.SolutionStops()[0],
@@ -96,12 +95,12 @@ func TestMoveGeneratorSingleStops(t *testing.T) {
 		t,
 		v,
 		planUnit1,
-		[]sdkNextRoute.SolutionMoveStops{move10, move11},
+		[]nextroute.SolutionMoveStops{move10, move11},
 	)
 
 	move1, err := nextroute.NewMoveStops(
 		planUnit1,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				planUnit0.SolutionStops()[0],
 				planUnit1.SolutionStops()[0],
@@ -120,10 +119,10 @@ func TestMoveGeneratorSingleStops(t *testing.T) {
 		t.Error("move should be planned")
 	}
 
-	planUnit2 := solution.UnPlannedPlanUnits().RandomElement().(sdkNextRoute.SolutionPlanStopsUnit)
+	planUnit2 := solution.UnPlannedPlanUnits().RandomElement().(nextroute.SolutionPlanStopsUnit)
 	move20, err := nextroute.NewMoveStops(
 		planUnit2,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				v.First(),
 				planUnit2.SolutionStops()[0],
@@ -136,7 +135,7 @@ func TestMoveGeneratorSingleStops(t *testing.T) {
 	}
 	move21, err := nextroute.NewMoveStops(
 		planUnit2,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				planUnit0.SolutionStops()[0],
 				planUnit2.SolutionStops()[0],
@@ -149,7 +148,7 @@ func TestMoveGeneratorSingleStops(t *testing.T) {
 	}
 	move22, err := nextroute.NewMoveStops(
 		planUnit2,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				planUnit1.SolutionStops()[0],
 				planUnit2.SolutionStops()[0],
@@ -164,7 +163,7 @@ func TestMoveGeneratorSingleStops(t *testing.T) {
 		t,
 		v,
 		planUnit2,
-		[]sdkNextRoute.SolutionMoveStops{move20, move21, move22},
+		[]nextroute.SolutionMoveStops{move20, move21, move22},
 	)
 }
 
@@ -180,11 +179,11 @@ func TestMoveGeneratorSequenceStops(t *testing.T) {
 	}
 
 	v := solution.Vehicles()[0]
-	planUnit0 := solution.UnPlannedPlanUnits().RandomElement().(sdkNextRoute.SolutionPlanStopsUnit)
+	planUnit0 := solution.UnPlannedPlanUnits().RandomElement().(nextroute.SolutionPlanStopsUnit)
 
 	move, err := nextroute.NewMoveStops(
 		planUnit0,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				v.First(),
 				planUnit0.SolutionStops()[0],
@@ -204,7 +203,7 @@ func TestMoveGeneratorSequenceStops(t *testing.T) {
 		t,
 		v,
 		planUnit0,
-		[]sdkNextRoute.SolutionMoveStops{
+		[]nextroute.SolutionMoveStops{
 			move,
 		},
 	)
@@ -217,11 +216,11 @@ func TestMoveGeneratorSequenceStops(t *testing.T) {
 		t.Error("move should be planned")
 	}
 
-	planUnit1 := solution.UnPlannedPlanUnits().RandomElement().(sdkNextRoute.SolutionPlanStopsUnit)
+	planUnit1 := solution.UnPlannedPlanUnits().RandomElement().(nextroute.SolutionPlanStopsUnit)
 
 	m1, err := nextroute.NewMoveStops(
 		planUnit1,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				v.First(),
 				planUnit1.SolutionStops()[0],
@@ -239,7 +238,7 @@ func TestMoveGeneratorSequenceStops(t *testing.T) {
 	}
 	m2, err := nextroute.NewMoveStops(
 		planUnit1,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				v.First(),
 				planUnit1.SolutionStops()[0],
@@ -257,7 +256,7 @@ func TestMoveGeneratorSequenceStops(t *testing.T) {
 	}
 	m3, err := nextroute.NewMoveStops(
 		planUnit1,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				v.First(),
 				planUnit1.SolutionStops()[0],
@@ -275,7 +274,7 @@ func TestMoveGeneratorSequenceStops(t *testing.T) {
 	}
 	m4, err := nextroute.NewMoveStops(
 		planUnit1,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				v.First().Next(),
 				planUnit1.SolutionStops()[0],
@@ -293,7 +292,7 @@ func TestMoveGeneratorSequenceStops(t *testing.T) {
 	}
 	m5, err := nextroute.NewMoveStops(
 		planUnit1,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				v.First().Next(),
 				planUnit1.SolutionStops()[0],
@@ -311,7 +310,7 @@ func TestMoveGeneratorSequenceStops(t *testing.T) {
 	}
 	m6, err := nextroute.NewMoveStops(
 		planUnit1,
-		sdkNextRoute.StopPositions{
+		nextroute.StopPositions{
 			nextroute.NewStopPosition(
 				v.Last().Previous(),
 				planUnit1.SolutionStops()[0],
@@ -331,7 +330,7 @@ func TestMoveGeneratorSequenceStops(t *testing.T) {
 		t,
 		v,
 		planUnit1,
-		[]sdkNextRoute.SolutionMoveStops{m1, m2, m3, m4, m5, m6},
+		[]nextroute.SolutionMoveStops{m1, m2, m3, m4, m5, m6},
 	)
 }
 
@@ -357,7 +356,7 @@ func TestMoveGeneratorMultipleStops(t *testing.T) {
 	quit := make(chan struct{})
 	defer close(quit)
 
-	planUnit := solution.UnPlannedPlanUnits().SolutionPlanUnits()[0].(sdkNextRoute.SolutionPlanStopsUnit)
+	planUnit := solution.UnPlannedPlanUnits().SolutionPlanUnits()[0].(nextroute.SolutionPlanStopsUnit)
 	alloc := nextroute.NewPreAllocatedMoveContainer(planUnit)
 	for move := range nextroute.SolutionMoveStopsGeneratorChannelTest(
 		vehicle, planUnit, quit, planUnit.SolutionStops(), alloc,
@@ -369,9 +368,9 @@ func TestMoveGeneratorMultipleStops(t *testing.T) {
 
 func testMoves(
 	t *testing.T,
-	vehicle sdkNextRoute.SolutionVehicle,
-	planUnit sdkNextRoute.SolutionPlanStopsUnit,
-	moves []sdkNextRoute.SolutionMoveStops,
+	vehicle nextroute.SolutionVehicle,
+	planUnit nextroute.SolutionPlanStopsUnit,
+	moves []nextroute.SolutionMoveStops,
 ) {
 	count := 0
 	quit := make(chan struct{})
@@ -381,7 +380,7 @@ func testMoves(
 	nextroute.SolutionMoveStopsGeneratorTest(
 		vehicle,
 		planUnit,
-		func(move sdkNextRoute.SolutionMoveStops) {
+		func(move nextroute.SolutionMoveStops) {
 			if count == len(moves) {
 				t.Errorf("more moves than expected")
 			}

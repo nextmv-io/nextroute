@@ -6,7 +6,6 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextRoute "github.com/nextmv-io/sdk/nextroute"
 )
 
 func TestNoMixConstraint(t *testing.T) {
@@ -83,35 +82,35 @@ func TestNoMixConstraint(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit sdkNextRoute.ModelPlanStopsUnit) bool {
+	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() > 1
 	})
 
-	deltas := make(map[sdkNextRoute.ModelStop]sdkNextRoute.MixItem)
+	deltas := make(map[nextroute.ModelStop]nextroute.MixItem)
 
-	deltas[sequencePlanUnits[0].Stops()[0]] = sdkNextRoute.MixItem{
+	deltas[sequencePlanUnits[0].Stops()[0]] = nextroute.MixItem{
 		Name:     "A",
 		Quantity: 1,
 	}
-	deltas[sequencePlanUnits[0].Stops()[1]] = sdkNextRoute.MixItem{
+	deltas[sequencePlanUnits[0].Stops()[1]] = nextroute.MixItem{
 		Name:     "A",
 		Quantity: -1,
 	}
 
-	deltas[sequencePlanUnits[1].Stops()[0]] = sdkNextRoute.MixItem{
+	deltas[sequencePlanUnits[1].Stops()[0]] = nextroute.MixItem{
 		Name:     "B",
 		Quantity: 1,
 	}
-	deltas[sequencePlanUnits[1].Stops()[1]] = sdkNextRoute.MixItem{
+	deltas[sequencePlanUnits[1].Stops()[1]] = nextroute.MixItem{
 		Name:     "B",
 		Quantity: -1,
 	}
 
-	deltas[sequencePlanUnits[2].Stops()[0]] = sdkNextRoute.MixItem{
+	deltas[sequencePlanUnits[2].Stops()[0]] = nextroute.MixItem{
 		Name:     "A",
 		Quantity: 1,
 	}
-	deltas[sequencePlanUnits[2].Stops()[1]] = sdkNextRoute.MixItem{
+	deltas[sequencePlanUnits[2].Stops()[1]] = nextroute.MixItem{
 		Name:     "A",
 		Quantity: -1,
 	}
@@ -131,7 +130,7 @@ func TestNoMixConstraint(t *testing.T) {
 	solutionPlanStopsUnit := solution.SolutionPlanStopsUnit(sequencePlanUnits[0])
 	move, err := nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -163,7 +162,7 @@ func TestNoMixConstraint(t *testing.T) {
 	solutionPlanStopsUnit = solution.SolutionPlanStopsUnit(sequencePlanUnits[1])
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -186,7 +185,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -208,7 +207,7 @@ func TestNoMixConstraint(t *testing.T) {
 	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First().Next(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -230,7 +229,7 @@ func TestNoMixConstraint(t *testing.T) {
 	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First().Next(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -252,7 +251,7 @@ func TestNoMixConstraint(t *testing.T) {
 	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].Last().Previous(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -284,7 +283,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -307,7 +306,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -329,7 +328,7 @@ func TestNoMixConstraint(t *testing.T) {
 	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -352,7 +351,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -375,7 +374,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -398,7 +397,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First().Next(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -421,7 +420,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First().Next(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -443,7 +442,7 @@ func TestNoMixConstraint(t *testing.T) {
 	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First().Next(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -466,7 +465,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First().Next(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -489,7 +488,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First().Next().Next(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -512,7 +511,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First().Next().Next(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -535,7 +534,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First().Next().Next(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -558,7 +557,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First().Next().Next().Next(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -581,7 +580,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First().Next().Next().Next(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -604,7 +603,7 @@ func TestNoMixConstraint(t *testing.T) {
 
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]sdkNextRoute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].Last().Previous(),
 				solutionPlanStopsUnit.SolutionStops()[0],
@@ -700,13 +699,13 @@ func TestNoMixConstraint_ArgumentMismatch(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit sdkNextRoute.ModelPlanStopsUnit) bool {
+	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() > 1
 	})
 
 	{
 		cnstr, err := nextroute.NewNoMixConstraint(
-			map[sdkNextRoute.ModelStop]sdkNextRoute.MixItem{},
+			map[nextroute.ModelStop]nextroute.MixItem{},
 		)
 		if err != nil {
 			t.Fatal(err)
@@ -717,13 +716,13 @@ func TestNoMixConstraint_ArgumentMismatch(t *testing.T) {
 		}
 	}
 	{
-		deltas := make(map[sdkNextRoute.ModelStop]sdkNextRoute.MixItem)
+		deltas := make(map[nextroute.ModelStop]nextroute.MixItem)
 
-		deltas[sequencePlanUnits[0].Stops()[0]] = sdkNextRoute.MixItem{
+		deltas[sequencePlanUnits[0].Stops()[0]] = nextroute.MixItem{
 			Name:     "A",
 			Quantity: 1,
 		}
-		deltas[sequencePlanUnits[0].Stops()[1]] = sdkNextRoute.MixItem{
+		deltas[sequencePlanUnits[0].Stops()[1]] = nextroute.MixItem{
 			Name:     "A",
 			Quantity: -2,
 		}
@@ -745,9 +744,9 @@ func TestNoMixConstraint_ArgumentMismatch(t *testing.T) {
 	{
 		stop := model.Stops()[0]
 
-		deltas := make(map[sdkNextRoute.ModelStop]sdkNextRoute.MixItem)
+		deltas := make(map[nextroute.ModelStop]nextroute.MixItem)
 
-		deltas[stop] = sdkNextRoute.MixItem{
+		deltas[stop] = nextroute.MixItem{
 			Name:     "A",
 			Quantity: 1,
 		}
@@ -767,13 +766,13 @@ func TestNoMixConstraint_ArgumentMismatch(t *testing.T) {
 		}
 	}
 	{
-		deltas := make(map[sdkNextRoute.ModelStop]sdkNextRoute.MixItem)
+		deltas := make(map[nextroute.ModelStop]nextroute.MixItem)
 
-		deltas[sequencePlanUnits[0].Stops()[0]] = sdkNextRoute.MixItem{
+		deltas[sequencePlanUnits[0].Stops()[0]] = nextroute.MixItem{
 			Name:     "A",
 			Quantity: 1,
 		}
-		deltas[sequencePlanUnits[0].Stops()[1]] = sdkNextRoute.MixItem{
+		deltas[sequencePlanUnits[0].Stops()[1]] = nextroute.MixItem{
 			Name:     "B",
 			Quantity: -1,
 		}
