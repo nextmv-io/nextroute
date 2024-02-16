@@ -3,8 +3,6 @@ package nextroute
 import (
 	"fmt"
 	"time"
-
-	"github.com/nextmv-io/nextroute/common"
 )
 
 // TimeExpression is a ModelExpression that returns a time.
@@ -198,7 +196,7 @@ func (s *stopTimeExpressionImpl) SetTime(stop ModelStop, t time.Time) {
 		// if it's not empty we grow it to 1 + idx
 		newLen := idx + 1
 		if len(s.values) == 0 {
-			newLen = common.Max(stop.Model().NumberOfStops(), newLen)
+			newLen = max(stop.Model().NumberOfStops(), newLen)
 		}
 		newValues := make([]float64, newLen)
 		newHasValue := make([]bool, newLen)
