@@ -3,7 +3,7 @@
     {
       "path": ".",
       "name": "nextroute"
-    }
+    },
   ],
   "settings": {
     "go.lintTool": "golangci-lint",
@@ -17,26 +17,15 @@
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceFolder:core}/cmd/nextroute",
+        "program": "${workspaceFolder}/cmd",
         "args": [
           "-runner.input.path",
           "input.json",
           "-solve.duration",
-          "120s",
+          "5s",
           "-runner.output.path",
           "output.json"
         ]
-      },
-      {
-        "name": "cli",
-        "type": "go",
-        "request": "launch",
-        "mode": "auto",
-        "program": "${workspaceFolder:core}/cli",
-        // Sample command line arguments to debug the CLI. You can change them
-        // to your needs. For example, installing latest SDK assets would be:
-        // "args": ["sdk", "install"]
-        "args": ["version"]
       }
     ],
     "compounds": []
