@@ -14,6 +14,13 @@ import (
 	"github.com/nextmv-io/sdk/run/statistics"
 )
 
+// FormatOptions are the options that influence the format of the output.
+type FormatOptions struct {
+	Disable struct {
+		Progression bool `json:"progression" usage:"disable the progression series"`
+	} `json:"disable"`
+}
+
 // Format formats a solution in basic format using the map function
 // toSolutionOutputFn to map a solution to a user specific format.
 func Format(

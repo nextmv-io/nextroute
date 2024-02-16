@@ -4,16 +4,15 @@ import (
 	"time"
 
 	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
 )
 
 // addMaximumWaitStopConstraint adds a MaximumWaitStopConstraint to the model.
 func addMaximumWaitStopConstraint(
 	input schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	maximumWaitPerStop := nextroute.NewStopDurationExpression("stop-wait-max", model.MaxDuration())
 

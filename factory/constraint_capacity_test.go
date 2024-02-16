@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 func Test_resources(t *testing.T) {

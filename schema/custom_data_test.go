@@ -4,7 +4,7 @@ package schema_test
 import (
 	"testing"
 
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 type customMap struct {

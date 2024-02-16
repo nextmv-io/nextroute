@@ -587,7 +587,7 @@ type solutionImpl struct {
 	propositionPlanUnits solutionPlanUnitCollectionBaseImpl
 	vehicleIndices       []int
 
-	// TODO: explore if vehicles should rather be interfaces, then we can avoid creating new vehices on the fly
+	// TODO: explore if vehicles should rather be interfaces, then we can avoid creating new vehicles on the fly
 	vehicles         []solutionVehicleImpl
 	solutionVehicles []SolutionVehicle
 	start            []float64
@@ -1051,7 +1051,7 @@ type PreAllocatedMoveContainer struct {
 }
 
 // NewPreAllocatedMoveContainer creates a new PreAllocatedMoveContainer.
-// The PreAllocatedMoveContainer is initialized with concreate values depending on the planUnit type at runtime.
+// The PreAllocatedMoveContainer is initialized with concrete values depending on the planUnit type at runtime.
 func NewPreAllocatedMoveContainer(planUnit SolutionPlanUnit) *PreAllocatedMoveContainer {
 	allocations := PreAllocatedMoveContainer{}
 	switch planUnit.(type) {

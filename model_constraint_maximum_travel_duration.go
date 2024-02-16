@@ -1,5 +1,15 @@
 package nextroute
 
+// MaximumTravelDurationConstraint is a constraint that limits the
+// total travel duration of a vehicle.
+type MaximumTravelDurationConstraint interface {
+	ModelConstraint
+
+	// Maximum returns the maximum expression which defines the maximum
+	// travel duration of a vehicle type.
+	Maximum() VehicleTypeDurationExpression
+}
+
 // NewMaximumTravelDurationConstraint returns a new
 // MaximumTravelDurationConstraint.
 func NewMaximumTravelDurationConstraint(

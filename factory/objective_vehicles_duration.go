@@ -2,8 +2,7 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // addVehiclesDurationObjective adds the minimization of the sum of vehicles
@@ -11,7 +10,7 @@ import (
 func addVehiclesDurationObjective(
 	_ schema.Input,
 	model nextroute.Model,
-	options factory.Options,
+	options Options,
 ) (nextroute.Model, error) {
 	o := nextroute.NewVehiclesDurationObjective()
 	_, err := model.Objective().NewTerm(options.Objectives.VehiclesDuration, o)

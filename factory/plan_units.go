@@ -5,15 +5,14 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
 )
 
 func addPlanUnits(
 	input schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
@@ -54,7 +53,7 @@ func addPlanUnits(
 		}
 	}
 
-	// travers through the vehicles and create the plan units for the alternate stops
+	// travels through the vehicles and create the plan units for the alternate stops
 	for _, vehicle := range input.Vehicles {
 		if vehicle.AlternateStops == nil {
 			continue

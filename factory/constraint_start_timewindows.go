@@ -7,16 +7,15 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
 )
 
 // addWindowsConstraint adds the time windows to the Model.
 func addWindowsConstraint(
 	input schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	latestStartExpression, model, err := latestStartExpression(model)
 	if err != nil {

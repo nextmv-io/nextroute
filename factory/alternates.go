@@ -5,16 +5,15 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
 )
 
 // addAlternates adds the alternate stops to the Model.
 func addAlternates(
 	input schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	if input.AlternateStops == nil {
 		return model, nil

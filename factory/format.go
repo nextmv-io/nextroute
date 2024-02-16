@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute/schema"
 	runSchema "github.com/nextmv-io/sdk/run/schema"
 )
 

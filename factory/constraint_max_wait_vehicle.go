@@ -4,8 +4,7 @@ import (
 	"time"
 
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // addMaximumWaitVehicleConstraint adds a MaximumWaitVehicleConstraint to the
@@ -13,7 +12,7 @@ import (
 func addMaximumWaitVehicleConstraint(
 	input schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	vehicleLimit := nextroute.NewVehicleTypeDurationExpression("vehicle-wait-max", model.MaxDuration())
 

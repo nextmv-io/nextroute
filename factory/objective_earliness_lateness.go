@@ -2,9 +2,8 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
 )
 
 // addEarlinessObjective adds an earliness penalty (per stop) objective to the
@@ -12,7 +11,7 @@ import (
 func addEarlinessObjective(
 	input schema.Input,
 	model nextroute.Model,
-	options factory.Options,
+	options Options,
 ) (nextroute.Model, error) {
 	targetTimeExpression, model, err := targetTimeExpression(model)
 	if err != nil {
@@ -152,7 +151,7 @@ func addEarlinessTargetsAlternateStops(
 func addLatenessObjective(
 	input schema.Input,
 	model nextroute.Model,
-	options factory.Options,
+	options Options,
 ) (nextroute.Model, error) {
 	if options.Objectives.LateArrivalPenalty == 0.0 {
 		return model, nil

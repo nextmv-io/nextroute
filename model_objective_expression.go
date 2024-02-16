@@ -1,5 +1,15 @@
 package nextroute
 
+// ExpressionObjective is an objective that uses an expression to calculate an
+// objective.
+type ExpressionObjective interface {
+	ModelObjective
+
+	// Expression returns the expression that is used to calculate the
+	// objective.
+	Expression() ModelExpression
+}
+
 // NewExpressionObjective is the implementation of sdk.NewExpressionObjective.
 func NewExpressionObjective(e ModelExpression) ExpressionObjective {
 	return &expressionObjectiveImpl{
@@ -65,9 +75,9 @@ func (e *expressionObjectiveImpl) EstimateDeltaValue(
 	}
 
 	nextmove, _ := moveImpl.next()
-	previousmove, _ := moveImpl.previous()
+	previousMove, _ := moveImpl.previous()
 	currentValue := nextmove.CumulativeValue(e.expression) -
-		previousmove.CumulativeValue(e.expression)
+		previousMove.CumulativeValue(e.expression)
 
 	return value - currentValue
 }

@@ -5,10 +5,9 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/sdk/common"
-	sdkNextroute "github.com/nextmv-io/sdk/nextroute"
 )
 
-func createTestModel() (sdkNextroute.Model, error) {
+func createTestModel() (nextroute.Model, error) {
 	model, err := nextroute.NewModel()
 	if err != nil {
 		return nil, err

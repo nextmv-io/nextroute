@@ -80,7 +80,7 @@ type ParallelSolveInformation interface {
 // solution. The parallel solver will stop when the maximum duration is reached.
 // The parallel solver will execute a single solver in a run for a given number
 // of iterations and time before starting a new run defined by the
-// DefaultSolveOptionsFactory. Everytime a run is finished
+// DefaultSolveOptionsFactory. Every time a run is finished
 // the best solution is returned and new runs are started. A new run will be
 // started with the global best found solution and with a solver defined by
 // SolverFactory.

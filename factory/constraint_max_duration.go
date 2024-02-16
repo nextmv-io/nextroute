@@ -4,8 +4,7 @@ import (
 	"time"
 
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // addMaximumDurationConstraint uses the latestEndConstraint of the model. It
@@ -16,7 +15,7 @@ import (
 func addMaximumDurationConstraint(
 	input schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	latestEndExpression, model, err := latestEndExpression(model)
 	if err != nil {

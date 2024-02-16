@@ -2,8 +2,7 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // addActivationPenaltyObjective adds the initialization cost (per vehicle)
@@ -11,7 +10,7 @@ import (
 func addActivationPenaltyObjective(
 	input schema.Input,
 	model nextroute.Model,
-	options factory.Options,
+	options Options,
 ) (nextroute.Model, error) {
 	activationPenalty := nextroute.NewVehicleTypeValueExpression("activation_penalty", 0.0)
 	present := false

@@ -2,15 +2,14 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // addAttributesConstraint adds the attributes constraint to the model.
 func addAttributesConstraint(
 	input schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	constraint, err := nextroute.NewAttributesConstraint()
 	if err != nil {

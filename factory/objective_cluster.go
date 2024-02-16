@@ -2,15 +2,14 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // addClusterObjective adds an objective which prefers clustered routes.
 func addClusterObjective(
 	_ schema.Input,
 	model nextroute.Model,
-	options factory.Options,
+	options Options,
 ) (nextroute.Model, error) {
 	cluster, err := nextroute.NewCluster()
 	if err != nil {

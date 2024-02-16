@@ -3,7 +3,7 @@ package schema
 import (
 	"time"
 
-	"github.com/nextmv-io/sdk/nextroute/check"
+	"github.com/nextmv-io/nextroute/check/schema"
 )
 
 // SolutionOutput represents a solution as JSON.
@@ -15,7 +15,7 @@ type SolutionOutput struct {
 	// Objective is the objective of the solution.
 	Objective ObjectiveOutput `json:"objective"`
 	// Check is the check of the solution.
-	Check *check.Output `json:"check,omitempty"`
+	Check *schema.Output `json:"check,omitempty"`
 }
 
 // StopOutput is the basic struct for a stop.

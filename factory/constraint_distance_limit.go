@@ -5,16 +5,15 @@ import (
 	"math"
 
 	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
 )
 
 // addDistanceLimitConstraint adds a distance limit for routes to the model.
 func addDistanceLimitConstraint(
 	input schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	composed := nextroute.NewComposedPerVehicleTypeExpression(
 		nextroute.NewConstantExpression(

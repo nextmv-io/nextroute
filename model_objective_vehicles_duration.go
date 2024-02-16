@@ -4,6 +4,12 @@ import (
 	"github.com/nextmv-io/sdk/common"
 )
 
+// VehiclesDurationObjective is an objective that uses the vehicle duration as an
+// objective.
+type VehiclesDurationObjective interface {
+	ModelObjective
+}
+
 // NewVehiclesDurationObjective returns a new VehiclesDurationObjective.
 func NewVehiclesDurationObjective() VehiclesDurationObjective {
 	return &vehiclesDurationObjectiveImpl{}

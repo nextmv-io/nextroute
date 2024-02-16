@@ -2,19 +2,18 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // modelModifier is a function that modifies a Model. The Model that is passed
 // as an argument is mutated and returned. This allows developers to
 // encapsulate Model-modifying logic individually in easy to digest functions.
-type modelModifier func(schema.Input, nextroute.Model, factory.Options) (nextroute.Model, error)
+type modelModifier func(schema.Input, nextroute.Model, Options) (nextroute.Model, error)
 
-// NewModel is the implementation of sdkFactory.NewModel.
+// NewModel is the implementation of NewModel.
 func NewModel(
 	input schema.Input,
-	modelOptions factory.Options,
+	modelOptions Options,
 ) (nextroute.Model, error) {
 	input = applyDefaults(input)
 	err := validate(input, modelOptions)
@@ -36,7 +35,7 @@ func NewModel(
 	return model, nil
 }
 
-func getModifiersFromOptions(options factory.Options) []modelModifier {
+func getModifiersFromOptions(options Options) []modelModifier {
 	modifiers := []modelModifier{addStops, addAlternates, addVehicles}
 	modifiers = appendConstraintModifiers(options, modifiers)
 	modifiers = appendObjectiveModifiers(options, modifiers)
@@ -51,7 +50,7 @@ func getModifiersFromOptions(options factory.Options) []modelModifier {
 }
 
 func appendConstraintModifiers(
-	options factory.Options,
+	options Options,
 	modifiers []modelModifier,
 ) []modelModifier {
 	if options.Constraints.Enable.Cluster {
@@ -110,7 +109,7 @@ func appendConstraintModifiers(
 }
 
 func appendObjectiveModifiers(
-	options factory.Options,
+	options Options,
 	modifiers []modelModifier,
 ) []modelModifier {
 	if options.Objectives.VehicleActivationPenalty > 0.0 {
@@ -153,7 +152,7 @@ func appendObjectiveModifiers(
 }
 
 func appendPropertiesModifiers(
-	options factory.Options,
+	options Options,
 	modifiers []modelModifier,
 ) []modelModifier {
 	if !options.Properties.Disable.Durations {

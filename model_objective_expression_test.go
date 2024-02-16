@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/nextmv-io/nextroute"
-	sdkNextroute "github.com/nextmv-io/sdk/nextroute"
 )
 
 // Simply test that we can add a new expression objective to the model.
@@ -44,7 +43,7 @@ func TestAddExpressionObjective(t *testing.T) {
 		t.Error("model objective should have an objective")
 	}
 
-	if registered, ok := objective.(sdkNextroute.RegisteredModelExpressions); ok {
+	if registered, ok := objective.(nextroute.RegisteredModelExpressions); ok {
 		if len(registered.ModelExpressions()) != 1 {
 			t.Error("objective should have an expression")
 		}
@@ -94,7 +93,7 @@ func TestExpressionObjective_EstimateDeltaValue(t *testing.T) {
 	planUnits := model.PlanStopsUnits()
 	m1, err := nextroute.NewMoveStops(
 		solution.SolutionPlanStopsUnit(planUnits[0]),
-		[]sdkNextroute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solution.SolutionPlanStopsUnit(planUnits[0]).SolutionStops()[0],
@@ -107,7 +106,7 @@ func TestExpressionObjective_EstimateDeltaValue(t *testing.T) {
 	}
 	m2, err := nextroute.NewMoveStops(
 		solution.SolutionPlanStopsUnit(planUnits[3]),
-		[]sdkNextroute.StopPosition{
+		[]nextroute.StopPosition{
 			nextroute.NewStopPosition(
 				solution.Vehicles()[0].First(),
 				solution.SolutionPlanStopsUnit(planUnits[3]).SolutionStops()[0],
@@ -125,7 +124,7 @@ func TestExpressionObjective_EstimateDeltaValue(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		move sdkNextroute.SolutionMoveStops
+		move nextroute.SolutionMoveStops
 		want float64
 	}{
 		{

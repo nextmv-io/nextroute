@@ -4,6 +4,17 @@ import (
 	"context"
 )
 
+// SolveOperatorRestart is a solve operator that restarts the solver.
+// The operator will set the working solution to the best solution found so far
+// after MaximumIterations number of iterations without finding a better
+// solution.
+type SolveOperatorRestart interface {
+	SolveOperator
+
+	// MaximumIterations returns the maximum iterations of the solve operator.
+	MaximumIterations() SolveParameter
+}
+
 // NewSolveOperatorRestart creates a new solve-operator that restarts the solver
 // after a certain number of iterations without improvement.
 // SolveOperatorRestart is a solve-operator that restarts the solver after a

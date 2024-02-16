@@ -6,16 +6,15 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
 )
 
 // addServiceDurations sets the time it takes them to service a stop.
 func addServiceDurations(
 	input schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	durationExpressions := common.UniqueDefined(
 		common.Map(
@@ -143,7 +142,7 @@ func groupToStops(ids []string, model nextroute.Model) (nextroute.ModelStops, er
 func addDurationGroups(
 	input schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	if input.DurationGroups == nil {
 		return model, nil
@@ -192,7 +191,7 @@ func addDurationGroups(
 func addDurationMultipliers(
 	input schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	// containerType struct with a field called durationExpression and a field called
 	// inputVehicle

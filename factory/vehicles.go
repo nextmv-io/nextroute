@@ -4,17 +4,16 @@ import (
 	"fmt"
 
 	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/common"
 	"github.com/nextmv-io/sdk/measure"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
 )
 
 // addVehicles adds the vehicle types to the Model.
 func addVehicles(
 	input schema.Input,
 	model nextroute.Model,
-	options factory.Options,
+	options Options,
 ) (nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
@@ -118,7 +117,7 @@ func newVehicle(
 	inputVehicle schema.Vehicle,
 	vehicleType nextroute.ModelVehicleType,
 	model nextroute.Model,
-	options factory.Options,
+	options Options,
 ) (nextroute.ModelVehicle, error) {
 	startLocation := common.NewInvalidLocation()
 	var err error

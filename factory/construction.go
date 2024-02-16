@@ -12,9 +12,8 @@ import (
 	"time"
 
 	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/common"
-	sdkFactory "github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
 	"github.com/nextmv-io/sdk/run"
 )
 
@@ -93,10 +92,10 @@ type ModelFactory interface {
 func NewStartSolution(
 	cont context.Context,
 	input schema.Input,
-	factoryOptions sdkFactory.Options,
-	modelFactory sdkFactory.ModelFactory,
+	factoryOptions Options,
+	modelFactory ModelFactory,
 	solveOptions nextroute.ParallelSolveOptions,
-	clusterSolutionOptions sdkFactory.ClusterSolutionOptions,
+	clusterSolutionOptions ClusterSolutionOptions,
 ) (nextroute.Solution, error) {
 	if cont.Value(run.Start) == nil {
 		cont = context.WithValue(cont, run.Start, time.Now())
@@ -261,9 +260,9 @@ func NewStartSolution(
 func NewGreedySolution(
 	ctx context.Context,
 	input schema.Input,
-	options sdkFactory.Options,
-	greedySolutionOptions sdkFactory.GreedySolutionOptions,
-	modelFactory sdkFactory.ModelFactory,
+	options Options,
+	greedySolutionOptions GreedySolutionOptions,
+	modelFactory ModelFactory,
 ) (nextroute.Solution, error) {
 	return NewClusterSolution(
 		ctx,
@@ -286,7 +285,7 @@ func NewGreedySolution(
 // NewDefaultModelFactory returns a new default model factory.
 // The default model factory creates a new model for the given side and
 // options.
-func NewDefaultModelFactory() sdkFactory.ModelFactory {
+func NewDefaultModelFactory() ModelFactory {
 	return defaultModelFactoryImpl{}
 }
 
@@ -294,14 +293,14 @@ type defaultModelFactoryImpl struct{}
 
 func (d defaultModelFactoryImpl) NewModel(
 	input schema.Input,
-	options sdkFactory.Options,
+	options Options,
 ) (nextroute.Model, error) {
 	return NewModel(input, options)
 }
 
 // NewStopCluster returns a new stop cluster for the given stops.
 func NewStopCluster(
-	stops []schema.Stop) sdkFactory.StopCluster {
+	stops []schema.Stop) StopCluster {
 	if len(stops) == 0 {
 		panic("cannot create stop cluster with no stops")
 	}
@@ -313,7 +312,7 @@ func NewStopCluster(
 
 // NewPlanUnitStopClusterGenerator returns a list of stop clusters based
 // upon unplanned plan units.
-func NewPlanUnitStopClusterGenerator() sdkFactory.StopClusterGenerator {
+func NewPlanUnitStopClusterGenerator() StopClusterGenerator {
 	return &planUnitStopClusterGeneratorImpl{}
 }
 
@@ -322,10 +321,10 @@ type planUnitStopClusterGeneratorImpl struct {
 
 func (s *planUnitStopClusterGeneratorImpl) Generate(
 	input schema.Input,
-	modelOptions sdkFactory.Options,
-	modelFactory sdkFactory.ModelFactory,
-) ([]sdkFactory.StopCluster, error) {
-	clusters := make([]sdkFactory.StopCluster, 0, len(input.Stops))
+	modelOptions Options,
+	modelFactory ModelFactory,
+) ([]StopCluster, error) {
+	clusters := make([]StopCluster, 0, len(input.Stops))
 
 	model, err := modelFactory.NewModel(input, modelOptions)
 	if err != nil {
@@ -349,7 +348,7 @@ func (s *planUnitStopClusterGeneratorImpl) Generate(
 
 // NewSortStopClustersRandom returns StopClusterSorter which sorts the stop
 // clusters randomly.
-func NewSortStopClustersRandom() sdkFactory.StopClusterSorter {
+func NewSortStopClustersRandom() StopClusterSorter {
 	return &sortStopClustersRandomImpl{}
 }
 
@@ -358,9 +357,9 @@ type sortStopClustersRandomImpl struct {
 
 func (s *sortStopClustersRandomImpl) Sort(
 	_ schema.Input,
-	clusters []sdkFactory.StopCluster,
-	_ sdkFactory.ModelFactory,
-) ([]sdkFactory.StopCluster, error) {
+	clusters []StopCluster,
+	_ ModelFactory,
+) ([]StopCluster, error) {
 	rand.Shuffle(len(clusters), func(i, j int) { clusters[i], clusters[j] = clusters[j], clusters[i] })
 	return clusters, nil
 }
@@ -368,7 +367,7 @@ func (s *sortStopClustersRandomImpl) Sort(
 // NewSortStopClustersOnDistanceFromCentroid sorts the stop clusters based upon
 // the distance from the centroid of the stop cluster to the centroid of all
 // stops.
-func NewSortStopClustersOnDistanceFromCentroid() sdkFactory.StopClusterSorter {
+func NewSortStopClustersOnDistanceFromCentroid() StopClusterSorter {
 	return &sortStopClustersOnDistanceFromCentroidImpl{}
 }
 
@@ -377,9 +376,9 @@ type sortStopClustersOnDistanceFromCentroidImpl struct {
 
 func (s *sortStopClustersOnDistanceFromCentroidImpl) Sort(
 	input schema.Input,
-	clusters []sdkFactory.StopCluster,
-	_ sdkFactory.ModelFactory,
-) ([]sdkFactory.StopCluster, error) {
+	clusters []StopCluster,
+	_ ModelFactory,
+) ([]StopCluster, error) {
 	centroid := CentroidLocation(input.Stops)
 	var err error
 	sort.Slice(clusters, func(i, j int) bool {
@@ -399,11 +398,11 @@ func (s *sortStopClustersOnDistanceFromCentroidImpl) Sort(
 // NewAndStopClusterFilter returns a StopClusterFilter that filters out stop clusters that are filtered out by all
 // the given filters.
 func NewAndStopClusterFilter(
-	filter sdkFactory.StopClusterFilter,
-	filters ...sdkFactory.StopClusterFilter,
-) sdkFactory.StopClusterFilter {
+	filter StopClusterFilter,
+	filters ...StopClusterFilter,
+) StopClusterFilter {
 	// combine filters
-	allFilters := make([]sdkFactory.StopClusterFilter, 0, len(filters)+1)
+	allFilters := make([]StopClusterFilter, 0, len(filters)+1)
 	allFilters = append(allFilters, filter)
 	return &nAryStopClusterFilterImpl{
 		filters:     allFilters,
@@ -414,11 +413,11 @@ func NewAndStopClusterFilter(
 // NewOrStopClusterFilter returns a StopClusterFilter that filters out stop clusters that are filtered out by any of
 // the given filters.
 func NewOrStopClusterFilter(
-	filter sdkFactory.StopClusterFilter,
-	filters ...sdkFactory.StopClusterFilter,
-) sdkFactory.StopClusterFilter {
+	filter StopClusterFilter,
+	filters ...StopClusterFilter,
+) StopClusterFilter {
 	// combine filters
-	allFilters := make([]sdkFactory.StopClusterFilter, 0, len(filters)+1)
+	allFilters := make([]StopClusterFilter, 0, len(filters)+1)
 	allFilters = append(allFilters, filter)
 	return &nAryStopClusterFilterImpl{
 		filters:     allFilters,
@@ -427,14 +426,14 @@ func NewOrStopClusterFilter(
 }
 
 type nAryStopClusterFilterImpl struct {
-	filters     []sdkFactory.StopClusterFilter
+	filters     []StopClusterFilter
 	conjunction bool
 }
 
 func (n *nAryStopClusterFilterImpl) Filter(
 	input schema.Input,
-	cluster sdkFactory.StopCluster,
-	modelFactory sdkFactory.ModelFactory,
+	cluster StopCluster,
+	modelFactory ModelFactory,
 ) (bool, error) {
 	for _, filter := range n.filters {
 		filter, err := filter.Filter(input, cluster, modelFactory)
@@ -456,7 +455,7 @@ func (n *nAryStopClusterFilterImpl) Filter(
 // The area is approximated using haversine distances.
 func NewStopClusterFilterArea(
 	side common.Distance,
-) sdkFactory.StopClusterFilter {
+) StopClusterFilter {
 	return &filterSortStopClusterAreaImpl{
 		side: side.Value(common.Meters),
 	}
@@ -468,8 +467,8 @@ type filterSortStopClusterAreaImpl struct {
 
 func (f *filterSortStopClusterAreaImpl) Filter(
 	input schema.Input,
-	cluster sdkFactory.StopCluster,
-	_ sdkFactory.ModelFactory,
+	cluster StopCluster,
+	_ ModelFactory,
 ) (bool, error) {
 	if f.side <= 0 {
 		return true, nil
@@ -532,13 +531,13 @@ func (f *filterSortStopClusterAreaImpl) Filter(
 func NewClusterSolution(
 	ctx context.Context,
 	input schema.Input,
-	options sdkFactory.Options,
-	stopClusterGenerator sdkFactory.StopClusterGenerator,
-	initialStopClusterSorter sdkFactory.StopClusterSorter,
-	additionalStopClusterSorter sdkFactory.StopClusterSorter,
-	stopClusterFilter sdkFactory.StopClusterFilter,
-	stopClusterOptions sdkFactory.ClusterSolutionOptions,
-	modelFactory sdkFactory.ModelFactory,
+	options Options,
+	stopClusterGenerator StopClusterGenerator,
+	initialStopClusterSorter StopClusterSorter,
+	additionalStopClusterSorter StopClusterSorter,
+	stopClusterFilter StopClusterFilter,
+	stopClusterOptions ClusterSolutionOptions,
+	modelFactory ModelFactory,
 ) (nextroute.Solution, error) {
 	if modelFactory == nil {
 		modelFactory = NewDefaultModelFactory()
@@ -686,9 +685,9 @@ func getStopsImpl(planUnit nextroute.ModelPlanUnit, stops []nextroute.ModelStop)
 func newSolution(
 	ctx context.Context,
 	input schema.Input,
-	options sdkFactory.Options,
+	options Options,
 	parallelSolveOptions nextroute.ParallelSolveOptions,
-	modelFactory sdkFactory.ModelFactory,
+	modelFactory ModelFactory,
 ) (nextroute.Solution, error) {
 	model, err := modelFactory.NewModel(input, options)
 	if err != nil {
@@ -761,14 +760,14 @@ func (s stopCluster) Centroid() schema.Location {
 func populateVehicle(
 	ctx context.Context,
 	input schema.Input,
-	clusters []sdkFactory.StopCluster,
-	options sdkFactory.Options,
-	initialStopClusterSorter sdkFactory.StopClusterSorter,
-	addStopClusterSorter sdkFactory.StopClusterSorter,
-	stopClusterFilter sdkFactory.StopClusterFilter,
-	stopClusterOptions sdkFactory.ClusterSolutionOptions,
-	modelFactory sdkFactory.ModelFactory,
-) (schema.Input, []sdkFactory.StopCluster, error) {
+	clusters []StopCluster,
+	options Options,
+	initialStopClusterSorter StopClusterSorter,
+	addStopClusterSorter StopClusterSorter,
+	stopClusterFilter StopClusterFilter,
+	stopClusterOptions ClusterSolutionOptions,
+	modelFactory ModelFactory,
+) (schema.Input, []StopCluster, error) {
 	if len(input.Vehicles) != 1 {
 		return input,
 			clusters,

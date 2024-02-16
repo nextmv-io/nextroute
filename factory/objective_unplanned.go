@@ -2,8 +2,7 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 const defaultUnplannedPenaltyStop = 1_000_000
@@ -14,7 +13,7 @@ const defaultUnplannedPenaltyAlternateStop = 2_000_000
 func addUnplannedObjective(
 	input schema.Input,
 	model nextroute.Model,
-	options factory.Options,
+	options Options,
 ) (nextroute.Model, error) {
 	if options.Objectives.UnplannedPenalty == 0 {
 		return model, nil

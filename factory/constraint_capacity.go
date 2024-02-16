@@ -6,9 +6,8 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
 )
 
 // addCapacityConstraint uses the stop's quantity and vehicle's capacity
@@ -17,7 +16,7 @@ import (
 func addCapacityConstraint(
 	input schema.Input,
 	model nextroute.Model,
-	options factory.Options,
+	options Options,
 ) (nextroute.Model, error) {
 	quantities, names, quantitiesPresent, err := stopQuantities(input.Stops)
 	if err != nil {

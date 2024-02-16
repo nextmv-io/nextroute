@@ -7,6 +7,16 @@ import (
 	"github.com/nextmv-io/sdk/common"
 )
 
+// SolveOperatorAnd is a solve-operator which executes a set of solve-operators
+// in each iteration.
+type SolveOperatorAnd interface {
+	SolveOperator
+
+	// Operators returns the solve-operators that will be executed in each
+	// iteration.
+	Operators() SolveOperators
+}
+
 // NewSolverOperatorAnd creates a new solve-and-operator.
 func NewSolverOperatorAnd(
 	probability float64,

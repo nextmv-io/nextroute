@@ -2,8 +2,7 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // addClusterConstraint adds a constraint which limits stops only to be added
@@ -11,7 +10,7 @@ import (
 func addClusterConstraint(
 	_ schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	cluster, err := nextroute.NewCluster()
 	if err != nil {

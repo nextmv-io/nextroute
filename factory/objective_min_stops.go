@@ -2,8 +2,7 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // addMinStopsObjective adds the min stops per vehicle objective to the
@@ -11,7 +10,7 @@ import (
 func addMinStopsObjective(
 	input schema.Input,
 	model nextroute.Model,
-	options factory.Options,
+	options Options,
 ) (nextroute.Model, error) {
 	minStops := nextroute.NewVehicleTypeValueExpression("min_stops", 0)
 	minStopsPenalty := nextroute.NewVehicleTypeValueExpression("min_stops_penalty", 0)

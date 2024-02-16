@@ -7,8 +7,7 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // capacityObjective is a capacity objective.
@@ -110,7 +109,7 @@ func parseCapacityObjectives(capacities string) ([]capacityObjective, error) {
 func addCapacityObjective(
 	input schema.Input,
 	model nextroute.Model,
-	options factory.Options,
+	options Options,
 ) (nextroute.Model, error) {
 	if options.Objectives.Capacities == "" {
 		return model, nil
@@ -193,7 +192,7 @@ func addCapacityObjective(
 func addMaximumObjectives(
 	model nextroute.Model,
 	names map[string]bool,
-	options factory.Options,
+	options Options,
 	capacityObjectives []capacityObjective,
 ) (
 	nextroute.Model,

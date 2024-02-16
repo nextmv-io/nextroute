@@ -6,28 +6,28 @@ import (
 	"math"
 	"time"
 
+	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/check/schema"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/check"
 )
 
 // ModelCheck is the check of a model returning a [Output].
 func ModelCheck(
 	model nextroute.Model,
-	options check.Options,
-) (check.Output, error) {
+	options Options,
+) (schema.Output, error) {
 	if model == nil {
-		return check.Output{}, fmt.Errorf("model is nil")
+		return schema.Output{}, fmt.Errorf("model is nil")
 	}
 
 	solution, err := nextroute.NewSolution(model)
 	if err != nil {
-		return check.Output{}, err
+		return schema.Output{}, err
 	}
 
 	err = removePlanUnits(solution)
 	if err != nil {
-		return check.Output{}, err
+		return schema.Output{}, err
 	}
 
 	return SolutionCheck(
@@ -39,18 +39,18 @@ func ModelCheck(
 // SolutionCheck is the check of a solution returning a [Output].
 func SolutionCheck(
 	solution nextroute.Solution,
-	options check.Options,
-) (check.Output, error) {
+	options Options,
+) (schema.Output, error) {
 	if solution == nil {
-		return check.Output{}, fmt.Errorf("solution is nil")
+		return schema.Output{}, fmt.Errorf("solution is nil")
 	}
 
-	verbosity := check.ToVerbosity(options.Verbosity)
-	if verbosity == check.Off || options.Duration.Seconds() == 0 {
-		return check.Output{}, nil
+	verbosity := ToVerbosity(options.Verbosity)
+	if verbosity == Off || options.Duration.Seconds() == 0 {
+		return schema.Output{}, nil
 	}
-	if int(verbosity) < int(check.Low) {
-		return check.Output{}, fmt.Errorf(
+	if int(verbosity) < int(Low) {
+		return schema.Output{}, fmt.Errorf(
 			"verbosity [%d] is not supported",
 			verbosity,
 		)
@@ -59,17 +59,17 @@ func SolutionCheck(
 	nextCheck := &checkImpl{
 		solution:  solution,
 		verbosity: verbosity,
-		output: check.Output{
+		output: schema.Output{
 			DurationMaximum: options.Duration.Seconds(),
 			Verbosity:       verbosity.String(),
 			Remark:          "completed",
-			Summary: check.Summary{
+			Summary: schema.Summary{
 				PlanUnitsToBeChecked: len(solution.Model().PlanUnits()),
 				PlanUnitsChecked:     0,
 			},
-			PlanUnits: make([]check.PlanUnit, 0, len(solution.Model().PlanUnits())),
-			Vehicles:  make([]check.Vehicle, 0, len(solution.Model().Vehicles())),
-			Solution: check.Solution{
+			PlanUnits: make([]schema.PlanUnit, 0, len(solution.Model().PlanUnits())),
+			Vehicles:  make([]schema.Vehicle, 0, len(solution.Model().Vehicles())),
+			Solution: schema.Solution{
 				StopsPlanned:       0,
 				PlanUnitsUnplanned: 0,
 				VehiclesUsed:       0,
@@ -85,8 +85,8 @@ func SolutionCheck(
 
 type checkImpl struct {
 	solution  nextroute.Solution
-	verbosity check.Verbosity
-	output    check.Output
+	verbosity Verbosity
+	output    schema.Output
 }
 
 func (m *checkImpl) checkStartSolution() {
@@ -118,7 +118,7 @@ func (m *checkImpl) checkStartSolution() {
 	)
 
 	m.output.Solution.Objective.Terms = make(
-		[]check.ObjectiveTerm,
+		[]schema.ObjectiveTerm,
 		0,
 		len(m.solution.Model().Objective().Terms()),
 	)
@@ -129,7 +129,7 @@ func (m *checkImpl) checkStartSolution() {
 		value := m.solution.ObjectiveValue(term.Objective())
 		m.output.Solution.Objective.Terms = append(
 			m.output.Solution.Objective.Terms,
-			check.ObjectiveTerm{
+			schema.ObjectiveTerm{
 				Name:   fmt.Sprintf("%v", term.Objective()),
 				Factor: term.Factor(),
 				Base:   value / term.Factor(),
@@ -152,11 +152,11 @@ func (m *checkImpl) checkSolutionPlanUnits(
 		return nil
 	}
 
-	if int(m.verbosity) >= int(check.Medium) {
+	if int(m.verbosity) >= int(Medium) {
 		for vIdx, solutionVehicle := range m.solution.Vehicles() {
 			m.output.Vehicles = append(
 				m.output.Vehicles,
-				check.Vehicle{
+				schema.Vehicle{
 					ID:                 solutionVehicle.ModelVehicle().ID(),
 					PlanUnitsHaveMoves: nil,
 				},
@@ -168,7 +168,7 @@ func (m *checkImpl) checkSolutionPlanUnits(
 
 	observer := newObserver()
 
-	if int(m.verbosity) >= int(check.Medium) {
+	if int(m.verbosity) >= int(Medium) {
 		defer func() {
 			m.solution.Model().RemoveSolutionObserver(observer)
 		}()
@@ -187,18 +187,18 @@ SolutionPlanUnitLoop:
 
 			m.output.PlanUnits = append(
 				m.output.PlanUnits,
-				check.PlanUnit{
+				schema.PlanUnit{
 					Stops:             toID(solutionPlanUnit.ModelPlanUnit()),
 					VehiclesHaveMoves: nil,
 					VehiclesWithMoves: nil,
 				},
 			)
 
-			if int(m.verbosity) >= int(check.Medium) {
+			if int(m.verbosity) >= int(Medium) {
 				vehiclesHaveMoves := 0
 				m.output.PlanUnits[solutionPlanUnitIdx].VehiclesHaveMoves = &vehiclesHaveMoves
 			}
-			if int(m.verbosity) >= int(check.High) {
+			if int(m.verbosity) >= int(High) {
 				m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves = &[]string{}
 			}
 
@@ -241,18 +241,18 @@ SolutionPlanUnitLoop:
 							return err
 						}
 
-						if int(m.verbosity) >= int(check.Medium) && move.Value() < moveMinimumValue {
+						if int(m.verbosity) >= int(Medium) && move.Value() < moveMinimumValue {
 							moveMinimumValue = move.Value()
 							id := solutionVehicle.ModelVehicle().ID()
-							nextCheckObjective := check.Objective{
+							nextCheckObjective := schema.Objective{
 								Vehicle: &id,
 								Value:   move.Value(),
-								Terms:   make([]check.ObjectiveTerm, len(m.solution.Model().Objective().Terms())),
+								Terms:   make([]schema.ObjectiveTerm, len(m.solution.Model().Objective().Terms())),
 							}
 							if solutionMoveStops, ok := move.(nextroute.SolutionMoveStops); ok {
 								for termIdx, term := range m.solution.Model().Objective().Terms() {
 									base := term.Objective().EstimateDeltaValue(solutionMoveStops)
-									nextCheckObjective.Terms[termIdx] = check.ObjectiveTerm{
+									nextCheckObjective.Terms[termIdx] = schema.ObjectiveTerm{
 										Name:   fmt.Sprintf("%v", term.Objective()),
 										Factor: term.Factor(),
 										Base:   base,
@@ -260,14 +260,14 @@ SolutionPlanUnitLoop:
 									}
 								}
 							} else {
-								nextCheckObjective.Terms = make([]check.ObjectiveTerm, 0)
+								nextCheckObjective.Terms = make([]schema.ObjectiveTerm, 0)
 							}
 
 							nextCheckObjective.Value += move.Value()
 							m.output.PlanUnits[solutionPlanUnitIdx].BestMoveObjective = &nextCheckObjective
 						}
 
-						if m.verbosity == check.Low {
+						if m.verbosity == Low {
 							break VehicleLoop
 						}
 					} else {

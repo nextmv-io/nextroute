@@ -6,6 +6,11 @@ import (
 	"github.com/nextmv-io/sdk/common"
 )
 
+// SolutionStopGenerator is an iterator of solution stops.
+type SolutionStopGenerator interface {
+	Next() SolutionStop
+}
+
 // NewSolutionStopGenerator return a solution stop iterator of a move.
 // If startAtFirst is true, the first stop will be first stop of the vehicle.
 // If endAtLast is true, the last stop will be the last stop of the vehicle.

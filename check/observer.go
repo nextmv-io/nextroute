@@ -1,6 +1,6 @@
 package check
 
-import "github.com/nextmv-io/sdk/nextroute"
+import "github.com/nextmv-io/nextroute"
 
 // Observer is an observer that is used to detect the constraints
 // that are violated when evaluating moves.

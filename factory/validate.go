@@ -8,13 +8,12 @@ import (
 	"strings"
 
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/common"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
 )
 
 // validate the input and return an error if invalid.
-func validate(input schema.Input, modelOptions factory.Options) error {
+func validate(input schema.Input, modelOptions Options) error {
 	allStopIDs := map[string]bool{}
 	stopIDs := map[string]bool{}
 	alternateStopIDs := map[string]bool{}
@@ -231,7 +230,7 @@ func validateMatrix(
 	return nil
 }
 
-func validateConstraints(input schema.Input, modelOptions factory.Options) error {
+func validateConstraints(input schema.Input, modelOptions Options) error {
 	if !modelOptions.Validate.Disable.StartTime {
 		hasStartTimeWindow := common.Has(
 			input.Stops,
@@ -777,7 +776,7 @@ type resourceInfo struct {
 	allStopsPositive         bool
 }
 
-func validateResources(input schema.Input, modelOptions factory.Options) error {
+func validateResources(input schema.Input, modelOptions Options) error {
 	resourcesInfo := map[string]*resourceInfo{}
 
 	for _, vehicle := range input.Vehicles {

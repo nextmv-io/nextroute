@@ -6,15 +6,14 @@ import (
 	"reflect"
 
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // addNoMixConstraint.
 func addNoMixConstraint(
 	input schema.Input,
 	model nextroute.Model,
-	_ factory.Options,
+	_ Options,
 ) (nextroute.Model, error) {
 	mixingItems := make(map[string]map[nextroute.ModelStop]nextroute.MixItem)
 

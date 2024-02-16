@@ -3,7 +3,7 @@ package factory
 import (
 	"reflect"
 
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // applyDefaults modifies the input by applying default values to stops and
