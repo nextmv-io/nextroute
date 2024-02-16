@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"math"
 
+	"slices"
+
 	"github.com/nextmv-io/sdk/common"
-	"golang.org/x/exp/slices"
 )
 
 // NewSweepSolution returns a solution for the given model using the sweep

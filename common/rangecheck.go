@@ -6,8 +6,9 @@ import (
 	"math"
 	"time"
 
+	"slices"
+
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
-	"golang.org/x/exp/slices"
 )
 
 // Interval represents a time interval.

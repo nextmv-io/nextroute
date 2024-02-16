@@ -7,8 +7,9 @@ import (
 	"sync"
 	"time"
 
+	"slices"
+
 	"github.com/nextmv-io/sdk/common"
-	"golang.org/x/exp/slices"
 )
 
 // SolutionVehicle is a vehicle in a solution.

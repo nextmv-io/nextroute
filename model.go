@@ -9,8 +9,9 @@ import (
 	"sync"
 	"time"
 
+	"slices"
+
 	"github.com/nextmv-io/sdk/common"
-	"golang.org/x/exp/slices"
 )
 
 // Model defines routing problem.
