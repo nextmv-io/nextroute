@@ -1,19 +1,19 @@
 name: json lint
 on: [push]
 jobs:
-  sdk-json-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: git clone
-        uses: actions/checkout@v4
+    sdk-json-lint:
+        runs-on: ubuntu-latest
+        steps:
+            - name: git clone
+              uses: actions/checkout@v4
 
-      - name: set up node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.8
+            - name: set up node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 18.8
 
-      - name: install prettier
-        run: npm install prettier@v2.7.1 --global
+            - name: install prettier
+              run: npm install prettier@v2.7.1 --global
 
-      - name: lint .json files with prettier
-        run: prettier -c "**/*.json"
+            - name: lint .json files with prettier
+              run: prettier -c "**/*.json"
