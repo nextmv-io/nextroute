@@ -1,18 +1,18 @@
 name: go lint
 on: [push]
 jobs:
-    lint:
-        runs-on: ubuntu-latest
-        steps:
-            - name: git clone
-              uses: actions/checkout@v4
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: git clone
+        uses: actions/checkout@v4
 
-            - name: set up go
-              uses: actions/setup-go@v5
-              with:
-                  go-version: 1.21.6
+      - name: set up go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.21.6
 
-            - name: golangci-lint
-              uses: golangci/golangci-lint-action@v4
-              with:
-                  version: v1.54.1
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: v1.56.2

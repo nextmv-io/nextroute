@@ -1,12 +1,12 @@
 name: markdown lint
 on: [push]
 jobs:
-    lint:
-        runs-on: ubuntu-latest
-        steps:
-            - name: git clone
-              uses: actions/checkout@v4
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: git clone
+        uses: actions/checkout@v4
 
-            - uses: DavidAnson/markdownlint-cli2-action@v7
-              with:
-                  globs: "**/*.md"
+      - uses: DavidAnson/markdownlint-cli2-action@v7
+        with:
+          globs: "**/*.md"
