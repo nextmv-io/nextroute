@@ -70,10 +70,11 @@ func (p *parallelSolverWrapperImpl) Solve(
 	startSolutions ...Solution,
 ) (SolutionChannel, error) {
 	start := ctx.Value(run.Start).(time.Time)
-	ctx, _ = context.WithDeadline(
+	ctx, cancel := context.WithDeadline(
 		ctx,
 		start.Add(solveOptions.Duration),
 	)
+	defer cancel()
 
 	interpretedParallelSolveOptions := ParallelSolveOptions{
 		Iterations:           solveOptions.Iterations,

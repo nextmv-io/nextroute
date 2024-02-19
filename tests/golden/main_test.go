@@ -7,8 +7,6 @@ import (
 	"github.com/nextmv-io/sdk/golden"
 )
 
-const templateName = "nextroute"
-
 func TestMain(m *testing.M) {
 	cleanUp()
 	golden.CopyFile("../../cmd/main.go", "main.go")
