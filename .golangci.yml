@@ -1,0 +1,330 @@
+# Options for analysis running. Details: https://golangci-lint.run/usage/configuration/#run-configuration
+run:
+  timeout: 5m
+  go: "1.21"
+
+# Configures linters. Details: https://golangci-lint.run/usage/linters
+linters-settings:
+  # Pick up duplicate code after severe repetition.
+  dupl:
+    threshold: 200
+  # Only allow certain modules to be imported.
+  gomodguard:
+    allowed:
+      modules:
+        - github.com/aws/aws-lambda-go
+        - github.com/aws/aws-sdk-go
+        - go.uber.org/mock
+        - github.com/google/uuid
+        - github.com/gruntwork-io/terratest
+        - github.com/hashicorp/go-version
+        - github.com/kinbiko/jsonassert
+        - github.com/nextmv-io/sdk
+        - github.com/xeipuuv/gojsonschema
+        - github.com/onsi/gomega
+        - github.com/onsi/ginkgo/v2
+        - github.com/fsnotify/fsnotify
+        - github.com/magiconair/properties
+        - github.com/ulikunitz/xz
+        - github.com/spf13/cobra
+        - gopkg.in/yaml.v3
+        - google.golang.org/grpc
+        - github.com/spf13/viper
+        - github.com/charmbracelet/bubbles
+        - github.com/charmbracelet/lipgloss
+        - github.com/grpc-ecosystem/go-grpc-middleware
+        - github.com/tobgu/qframe
+        - github.com/vbauerster/mpb/v8
+        - github.com/teris-io/shortid
+        - github.com/danielgtaylor/huma
+        - golang.org/x/exp
+        - gonum.org/v1/gonum
+  # Functions cannot exceed this cyclomatic complexity.
+  gocyclo:
+    min-complexity: 20
+  # Set correct go version.
+  gosimple:
+    go: "1.21"
+  staticcheck:
+    go: "1.21"
+  stylecheck:
+    go: "1.21"
+  # Check case of struct tags
+  tagliatelle:
+    case:
+      use-field-name: true
+      rules:
+        json: snake
+  # Check line length
+  lll:
+    line-length: 120
+
+# Specifies which linters are enabled. Full list: https://golangci-lint.run/usage/linters/
+linters:
+  # Some linters are just too strict.
+  disable-all: true
+  enable:
+    # Checks whether HTTP response body is closed successfully.
+    - bodyclose
+    # containedctx is a linter that detects struct contained context.Context field.
+    - containedctx
+    # Check the function whether use a non-inherited context.
+    - contextcheck
+    # Finds unused code. WARN [runner] The linter 'deadcode' is deprecated
+    # (since v1.49.0) due to: The owner seems to have abandoned the linter.
+    # Replaced by unused.
+    # - deadcode
+    # check declaration order and count of types, constants, variables and functions.
+    - decorder
+    # Checks assignments with too many blank identifiers (e.g. x, , , _, := f())
+    - dogsled
+    # Tool for code clone detection
+    - dupl
+    # Errcheck is a program for checking for unchecked errors in go programs.
+    # These unchecked errors can be critical bugs in some cases.
+    - errcheck
+    # Gci controls golang package import order and makes it always deterministic.
+    - gci
+    # Finds repeated strings that could be replaced by a constant.
+    - goconst
+    # Provides diagnostics that check for bugs, performance and style issues.
+    # Extensible without recompilation through dynamic rules. Dynamic rules are
+    # written declaratively with AST patterns, filters, report message and
+    # optional suggestion.
+    - gocritic
+    # Computes and checks the cyclomatic complexity of functions.
+    - gocyclo
+    # Check if comments end in a period.
+    - godot
+    # Gofmt checks whether code was gofmt-ed. By default this tool runs with -s
+    # option to check for code simplification.
+    - gofmt
+    # In addition to fixing imports, goimports also formats your code in the
+    # same style as gofmt.
+    - goimports
+    # Allow and block list linter for direct Go module dependencies. This is
+    # different from depguard where there are different block types for example
+    # version constraints and module recommendations.
+    - gomodguard
+    # Linter for Go source code that specializes in simplifying a code.
+    - gosimple
+    # Vet examines Go source code and reports suspicious constructs, such as
+    # Printf calls whose arguments do not align with the format string.
+    - govet
+    # Enforces consistent import aliases.
+    - importas
+    # Detects when assignments to existing variables are not used.
+    - ineffassign
+    # Reports long lines.
+    - lll
+    # Finds commonly misspelled English words in comments.
+    - misspell
+    # Finds naked returns in functions greater than a specified function length.
+    - nakedret
+    # Reports deeply nested if statements.
+    - nestif
+    # Finds the code that returns nil even if it checks that the error is not nil.
+    - nilerr
+    # noctx finds sending http request without context.Context.
+    - noctx
+    # Finds slice declarations that could potentially be preallocated.
+    - prealloc
+    # Find code that shadows one of Go's predeclared identifiers.
+    - predeclared
+    # Fast, configurable, extensible, flexible, and beautiful linter for Go.
+    # Drop-in replacement of golint.
+    - revive
+    # Staticcheck is a go vet on steroids, applying a ton of static analysis checks.
+    - staticcheck
+    # Finds unused struct fields. WARN [runner] The linter 'structcheck' is
+    # deprecated (since v1.49.0) due to: The owner seems to have abandoned the
+    # linter.  Replaced by unused.
+    # - structcheck
+    # Stylecheck is a replacement for golint.
+    - stylecheck
+    # Checks the struct tags.
+    - tagliatelle
+    # Like the front-end of a Go compiler, parses and type-checks Go code.
+    - typecheck
+    # Remove unnecessary type conversions.
+    - unconvert
+    # Reports unused function parameters.
+    - unparam
+    # Checks Go code for unused constants, variables, functions and types.
+    - unused
+    # Finds unused global variables and constants. WARN [runner] The linter
+    # 'varcheck' is deprecated (since v1.49.0) due to: The owner seems to have
+    # abandoned the linter.  Replaced by unused.
+    # - varcheck
+    # wastedassign finds wasted assignment statements.
+    #  wastedassign is disabled because of generics. You can track the evolution
+    # of the generics support by following the https://github.com/golangci/golangci-lint/issues/2649.
+    # - wastedassign
+    # Tool for detection of leading and trailing whitespace.
+    - whitespace
+
+# List of regexps of issue texts to exclude. Details: https://golangci-lint.run/usage/configuration/#issues-configuration
+issues:
+  # Disable default exclude patterns to surface commonly-ignored linting errors.
+  exclude-use-default: false
+  exclude-rules:
+    # Ignore cyclomatic complexity of tests
+    - path: '.*_test\.go'
+      linters:
+        - gocyclo
+    # Next route tests and methods contain complex code hard to simplify.
+    - path: model_expression_time_dependent_test\.go
+      linters:
+        - gocyclo
+    - path: solution_construction_cluster\.go
+      linters:
+        - gocyclo
+    - path: model_constraint_no_mix_test\.go
+      linters:
+        - gocyclo
+    - path: check/check\.go
+      linters:
+        - gocyclo
+        - nestif
+    - path: solution_move\.go
+      linters:
+        - gocyclo
+    - path: solution_move_stops\.go
+      linters:
+        - gocyclo
+    - path: solve_solver_parallel\.go
+      linters:
+        - gocyclo
+    - path: solution\.go
+      linters:
+        - gocyclo
+    # False alarm from staticcheck.
+    - path: solution_vehicle\.go
+      linters:
+        - staticcheck
+      text: SA6002
+    - path: model_plan_unit_test\.go
+      linters:
+        - gocyclo
+    - path: model_plan_units_unit_test\.go
+      linters:
+        - gocyclo
+    - path: model_plan_stops_unit_test\.go
+      linters:
+        - gocyclo
+    - path: model_constraint_maximum_test\.go
+      linters:
+        - gocyclo
+    - path: model\.go
+      linters:
+        - nestif
+    - path: model_test\.go
+      linters:
+        - gocyclo
+    # Next route stop generator - too complex to simplify at this point.
+    - path: solution_stop_generator\.go
+      linters:
+        - nestif
+    # Model factory.
+    - path: model_factory\.go
+      linters:
+        - nestif
+    # Next route solver cancel on context.
+    - path: solver\.go
+      linters:
+        - govet
+    - path: solver_parallel.go
+      linters:
+        - govet
+    # Function name is too long but cannot be broken up.
+    - path: solution_observer\.go
+      linters:
+        - lll
+    # Carried over validations from cloud and it is hard to simplify.
+    - path: factory/validate\.go
+      linters:
+        - gocyclo
+    # Construction complexity.
+    - path: factory/construction\.go
+      linters:
+        - gocyclo
+        - nestif
+    # Model factory.
+    - path: factory/constraint_no_mix\.go
+      linters:
+        - nestif
+    # Complex code that is hard to simplify.
+    - path: factory/plan_units\.go
+      linters:
+        - gocyclo
+        - nestif
+    # Complex code that is hard to simplify.
+    - path: factory/format\.go
+      linters:
+        - nestif
+    # TemporalValues has 4 return values, but only need one here.
+    - path: model_objective_vehicles_duration\.go
+      linters:
+        - dogsled
+    # The expression cannot be simplified with switch.
+    - path: factory/validate\.go
+      linters:
+        - gocritic
+    # The expression cannot be simplified with switch.
+    - path: factory/plan_units\.go
+      linters:
+        - gocritic
+      text: ifElseChain
+    # Solution isFeasible test is critical code
+    - path: solution_vehicle\.go
+      linters:
+        - nestif
+    # Model constraint parameters are used in apps
+    - path: model_constraint\.go
+      linters:
+        - unparam
+    - path: solution_stop_generator\.go
+      linters:
+        - unparam
+    # Deactivate line length in solver.go because of go tags
+    - path: solver\.go
+      linters:
+        - lll
+    - path: solve_solver_parallel\.go
+      linters:
+        - lll
+    - path: solve_solver\.go
+      linters:
+        - lll
+    # Deactivate line length because of go tags
+    - path: check/options\.go
+      linters:
+        - lll
+    # Deactivate lll in schema due to go tags.
+    - path: schema
+      linters:
+        - lll
+    # Deactivate line length in model.go because of go tags
+    - path: model\.go
+      linters:
+        - lll
+    # Deactivate line length in factory/model.go because of go tags
+    - path: factory/model\.go
+      linters:
+        - lll
+    # Deactivate line length in construction.go because of go tags
+    - path: factory/construction\.go
+      linters:
+        - lll
+    # Cloud code for compatibility
+    - path: schema/fleet_defaults\.go
+      linters:
+        - gocyclo
+    - path: schema/router\.go
+      linters:
+        - staticcheck
+    # This tag is used by our validation engine and it is valid.
+    - path: schema/input\.go
+      linters:
+        - govet
+      text: structtag
