@@ -116,8 +116,9 @@ func (v *modelVehicleImpl) AddStop(
 	stop ModelStop,
 	fixed bool,
 ) error {
+	message := "can not add a stop `%v` to vehicle `%v`, "
 	if v.Model().IsLocked() {
-		return fmt.Errorf("can not add a stop `%v` to vehicle `%v`, "+
+		return fmt.Errorf(message+
 			"the model is locked, this happens once a"+
 			"solution has been created using this model",
 			stop.ID(),
@@ -130,14 +131,14 @@ func (v *modelVehicleImpl) AddStop(
 		)
 	}
 	if stop.IsFirstOrLast() {
-		return fmt.Errorf("can not add a stop `%v` to vehicle `%v`, "+
+		return fmt.Errorf(message+
 			"the stop is first or last",
 			stop.ID(),
 			v.ID(),
 		)
 	}
 	if !stop.HasPlanStopsUnit() {
-		return fmt.Errorf("can not add a stop `%v` to vehicle `%v`, "+
+		return fmt.Errorf(message+
 			"the stop does not have a plan unit",
 			stop.ID(),
 			v.ID(),

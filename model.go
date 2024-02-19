@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"math/rand"
 	"reflect"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
 	"time"
-
-	"slices"
 
 	"github.com/nextmv-io/sdk/common"
 )
@@ -300,10 +299,7 @@ func (m *modelImpl) NewVehicle(
 ) (ModelVehicle, error) {
 	if m.isLocked {
 		return nil,
-			fmt.Errorf("model is isLocked, a model is" +
-				" isLocked once a" +
-				" solution has been created using this model",
-			)
+			fmt.Errorf(lockErrorMessage, "vehicle")
 	}
 
 	vehicle, err := newModelVehicle(
@@ -334,10 +330,7 @@ func (m *modelImpl) NewVehicleType(
 ) (ModelVehicleType, error) {
 	if m.isLocked {
 		return nil,
-			fmt.Errorf("model is isLocked, a model is" +
-				" isLocked once a" +
-				" solution has been created using this model",
-			)
+			fmt.Errorf(lockErrorMessage, "vehicle type")
 	}
 	vehicle := &vehicleTypeImpl{
 		index:          len(m.vehicleTypes),
@@ -396,10 +389,7 @@ func (m *modelImpl) addToCheckAt(checkAt CheckedAt, constraint ModelConstraint) 
 
 func (m *modelImpl) AddConstraint(constraint ModelConstraint) error {
 	if m.IsLocked() {
-		return fmt.Errorf("model is isLocked, a model is" +
-			" isLocked once a" +
-			" solution has been created using this model",
-		)
+		return fmt.Errorf(lockErrorMessage, "constraint")
 	}
 	for _, existingConstraint := range m.constraints {
 		if &existingConstraint == &constraint {
@@ -475,15 +465,15 @@ func (m *modelImpl) Objective() ModelObjectiveSum {
 	return m.objective
 }
 
+const lockErrorMessage = "model is locked, can not create a %s," +
+	" a model is locked once a solution has been created using this model"
+
 func (m *modelImpl) NewPlanOneOfPlanUnits(
 	planUnits ...ModelPlanUnit,
 ) (ModelPlanUnitsUnit, error) {
 	if m.IsLocked() {
 		return nil,
-			fmt.Errorf("model is locked, can not create a plan," +
-				" a model is locked once a" +
-				" solution has been created using this model",
-			)
+			fmt.Errorf(lockErrorMessage, "one plan")
 	}
 	plan, err := newPlanUnitsUnit(
 		len(m.planUnits),
@@ -506,10 +496,7 @@ func (m *modelImpl) NewPlanAllPlanUnits(
 ) (ModelPlanUnitsUnit, error) {
 	if m.IsLocked() {
 		return nil,
-			fmt.Errorf("model is locked, can not create a plan all plan," +
-				" a model is locked once a" +
-				" solution has been created using this model",
-			)
+			fmt.Errorf(lockErrorMessage, "all plan")
 	}
 	plan, err := newPlanUnitsUnit(
 		len(m.planUnits),
@@ -529,10 +516,7 @@ func (m *modelImpl) NewPlanAllPlanUnits(
 func (m *modelImpl) NewPlanSingleStop(stop ModelStop) (ModelPlanStopsUnit, error) {
 	if m.IsLocked() {
 		return nil,
-			fmt.Errorf("model is locked, can not create a plan one of plan unit," +
-				" a model is locked once a" +
-				" solution has been created using this model",
-			)
+			fmt.Errorf(lockErrorMessage, "plan single stop")
 	}
 
 	planSingleStop, err := newPlanSingleStop(len(m.planUnits), stop)
@@ -548,10 +532,7 @@ func (m *modelImpl) NewPlanSingleStop(stop ModelStop) (ModelPlanStopsUnit, error
 func (m *modelImpl) NewPlanSequence(stops ModelStops) (ModelPlanStopsUnit, error) {
 	if m.IsLocked() {
 		return nil,
-			fmt.Errorf("model is locked, can not create a plan sequence," +
-				" a model is locked once a" +
-				" solution has been created using this model",
-			)
+			fmt.Errorf(lockErrorMessage, "plan sequence")
 	}
 
 	directedAcyclicGraph := NewDirectedAcyclicGraph()
@@ -571,10 +552,7 @@ func (m *modelImpl) NewPlanMultipleStops(
 ) (ModelPlanStopsUnit, error) {
 	if m.IsLocked() {
 		return nil,
-			fmt.Errorf("model is locked, can not create multiple stops plan," +
-				" a model is locked once a" +
-				" solution has been created using this model",
-			)
+			fmt.Errorf(lockErrorMessage, "plan multiple stops")
 	}
 
 	planUnit, err := newPlanMultipleStops(len(m.planUnits), stops, sequence)
@@ -773,9 +751,7 @@ func (m *modelImpl) NewStop(
 ) (ModelStop, error) {
 	if m.isLocked {
 		return nil,
-			fmt.Errorf("model is isLocked, a model is" +
-				" isLocked once a solution has been created using" +
-				" this model")
+			fmt.Errorf(lockErrorMessage, "stop")
 	}
 
 	stop := &stopImpl{

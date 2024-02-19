@@ -92,11 +92,10 @@ func (s *solverWrapperImpl) Solve(
 	startSolutions ...Solution,
 ) (SolutionChannel, error) {
 	start := ctx.Value(run.Start).(time.Time)
-	ctx, cancel := context.WithDeadline(
+	ctx, _ = context.WithDeadline(
 		ctx,
 		start.Add(solveOptions.Duration),
 	)
-	defer cancel()
 	interpretedSolveOptions := SolveOptions{
 		Iterations: solveOptions.Iterations,
 		Duration:   solveOptions.Duration,
