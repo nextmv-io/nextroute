@@ -1,3 +1,4 @@
+// Package check contains the schema for the check configuration.
 package check
 
 import "strings"
