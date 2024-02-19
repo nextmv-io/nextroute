@@ -4,9 +4,8 @@ package common
 import (
 	"fmt"
 	"math"
-	"time"
-
 	"slices"
+	"time"
 
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
 )

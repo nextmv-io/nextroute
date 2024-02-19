@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Input is the default input schema for
+// Input is the default input schema for nextroute.
 type Input struct {
 	// Options arbitrary options.
 	Options any `json:"options,omitempty"`
