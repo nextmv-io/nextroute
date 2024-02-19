@@ -1,7 +1,7 @@
 name: json lint
 on: [push]
 jobs:
-  lint:
+  json-lint:
     runs-on: ubuntu-latest
     steps:
       - name: git clone

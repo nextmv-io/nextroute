@@ -1,7 +1,7 @@
 name: go lint
 on: [push]
 jobs:
-  lint:
+  go-lint:
     runs-on: ubuntu-latest
     steps:
       - name: git clone
