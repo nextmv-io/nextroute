@@ -1,15 +1,15 @@
-// Package main allows you to run a nextroute solver from the command line
-// without the need of compiling plugins.
+// package main holds the implementation of the nextroute template.
 package main
 
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/nextroute/check"
+	"github.com/nextmv-io/nextroute/common"
 	"github.com/nextmv-io/nextroute/factory"
-
 	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/run"
 	runSchema "github.com/nextmv-io/sdk/run/schema"
@@ -38,6 +38,53 @@ func solver(
 	model, err := factory.NewModel(input, options.Model)
 	if err != nil {
 		return runSchema.Output{}, err
+	}
+
+	haversineExpression := nextroute.NewHaversineExpression()
+	defaultDurationExpression := nextroute.NewTravelDurationExpression(
+		haversineExpression,
+		common.NewSpeed(10, common.MetersPerSecond),
+	)
+
+	slowDurationExpression := nextroute.NewScaledDurationExpression(defaultDurationExpression, 2.0)
+
+	timeDependentExpression, err := nextroute.NewTimeDependentDurationExpression(
+		model,
+		defaultDurationExpression,
+	)
+	if err != nil {
+		return runSchema.Output{}, err
+	}
+
+	s1 := time.Date(2023, 1, 1, 6, 30, 0, 0, time.UTC)
+	e1 := time.Date(2023, 1, 1, 9, 30, 0, 0, time.UTC)
+
+	err = timeDependentExpression.SetExpression(
+		s1,
+		e1,
+		slowDurationExpression,
+	)
+	if err != nil {
+		return runSchema.Output{}, err
+	}
+
+	s2 := time.Date(2023, 1, 1, 17, 30, 0, 0, time.UTC)
+	e2 := time.Date(2023, 1, 1, 19, 30, 0, 0, time.UTC)
+
+	err = timeDependentExpression.SetExpression(
+		s2,
+		e2,
+		slowDurationExpression,
+	)
+	if err != nil {
+		return runSchema.Output{}, err
+	}
+
+	for _, v := range model.Vehicles() {
+		err := v.VehicleType().SetTravelDurationExpression(timeDependentExpression)
+		if err != nil {
+			return runSchema.Output{}, err
+		}
 	}
 
 	solver, err := nextroute.NewParallelSolver(model)

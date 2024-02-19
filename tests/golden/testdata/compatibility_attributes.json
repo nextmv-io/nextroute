@@ -1,0 +1,62 @@
+{
+  "defaults": {
+    "vehicles": {
+      "speed": 20
+    }
+  },
+  "stops": [
+    {
+      "id": "Fushimi Inari Taisha",
+      "location": { "lon": 135.772695, "lat": 34.967146 }
+    },
+    {
+      "id": "Kiyomizu-dera",
+      "location": { "lon": 135.78506, "lat": 34.994857 }
+    },
+    {
+      "id": "Nijō Castle",
+      "location": { "lon": 135.748134, "lat": 35.014239 },
+      "compatibility_attributes": ["level_1"]
+    },
+    {
+      "id": "Kyoto Imperial Palace",
+      "location": { "lon": 135.762057, "lat": 35.025431 },
+      "compatibility_attributes": ["level_1"]
+    },
+    {
+      "id": "Gionmachi",
+      "location": { "lon": 135.775682, "lat": 35.002457 },
+      "compatibility_attributes": ["level_2"]
+    },
+    {
+      "id": "Kinkaku-ji",
+      "location": { "lon": 135.728898, "lat": 35.039705 },
+      "compatibility_attributes": ["level_2"]
+    },
+    {
+      "id": "Arashiyama Bamboo Forest",
+      "location": { "lon": 135.672009, "lat": 35.017209 },
+      "compatibility_attributes": ["level_3"]
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1",
+      "start_location": { "lon": 135.772695, "lat": 34.967146 }
+    },
+    {
+      "id": "v2",
+      "compatibility_attributes": ["level_1"],
+      "start_location": { "lon": 135.762057, "lat": 35.025431 }
+    },
+    {
+      "id": "v3",
+      "compatibility_attributes": ["level_1", "level_2"],
+      "start_location": { "lon": 135.78506, "lat": 34.994857 }
+    },
+    {
+      "id": "v4",
+      "compatibility_attributes": ["level_3"]
+    }
+  ]
+}

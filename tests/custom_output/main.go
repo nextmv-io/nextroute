@@ -1,5 +1,4 @@
-// Package main allows you to run a nextroute solver from the command line
-// without the need of compiling plugins.
+// package main holds the implementation of the nextroute template.
 package main
 
 import (
@@ -9,10 +8,8 @@ import (
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/nextroute/check"
 	"github.com/nextmv-io/nextroute/factory"
-
 	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/run"
-	runSchema "github.com/nextmv-io/sdk/run/schema"
 )
 
 func main() {
@@ -34,34 +31,39 @@ func solver(
 	ctx context.Context,
 	input schema.Input,
 	options options,
-) (runSchema.Output, error) {
+) (customOutput, error) {
 	model, err := factory.NewModel(input, options.Model)
 	if err != nil {
-		return runSchema.Output{}, err
+		return customOutput{}, err
 	}
 
 	solver, err := nextroute.NewParallelSolver(model)
 	if err != nil {
-		return runSchema.Output{}, err
+		return customOutput{}, err
 	}
 
 	solutions, err := solver.Solve(ctx, options.Solve)
 	if err != nil {
-		return runSchema.Output{}, err
+		return customOutput{}, err
 	}
 	last := solutions.Last()
+	out := toOutput(last)
 
-	output, err := check.Format(
-		ctx,
-		options,
-		options.Check,
-		solver,
-		last,
-	)
-	if err != nil {
-		return runSchema.Output{}, err
+	return out, nil
+}
+
+type customOutput struct {
+	Custom string  `json:"custom,omitempty"`
+	Value  float64 `json:"value,omitempty"`
+}
+
+func toOutput(solution nextroute.Solution) customOutput {
+	value := 0.0
+	for _, t := range solution.Model().Objective().Terms() {
+		value += solution.ObjectiveValue(t.Objective())
 	}
-	output.Statistics.Result.Custom = factory.DefaultCustomResultStatistics(last)
-
-	return output, nil
+	return customOutput{
+		Custom: "hello world",
+		Value:  value,
+	}
 }

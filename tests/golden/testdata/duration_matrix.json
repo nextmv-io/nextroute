@@ -1,0 +1,28 @@
+{
+  "duration_matrix": [
+    [0, 720, 1020, 0, 0],
+    [720, 0, 660, 0, 0],
+    [1020, 660, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0]
+  ],
+  "stops": [
+    {
+      "id": "Fushimi Inari Taisha",
+      "location": { "lon": 135.772695, "lat": 34.967146 }
+    },
+    {
+      "id": "Kiyomizu-dera",
+      "location": { "lon": 135.78506, "lat": 34.994857 }
+    },
+    {
+      "id": "Nijō Castle",
+      "location": { "lon": 135.748134, "lat": 35.014239 }
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1"
+    }
+  ]
+}

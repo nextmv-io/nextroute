@@ -1,5 +1,4 @@
-// Package main allows you to run a nextroute solver from the command line
-// without the need of compiling plugins.
+// package main holds the implementation of the nextroute template.
 package main
 
 import (
@@ -9,7 +8,6 @@ import (
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/nextroute/check"
 	"github.com/nextmv-io/nextroute/factory"
-
 	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/run"
 	runSchema "github.com/nextmv-io/sdk/run/schema"
@@ -35,6 +33,11 @@ func solver(
 	input schema.Input,
 	options options,
 ) (runSchema.Output, error) {
+	// Customize options in the code.
+	options.Solve.StartSolutions = 0
+	options.Solve.Iterations = 0
+	options.Check.Verbosity = "high"
+
 	model, err := factory.NewModel(input, options.Model)
 	if err != nil {
 		return runSchema.Output{}, err
@@ -51,13 +54,7 @@ func solver(
 	}
 	last := solutions.Last()
 
-	output, err := check.Format(
-		ctx,
-		options,
-		options.Check,
-		solver,
-		last,
-	)
+	output, err := check.Format(ctx, options, options.Check, solver, last)
 	if err != nil {
 		return runSchema.Output{}, err
 	}

@@ -1,0 +1,46 @@
+{
+  "defaults": {
+    "stops": {
+      "unplanned_penalty": 20000,
+      "duration": 600
+    }
+  },
+  "stops": [
+    {
+      "id": "stop1",
+      "location": { "lat": 51.9636, "lon": 7.6293 }
+    },
+    {
+      "id": "stop2",
+      "location": { "lat": 51.9635, "lon": 7.6439 }
+    },
+    {
+      "id": "stop3",
+      "location": { "lat": 51.9635, "lon": 7.6585 }
+    },
+    {
+      "id": "stop4",
+      "location": { "lat": 51.9635, "lon": 7.6731 }
+    },
+    {
+      "id": "stop5",
+      "location": { "lat": 51.9635, "lon": 7.6877 }
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1",
+      "speed": 200,
+      "start_time": "2023-01-01T12:00:00Z",
+      "start_location": { "lat": 51.9635, "lon": 7.7023 },
+      "initial_stops": [
+        { "id": "stop1" },
+        { "id": "stop2" },
+        { "id": "stop3" },
+        { "id": "stop4" },
+        { "id": "stop5", "fixed": true }
+      ],
+      "max_duration": 2100
+    }
+  ]
+}
