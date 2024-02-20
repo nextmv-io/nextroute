@@ -738,7 +738,7 @@ func TestNoMixConstraint_ArgumentMismatch(t *testing.T) {
 		_, err = nextroute.NewSolution(model)
 		if err == nil {
 			t.Fatal("should not be possible to create constraint with" +
-				" sum insert and remove not equal per plan-unit")
+				" sum insert and remove not equal across plan-units")
 		}
 	}
 	{
@@ -761,8 +761,7 @@ func TestNoMixConstraint_ArgumentMismatch(t *testing.T) {
 		}
 		_, err = nextroute.NewSolution(model)
 		if err == nil {
-			t.Fatal("should not be possible to create constraint with" +
-				" sum insert and remove not equal per plan-unit")
+			t.Fatal("should not be possible to create constraint with missing pickup")
 		}
 	}
 	{
@@ -787,8 +786,7 @@ func TestNoMixConstraint_ArgumentMismatch(t *testing.T) {
 		}
 		_, err = nextroute.NewSolution(model)
 		if err == nil {
-			t.Fatal("should not be possible to create constraint with" +
-				" different types per plan-unit")
+			t.Fatal("should not be possible to create constraint with different types per plan-unit")
 		}
 	}
 }

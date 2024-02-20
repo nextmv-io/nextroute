@@ -1,0 +1,51 @@
+{
+  "defaults": {
+    "vehicles": {
+      "start_time": "2023-01-01T12:00:00Z",
+      "speed": 200
+    },
+    "stops": {
+      "duration": 600
+    }
+  },
+  "stops": [
+    {
+      "id": "stop1",
+      "location": { "lat": 51.96239909784941, "lon": 7.640195127867031 },
+      "precedes": "stop3"
+    },
+    {
+      "id": "stop2",
+      "location": { "lat": 51.96239639139782, "lon": 7.654790254559089 }
+    },
+    {
+      "id": "stop3",
+      "location": { "lat": 51.96239188064561, "lon": 7.669385378901211 },
+      "start_time_window": ["2023-01-01T12:20:00Z", "2023-01-01T12:25:00Z"],
+      "max_wait": 60
+    },
+    {
+      "id": "stop4",
+      "location": { "lat": 51.94899909828405, "lon": 7.653490766493093 }
+    },
+    {
+      "id": "stop5",
+      "location": { "lat": 51.948996393136326, "lon": 7.6680815318127316 }
+    },
+    {
+      "id": "stop6",
+      "location": { "lat": 51.948991884557245, "lon": 7.6826722947853625 },
+      "start_time_window": ["2023-01-01T12:00:00Z", "2023-01-01T12:05:00Z"]
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1",
+      "initial_stops": [{ "id": "stop1" }, { "id": "stop2" }, { "id": "stop3" }]
+    },
+    {
+      "id": "v2",
+      "initial_stops": [{ "id": "stop4" }, { "id": "stop5" }, { "id": "stop6" }]
+    }
+  ]
+}

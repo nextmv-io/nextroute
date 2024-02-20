@@ -1,0 +1,77 @@
+{
+  "stops": [
+    {
+      "id": "Fushimi Inari Taisha",
+      "location": { "lon": 135.772695, "lat": 34.967146 },
+      "precedes": "Kiyomizu-dera",
+      "mixing_items": {
+        "hazchem": {
+          "name": "F-A-W-E",
+          "quantity": 1
+        }
+      }
+    },
+    {
+      "id": "Kiyomizu-dera",
+      "location": { "lon": 135.78506, "lat": 34.994857 },
+      "mixing_items": {
+        "hazchem": {
+          "name": "F-A-W-E",
+          "quantity": -1
+        }
+      }
+    },
+    {
+      "id": "Nijō Castle",
+      "location": { "lon": 135.748134, "lat": 35.014239 },
+      "precedes": "Kyoto Imperial Palace",
+      "mixing_items": {
+        "hazchem": {
+          "name": "S-P-W-E",
+          "quantity": 1
+        }
+      }
+    },
+    {
+      "id": "Kyoto Imperial Palace",
+      "location": { "lon": 135.762057, "lat": 35.025431 },
+      "mixing_items": {
+        "hazchem": {
+          "name": "S-P-W-E",
+          "quantity": -1
+        }
+      }
+    },
+    {
+      "id": "Gionmachi",
+      "location": { "lon": 135.775682, "lat": 35.002457 },
+      "precedes": "Kinkaku-ji",
+      "mixing_items": {
+        "hazchem": {
+          "name": "S-P-W-E",
+          "quantity": 1
+        }
+      }
+    },
+    {
+      "id": "Kinkaku-ji",
+      "location": { "lon": 135.728898, "lat": 35.039705 },
+      "mixing_items": {
+        "hazchem": {
+          "name": "S-P-W-E",
+          "quantity": -1
+        }
+      }
+    },
+    {
+      "id": "Arashiyama Bamboo Forest",
+      "location": { "lon": 135.672009, "lat": 35.017209 }
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1",
+      "speed": 20
+    }
+  ]
+}

@@ -1,0 +1,474 @@
+{
+  "options": {
+    "check": {
+      "duration": 30000000000,
+      "verbosity": "off"
+    },
+    "format": {
+      "disable": {
+        "progression": true
+      }
+    },
+    "model": {
+      "constraints": {
+        "disable": {
+          "attributes": false,
+          "capacities": null,
+          "capacity": false,
+          "distance_limit": false,
+          "groups": false,
+          "maximum_duration": false,
+          "maximum_stops": false,
+          "maximum_wait_stop": false,
+          "maximum_wait_vehicle": false,
+          "mixing_items": false,
+          "precedence": false,
+          "start_time_windows": false,
+          "vehicle_end_time": false,
+          "vehicle_start_time": false
+        },
+        "enable": {
+          "cluster": false
+        }
+      },
+      "objectives": {
+        "capacities": "",
+        "cluster": 0,
+        "early_arrival_penalty": 1,
+        "late_arrival_penalty": 1,
+        "min_stops": 1,
+        "travel_duration": 0,
+        "unplanned_penalty": 1,
+        "vehicle_activation_penalty": 1,
+        "vehicles_duration": 1
+      },
+      "properties": {
+        "disable": {
+          "duration_groups": false,
+          "durations": false,
+          "initial_solution": false,
+          "stop_duration_multipliers": false
+        }
+      },
+      "validate": {
+        "disable": {
+          "resources": false,
+          "start_time": false
+        },
+        "enable": {
+          "matrix": false,
+          "matrix_asymmetry_tolerance": 20
+        }
+      }
+    },
+    "solve": {
+      "duration": 10000000000,
+      "iterations": 50,
+      "parallel_runs": 1,
+      "run_deterministically": true,
+      "start_solutions": 1
+    }
+  },
+  "solutions": [
+    {
+      "objective": {
+        "name": "1 * vehicles_duration + 1 * unplanned_penalty + 1 * early_arrival_penalty + 1 * late_arrival_penalty",
+        "objectives": [
+          {
+            "base": 6192.244272708893,
+            "factor": 1,
+            "name": "vehicles_duration",
+            "value": 6192.244272708893
+          },
+          {
+            "factor": 1,
+            "name": "unplanned_penalty",
+            "value": 0
+          },
+          {
+            "factor": 1,
+            "name": "early_arrival_penalty",
+            "value": 0
+          },
+          {
+            "base": 3327092.8730487823,
+            "factor": 1,
+            "name": "late_arrival_penalty",
+            "value": 3327092.8730487823
+          }
+        ],
+        "value": 3333285.1173214912
+      },
+      "unplanned": [],
+      "vehicles": [
+        {
+          "id": "f58d08e1-c76e-4069-84f2-5bf1f91cb5af",
+          "route": [
+            {
+              "arrival_time": "2023-08-14T04:50:58Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-08-14T04:50:58Z",
+              "start_time": "2023-08-14T04:50:58Z",
+              "stop": {
+                "id": "f58d08e1-c76e-4069-84f2-5bf1f91cb5af-start",
+                "location": {
+                  "lat": 36.54117456741561,
+                  "lon": 26.339803225684133
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "arrival_time": "2023-08-14T04:50:58Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-08-14T04:50:58Z",
+              "late_arrival_duration": 357,
+              "start_time": "2023-08-14T04:50:58Z",
+              "stop": {
+                "id": "f58d08e1-c76e-4069-84f2-5bf1f91cb5af-start-pickup",
+                "location": {
+                  "lat": 36.54117456741561,
+                  "lon": 26.339803225684133
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:45:00.591503Z",
+              "travel_duration": 0
+            },
+            {
+              "arrival_time": "2023-08-14T04:55:56Z",
+              "cumulative_travel_distance": 1194,
+              "cumulative_travel_duration": 298,
+              "duration": 90,
+              "end_time": "2023-08-14T04:57:26Z",
+              "late_arrival_duration": 766,
+              "start_time": "2023-08-14T04:55:56Z",
+              "stop": {
+                "id": "67259CDYWF-DROP_OFF",
+                "location": {
+                  "lat": 36.545800386888374,
+                  "lon": 26.351867507809075
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:43:09.749692Z",
+              "travel_distance": 1194,
+              "travel_duration": 298
+            },
+            {
+              "arrival_time": "2023-08-14T05:06:52Z",
+              "cumulative_travel_distance": 3459,
+              "cumulative_travel_duration": 864,
+              "duration": 180,
+              "end_time": "2023-08-14T05:09:52Z",
+              "late_arrival_duration": 961,
+              "start_time": "2023-08-14T05:06:52Z",
+              "stop": {
+                "id": "6725EE3X1S-PICK_UP",
+                "location": {
+                  "lat": 36.566128234355254,
+                  "lon": 26.35361626659969
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:50:51Z",
+              "travel_distance": 2265,
+              "travel_duration": 566
+            },
+            {
+              "arrival_time": "2023-08-14T05:21:22Z",
+              "cumulative_travel_distance": 6215,
+              "cumulative_travel_duration": 1554,
+              "duration": 90,
+              "end_time": "2023-08-14T05:22:52Z",
+              "late_arrival_duration": 2530,
+              "start_time": "2023-08-14T05:21:22Z",
+              "stop": {
+                "id": "6725C6378Q-PICK_UP",
+                "location": {
+                  "lat": 36.57730697190387,
+                  "lon": 26.381170639727394
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:39:11.264097Z",
+              "travel_distance": 2756,
+              "travel_duration": 689
+            },
+            {
+              "arrival_time": "2023-08-14T05:24:13Z",
+              "cumulative_travel_distance": 6540,
+              "cumulative_travel_duration": 1635,
+              "duration": 90,
+              "end_time": "2023-08-14T05:25:43Z",
+              "late_arrival_duration": 3950,
+              "start_time": "2023-08-14T05:24:13Z",
+              "stop": {
+                "id": "6725782PZY-PICK_UP",
+                "location": {
+                  "lat": 36.57622921586711,
+                  "lon": 26.38456105888973
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:18:22.347629Z",
+              "travel_distance": 325,
+              "travel_duration": 81
+            },
+            {
+              "arrival_time": "2023-08-14T05:42:14Z",
+              "cumulative_travel_distance": 10503,
+              "cumulative_travel_duration": 2626,
+              "duration": 180,
+              "end_time": "2023-08-14T05:45:14Z",
+              "late_arrival_duration": 2183,
+              "start_time": "2023-08-14T05:42:14Z",
+              "stop": {
+                "id": "6725EE3X1S-DROP_OFF",
+                "location": {
+                  "lat": 36.55033217318192,
+                  "lon": 26.354067929305888
+                }
+              },
+              "target_arrival_time": "2023-08-14T05:05:51Z",
+              "travel_distance": 3963,
+              "travel_duration": 990
+            },
+            {
+              "arrival_time": "2023-08-14T05:47:29Z",
+              "cumulative_travel_distance": 11043,
+              "cumulative_travel_duration": 2761,
+              "duration": 90,
+              "end_time": "2023-08-14T05:48:59Z",
+              "late_arrival_duration": 3197,
+              "start_time": "2023-08-14T05:47:29Z",
+              "stop": {
+                "id": "6725C6378Q-DROP_OFF",
+                "location": {
+                  "lat": 36.545800386888374,
+                  "lon": 26.351867507809075
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:54:11.264097Z",
+              "travel_distance": 540,
+              "travel_duration": 135
+            },
+            {
+              "arrival_time": "2023-08-14T05:48:59Z",
+              "cumulative_travel_distance": 11043,
+              "cumulative_travel_duration": 2761,
+              "duration": 90,
+              "end_time": "2023-08-14T05:50:29Z",
+              "late_arrival_duration": 4536,
+              "start_time": "2023-08-14T05:48:59Z",
+              "stop": {
+                "id": "6725782PZY-DROP_OFF",
+                "location": {
+                  "lat": 36.545800386888374,
+                  "lon": 26.351867507809075
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:33:22.347629Z",
+              "travel_duration": 0
+            }
+          ],
+          "route_duration": 3571,
+          "route_stops_duration": 810,
+          "route_travel_distance": 11043,
+          "route_travel_duration": 2761
+        },
+        {
+          "id": "b5fdf5fa-5022-46de-84e1-1bdf360c5e61",
+          "route": [
+            {
+              "arrival_time": "2023-08-14T04:49:19Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-08-14T04:49:19Z",
+              "start_time": "2023-08-14T04:49:19Z",
+              "stop": {
+                "id": "b5fdf5fa-5022-46de-84e1-1bdf360c5e61-start",
+                "location": {
+                  "lat": 36.579638979635,
+                  "lon": 26.36896132086359
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "arrival_time": "2023-08-14T04:49:19Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-08-14T04:49:19Z",
+              "late_arrival_duration": 258,
+              "start_time": "2023-08-14T04:49:19Z",
+              "stop": {
+                "id": "b5fdf5fa-5022-46de-84e1-1bdf360c5e61-start-pickup",
+                "location": {
+                  "lat": 36.579638979635,
+                  "lon": 26.36896132086359
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:45:00.598768Z",
+              "travel_duration": 0
+            },
+            {
+              "arrival_time": "2023-08-14T04:53:59Z",
+              "cumulative_travel_distance": 1120,
+              "cumulative_travel_duration": 280,
+              "duration": 90,
+              "end_time": "2023-08-14T04:55:29Z",
+              "late_arrival_duration": 833,
+              "start_time": "2023-08-14T04:53:59Z",
+              "stop": {
+                "id": "6725C99WQR-PICK_UP",
+                "location": {
+                  "lat": 36.57730697190387,
+                  "lon": 26.381170639727394
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:40:05.194858Z",
+              "travel_distance": 1120,
+              "travel_duration": 280
+            },
+            {
+              "arrival_time": "2023-08-14T05:12:29Z",
+              "cumulative_travel_distance": 5201,
+              "cumulative_travel_duration": 1300,
+              "duration": 270,
+              "end_time": "2023-08-14T05:16:59Z",
+              "late_arrival_duration": 1596,
+              "start_time": "2023-08-14T05:12:29Z",
+              "stop": {
+                "id": "67252B6AU7-DROP_OFF",
+                "location": {
+                  "lat": 36.5469121396049,
+                  "lon": 26.355559253425483
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:45:53Z",
+              "travel_distance": 4081,
+              "travel_duration": 1020
+            },
+            {
+              "arrival_time": "2023-08-14T05:18:14Z",
+              "cumulative_travel_distance": 5501,
+              "cumulative_travel_duration": 1375,
+              "duration": 90,
+              "end_time": "2023-08-14T05:19:44Z",
+              "late_arrival_duration": 1430,
+              "start_time": "2023-08-14T05:18:14Z",
+              "stop": {
+                "id": "6725FF3BY5-PICK_UP",
+                "location": {
+                  "lat": 36.54955608987272,
+                  "lon": 26.354841051021616
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:54:23.965466Z",
+              "travel_distance": 300,
+              "travel_duration": 75
+            },
+            {
+              "arrival_time": "2023-08-14T05:21:17Z",
+              "cumulative_travel_distance": 5873,
+              "cumulative_travel_duration": 1468,
+              "duration": 90,
+              "end_time": "2023-08-14T05:22:47Z",
+              "late_arrival_duration": 1323,
+              "start_time": "2023-08-14T05:21:17Z",
+              "stop": {
+                "id": "67261158NH-PICK_UP",
+                "location": {
+                  "lat": 36.54853950288169,
+                  "lon": 26.350871714738275
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:59:13.978563Z",
+              "travel_distance": 372,
+              "travel_duration": 93
+            },
+            {
+              "arrival_time": "2023-08-14T05:24:07Z",
+              "cumulative_travel_distance": 6190,
+              "cumulative_travel_duration": 1548,
+              "duration": 90,
+              "end_time": "2023-08-14T05:25:37Z",
+              "late_arrival_duration": 1741,
+              "start_time": "2023-08-14T05:24:07Z",
+              "stop": {
+                "id": "6725C99WQR-DROP_OFF",
+                "location": {
+                  "lat": 36.545800386888374,
+                  "lon": 26.351867507809075
+                }
+              },
+              "target_arrival_time": "2023-08-14T04:55:05.194858Z",
+              "travel_distance": 317,
+              "travel_duration": 79
+            },
+            {
+              "arrival_time": "2023-08-14T05:26:24Z",
+              "cumulative_travel_distance": 6379,
+              "cumulative_travel_duration": 1595,
+              "duration": 90,
+              "end_time": "2023-08-14T05:27:54Z",
+              "late_arrival_duration": 1020,
+              "start_time": "2023-08-14T05:26:24Z",
+              "stop": {
+                "id": "6725FF3BY5-DROP_OFF",
+                "location": {
+                  "lat": 36.54444696712649,
+                  "lon": 26.350574660089876
+                }
+              },
+              "target_arrival_time": "2023-08-14T05:09:23.965466Z",
+              "travel_distance": 189,
+              "travel_duration": 47
+            },
+            {
+              "arrival_time": "2023-08-14T05:31:29Z",
+              "cumulative_travel_distance": 7239,
+              "cumulative_travel_duration": 1810,
+              "duration": 90,
+              "end_time": "2023-08-14T05:32:59Z",
+              "late_arrival_duration": 1035,
+              "start_time": "2023-08-14T05:31:29Z",
+              "stop": {
+                "id": "67261158NH-DROP_OFF",
+                "location": {
+                  "lat": 36.54171597174676,
+                  "lon": 26.341562225094144
+                }
+              },
+              "target_arrival_time": "2023-08-14T05:14:13.978563Z",
+              "travel_distance": 860,
+              "travel_duration": 215
+            }
+          ],
+          "route_duration": 2620,
+          "route_stops_duration": 810,
+          "route_travel_distance": 7239,
+          "route_travel_duration": 1810
+        }
+      ]
+    }
+  ],
+  "statistics": {
+    "result": {
+      "custom": {
+        "activated_vehicles": 2,
+        "max_duration": 3571,
+        "max_stops_in_vehicle": 8,
+        "max_travel_duration": 2761,
+        "min_duration": 2620,
+        "min_stops_in_vehicle": 8,
+        "min_travel_duration": 1810,
+        "unplanned_stops": 0
+      },
+      "duration": 0.123,
+      "value": 3333285.1173214912
+    },
+    "run": {
+      "duration": 0.123,
+      "iterations": 50
+    },
+    "schema": "v1"
+  },
+  "version": {
+    "sdk": "VERSION"
+  }
+}

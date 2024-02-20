@@ -1,0 +1,262 @@
+{
+  "options": {
+    "check": {
+      "duration": 30000000000,
+      "verbosity": "off"
+    },
+    "format": {
+      "disable": {
+        "progression": true
+      }
+    },
+    "model": {
+      "constraints": {
+        "disable": {
+          "attributes": false,
+          "capacities": null,
+          "capacity": false,
+          "distance_limit": false,
+          "groups": false,
+          "maximum_duration": false,
+          "maximum_stops": false,
+          "maximum_wait_stop": false,
+          "maximum_wait_vehicle": false,
+          "mixing_items": false,
+          "precedence": false,
+          "start_time_windows": false,
+          "vehicle_end_time": false,
+          "vehicle_start_time": false
+        },
+        "enable": {
+          "cluster": false
+        }
+      },
+      "objectives": {
+        "capacities": "",
+        "cluster": 0,
+        "early_arrival_penalty": 1,
+        "late_arrival_penalty": 1,
+        "min_stops": 1,
+        "travel_duration": 0,
+        "unplanned_penalty": 1,
+        "vehicle_activation_penalty": 1,
+        "vehicles_duration": 1
+      },
+      "properties": {
+        "disable": {
+          "duration_groups": false,
+          "durations": false,
+          "initial_solution": false,
+          "stop_duration_multipliers": false
+        }
+      },
+      "validate": {
+        "disable": {
+          "resources": false,
+          "start_time": false
+        },
+        "enable": {
+          "matrix": false,
+          "matrix_asymmetry_tolerance": 20
+        }
+      }
+    },
+    "solve": {
+      "duration": 10000000000,
+      "iterations": 50,
+      "parallel_runs": 1,
+      "run_deterministically": true,
+      "start_solutions": 1
+    }
+  },
+  "solutions": [
+    {
+      "objective": {
+        "name": "1 * vehicles_duration + 1 * unplanned_penalty",
+        "objectives": [
+          {
+            "base": 823.605193191854,
+            "factor": 1,
+            "name": "vehicles_duration",
+            "value": 823.605193191854
+          },
+          {
+            "factor": 1,
+            "name": "unplanned_penalty",
+            "value": 0
+          }
+        ],
+        "value": 823.605193191854
+      },
+      "unplanned": [],
+      "vehicles": [
+        {
+          "id": "v1",
+          "route": [
+            {
+              "cumulative_travel_duration": 0,
+              "stop": {
+                "id": "v1-start",
+                "location": {
+                  "lat": 34.967146,
+                  "lon": 135.772695
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "cumulative_travel_duration": 0,
+              "stop": {
+                "id": "Fushimi Inari Taisha",
+                "location": {
+                  "lat": 34.967146,
+                  "lon": 135.772695
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "cumulative_travel_distance": 3280,
+              "cumulative_travel_duration": 164,
+              "stop": {
+                "id": "Kiyomizu-dera",
+                "location": {
+                  "lat": 34.994857,
+                  "lon": 135.78506
+                }
+              },
+              "travel_distance": 3280,
+              "travel_duration": 164
+            }
+          ],
+          "route_duration": 164,
+          "route_travel_distance": 3280,
+          "route_travel_duration": 164
+        },
+        {
+          "id": "v2",
+          "route": [
+            {
+              "cumulative_travel_duration": 0,
+              "stop": {
+                "id": "v2-start",
+                "location": {
+                  "lat": 35.002457,
+                  "lon": 135.775682
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "cumulative_travel_duration": 0,
+              "stop": {
+                "id": "Gionmachi",
+                "location": {
+                  "lat": 35.002457,
+                  "lon": 135.775682
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "cumulative_travel_distance": 2839,
+              "cumulative_travel_duration": 141,
+              "stop": {
+                "id": "Kyoto Imperial Palace",
+                "location": {
+                  "lat": 35.025431,
+                  "lon": 135.762057
+                }
+              },
+              "travel_distance": 2839,
+              "travel_duration": 141
+            },
+            {
+              "cumulative_travel_distance": 6249,
+              "cumulative_travel_duration": 312,
+              "stop": {
+                "id": "Kinkaku-ji",
+                "location": {
+                  "lat": 35.039705,
+                  "lon": 135.728898
+                }
+              },
+              "travel_distance": 3410,
+              "travel_duration": 170
+            }
+          ],
+          "route_duration": 312,
+          "route_travel_distance": 6249,
+          "route_travel_duration": 312
+        },
+        {
+          "id": "v3",
+          "route": [
+            {
+              "cumulative_travel_duration": 0,
+              "stop": {
+                "id": "v3-start",
+                "location": {
+                  "lat": 35.017209,
+                  "lon": 135.672009
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "cumulative_travel_duration": 0,
+              "stop": {
+                "id": "Arashiyama Bamboo Forest",
+                "location": {
+                  "lat": 35.017209,
+                  "lon": 135.672009
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "cumulative_travel_distance": 6940,
+              "cumulative_travel_duration": 347,
+              "stop": {
+                "id": "Nijō Castle",
+                "location": {
+                  "lat": 35.014239,
+                  "lon": 135.748134
+                }
+              },
+              "travel_distance": 6940,
+              "travel_duration": 347
+            }
+          ],
+          "route_duration": 347,
+          "route_travel_distance": 6940,
+          "route_travel_duration": 347
+        }
+      ]
+    }
+  ],
+  "statistics": {
+    "result": {
+      "custom": {
+        "activated_vehicles": 3,
+        "max_duration": 347,
+        "max_stops_in_vehicle": 3,
+        "max_travel_duration": 347,
+        "min_duration": 164,
+        "min_stops_in_vehicle": 2,
+        "min_travel_duration": 164,
+        "unplanned_stops": 0
+      },
+      "duration": 0.123,
+      "value": 823.605193191854
+    },
+    "run": {
+      "duration": 0.123,
+      "iterations": 50
+    },
+    "schema": "v1"
+  },
+  "version": {
+    "sdk": "VERSION"
+  }
+}

@@ -1,3 +1,4 @@
+// Package schema contains the core schemas for nextroute.
 package schema
 
 // Output is the output of the  check.

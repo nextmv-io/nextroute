@@ -1,0 +1,52 @@
+{
+  "defaults": {
+    "vehicles": {
+      "speed": 5,
+      "start_time": "2023-01-01T12:00:00Z"
+    },
+    "stops": {
+      "unplanned_penalty": 20000,
+      "duration": 300
+    }
+  },
+  "stops": [
+    {
+      "id": "Fushimi Inari Taisha",
+      "location": { "lon": 135.772695, "lat": 34.967146 }
+    },
+    {
+      "id": "Kiyomizu-dera",
+      "location": { "lon": 135.78506, "lat": 34.994857 }
+    },
+    {
+      "id": "Nijō Castle",
+      "location": { "lon": 135.748134, "lat": 35.014239 }
+    },
+    {
+      "id": "Kyoto Imperial Palace",
+      "location": { "lon": 135.762057, "lat": 35.025431 }
+    },
+    {
+      "id": "Gionmachi",
+      "location": { "lon": 135.775682, "lat": 35.002457 }
+    },
+    {
+      "id": "Kinkaku-ji",
+      "location": { "lon": 135.728898, "lat": 35.039705 }
+    },
+    {
+      "id": "Arashiyama Bamboo Forest",
+      "location": { "lon": 135.672009, "lat": 35.017209 }
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1",
+      "max_duration": 1800
+    },
+    {
+      "id": "v2",
+      "max_duration": 1200
+    }
+  ]
+}
