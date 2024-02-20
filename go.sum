@@ -305,6 +305,8 @@ github.com/nextmv-io/sdk v1.3.1-0.20240219145622-e1dff93c1b6d h1:XWN6IvUPRUqNZ8g
 github.com/nextmv-io/sdk v1.3.1-0.20240219145622-e1dff93c1b6d/go.mod h1:lA3YgE1vdclPwQfPH3jFo76WXx5snk9XOWX2PCMO8cc=
 github.com/nextmv-io/sdk v1.3.1-0.20240219215142-f91aa22e1377 h1:+LyaM1mq5eOHE99CSDknMyZ99I2wGapbu5Nr3vLp63g=
 github.com/nextmv-io/sdk v1.3.1-0.20240219215142-f91aa22e1377/go.mod h1:lA3YgE1vdclPwQfPH3jFo76WXx5snk9XOWX2PCMO8cc=
+github.com/nextmv-io/sdk v1.3.1-0.20240220144909-88ba9907052f h1:OLDqQkL/FK8CX7//qZGa6A4rTnHqUPYBCMmlSupVvOk=
+github.com/nextmv-io/sdk v1.3.1-0.20240220144909-88ba9907052f/go.mod h1:lA3YgE1vdclPwQfPH3jFo76WXx5snk9XOWX2PCMO8cc=
 github.com/opentracing/opentracing-go v1.2.0/go.mod h1:GxEUsuufX4nBwe+T+Wl9TAgYrxe9dPLANfrWvHYVTgc=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pascaldekloe/goe v0.1.0/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
