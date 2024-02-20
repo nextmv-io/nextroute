@@ -1,3 +1,2 @@
-// Package nextroute provides a plugin that allows you to define routes for
-// vehicleTypes.
+// Package nextroute provides a solver for vehicle routing problems.
 package nextroute

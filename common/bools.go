@@ -1,4 +1,4 @@
-// Package common provides common functionality for the nextroute plugin.
+// Package common provides common functionality for nextroute.
 package common
 
 // Bools is a data structure for storing a sequence of booleans.

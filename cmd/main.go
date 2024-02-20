@@ -1,5 +1,4 @@
-// Package main allows you to run a nextroute solver from the command line
-// without the need of compiling plugins.
+// Package main allows you to run a nextroute solver from the command line.
 package main
 
 import (
