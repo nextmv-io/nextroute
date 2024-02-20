@@ -1,4 +1,4 @@
-name: json lint
+name: json
 on: [push]
 jobs:
   json-lint:

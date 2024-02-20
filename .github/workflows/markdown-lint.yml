@@ -1,4 +1,4 @@
-name: markdown lint
+name: markdown
 on: [push]
 jobs:
   markdown-lint:
