@@ -1,7 +1,7 @@
 # Options for analysis running. Details: https://golangci-lint.run/usage/configuration/#run-configuration
 run:
   timeout: 5m
-  go: "1.21"
+  go: "1.22"
 
 # Configures linters. Details: https://golangci-lint.run/usage/linters
 linters-settings:
@@ -12,43 +12,18 @@ linters-settings:
   gomodguard:
     allowed:
       modules:
-        - github.com/aws/aws-lambda-go
-        - github.com/aws/aws-sdk-go
-        - go.uber.org/mock
-        - github.com/google/uuid
-        - github.com/gruntwork-io/terratest
-        - github.com/hashicorp/go-version
-        - github.com/kinbiko/jsonassert
         - github.com/nextmv-io/sdk
-        - github.com/xeipuuv/gojsonschema
-        - github.com/onsi/gomega
-        - github.com/onsi/ginkgo/v2
-        - github.com/fsnotify/fsnotify
-        - github.com/magiconair/properties
-        - github.com/ulikunitz/xz
-        - github.com/spf13/cobra
-        - gopkg.in/yaml.v3
-        - google.golang.org/grpc
-        - github.com/spf13/viper
-        - github.com/charmbracelet/bubbles
-        - github.com/charmbracelet/lipgloss
-        - github.com/grpc-ecosystem/go-grpc-middleware
-        - github.com/tobgu/qframe
-        - github.com/vbauerster/mpb/v8
-        - github.com/teris-io/shortid
-        - github.com/danielgtaylor/huma
-        - golang.org/x/exp
         - gonum.org/v1/gonum
   # Functions cannot exceed this cyclomatic complexity.
   gocyclo:
     min-complexity: 20
   # Set correct go version.
   gosimple:
-    go: "1.21"
+    go: "1.22"
   staticcheck:
-    go: "1.21"
+    go: "1.22"
   stylecheck:
-    go: "1.21"
+    go: "1.22"
   # Check case of struct tags
   tagliatelle:
     case:
