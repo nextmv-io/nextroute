@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"slices"
 	"time"
 
 	"github.com/nextmv-io/sdk/alns"
-	"github.com/nextmv-io/sdk/common"
 	"github.com/nextmv-io/sdk/run"
 )
 
@@ -99,7 +99,7 @@ func (s *solveImpl) OnImprovement(solveInformation SolveInformation) {
 }
 
 func (s *solveImpl) Progression() []alns.ProgressionEntry {
-	return common.DefensiveCopy(s.progression)
+	return slices.Clone(s.progression)
 }
 
 func (s *solveImpl) Model() Model {

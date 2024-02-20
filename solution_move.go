@@ -3,8 +3,7 @@ package nextroute
 import (
 	"context"
 	"math"
-
-	"github.com/nextmv-io/sdk/common"
+	"slices"
 )
 
 // SolutionMove is a move in a solution.
@@ -150,12 +149,12 @@ func tryReplaceBy(dst, src SolutionMove, newValueSeen int) SolutionMove {
 	switch m := src.(type) {
 	case *solutionMoveStopsImpl:
 		m2 := *m
-		m2.stopPositions = common.DefensiveCopy(m.stopPositions)
+		m2.stopPositions = slices.Clone(m.stopPositions)
 		m2.valueSeen = newValueSeen
 		return &m2
 	case solutionMoveUnitsImpl:
 		m2 := m
-		m2.moves = common.DefensiveCopy(m.moves)
+		m2.moves = slices.Clone(m.moves)
 		m2.valueSeen = newValueSeen
 		return m2
 	}

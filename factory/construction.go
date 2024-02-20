@@ -7,6 +7,7 @@ import (
 	"math"
 	"math/rand"
 	"runtime"
+	"slices"
 	"sort"
 	"sync"
 	"time"
@@ -305,7 +306,7 @@ func NewStopCluster(
 		panic("cannot create stop cluster with no stops")
 	}
 	return stopCluster{
-		stops:    common.DefensiveCopy(stops),
+		stops:    slices.Clone(stops),
 		centroid: CentroidLocation(stops),
 	}
 }
@@ -882,14 +883,14 @@ func populateVehicle(
 				continue
 			}
 
-			initialStops := common.DefensiveCopy(*input.Vehicles[0].InitialStops)
+			initialStops := slices.Clone(*input.Vehicles[0].InitialStops)
 
 			newInputVehicle := input.Vehicles[0]
 			newInputVehicle.InitialStops = &initialStops
 
 			newInput := schema.Input{
 				Defaults: input.Defaults,
-				Stops:    common.DefensiveCopy(input.Stops),
+				Stops:    slices.Clone(input.Stops),
 				Vehicles: []schema.Vehicle{newInputVehicle},
 			}
 

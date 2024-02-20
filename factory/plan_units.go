@@ -2,6 +2,7 @@ package factory
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/nextmv-io/nextroute"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
@@ -114,7 +115,7 @@ type unitInformation struct {
 // allSequences returns all the sequences of stops that are related to each
 // other due to the precedence (pickups & deliveries) constraint.
 func allSequences(data modelData) [][]sequence {
-	dataSequences := common.DefensiveCopy(data.sequences)
+	dataSequences := slices.Clone(data.sequences)
 	if len(dataSequences) == 0 {
 		return [][]sequence{}
 	}

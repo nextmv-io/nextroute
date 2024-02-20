@@ -1,6 +1,8 @@
 package nextroute
 
 import (
+	"slices"
+
 	"github.com/nextmv-io/sdk/common"
 )
 
@@ -114,14 +116,14 @@ func (l *attributesConstraintImpl) String() string {
 
 func (l *attributesConstraintImpl) StopAttributes(stop ModelStop) []string {
 	if attributes, hasAttributes := l.stopAttributes[stop.Index()]; hasAttributes {
-		return common.DefensiveCopy(attributes)
+		return slices.Clone(attributes)
 	}
 	return []string{}
 }
 
 func (l *attributesConstraintImpl) VehicleTypeAttributes(vehicle ModelVehicleType) []string {
 	if attributes, hasAttributes := l.vehicleTypeAttributes[vehicle.Index()]; hasAttributes {
-		return common.DefensiveCopy(attributes)
+		return slices.Clone(attributes)
 	}
 	return []string{}
 }

@@ -3,6 +3,7 @@ package nextroute
 import (
 	"fmt"
 	"math"
+	"slices"
 	"strings"
 	"time"
 
@@ -179,7 +180,7 @@ func (t *timeDependentDurationExpressionImpl) Name() string {
 }
 
 func (t *timeDependentDurationExpressionImpl) Expressions() []DurationExpression {
-	return common.DefensiveCopy(t.expressions)
+	return slices.Clone(t.expressions)
 }
 
 func (t *timeDependentDurationExpressionImpl) Value(

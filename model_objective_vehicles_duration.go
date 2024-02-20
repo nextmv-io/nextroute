@@ -1,8 +1,6 @@
 package nextroute
 
-import (
-	"github.com/nextmv-io/sdk/common"
-)
+import "slices"
 
 // VehiclesDurationObjective is an objective that uses the vehicle duration as an
 // objective.
@@ -16,7 +14,7 @@ func NewVehiclesDurationObjective() VehiclesDurationObjective {
 }
 
 func (t *vehiclesDurationObjectiveImpl) Lock(model Model) error {
-	t.canIncurWaitingTime = common.HasTrue(model.Stops(), func(stop ModelStop) bool {
+	t.canIncurWaitingTime = slices.ContainsFunc(model.Stops(), func(stop ModelStop) bool {
 		return stop.(*stopImpl).canIncurWaitingTime()
 	})
 	vehicleTypes := model.VehicleTypes()

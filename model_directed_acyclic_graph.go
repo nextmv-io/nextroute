@@ -2,6 +2,7 @@ package nextroute
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/nextmv-io/sdk/common"
 )
@@ -90,7 +91,7 @@ func (d *directedAcyclicGraphImpl) AddArc(origin, destination ModelStop) error {
 }
 
 func (d *directedAcyclicGraphImpl) Arcs() Arcs {
-	return common.DefensiveCopy(d.arcs)
+	return slices.Clone(d.arcs)
 }
 
 func (d *directedAcyclicGraphImpl) updateColors(
@@ -197,7 +198,7 @@ func (d *directedAcyclicGraphImpl) ModelStops() ModelStops {
 }
 
 func (d *directedAcyclicGraphImpl) OutboundArcs(stop ModelStop) Arcs {
-	return common.DefensiveCopy(d.outboundArcs[stop.Index()])
+	return slices.Clone(d.outboundArcs[stop.Index()])
 }
 
 func (d *directedAcyclicGraphImpl) addEdge(u int, v int) {
