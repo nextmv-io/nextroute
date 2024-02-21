@@ -1,9 +1,8 @@
 package nextroute
 
 import (
+	"slices"
 	"sync"
-
-	"github.com/nextmv-io/sdk/common"
 )
 
 // SolutionStopGenerator is an iterator of solution stops.
@@ -40,7 +39,7 @@ func NewSolutionStopGenerator(
 		nextStop = move.StopPositions()[0].Previous()
 	}
 	return &solutionStopGeneratorImpl{
-		stopPositions:           common.DefensiveCopy(move.(*solutionMoveStopsImpl).stopPositions),
+		stopPositions:           slices.Clone(move.(*solutionMoveStopsImpl).stopPositions),
 		startAtFirst:            startAtFirst,
 		endAtLast:               endAtLast,
 		nextStop:                nextStop.(solutionStopImpl),

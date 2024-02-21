@@ -2,8 +2,7 @@ package nextroute
 
 import (
 	"fmt"
-
-	"github.com/nextmv-io/sdk/common"
+	"slices"
 )
 
 // SolutionPlanUnitsUnit is a set of solution plan units.
@@ -90,7 +89,7 @@ func (p *solutionPlanUnitsUnitImpl) Solution() Solution {
 }
 
 func (p *solutionPlanUnitsUnitImpl) SolutionPlanUnits() SolutionPlanUnits {
-	return common.DefensiveCopy(p.solutionPlanUnits)
+	return slices.Clone(p.solutionPlanUnits)
 }
 
 func (p *solutionPlanUnitsUnitImpl) IsPlanned() bool {

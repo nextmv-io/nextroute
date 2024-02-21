@@ -2,6 +2,7 @@ package nextroute
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/nextmv-io/sdk/common"
 )
@@ -59,7 +60,7 @@ func newPlanUnitsUnit(
 		modelDataImpl: newModelDataImpl(),
 		index:         index,
 		planOneOf:     planOneOf,
-		planUnits:     common.DefensiveCopy(planUnits),
+		planUnits:     slices.Clone(planUnits),
 		sameVehicle:   sameVehicle,
 	}
 

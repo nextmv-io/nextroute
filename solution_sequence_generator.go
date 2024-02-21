@@ -2,9 +2,8 @@ package nextroute
 
 import (
 	"math/rand"
+	"slices"
 	"sync/atomic"
-
-	"github.com/nextmv-io/sdk/common"
 )
 
 // SequenceGeneratorChannel generates all possible sequences of solution stops
@@ -75,7 +74,7 @@ func sequenceGenerator(
 ) {
 	if len(sequence) == len(stops) {
 		if atomic.AddInt64(maxSequences, -1) >= 0 {
-			yield(common.DefensiveCopy(sequence))
+			yield(slices.Clone(sequence))
 		}
 		return
 	}

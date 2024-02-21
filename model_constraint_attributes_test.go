@@ -1,6 +1,7 @@
 package nextroute_test
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/nextmv-io/nextroute"
@@ -76,7 +77,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 		t.Error(err)
 	}
 
-	truckIndex := common.FindIndex(solution.Vehicles(), func(solutionVehicle nextroute.SolutionVehicle) bool {
+	truckIndex := slices.IndexFunc(solution.Vehicles(), func(solutionVehicle nextroute.SolutionVehicle) bool {
 		return solutionVehicle.ModelVehicle().VehicleType().ID() == "truck"
 	})
 	if truckIndex == -1 {
@@ -84,7 +85,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 	}
 	truck := solution.Vehicles()[truckIndex]
 
-	carIndex := common.FindIndex(solution.Vehicles(), func(solutionVehicle nextroute.SolutionVehicle) bool {
+	carIndex := slices.IndexFunc(solution.Vehicles(), func(solutionVehicle nextroute.SolutionVehicle) bool {
 		return solutionVehicle.ModelVehicle().VehicleType().ID() == "car"
 	})
 	if carIndex == -1 {
@@ -92,7 +93,7 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 	}
 	car := solution.Vehicles()[carIndex]
 
-	bikeIndex := common.FindIndex(solution.Vehicles(), func(solutionVehicle nextroute.SolutionVehicle) bool {
+	bikeIndex := slices.IndexFunc(solution.Vehicles(), func(solutionVehicle nextroute.SolutionVehicle) bool {
 		return solutionVehicle.ModelVehicle().VehicleType().ID() == "bike"
 	})
 	if bikeIndex == -1 {
@@ -406,7 +407,7 @@ func TestAttributesConstraint(t *testing.T) {
 				len(attributes),
 			)
 		}
-		if !common.HasTrue(attributes, func(s string) bool {
+		if !slices.ContainsFunc(attributes, func(s string) bool {
 			return s == vehicleTypeAttributes[0]
 		}) {
 			t.Errorf(
@@ -415,7 +416,7 @@ func TestAttributesConstraint(t *testing.T) {
 				attributes,
 			)
 		}
-		if !common.HasTrue(attributes, func(s string) bool {
+		if !slices.ContainsFunc(attributes, func(s string) bool {
 			return s == vehicleTypeAttributes[1]
 		}) {
 			t.Errorf(
@@ -442,7 +443,7 @@ func TestAttributesConstraint(t *testing.T) {
 				len(attributes),
 			)
 		}
-		if !common.HasTrue(attributes, func(s string) bool {
+		if !slices.ContainsFunc(attributes, func(s string) bool {
 			return s == stopAttributes[0]
 		}) {
 			t.Errorf(
@@ -451,7 +452,7 @@ func TestAttributesConstraint(t *testing.T) {
 				attributes,
 			)
 		}
-		if !common.HasTrue(attributes, func(s string) bool {
+		if !slices.ContainsFunc(attributes, func(s string) bool {
 			return s == stopAttributes[1]
 		}) {
 			t.Errorf(

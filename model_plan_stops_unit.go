@@ -2,6 +2,7 @@ package nextroute
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/nextmv-io/sdk/common"
 )
@@ -88,7 +89,7 @@ func newPlanMultipleStops(
 	planUnit := &planMultipleStopsImpl{
 		modelDataImpl: newModelDataImpl(),
 		index:         index,
-		stops:         common.DefensiveCopy(modelStops),
+		stops:         slices.Clone(modelStops),
 		dag:           sequence,
 	}
 	inStops := make(map[int]bool)
@@ -185,7 +186,7 @@ func (p *planMultipleStopsImpl) NumberOfStops() int {
 }
 
 func (p *planMultipleStopsImpl) Stops() ModelStops {
-	return common.DefensiveCopy(p.stops)
+	return slices.Clone(p.stops)
 }
 
 func (p *planMultipleStopsImpl) DirectedAcyclicGraph() DirectedAcyclicGraph {

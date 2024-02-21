@@ -260,7 +260,7 @@ type modelImpl struct {
 }
 
 func (m *modelImpl) Vehicles() ModelVehicles {
-	return common.DefensiveCopy(m.vehicles)
+	return slices.Clone(m.vehicles)
 }
 
 func (m *modelImpl) SetRandom(random *rand.Rand) {
@@ -447,12 +447,12 @@ func (m *modelImpl) Epoch() time.Time {
 }
 
 func (m *modelImpl) Constraints() ModelConstraints {
-	return common.DefensiveCopy(m.constraints)
+	return slices.Clone(m.constraints)
 }
 
 func (m *modelImpl) ConstraintsCheckedAt(violation CheckedAt) ModelConstraints {
 	if constraints, ok := m.constraintMap[violation]; ok {
-		return common.DefensiveCopy(constraints)
+		return slices.Clone(constraints)
 	}
 	return make(ModelConstraints, 0)
 }
@@ -566,7 +566,7 @@ func (m *modelImpl) NewPlanMultipleStops(
 }
 
 func (m *modelImpl) PlanUnits() ModelPlanUnits {
-	return common.DefensiveCopy(m.planUnits)
+	return slices.Clone(m.planUnits)
 }
 
 func (m *modelImpl) PlanStopsUnits() ModelPlanStopsUnits {
@@ -739,7 +739,7 @@ func (m *modelImpl) IsLocked() bool {
 }
 
 func (m *modelImpl) VehicleTypes() ModelVehicleTypes {
-	return common.DefensiveCopy(m.vehicleTypes)
+	return slices.Clone(m.vehicleTypes)
 }
 
 func (m *modelImpl) Vehicle(index int) ModelVehicle {
@@ -777,7 +777,7 @@ func (m *modelImpl) Stop(index int) (ModelStop, error) {
 }
 
 func (m *modelImpl) Stops() ModelStops {
-	return common.DefensiveCopy(m.stops)
+	return slices.Clone(m.stops)
 }
 
 func (m *modelImpl) NumberOfStops() int {

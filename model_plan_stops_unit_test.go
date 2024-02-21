@@ -2,6 +2,7 @@ package nextroute_test
 
 import (
 	"context"
+	"slices"
 	"testing"
 	"time"
 
@@ -73,22 +74,22 @@ func TestPlanMultipleStops(t *testing.T) {
 	if len(ms1.Stops()) != 4 {
 		t.Fatal("ms1 should have 4 stops")
 	}
-	if common.FindIndex(ms1.Stops(), func(stop nextroute.ModelStop) bool {
+	if slices.IndexFunc(ms1.Stops(), func(stop nextroute.ModelStop) bool {
 		return stop == s1
 	}) == -1 {
 		t.Fatal("ms1 should have s1")
 	}
-	if common.FindIndex(ms1.Stops(), func(stop nextroute.ModelStop) bool {
+	if slices.IndexFunc(ms1.Stops(), func(stop nextroute.ModelStop) bool {
 		return stop == s2
 	}) == -1 {
 		t.Fatal("ms1 should have s2")
 	}
-	if common.FindIndex(ms1.Stops(), func(stop nextroute.ModelStop) bool {
+	if slices.IndexFunc(ms1.Stops(), func(stop nextroute.ModelStop) bool {
 		return stop == s3
 	}) == -1 {
 		t.Fatal("ms1 should have s3")
 	}
-	if common.FindIndex(ms1.Stops(), func(stop nextroute.ModelStop) bool {
+	if slices.IndexFunc(ms1.Stops(), func(stop nextroute.ModelStop) bool {
 		return stop == s4
 	}) == -1 {
 		t.Fatal("ms1 should have s4")

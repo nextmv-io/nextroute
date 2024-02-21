@@ -2,9 +2,8 @@ package nextroute
 
 import (
 	"fmt"
+	"slices"
 	"strings"
-
-	"github.com/nextmv-io/sdk/common"
 )
 
 // SumExpression is an expression that returns the sum of the values of the
@@ -46,13 +45,13 @@ type sumExpressionImpl struct {
 }
 
 func (n *sumExpressionImpl) HasNegativeValues() bool {
-	return common.HasTrue(n.expressions, func(expression ModelExpression) bool {
+	return slices.ContainsFunc(n.expressions, func(expression ModelExpression) bool {
 		return expression.HasNegativeValues()
 	})
 }
 
 func (n *sumExpressionImpl) HasPositiveValues() bool {
-	return common.HasTrue(n.expressions, func(expression ModelExpression) bool {
+	return slices.ContainsFunc(n.expressions, func(expression ModelExpression) bool {
 		return expression.HasPositiveValues()
 	})
 }

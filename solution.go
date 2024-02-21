@@ -6,6 +6,7 @@ import (
 	"math"
 	"math/rand"
 	"reflect"
+	"slices"
 	"strings"
 	"sync"
 
@@ -690,29 +691,29 @@ func (s *solutionImpl) Copy() Solution {
 	random := rand.New(rand.NewSource(s.random.Int63()))
 	s.randomMutex.Unlock()
 	solution := &solutionImpl{
-		arrival:                common.DefensiveCopy(s.arrival),
-		slack:                  common.DefensiveCopy(s.slack),
+		arrival:                slices.Clone(s.arrival),
+		slack:                  slices.Clone(s.slack),
 		constraintStopData:     make(map[ModelConstraint][]Copier, len(s.constraintStopData)),
 		objectiveStopData:      make(map[ModelObjective][]Copier, len(s.objectiveStopData)),
 		constraintSolutionData: make(map[ModelConstraint]Copier, len(s.constraintSolutionData)),
 		objectiveSolutionData:  make(map[ModelObjective]Copier, len(s.objectiveSolutionData)),
-		cumulativeTravelDuration: common.DefensiveCopy(
+		cumulativeTravelDuration: slices.Clone(
 			s.cumulativeTravelDuration,
 		),
 		cumulativeValues: make([][]float64, len(s.cumulativeValues)),
 		stopToPlanUnit:   make([]*solutionPlanStopsUnitImpl, len(s.stopToPlanUnit)),
-		end:              common.DefensiveCopy(s.end),
-		first:            common.DefensiveCopy(s.first),
-		inVehicle:        common.DefensiveCopy(s.inVehicle),
-		last:             common.DefensiveCopy(s.last),
+		end:              slices.Clone(s.end),
+		first:            slices.Clone(s.first),
+		inVehicle:        slices.Clone(s.inVehicle),
+		last:             slices.Clone(s.last),
 		model:            model,
-		next:             common.DefensiveCopy(s.next),
-		previous:         common.DefensiveCopy(s.previous),
-		start:            common.DefensiveCopy(s.start),
-		stop:             common.DefensiveCopy(s.stop),
-		stopPosition:     common.DefensiveCopy(s.stopPosition),
+		next:             slices.Clone(s.next),
+		previous:         slices.Clone(s.previous),
+		start:            slices.Clone(s.start),
+		stop:             slices.Clone(s.stop),
+		stopPosition:     slices.Clone(s.stopPosition),
 		values:           make([][]float64, len(s.values)),
-		vehicleIndices:   common.DefensiveCopy(s.vehicleIndices),
+		vehicleIndices:   slices.Clone(s.vehicleIndices),
 		random:           random,
 		fixedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
 			random, s.fixedPlanUnits.Size(),
@@ -729,8 +730,8 @@ func (s *solutionImpl) Copy() Solution {
 		scores: make(map[ModelObjective]float64, len(s.scores)),
 	}
 
-	solution.vehicles = common.DefensiveCopy(s.vehicles)
-	solution.solutionVehicles = common.DefensiveCopy(s.solutionVehicles)
+	solution.vehicles = slices.Clone(s.vehicles)
+	solution.solutionVehicles = slices.Clone(s.solutionVehicles)
 	// update solution reference
 	for idx := range solution.vehicles {
 		solution.vehicles[idx].solution = solution
@@ -740,8 +741,8 @@ func (s *solutionImpl) Copy() Solution {
 	resetStopInterfaceCache(solution)
 
 	for _, expression := range model.expressions {
-		solution.cumulativeValues[expression.Index()] = common.DefensiveCopy(s.cumulativeValues[expression.Index()])
-		solution.values[expression.Index()] = common.DefensiveCopy(s.values[expression.Index()])
+		solution.cumulativeValues[expression.Index()] = slices.Clone(s.cumulativeValues[expression.Index()])
+		solution.values[expression.Index()] = slices.Clone(s.values[expression.Index()])
 	}
 
 	for _, constraint := range model.constraintsWithStopUpdater {
@@ -1116,7 +1117,7 @@ func (s *solutionImpl) Model() Model {
 }
 
 func (s *solutionImpl) Vehicles() SolutionVehicles {
-	return common.DefensiveCopy(s.solutionVehicles)
+	return slices.Clone(s.solutionVehicles)
 }
 
 func (s *solutionImpl) vehiclesMutable() SolutionVehicles {

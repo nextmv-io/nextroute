@@ -1,10 +1,10 @@
 package nextroute_test
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/common"
 )
 
 func TestSolutionPlanUnitCollection(t *testing.T) {
@@ -17,7 +17,7 @@ func TestSolutionPlanUnitCollection(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	sourcePlanUnits := common.DefensiveCopy(solution.UnPlannedPlanUnits().SolutionPlanUnits())
+	sourcePlanUnits := slices.Clone(solution.UnPlannedPlanUnits().SolutionPlanUnits())
 
 	unplannedPlanUnitCollection := nextroute.NewSolutionPlanUnitCollection(
 		solution.Random(),

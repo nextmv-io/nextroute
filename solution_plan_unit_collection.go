@@ -2,6 +2,7 @@ package nextroute
 
 import (
 	"math/rand"
+	"slices"
 
 	"github.com/nextmv-io/sdk/common"
 )
@@ -59,7 +60,7 @@ func NewSolutionPlanUnitCollection(
 	p := solutionPlanUnitCollectionImpl{
 		solutionPlanUnitCollectionBaseImpl: solutionPlanUnitCollectionBaseImpl{
 			random:            random,
-			solutionPlanUnits: common.DefensiveCopy(planUnits),
+			solutionPlanUnits: slices.Clone(planUnits),
 			indices:           make(map[int]int, len(planUnits)), // TODO: can this be an int slice?
 		},
 	}
@@ -99,7 +100,7 @@ type solutionPlanUnitCollectionBaseImpl struct {
 }
 
 func (p *solutionPlanUnitCollectionBaseImpl) SolutionPlanUnits() SolutionPlanUnits {
-	return common.DefensiveCopy(p.solutionPlanUnits)
+	return slices.Clone(p.solutionPlanUnits)
 }
 
 func (p *solutionPlanUnitCollectionBaseImpl) RandomElement() SolutionPlanUnit {

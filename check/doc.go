@@ -1,5 +1,5 @@
 /*
-Package check provides a plugin that allows you check models and solutions.
+Package check provides a package that allows you check models and solutions.
 
 Checking a model or a solution checks the unplanned plan units. It checks each
 individual plan unit if it can be added to the solution. If the plan unit can

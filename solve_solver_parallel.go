@@ -6,12 +6,12 @@ import (
 	"math"
 	"math/rand"
 	"runtime"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/nextmv-io/sdk/alns"
-	"github.com/nextmv-io/sdk/common"
 	"github.com/nextmv-io/sdk/run"
 )
 
@@ -198,7 +198,7 @@ func (s *parallelSolverImpl) Model() Model {
 }
 
 func (s *parallelSolverImpl) Progression() []alns.ProgressionEntry {
-	return common.DefensiveCopy(s.progression)
+	return slices.Clone(s.progression)
 }
 
 type solutionContainer struct {
