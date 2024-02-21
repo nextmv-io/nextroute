@@ -62,7 +62,7 @@ type SolutionMove interface {
 type SolutionMoves []SolutionMove
 
 // NotExecutableMove returns a constant new empty non-executable move.
-var NotExecutableMove SolutionMove = NewNotExecutableMove()
+var NotExecutableMove = NewNotExecutableMove()
 
 // NewNotExecutableMove creates a new empty non-executable move.
 func NewNotExecutableMove() SolutionMove {

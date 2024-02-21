@@ -1,0 +1,36 @@
+{
+  "defaults": {
+    "vehicles": {
+      "speed": 15,
+      "start_time": "2023-01-01T12:00:00Z"
+    },
+    "stops": {
+      "unplanned_penalty": 20000,
+      "duration": 600,
+      "start_time_window": [
+        ["2023-01-01T12:00:00Z", "2023-01-01T12:05:00Z"],
+        ["2023-01-01T12:30:00Z", "2023-01-01T13:35:00Z"]
+      ]
+    }
+  },
+  "stops": [
+    {
+      "id": "Kyoto Imperial Palace",
+      "location": { "lon": 135.77159, "lat": 34.96714 }
+    },
+    {
+      "id": "Gionmachi",
+      "location": { "lon": 135.77159, "lat": 34.96714 }
+    },
+    {
+      "id": "Kinkaku-ji",
+      "location": { "lon": 135.77159, "lat": 34.96714 },
+      "start_time_window": ["2023-01-01T12:20:00Z", "2023-01-01T12:25:00Z"]
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1"
+    }
+  ]
+}

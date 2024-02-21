@@ -1,0 +1,41 @@
+{
+  "defaults": {
+    "vehicles": {
+      "speed": 15,
+      "start_time": "2023-01-01T12:00:00Z"
+    },
+    "stops": {
+      "unplanned_penalty": 20000,
+      "duration": 10,
+      "max_wait": 1800
+    }
+  },
+  "stops": [
+    {
+      "id": "Kyoto Imperial Palace",
+      "location": { "lon": 135.77159, "lat": 34.96714 },
+      "max_wait": 600,
+      "start_time_window": ["2023-01-01T12:20:00Z", "2023-01-01T13:00:00Z"]
+    },
+    {
+      "id": "Gionmachi",
+      "location": { "lon": 135.77159, "lat": 34.96714 },
+      "max_wait": 600,
+      "start_time_window": ["2023-01-01T12:05:00Z", "2023-01-01T13:00:00Z"]
+    },
+    {
+      "id": "Kinkaku-ji",
+      "location": { "lon": 135.77159, "lat": 34.96714 },
+      "start_time_window": ["2023-01-01T12:45:00Z", "2023-01-01T13:00:00Z"]
+    },
+    {
+      "id": "Arashiyama Bamboo Forest",
+      "location": { "lon": 135.77159, "lat": 34.96714 }
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1"
+    }
+  ]
+}

@@ -1,0 +1,228 @@
+{
+  "options": {
+    "check": {
+      "duration": 30000000000,
+      "verbosity": "off"
+    },
+    "format": {
+      "disable": {
+        "progression": true
+      }
+    },
+    "model": {
+      "constraints": {
+        "disable": {
+          "attributes": false,
+          "capacities": null,
+          "capacity": false,
+          "distance_limit": false,
+          "groups": false,
+          "maximum_duration": false,
+          "maximum_stops": false,
+          "maximum_wait_stop": false,
+          "maximum_wait_vehicle": false,
+          "mixing_items": false,
+          "precedence": false,
+          "start_time_windows": false,
+          "vehicle_end_time": false,
+          "vehicle_start_time": false
+        },
+        "enable": {
+          "cluster": false
+        }
+      },
+      "objectives": {
+        "capacities": "",
+        "cluster": 0,
+        "early_arrival_penalty": 1,
+        "late_arrival_penalty": 1,
+        "min_stops": 1,
+        "travel_duration": 0,
+        "unplanned_penalty": 1,
+        "vehicle_activation_penalty": 1,
+        "vehicles_duration": 1
+      },
+      "properties": {
+        "disable": {
+          "duration_groups": false,
+          "durations": false,
+          "initial_solution": false,
+          "stop_duration_multipliers": false
+        }
+      },
+      "validate": {
+        "disable": {
+          "resources": false,
+          "start_time": false
+        },
+        "enable": {
+          "matrix": false,
+          "matrix_asymmetry_tolerance": 20
+        }
+      }
+    },
+    "solve": {
+      "duration": 10000000000,
+      "iterations": 50,
+      "parallel_runs": 1,
+      "run_deterministically": true,
+      "start_solutions": 1
+    }
+  },
+  "solutions": [
+    {
+      "objective": {
+        "name": "1 * vehicles_duration + 1 * unplanned_penalty",
+        "objectives": [
+          {
+            "base": 1200,
+            "factor": 1,
+            "name": "vehicles_duration",
+            "value": 1200
+          },
+          {
+            "base": 20000,
+            "factor": 1,
+            "name": "unplanned_penalty",
+            "value": 20000
+          }
+        ],
+        "value": 21200
+      },
+      "unplanned": [
+        {
+          "id": "Fushimi Inari Taisha",
+          "location": {
+            "lat": 34.96714,
+            "lon": 135.77159
+          }
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "v1",
+          "route": [],
+          "route_duration": 0,
+          "route_travel_duration": 0
+        },
+        {
+          "id": "v2",
+          "route": [
+            {
+              "arrival_time": "2023-01-01T12:00:00Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-01-01T12:00:00Z",
+              "start_time": "2023-01-01T12:00:00Z",
+              "stop": {
+                "id": "Arashiyama Bamboo Forest",
+                "location": {
+                  "lat": 34.96714,
+                  "lon": 135.77159
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "arrival_time": "2023-01-01T12:00:00Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-01-01T12:20:00Z",
+              "start_time": "2023-01-01T12:20:00Z",
+              "stop": {
+                "id": "Kinkaku-ji",
+                "location": {
+                  "lat": 34.96714,
+                  "lon": 135.77159
+                }
+              },
+              "travel_duration": 0,
+              "waiting_duration": 1200
+            },
+            {
+              "arrival_time": "2023-01-01T12:20:00Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-01-01T12:20:00Z",
+              "start_time": "2023-01-01T12:20:00Z",
+              "stop": {
+                "id": "Kyoto Imperial Palace",
+                "location": {
+                  "lat": 34.96714,
+                  "lon": 135.77159
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "arrival_time": "2023-01-01T12:20:00Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-01-01T12:20:00Z",
+              "start_time": "2023-01-01T12:20:00Z",
+              "stop": {
+                "id": "Kiyomizu-dera",
+                "location": {
+                  "lat": 34.96714,
+                  "lon": 135.77159
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "arrival_time": "2023-01-01T12:20:00Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-01-01T12:20:00Z",
+              "start_time": "2023-01-01T12:20:00Z",
+              "stop": {
+                "id": "Nijō Castle",
+                "location": {
+                  "lat": 34.96714,
+                  "lon": 135.77159
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "arrival_time": "2023-01-01T12:20:00Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-01-01T12:20:00Z",
+              "start_time": "2023-01-01T12:20:00Z",
+              "stop": {
+                "id": "Gionmachi",
+                "location": {
+                  "lat": 34.96714,
+                  "lon": 135.77159
+                }
+              },
+              "travel_duration": 0
+            }
+          ],
+          "route_duration": 1200,
+          "route_travel_duration": 0,
+          "route_waiting_duration": 1200
+        }
+      ]
+    }
+  ],
+  "statistics": {
+    "result": {
+      "custom": {
+        "activated_vehicles": 1,
+        "max_duration": 1200,
+        "max_stops_in_vehicle": 6,
+        "max_travel_duration": 0,
+        "min_duration": 1200,
+        "min_stops_in_vehicle": 6,
+        "min_travel_duration": 0,
+        "unplanned_stops": 1
+      },
+      "duration": 0.123,
+      "value": 21200
+    },
+    "run": {
+      "duration": 0.123,
+      "iterations": 50
+    },
+    "schema": "v1"
+  },
+  "version": {
+    "sdk": "VERSION"
+  }
+}

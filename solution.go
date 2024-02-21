@@ -326,7 +326,7 @@ func reportInfeasibleInitialSolution(
 	move SolutionMoveStops,
 	constraint ModelConstraint,
 ) string {
-	stopIds := common.MapSlice(
+	stopIDs := common.MapSlice(
 		move.StopPositions(),
 		func(stopPosition StopPosition) []string {
 			return []string{stopPosition.Stop().ModelStop().ID()}
@@ -345,7 +345,7 @@ func reportInfeasibleInitialSolution(
 	return fmt.Sprintf("infeasible initial solution: vehicle `%v` violates constraint `%v` for stops [%v]",
 		move.Vehicle().ModelVehicle().ID(),
 		name,
-		strings.Join(stopIds, ", "),
+		strings.Join(stopIDs, ", "),
 	)
 }
 

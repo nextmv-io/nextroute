@@ -1,0 +1,56 @@
+{
+  "defaults": {
+    "vehicles": {
+      "speed": 20,
+      "start_time": "2023-01-01T12:00:00Z"
+    },
+    "stops": {
+      "duration": 300
+    }
+  },
+  "stops": [
+    {
+      "id": "Fushimi Inari Taisha",
+      "location": { "lon": 135.772695, "lat": 34.967146 },
+      "start_time_window": ["2023-01-01T12:00:00Z", "2023-01-01T12:05:00Z"]
+    },
+    {
+      "id": "Kiyomizu-dera",
+      "location": { "lon": 135.78506, "lat": 34.994857 },
+      "start_time_window": ["2023-01-01T12:05:00Z", "2023-01-01T12:10:00Z"]
+    },
+    {
+      "id": "Nijō Castle",
+      "location": { "lon": 135.748134, "lat": 35.014239 },
+      "start_time_window": ["2023-01-01T12:10:00Z", "2023-01-01T12:15:00Z"]
+    },
+    {
+      "id": "Kyoto Imperial Palace",
+      "location": { "lon": 135.762057, "lat": 35.025431 },
+      "start_time_window": ["2023-01-01T12:15:00Z", "2023-01-01T12:20:00Z"]
+    },
+    {
+      "id": "Gionmachi",
+      "location": { "lon": 135.775682, "lat": 35.002457 },
+      "start_time_window": ["2023-01-01T12:20:00Z", "2023-01-01T12:25:00Z"]
+    },
+    {
+      "id": "Kinkaku-ji",
+      "location": { "lon": 135.728898, "lat": 35.039705 },
+      "start_time_window": ["2023-01-01T12:25:00Z", "2023-01-01T12:30:00Z"]
+    },
+    {
+      "id": "Arashiyama Bamboo Forest",
+      "location": { "lon": 135.672009, "lat": 35.017209 },
+      "start_time_window": ["2023-01-01T12:30:00Z", "2023-01-01T12:35:00Z"]
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1"
+    },
+    {
+      "id": "v2"
+    }
+  ]
+}

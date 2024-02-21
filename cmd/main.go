@@ -8,7 +8,6 @@ import (
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/nextroute/check"
 	"github.com/nextmv-io/nextroute/factory"
-
 	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/run"
 	runSchema "github.com/nextmv-io/sdk/run/schema"
@@ -23,13 +22,14 @@ func main() {
 }
 
 type options struct {
-	Check  check.Options
-	Model  factory.Options
-	Solve  nextroute.ParallelSolveOptions
-	Format nextroute.FormatOptions
+	Model  factory.Options                `json:"model,omitempty"`
+	Solve  nextroute.ParallelSolveOptions `json:"solve,omitempty"`
+	Format nextroute.FormatOptions        `json:"format,omitempty"`
+	Check  check.Options                  `json:"check,omitempty"`
 }
 
-func solver(ctx context.Context,
+func solver(
+	ctx context.Context,
 	input schema.Input,
 	options options,
 ) (runSchema.Output, error) {
@@ -38,21 +38,28 @@ func solver(ctx context.Context,
 		return runSchema.Output{}, err
 	}
 
-	parallelSolver, err := nextroute.NewParallelSolver(model)
+	solver, err := nextroute.NewParallelSolver(model)
 	if err != nil {
 		return runSchema.Output{}, err
 	}
 
-	solutions, err := parallelSolver.Solve(ctx, options.Solve)
+	solutions, err := solver.Solve(ctx, options.Solve)
 	if err != nil {
 		return runSchema.Output{}, err
 	}
+	last := solutions.Last()
 
-	return check.Format(
+	output, err := check.Format(
 		ctx,
 		options,
 		options.Check,
-		parallelSolver,
-		solutions.Last(),
+		solver,
+		last,
 	)
+	if err != nil {
+		return runSchema.Output{}, err
+	}
+	output.Statistics.Result.Custom = factory.DefaultCustomResultStatistics(last)
+
+	return output, nil
 }

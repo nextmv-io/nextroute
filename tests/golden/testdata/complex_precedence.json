@@ -1,0 +1,274 @@
+{
+  "vehicles": [
+    {
+      "capacity": { "passengers": 4 },
+      "start_level": { "passengers": 0 },
+      "compatibility_attributes": [
+        "f58d08e1-c76e-4069-84f2-5bf1f91cb5af-start-pickup",
+        "67259CDYWF-DROP_OFF",
+        "6725EE3X1S-PICK_UP",
+        "6725EE3X1S-DROP_OFF",
+        "6725782PZY-PICK_UP",
+        "6725782PZY-DROP_OFF"
+      ],
+      "stop_duration_multiplier": 1,
+      "start_time": "2023-08-14T04:50:58Z",
+      "speed": 4,
+      "activation_penalty": 0,
+      "start_location": { "lon": 26.339803225684133, "lat": 36.54117456741561 },
+      "initial_stops": [
+        {
+          "fixed": false,
+          "id": "f58d08e1-c76e-4069-84f2-5bf1f91cb5af-start-pickup"
+        },
+        { "fixed": false, "id": "67259CDYWF-DROP_OFF" },
+        { "fixed": false, "id": "6725EE3X1S-PICK_UP" },
+        { "fixed": false, "id": "6725EE3X1S-DROP_OFF" },
+        { "fixed": false, "id": "6725782PZY-PICK_UP" },
+        { "fixed": false, "id": "6725782PZY-DROP_OFF" }
+      ],
+      "id": "f58d08e1-c76e-4069-84f2-5bf1f91cb5af"
+    },
+    {
+      "capacity": { "passengers": 4 },
+      "start_level": { "passengers": 0 },
+      "compatibility_attributes": [
+        "b5fdf5fa-5022-46de-84e1-1bdf360c5e61-start-pickup",
+        "6725C99WQR-PICK_UP",
+        "67252B6AU7-DROP_OFF",
+        "6725FF3BY5-PICK_UP",
+        "6725C99WQR-DROP_OFF",
+        "6725FF3BY5-DROP_OFF"
+      ],
+      "stop_duration_multiplier": 1,
+      "start_time": "2023-08-14T04:49:19Z",
+      "speed": 4,
+      "activation_penalty": 0,
+      "start_location": { "lon": 26.36896132086359, "lat": 36.579638979635 },
+      "initial_stops": [
+        {
+          "fixed": false,
+          "id": "b5fdf5fa-5022-46de-84e1-1bdf360c5e61-start-pickup"
+        },
+        { "fixed": false, "id": "6725C99WQR-PICK_UP" },
+        { "fixed": false, "id": "67252B6AU7-DROP_OFF" },
+        { "fixed": false, "id": "6725FF3BY5-PICK_UP" },
+        { "fixed": false, "id": "6725C99WQR-DROP_OFF" },
+        { "fixed": false, "id": "6725FF3BY5-DROP_OFF" }
+      ],
+      "id": "b5fdf5fa-5022-46de-84e1-1bdf360c5e61"
+    }
+  ],
+  "stops": [
+    {
+      "precedes": [
+        "67259CDYWF-DROP_OFF",
+        "6725EE3X1S-PICK_UP",
+        "6725EE3X1S-DROP_OFF",
+        "6725782PZY-PICK_UP",
+        "6725782PZY-DROP_OFF"
+      ],
+      "quantity": { "passengers": -1 },
+      "duration": 0,
+      "unplanned_penalty": 2147483647,
+      "late_arrival_time_penalty": 1000,
+      "compatibility_attributes": [
+        "f58d08e1-c76e-4069-84f2-5bf1f91cb5af-start-pickup"
+      ],
+      "target_arrival_time": "2023-08-14T04:45:00.591503Z",
+      "id": "f58d08e1-c76e-4069-84f2-5bf1f91cb5af-start-pickup",
+      "location": { "lon": 26.339803225684133, "lat": 36.54117456741561 }
+    },
+    {
+      "quantity": { "passengers": 1 },
+      "duration": 90,
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 0,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": ["67259CDYWF-DROP_OFF"],
+      "target_arrival_time": "2023-08-14T04:43:09.749692Z",
+      "id": "67259CDYWF-DROP_OFF",
+      "location": { "lon": 26.351867507809075, "lat": 36.545800386888374 }
+    },
+    {
+      "precedes": ["6725EE3X1S-DROP_OFF"],
+      "quantity": { "passengers": -2 },
+      "duration": 180,
+      "max_wait": 3000,
+      "start_time_window": ["2023-08-14T04:46:00Z", "2023-08-14T06:51:00Z"],
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 1,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": ["6725EE3X1S-PICK_UP"],
+      "target_arrival_time": "2023-08-14T04:50:51Z",
+      "id": "6725EE3X1S-PICK_UP",
+      "location": { "lon": 26.35361626659969, "lat": 36.566128234355254 }
+    },
+    {
+      "quantity": { "passengers": 2 },
+      "duration": 180,
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 0,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": ["6725EE3X1S-DROP_OFF"],
+      "target_arrival_time": "2023-08-14T05:05:51Z",
+      "id": "6725EE3X1S-DROP_OFF",
+      "location": { "lon": 26.354067929305888, "lat": 36.55033217318192 }
+    },
+    {
+      "precedes": ["6725782PZY-DROP_OFF"],
+      "quantity": { "passengers": -1 },
+      "duration": 90,
+      "max_wait": 3000,
+      "start_time_window": ["2023-08-14T04:13:00Z", "2023-08-14T06:18:00Z"],
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 1,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": ["6725782PZY-PICK_UP"],
+      "target_arrival_time": "2023-08-14T04:18:22.347629Z",
+      "id": "6725782PZY-PICK_UP",
+      "location": { "lon": 26.38456105888973, "lat": 36.57622921586711 }
+    },
+    {
+      "quantity": { "passengers": 1 },
+      "duration": 90,
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 0,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": ["6725782PZY-DROP_OFF"],
+      "target_arrival_time": "2023-08-14T04:33:22.347629Z",
+      "id": "6725782PZY-DROP_OFF",
+      "location": { "lon": 26.351867507809075, "lat": 36.545800386888374 }
+    },
+    {
+      "precedes": [
+        "6725C99WQR-PICK_UP",
+        "67252B6AU7-DROP_OFF",
+        "6725FF3BY5-PICK_UP",
+        "6725C99WQR-DROP_OFF",
+        "6725FF3BY5-DROP_OFF"
+      ],
+      "quantity": { "passengers": -3 },
+      "duration": 0,
+      "unplanned_penalty": 2147483647,
+      "late_arrival_time_penalty": 1000,
+      "compatibility_attributes": [
+        "b5fdf5fa-5022-46de-84e1-1bdf360c5e61-start-pickup"
+      ],
+      "target_arrival_time": "2023-08-14T04:45:00.598768Z",
+      "id": "b5fdf5fa-5022-46de-84e1-1bdf360c5e61-start-pickup",
+      "location": { "lon": 26.36896132086359, "lat": 36.579638979635 }
+    },
+    {
+      "precedes": ["6725C99WQR-DROP_OFF"],
+      "quantity": { "passengers": -1 },
+      "duration": 90,
+      "max_wait": 3000,
+      "start_time_window": ["2023-08-14T04:36:00Z", "2023-08-14T06:41:00Z"],
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 1,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": ["6725C99WQR-PICK_UP"],
+      "target_arrival_time": "2023-08-14T04:40:05.194858Z",
+      "id": "6725C99WQR-PICK_UP",
+      "location": { "lon": 26.381170639727394, "lat": 36.57730697190387 }
+    },
+    {
+      "quantity": { "passengers": 3 },
+      "duration": 270,
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 0,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": ["67252B6AU7-DROP_OFF"],
+      "target_arrival_time": "2023-08-14T04:45:53Z",
+      "id": "67252B6AU7-DROP_OFF",
+      "location": { "lon": 26.355559253425483, "lat": 36.5469121396049 }
+    },
+    {
+      "precedes": ["6725FF3BY5-DROP_OFF"],
+      "quantity": { "passengers": -1 },
+      "duration": 90,
+      "max_wait": 3000,
+      "start_time_window": ["2023-08-14T04:50:00Z", "2023-08-14T06:55:00Z"],
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 1,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": ["6725FF3BY5-PICK_UP"],
+      "target_arrival_time": "2023-08-14T04:54:23.965466Z",
+      "id": "6725FF3BY5-PICK_UP",
+      "location": { "lon": 26.354841051021616, "lat": 36.54955608987272 }
+    },
+    {
+      "quantity": { "passengers": 1 },
+      "duration": 90,
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 0,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": ["6725C99WQR-DROP_OFF"],
+      "target_arrival_time": "2023-08-14T04:55:05.194858Z",
+      "id": "6725C99WQR-DROP_OFF",
+      "location": { "lon": 26.351867507809075, "lat": 36.545800386888374 }
+    },
+    {
+      "quantity": { "passengers": 1 },
+      "duration": 90,
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 0,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": ["6725FF3BY5-DROP_OFF"],
+      "target_arrival_time": "2023-08-14T05:09:23.965466Z",
+      "id": "6725FF3BY5-DROP_OFF",
+      "location": { "lon": 26.350574660089876, "lat": 36.54444696712649 }
+    },
+    {
+      "precedes": ["6725C6378Q-DROP_OFF"],
+      "quantity": { "passengers": -1 },
+      "duration": 90,
+      "max_wait": 3000,
+      "start_time_window": ["2023-08-14T04:35:00Z", "2023-08-14T06:40:00Z"],
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 1,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": [],
+      "target_arrival_time": "2023-08-14T04:39:11.264097Z",
+      "id": "6725C6378Q-PICK_UP",
+      "location": { "lon": 26.381170639727394, "lat": 36.57730697190387 }
+    },
+    {
+      "quantity": { "passengers": 1 },
+      "duration": 90,
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 0,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": [],
+      "target_arrival_time": "2023-08-14T04:54:11.264097Z",
+      "id": "6725C6378Q-DROP_OFF",
+      "location": { "lon": 26.351867507809075, "lat": 36.545800386888374 }
+    },
+    {
+      "precedes": ["67261158NH-DROP_OFF"],
+      "quantity": { "passengers": -1 },
+      "duration": 90,
+      "max_wait": 3000,
+      "start_time_window": ["2023-08-14T04:55:00Z", "2023-08-14T07:00:00Z"],
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 1,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": [],
+      "target_arrival_time": "2023-08-14T04:59:13.978563Z",
+      "id": "67261158NH-PICK_UP",
+      "location": { "lon": 26.350871714738275, "lat": 36.54853950288169 }
+    },
+    {
+      "quantity": { "passengers": 1 },
+      "duration": 90,
+      "unplanned_penalty": 360000,
+      "early_arrival_time_penalty": 0,
+      "late_arrival_time_penalty": 100,
+      "compatibility_attributes": [],
+      "target_arrival_time": "2023-08-14T05:14:13.978563Z",
+      "id": "67261158NH-DROP_OFF",
+      "location": { "lon": 26.341562225094144, "lat": 36.54171597174676 }
+    }
+  ]
+}

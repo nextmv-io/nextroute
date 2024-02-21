@@ -1,0 +1,70 @@
+{
+  "model": {
+    "constraints": {
+      "disable": {
+        "attributes": false,
+        "capacity": false,
+        "capacities": null,
+        "distance_limit": false,
+        "groups": false,
+        "maximum_duration": false,
+        "maximum_stops": false,
+        "maximum_wait_stop": false,
+        "maximum_wait_vehicle": false,
+        "mixing_items": false,
+        "precedence": false,
+        "vehicle_start_time": false,
+        "vehicle_end_time": false,
+        "start_time_windows": false
+      },
+      "enable": {
+        "cluster": false
+      }
+    },
+    "objectives": {
+      "capacities": "",
+      "min_stops": 1,
+      "early_arrival_penalty": 1,
+      "late_arrival_penalty": 1,
+      "vehicle_activation_penalty": 1,
+      "travel_duration": 0,
+      "vehicles_duration": 1,
+      "unplanned_penalty": 1,
+      "cluster": 0
+    },
+    "properties": {
+      "disable": {
+        "durations": false,
+        "stop_duration_multipliers": false,
+        "duration_groups": false,
+        "initial_solution": false
+      }
+    },
+    "validate": {
+      "disable": {
+        "start_time": false,
+        "resources": false
+      },
+      "enable": {
+        "matrix": false,
+        "matrix_asymmetry_tolerance": 20
+      }
+    }
+  },
+  "solve": {
+    "iterations": 50,
+    "duration": 10000000000,
+    "parallel_runs": 1,
+    "start_solutions": 1,
+    "run_deterministically": true
+  },
+  "format": {
+    "disable": {
+      "progression": true
+    }
+  },
+  "check": {
+    "duration": 30000000000,
+    "verbosity": "off"
+  }
+}

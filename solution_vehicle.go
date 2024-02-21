@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"slices"
 	"sync"
 	"time"
-
-	"slices"
 
 	"github.com/nextmv-io/sdk/common"
 )
