@@ -529,8 +529,8 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 					return fmt.Errorf(
 						"no feasible route from start to end found for vehicle %v"+
 							" due to constraint %v, no further stops to remove",
-						constraint,
-						solutionVehicle.ModelVehicle().ID())
+						solutionVehicle.ModelVehicle().ID(),
+						constraint)
 				}
 			}
 
