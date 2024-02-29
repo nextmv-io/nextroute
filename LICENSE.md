@@ -59,6 +59,5 @@ any additional restriction on the right granted in this License, as the
 Additional Use Grant; or (b) insert the text “None” to specify a Change Date.
 Not to modify this License in any other way.
 
-
 License text copyright © 2023 MariaDB plc, All Rights Reserved. “Business Source
 License” is a trademark of MariaDB plc.
