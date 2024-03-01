@@ -21,7 +21,7 @@ func TestMain(m *testing.M) {
 func TestGolden(t *testing.T) {
 	golden.FileTests(
 		t,
-		"testdata/template_input.json",
+		"testdata",
 		golden.Config{
 			Args: []string{
 				"-solve.duration", "10s",
