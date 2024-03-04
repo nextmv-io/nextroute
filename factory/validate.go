@@ -909,7 +909,7 @@ func validateResources(input schema.Input, modelOptions Options) error {
 		for name, info := range resourcesInfo {
 			if info.anyStops && info.allStopsPositive && info.allStartLevelsZero {
 				return nmerror.NewInputDataError(fmt.Errorf(
-					"Resource `%s` is starting without any capacity being"+
+					"resource `%s` is starting without any capacity being"+
 						" used. All your stops have a positive quantity and"+
 						" are considered as dropoff stops. You need to have"+
 						" at least one pickup stop (negative quantity) or a"+
@@ -921,7 +921,7 @@ func validateResources(input schema.Input, modelOptions Options) error {
 
 			if info.anyStops && info.allStopsNegative && info.allStartLevelsAtCapacity {
 				return nmerror.NewInputDataError(fmt.Errorf(
-					"Resource `%s` is starting with all of the capacity"+
+					"resource `%s` is starting with all of the capacity"+
 						" being used. All your stops have a negative quantity"+
 						" and are considered as pickup stops. You need to have"+
 						" at least one dropoff stop (positive quantity) or a"+
