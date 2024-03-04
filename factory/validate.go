@@ -916,7 +916,6 @@ func validateResources(input schema.Input, modelOptions Options) error {
 						" start level > 0 to plan a stop with a positive"+
 						" quantity.",
 					name,
-					name,
 				))
 			}
 
@@ -928,7 +927,6 @@ func validateResources(input schema.Input, modelOptions Options) error {
 						" at least one dropoff stop (positive quantity) or a"+
 						" start level < max capacity to plan a stop with a"+
 						" negative quantity.",
-					name,
 					name,
 				))
 			}
