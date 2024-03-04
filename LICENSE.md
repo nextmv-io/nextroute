@@ -1,5 +1,29 @@
 # LICENSE
 
+Business Source License 1.1
+
+Parameters
+
+Licensor:             nextmv.io inc
+Licensed Work:        nextroute
+
+Change Date:          Four years from the date the Licensed Work is published.
+Change License:       GPLv3
+
+For information about alternative licensing arrangements for the Software,
+please email info@nextmv.io.
+
+Notice
+
+The Business Source License (this document, or the “License”) is not an Open
+Source license. However, the Licensed Work will eventually be made available
+under an Open Source License, as stated in this License.
+
+License text copyright © 2023 MariaDB plc, All Rights Reserved. “Business Source
+License” is a trademark of MariaDB plc.
+
+-----------------------------------------------------------------------------
+
 ## Terms
 
 The Licensor hereby grants you the right to copy, modify, create derivative
