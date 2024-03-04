@@ -914,7 +914,7 @@ func validateResources(input schema.Input, modelOptions Options) error {
 						" are considered as dropoff stops. You need to have"+
 						" at least one pickup stop (negative quantity) or a"+
 						" start level > 0 to plan a stop with a positive"+
-						" quantity.",
+						" quantity",
 					name,
 				))
 			}
@@ -926,7 +926,7 @@ func validateResources(input schema.Input, modelOptions Options) error {
 						" and are considered as pickup stops. You need to have"+
 						" at least one dropoff stop (positive quantity) or a"+
 						" start level < max capacity to plan a stop with a"+
-						" negative quantity.",
+						" negative quantity",
 					name,
 				))
 			}
