@@ -1,6 +1,7 @@
 # nextroute
 
-The Nextmv **nextroute** solver optimizes the routes of a fleet of vehicles under various constraints.
+The Nextmv **nextroute** solver optimizes the routes of a fleet of vehicles
+under various constraints.
 
 ## License
 
