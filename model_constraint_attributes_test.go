@@ -132,15 +132,17 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 	bike := solution.Vehicles()[bikeIndex]
 
 	{
+		position, err := nextroute.NewStopPosition(
+			truck.First(),
+			solution.SolutionStop(singleStopPlanUnits[0].Stops()[0]),
+			truck.Last(),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
 		moveSingle0OnTruck, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[0]),
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					truck.First(),
-					solution.SolutionStop(singleStopPlanUnits[0].Stops()[0]),
-					truck.Last(),
-				),
-			},
+			[]nextroute.StopPosition{position},
 		)
 
 		if err != nil {
@@ -151,15 +153,18 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 			t.Errorf("moveSingle0OnTruck should not be violated, share attribute-0")
 		}
 
+		position, err = nextroute.NewStopPosition(
+			car.First(),
+			solution.SolutionStop(singleStopPlanUnits[0].Stops()[0]),
+			car.Last(),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		moveSingle0OnCar, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[0]),
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					car.First(),
-					solution.SolutionStop(singleStopPlanUnits[0].Stops()[0]),
-					car.Last(),
-				),
-			},
+			[]nextroute.StopPosition{position},
 		)
 
 		if err != nil {
@@ -170,15 +175,17 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 			t.Errorf("moveSingle0OnCar should be violated, car no attribute-0")
 		}
 
+		position, err = nextroute.NewStopPosition(
+			bike.First(),
+			solution.SolutionStop(singleStopPlanUnits[0].Stops()[0]),
+			bike.Last(),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
 		moveSingle0OnBike, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[0]),
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					bike.First(),
-					solution.SolutionStop(singleStopPlanUnits[0].Stops()[0]),
-					bike.Last(),
-				),
-			},
+			[]nextroute.StopPosition{position},
 		)
 
 		if err != nil {
@@ -190,15 +197,19 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 		}
 	}
 	{
+		position, err := nextroute.NewStopPosition(
+			truck.First(),
+			solution.SolutionStop(singleStopPlanUnits[1].Stops()[0]),
+			truck.Last(),
+		)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		moveSingle1OnTruck, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[1]),
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					truck.First(),
-					solution.SolutionStop(singleStopPlanUnits[1].Stops()[0]),
-					truck.Last(),
-				),
-			},
+			[]nextroute.StopPosition{position},
 		)
 
 		if err != nil {
@@ -208,16 +219,17 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 		if violated, _ := cnstr.EstimateIsViolated(moveSingle1OnTruck); violated {
 			t.Errorf("moveSingle1OnTruck should not be violated, share attribute-1")
 		}
-
+		position, err = nextroute.NewStopPosition(
+			car.First(),
+			solution.SolutionStop(singleStopPlanUnits[1].Stops()[0]),
+			car.Last(),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
 		moveSingle1OnCar, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[1]),
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					car.First(),
-					solution.SolutionStop(singleStopPlanUnits[1].Stops()[0]),
-					car.Last(),
-				),
-			},
+			[]nextroute.StopPosition{position},
 		)
 
 		if err != nil {
@@ -227,16 +239,17 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 		if violated, _ := cnstr.EstimateIsViolated(moveSingle1OnCar); violated {
 			t.Errorf("moveSingle1OnCar should not be violated, share attribute-1")
 		}
-
+		position, err = nextroute.NewStopPosition(
+			bike.First(),
+			solution.SolutionStop(singleStopPlanUnits[1].Stops()[0]),
+			bike.Last(),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
 		moveSingle1OnBike, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[1]),
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					bike.First(),
-					solution.SolutionStop(singleStopPlanUnits[1].Stops()[0]),
-					bike.Last(),
-				),
-			},
+			[]nextroute.StopPosition{position},
 		)
 
 		if err != nil {
@@ -248,15 +261,19 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 		}
 	}
 	{
+		position, err := nextroute.NewStopPosition(
+			truck.First(),
+			solution.SolutionStop(singleStopPlanUnits[2].Stops()[0]),
+			truck.Last(),
+		)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		moveSingle2OnTruck, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[2]),
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					truck.First(),
-					solution.SolutionStop(singleStopPlanUnits[2].Stops()[0]),
-					truck.Last(),
-				),
-			},
+			[]nextroute.StopPosition{position},
 		)
 
 		if err != nil {
@@ -266,16 +283,17 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 		if violated, _ := cnstr.EstimateIsViolated(moveSingle2OnTruck); violated {
 			t.Errorf("moveSingle2OnTruck should not be violated, stop no attributes")
 		}
-
+		position, err = nextroute.NewStopPosition(
+			car.First(),
+			solution.SolutionStop(singleStopPlanUnits[2].Stops()[0]),
+			car.Last(),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
 		moveSingle2OnCar, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[2]),
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					car.First(),
-					solution.SolutionStop(singleStopPlanUnits[2].Stops()[0]),
-					car.Last(),
-				),
-			},
+			[]nextroute.StopPosition{position},
 		)
 
 		if err != nil {
@@ -285,16 +303,17 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 		if violated, _ := cnstr.EstimateIsViolated(moveSingle2OnCar); violated {
 			t.Errorf("moveSingle1OnCar should not be violated, stop no attributes")
 		}
-
+		position, err = nextroute.NewStopPosition(
+			bike.First(),
+			solution.SolutionStop(singleStopPlanUnits[2].Stops()[0]),
+			bike.Last(),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
 		moveSingle2OnBike, err := nextroute.NewMoveStops(
 			solution.SolutionPlanStopsUnit(singleStopPlanUnits[2]),
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					bike.First(),
-					solution.SolutionStop(singleStopPlanUnits[2].Stops()[0]),
-					bike.Last(),
-				),
-			},
+			[]nextroute.StopPosition{position},
 		)
 
 		if err != nil {
@@ -308,21 +327,25 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 
 	{
 		sequencePlanUnit := solution.SolutionPlanStopsUnit(sequencePlanUnits[0])
-
+		position1, err := nextroute.NewStopPosition(
+			truck.First(),
+			sequencePlanUnit.SolutionStops()[0],
+			sequencePlanUnit.SolutionStops()[1],
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+		position2, err := nextroute.NewStopPosition(
+			sequencePlanUnit.SolutionStops()[0],
+			sequencePlanUnit.SolutionStops()[1],
+			truck.Last(),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
 		moveSequence0OnTruck, err := nextroute.NewMoveStops(
 			sequencePlanUnit,
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					truck.First(),
-					sequencePlanUnit.SolutionStops()[0],
-					sequencePlanUnit.SolutionStops()[1],
-				),
-				nextroute.NewStopPosition(
-					sequencePlanUnit.SolutionStops()[0],
-					sequencePlanUnit.SolutionStops()[1],
-					truck.Last(),
-				),
-			},
+			[]nextroute.StopPosition{position1, position2},
 		)
 
 		if err != nil {
@@ -332,21 +355,25 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 		if violated, _ := cnstr.EstimateIsViolated(moveSequence0OnTruck); violated {
 			t.Errorf("moveSequence0OnTruck should not be violated, stop shares attributes with truck")
 		}
-
+		position1, err = nextroute.NewStopPosition(
+			car.First(),
+			sequencePlanUnit.SolutionStops()[0],
+			sequencePlanUnit.SolutionStops()[1],
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+		position2, err = nextroute.NewStopPosition(
+			sequencePlanUnit.SolutionStops()[0],
+			sequencePlanUnit.SolutionStops()[1],
+			car.Last(),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
 		moveSequence0OnCar, err := nextroute.NewMoveStops(
 			sequencePlanUnit,
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					car.First(),
-					sequencePlanUnit.SolutionStops()[0],
-					sequencePlanUnit.SolutionStops()[1],
-				),
-				nextroute.NewStopPosition(
-					sequencePlanUnit.SolutionStops()[0],
-					sequencePlanUnit.SolutionStops()[1],
-					car.Last(),
-				),
-			},
+			[]nextroute.StopPosition{position1, position2},
 		)
 
 		if err != nil {
@@ -356,21 +383,25 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 		if violated, _ := cnstr.EstimateIsViolated(moveSequence0OnCar); violated {
 			t.Errorf("moveSequence0OnCar should not be violated, stops share attribute-1 with car")
 		}
-
+		position1, err = nextroute.NewStopPosition(
+			bike.First(),
+			sequencePlanUnit.SolutionStops()[0],
+			sequencePlanUnit.SolutionStops()[1],
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+		position2, err = nextroute.NewStopPosition(
+			sequencePlanUnit.SolutionStops()[0],
+			sequencePlanUnit.SolutionStops()[1],
+			bike.Last(),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
 		moveSequence0OnBike, err := nextroute.NewMoveStops(
 			sequencePlanUnit,
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					bike.First(),
-					sequencePlanUnit.SolutionStops()[0],
-					sequencePlanUnit.SolutionStops()[1],
-				),
-				nextroute.NewStopPosition(
-					sequencePlanUnit.SolutionStops()[0],
-					sequencePlanUnit.SolutionStops()[1],
-					bike.Last(),
-				),
-			},
+			[]nextroute.StopPosition{position1, position2},
 		)
 		if err != nil {
 			t.Fatal(err)

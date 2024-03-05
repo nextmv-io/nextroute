@@ -25,16 +25,17 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 			solution.UnPlannedPlanUnits().Size(),
 		)
 	}
-
+	position, err := nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		unplannedPlanUnits[0].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err := nextroute.NewMoveStops(
 		unplannedPlanUnits[0].(nextroute.SolutionPlanStopsUnit),
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				unplannedPlanUnits[0].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -67,15 +68,17 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 
 	t.Run("next single stop, startAtFirst=true, endAtLast=true",
 		func(t *testing.T) {
+			position, err = nextroute.NewStopPosition(
+				move.Vehicle().First(),
+				unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
+				move.Vehicle().First().Next(),
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
 			move, err = nextroute.NewMoveStops(
 				unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit),
-				[]nextroute.StopPosition{
-					nextroute.NewStopPosition(
-						move.Vehicle().First(),
-						unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
-						move.Vehicle().First().Next(),
-					),
-				},
+				[]nextroute.StopPosition{position},
 			)
 			if err != nil {
 				t.Fatal(err)
@@ -106,15 +109,17 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 
 	t.Run("next single stop, 2 stops on vehicle, first position",
 		func(t *testing.T) {
+			position, err = nextroute.NewStopPosition(
+				move.Vehicle().First(),
+				unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
+				move.Vehicle().First().Next(),
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
 			move, err = nextroute.NewMoveStops(
 				unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit),
-				[]nextroute.StopPosition{
-					nextroute.NewStopPosition(
-						move.Vehicle().First(),
-						unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
-						move.Vehicle().First().Next(),
-					),
-				},
+				[]nextroute.StopPosition{position},
 			)
 			if err != nil {
 				t.Fatal(err)
@@ -162,15 +167,17 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 
 	t.Run("next single stop, 2 stops on vehicle, second position",
 		func(t *testing.T) {
+			position, err = nextroute.NewStopPosition(
+				move.Vehicle().First().Next(),
+				unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
+				move.Vehicle().First().Next().Next(),
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
 			move, err = nextroute.NewMoveStops(
 				unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit),
-				[]nextroute.StopPosition{
-					nextroute.NewStopPosition(
-						move.Vehicle().First().Next(),
-						unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
-						move.Vehicle().First().Next().Next(),
-					),
-				},
+				[]nextroute.StopPosition{position},
 			)
 			if err != nil {
 				t.Fatal(err)
@@ -216,15 +223,17 @@ func TestSolutionStopGeneratorSingleStop(t *testing.T) {
 
 	t.Run("next single stop, 2 stops on vehicle, last position",
 		func(t *testing.T) {
+			position, err = nextroute.NewStopPosition(
+				move.Vehicle().Last().Previous(),
+				unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
+				move.Vehicle().Last(),
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
 			move, err = nextroute.NewMoveStops(
 				unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit),
-				[]nextroute.StopPosition{
-					nextroute.NewStopPosition(
-						move.Vehicle().Last().Previous(),
-						unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
-						move.Vehicle().Last(),
-					),
-				},
+				[]nextroute.StopPosition{position},
 			)
 			if err != nil {
 				t.Fatal(err)
@@ -280,15 +289,17 @@ func BenchmarkSolutionStopGenerator(b *testing.B) {
 		b.Fatal(err)
 	}
 	unplannedPlanUnits := solution.UnPlannedPlanUnits().SolutionPlanUnits()
+	position, err := nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		unplannedPlanUnits[0].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		b.Fatal(err)
+	}
 	move, err := nextroute.NewMoveStops(
 		unplannedPlanUnits[0].(nextroute.SolutionPlanStopsUnit),
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				unplannedPlanUnits[0].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position},
 	)
 	if err != nil {
 		b.Fatal(err)
@@ -301,15 +312,17 @@ func BenchmarkSolutionStopGenerator(b *testing.B) {
 	if !planned {
 		b.Fatal("move should be planned")
 	}
+	position, err = nextroute.NewStopPosition(
+		move.Vehicle().First(),
+		unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
+		move.Vehicle().First().Next(),
+	)
+	if err != nil {
+		b.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit),
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				move.Vehicle().First(),
-				unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
-				move.Vehicle().First().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position},
 	)
 	if err != nil {
 		b.Fatal(err)
@@ -322,15 +335,17 @@ func BenchmarkSolutionStopGenerator(b *testing.B) {
 	if !planned {
 		b.Fatal("move should be planned")
 	}
+	position, err = nextroute.NewStopPosition(
+		move.Vehicle().First(),
+		unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
+		move.Vehicle().First().Next(),
+	)
+	if err != nil {
+		b.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit),
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				move.Vehicle().First(),
-				unplannedPlanUnits[2].(nextroute.SolutionPlanStopsUnit).SolutionStops()[0],
-				move.Vehicle().First().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position},
 	)
 	if err != nil {
 		b.Fatal(err)
@@ -370,20 +385,25 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 	vehicle := solution.Vehicles()[0]
 
 	upu := unplannedPlanUnits[0].(nextroute.SolutionPlanStopsUnit)
+	position1, err := nextroute.NewStopPosition(
+		vehicle.First(),
+		upu.SolutionStops()[0],
+		upu.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err := nextroute.NewStopPosition(
+		upu.SolutionStops()[0],
+		upu.SolutionStops()[1],
+		vehicle.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err := nextroute.NewMoveStops(
 		upu,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				vehicle.First(),
-				upu.SolutionStops()[0],
-				upu.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				upu.SolutionStops()[0],
-				upu.SolutionStops()[1],
-				vehicle.Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -447,20 +467,26 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 		t.Fatal("move is not planned")
 	}
 	upu = unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit)
+	position1, err = nextroute.NewStopPosition(
+		move.Vehicle().First(),
+		upu.SolutionStops()[0],
+		upu.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		upu.SolutionStops()[0],
+		upu.SolutionStops()[1],
+		move.Vehicle().First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+
+	}
 	move, err = nextroute.NewMoveStops(
 		upu,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				move.Vehicle().First(),
-				upu.SolutionStops()[0],
-				upu.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				upu.SolutionStops()[0],
-				upu.SolutionStops()[1],
-				move.Vehicle().First().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -521,20 +547,25 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 		},
 	)
 	upu = unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit)
+	position1, err = nextroute.NewStopPosition(
+		vehicle.First(),
+		upu.SolutionStops()[0],
+		vehicle.First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		vehicle.Last().Previous(),
+		upu.SolutionStops()[1],
+		vehicle.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		upu,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				vehicle.First(),
-				upu.SolutionStops()[0],
-				vehicle.First().Next(),
-			),
-			nextroute.NewStopPosition(
-				vehicle.Last().Previous(),
-				upu.SolutionStops()[1],
-				vehicle.Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -597,20 +628,26 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 		},
 	)
 	upu = unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit)
+	position1, err = nextroute.NewStopPosition(
+		move.Vehicle().First().Next(),
+		upu.SolutionStops()[0],
+		move.Vehicle().Last().Previous(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		vehicle.Last().Previous(),
+		upu.SolutionStops()[1],
+		vehicle.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+
+	}
 	move, err = nextroute.NewMoveStops(
 		upu,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				move.Vehicle().First().Next(),
-				upu.SolutionStops()[0],
-				move.Vehicle().Last().Previous(),
-			),
-			nextroute.NewStopPosition(
-				vehicle.Last().Previous(),
-				upu.SolutionStops()[1],
-				vehicle.Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -672,20 +709,26 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 	)
 
 	upu = unplannedPlanUnits[1].(nextroute.SolutionPlanStopsUnit)
+	position1, err = nextroute.NewStopPosition(
+		move.Vehicle().Last().Previous(),
+		upu.SolutionStops()[0],
+		move.PlanStopsUnit().SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		upu.SolutionStops()[0],
+		upu.SolutionStops()[1],
+		vehicle.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	move, err = nextroute.NewMoveStops(
 		upu,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				move.Vehicle().Last().Previous(),
-				upu.SolutionStops()[0],
-				move.PlanStopsUnit().SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				upu.SolutionStops()[0],
-				upu.SolutionStops()[1],
-				vehicle.Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)

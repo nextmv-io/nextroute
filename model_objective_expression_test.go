@@ -91,33 +91,41 @@ func TestExpressionObjective_EstimateDeltaValue(t *testing.T) {
 	}
 
 	planUnits := model.PlanStopsUnits()
-	m1, err := nextroute.NewMoveStops(
-		solution.SolutionPlanStopsUnit(planUnits[0]),
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solution.SolutionPlanStopsUnit(planUnits[0]).SolutionStops()[0],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+	position, err := nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solution.SolutionPlanStopsUnit(planUnits[0]).SolutionStops()[0],
+		solution.Vehicles()[0].Last(),
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
+	m1, err := nextroute.NewMoveStops(
+		solution.SolutionPlanStopsUnit(planUnits[0]),
+		[]nextroute.StopPosition{position},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position1, err := nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solution.SolutionPlanStopsUnit(planUnits[3]).SolutionStops()[0],
+		solution.SolutionPlanStopsUnit(planUnits[3]).SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err := nextroute.NewStopPosition(
+		solution.SolutionPlanStopsUnit(planUnits[3]).SolutionStops()[0],
+		solution.SolutionPlanStopsUnit(planUnits[3]).SolutionStops()[1],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+
+	}
 	m2, err := nextroute.NewMoveStops(
 		solution.SolutionPlanStopsUnit(planUnits[3]),
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solution.SolutionPlanStopsUnit(planUnits[3]).SolutionStops()[0],
-				solution.SolutionPlanStopsUnit(planUnits[3]).SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solution.SolutionPlanStopsUnit(planUnits[3]).SolutionStops()[0],
-				solution.SolutionPlanStopsUnit(planUnits[3]).SolutionStops()[1],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
