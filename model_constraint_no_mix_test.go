@@ -662,7 +662,7 @@ func TestNoMixConstraint(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	move, err = nextroute.NewMoveStops(
+	_, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
 		[]nextroute.StopPosition{position1, position2},
 	)

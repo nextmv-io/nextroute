@@ -484,7 +484,6 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 	)
 	if err != nil {
 		t.Fatal(err)
-
 	}
 	move, err = nextroute.NewMoveStops(
 		upu,
@@ -645,7 +644,6 @@ func TestSolutionStopGeneratorSequence(t *testing.T) {
 	)
 	if err != nil {
 		t.Fatal(err)
-
 	}
 	move, err = nextroute.NewMoveStops(
 		upu,

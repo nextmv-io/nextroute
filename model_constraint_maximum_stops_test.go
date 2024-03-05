@@ -127,7 +127,6 @@ func TestMaximumStopsConstraint_EstimateIsViolated(t *testing.T) {
 	)
 	if err != nil {
 		t.Fatal(err)
-
 	}
 	moveSequenceOnVehicle0, err := nextroute.NewMoveStops(
 		solutionSequencePlanUnit,

@@ -424,7 +424,6 @@ func (s *parallelSolverImpl) Solve(
 								Iterations: int(totalIterations.Load()),
 							}
 						}
-
 					}(runCount)
 				}
 			}

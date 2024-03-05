@@ -123,7 +123,6 @@ func TestExpressionObjective_EstimateDeltaValue(t *testing.T) {
 	)
 	if err != nil {
 		t.Fatal(err)
-
 	}
 	m2, err := nextroute.NewMoveStops(
 		solution.SolutionPlanStopsUnit(planUnits[3]),
