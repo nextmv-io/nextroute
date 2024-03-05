@@ -1,4 +1,5 @@
 // © 2019-present nextmv.io inc
+
 // Package common provides common functionality for the nextroute plugin.
 package common
 

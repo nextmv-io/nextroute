@@ -1,4 +1,5 @@
 // © 2019-present nextmv.io inc
+
 package nextroute
 
 // ModelData is a data interface available on several model constructs. It

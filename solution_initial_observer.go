@@ -1,4 +1,5 @@
 // © 2019-present nextmv.io inc
+
 package nextroute
 
 // InitialSolutionObserver is an observer that is used to detect the constraint

@@ -1,4 +1,5 @@
 // © 2019-present nextmv.io inc
+
 package nextroute
 
 // TravelDurationObjective is an objective that uses the travel duration as an

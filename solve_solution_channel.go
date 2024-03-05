@@ -1,4 +1,5 @@
 // © 2019-present nextmv.io inc
+
 package nextroute
 
 // SolutionChannel is a channel of solutions.

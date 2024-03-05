@@ -1,4 +1,5 @@
 // © 2019-present nextmv.io inc
+
 /*
 Package check provides a package that allows you check models and solutions.
 

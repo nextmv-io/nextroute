@@ -1,4 +1,5 @@
 // © 2019-present nextmv.io inc
+
 package nextroute
 
 // CheckedAt is the type indicating when to check a constraint when
