@@ -56,6 +56,11 @@ type Solution interface {
 
 	// Score returns the score of the solution.
 	Score() float64
+
+	// SetRandom sets the random number generator of the solution. Returns an
+	// error if the random number generator is nil.
+	SetRandom(random *rand.Rand) error
+
 	// SolutionPlanStopsUnit returns the [SolutionPlanStopsUnit] for the given
 	// model plan unit.
 	SolutionPlanStopsUnit(planUnit ModelPlanStopsUnit) SolutionPlanStopsUnit
@@ -822,11 +827,13 @@ func resetStopInterfaceCache(solution *solutionImpl) {
 	}
 }
 
-func (s *solutionImpl) SetRandom(random *rand.Rand) {
+func (s *solutionImpl) SetRandom(random *rand.Rand) error {
 	if random == nil {
-		panic("random is nil")
+		return fmt.Errorf("random is nil")
 	}
 	s.random = random
+
+	return nil
 }
 
 func (s *solutionImpl) Random() *rand.Rand {

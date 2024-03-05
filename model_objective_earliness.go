@@ -94,24 +94,20 @@ func (l *earlinessObjectiveImpl) earliness(stop solutionStopImpl) float64 {
 	return math.Max(0, targetTime-compare)
 }
 
-func (l *earlinessObjectiveImpl) InternalValue(solution *solutionImpl) float64 {
+func (l *earlinessObjectiveImpl) Value(solution Solution) float64 {
 	value := 0.0
-	for _, vehicle := range solution.vehicles {
-		for s := vehicle.first().next(); !s.IsLast(); s = s.next() {
+	for _, vehicle := range solution.Vehicles() {
+		for s := vehicle.First().Next(); !s.IsLast(); s = s.Next() {
 			earlinessFactor := l.earlinessFactor.Value(
 				nil,
 				nil,
 				s.ModelStop(),
 			)
-			value += l.earliness(s) * earlinessFactor
+			value += l.Earliness(s) * earlinessFactor
 		}
 	}
 
 	return value
-}
-
-func (l *earlinessObjectiveImpl) Value(solution Solution) float64 {
-	return l.InternalValue(solution.(*solutionImpl))
 }
 
 func (l *earlinessObjectiveImpl) EstimateDeltaValue(

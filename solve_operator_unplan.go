@@ -115,7 +115,10 @@ func (d *solveOperatorUnPlanImpl) unplanOneStopIsland(
 		}
 	}
 
-	units := d.unplanClosestStops(solutionStop, numberOfStops-1)
+	units, err := d.unplanClosestStops(solutionStop, numberOfStops-1)
+	if err != nil {
+		return 0, err
+	}
 
 	return 1 + len(units), nil
 }
@@ -123,12 +126,15 @@ func (d *solveOperatorUnPlanImpl) unplanOneStopIsland(
 func (d *solveOperatorUnPlanImpl) unplanClosestStops(
 	solutionStop SolutionStop,
 	numberOfStops int,
-) SolutionPlanUnits {
+) (SolutionPlanUnits, error) {
 	planUnits := make(SolutionPlanUnits, 0)
 
 	solution := solutionStop.Solution()
 
-	stops := solutionStop.ModelStop().(*stopImpl).closestStops()
+	stops, err := solutionStop.ModelStop().(*stopImpl).closestStops()
+	if err != nil {
+		return planUnits, err
+	}
 	unplannedCount := 0
 	for _, stop := range stops {
 		if stop.Index() == solutionStop.ModelStop().Index() ||
@@ -141,7 +147,7 @@ func (d *solveOperatorUnPlanImpl) unplanClosestStops(
 			SolutionPlanStopsUnit(stop.PlanStopsUnit()).
 			UnPlan()
 		if err != nil {
-			panic(err)
+			return planUnits, err
 		}
 		if unPlanned {
 			planUnits = append(planUnits, solutionStop.PlanStopsUnit())
@@ -152,7 +158,7 @@ func (d *solveOperatorUnPlanImpl) unplanClosestStops(
 			break
 		}
 	}
-	return planUnits
+	return planUnits, nil
 }
 
 func (d *solveOperatorUnPlanImpl) unplanOneIsland(

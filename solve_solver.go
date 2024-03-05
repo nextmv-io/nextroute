@@ -250,8 +250,11 @@ func (s *solveImpl) Solve(
 
 	// hard coding a size of 100 here. If we ever need to, we can make it
 	// configurable.
-	solutions := make(chan Solution, 100)
-	solutions <- s.bestSolution
+	solutions := make(chan SolutionInfo, 100)
+	solutions <- SolutionInfo{
+		Solution: s.bestSolution,
+		Error:    nil,
+	}
 	go func() {
 		defer close(solutions)
 
@@ -274,11 +277,17 @@ func (s *solveImpl) Solve(
 				default:
 					improved, e := s.invoke(ctx, solveOperator, solveInformation)
 					if e != nil {
-						err = fmt.Errorf("%w", e)
+						solutions <- SolutionInfo{
+							Solution: nil,
+							Error:    e,
+						}
 						break Loop
 					}
 					if improved {
-						solutions <- s.bestSolution
+						solutions <- SolutionInfo{
+							Solution: s.bestSolution,
+							Error:    nil,
+						}
 					}
 				}
 			}

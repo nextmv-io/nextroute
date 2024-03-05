@@ -570,12 +570,8 @@ func TestNoMixConstraint(t *testing.T) {
 			),
 		},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
-	isViolated, _ = cnstr.EstimateIsViolated(move)
-	if !isViolated {
-		t.Fatal("constraint is not violated, it should not fit +A-A+B[+A][-A]-B")
+	if err == nil {
+		t.Fatal("planned stop must be after the previous planned stop, stop s3 is not")
 	}
 
 	move, err = nextroute.NewMoveStops(

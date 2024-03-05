@@ -1,6 +1,7 @@
 package nextroute
 
 import (
+	"fmt"
 	"slices"
 
 	"github.com/nextmv-io/sdk/common"
@@ -24,7 +25,7 @@ type AttributesConstraint interface {
 	SetStopAttributes(
 		stop ModelStop,
 		stopAttributes []string,
-	)
+	) error
 	// SetVehicleTypeAttributes sets the attributes for the given vehicle type.
 	// The attributes are specified as a list of strings. The attributes are not
 	// interpreted in any way. They are only used to determine compatibility
@@ -32,7 +33,7 @@ type AttributesConstraint interface {
 	SetVehicleTypeAttributes(
 		vehicle ModelVehicleType,
 		vehicleAttributes []string,
-	)
+	) error
 	// StopAttributes returns the attributes for the given stop. The attributes
 	// are specified as a list of strings.
 	StopAttributes(stop ModelStop) []string
@@ -131,21 +132,23 @@ func (l *attributesConstraintImpl) VehicleTypeAttributes(vehicle ModelVehicleTyp
 func (l *attributesConstraintImpl) SetStopAttributes(
 	stop ModelStop,
 	stopAttributes []string,
-) {
+) error {
 	if stop.Model().IsLocked() {
-		panic("cannot set stop attributes after model is locked")
+		return fmt.Errorf("cannot set stop attributes after model is locked")
 	}
 	l.stopAttributes[stop.Index()] = common.Unique(stopAttributes)
+	return nil
 }
 
 func (l *attributesConstraintImpl) SetVehicleTypeAttributes(
 	vehicleType ModelVehicleType,
 	vehicleAttributes []string,
-) {
+) error {
 	if vehicleType.Model().IsLocked() {
-		panic("cannot set vehicle type attributes after model is locked")
+		return fmt.Errorf("cannot set vehicle type attributes after model is locked")
 	}
 	l.vehicleTypeAttributes[vehicleType.Index()] = common.Unique(vehicleAttributes)
+	return nil
 }
 
 func (l *attributesConstraintImpl) CheckCost() Cost {

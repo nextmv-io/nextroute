@@ -33,16 +33,12 @@ func (e *expressionObjectiveImpl) Index() int {
 	return e.index
 }
 
-func (e *expressionObjectiveImpl) InternalValue(solution *solutionImpl) float64 {
+func (e *expressionObjectiveImpl) Value(solution Solution) float64 {
 	score := 0.0
-	for _, r := range solution.vehicles {
-		score += r.last().CumulativeValue(e.expression)
+	for _, r := range solution.Vehicles() {
+		score += r.Last().CumulativeValue(e.expression)
 	}
 	return score
-}
-
-func (e *expressionObjectiveImpl) Value(solution Solution) float64 {
-	return e.InternalValue(solution.(*solutionImpl))
 }
 
 func (e *expressionObjectiveImpl) EstimateDeltaValue(

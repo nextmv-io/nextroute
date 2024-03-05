@@ -202,8 +202,9 @@ func (s *parallelSolverImpl) Progression() []alns.ProgressionEntry {
 }
 
 type solutionContainer struct {
-	solution   Solution
-	iterations int
+	Solution   Solution
+	Error      error
+	Iterations int
 }
 
 func (s *parallelSolverImpl) SetSolverFactory(
@@ -307,22 +308,28 @@ func (s *parallelSolverImpl) Solve(
 	parallelCount := make(chan struct{}, parallelRuns)
 
 	syncResultChannel := make(chan solutionContainer)
-	resultChannel := make(chan Solution, 1)
+	resultChannel := make(chan SolutionInfo, 1)
 
 	totalIterations := atomic.Int64{}
 
 	reportBestSolution := func(solutionContainer solutionContainer) {
-		resultChannel <- solutionContainer.solution
-		s.progression = append(s.progression, alns.ProgressionEntry{
-			ElapsedSeconds: time.Since(start).Seconds(),
-			Value:          solutionContainer.solution.Score(),
-			Iterations:     solutionContainer.iterations,
-		})
+		resultChannel <- SolutionInfo{
+			Solution: solutionContainer.Solution,
+			Error:    solutionContainer.Error,
+		}
+		if solutionContainer.Solution != nil {
+			s.progression = append(s.progression, alns.ProgressionEntry{
+				ElapsedSeconds: time.Since(start).Seconds(),
+				Value:          solutionContainer.Solution.Score(),
+				Iterations:     solutionContainer.Iterations,
+			})
+		}
 	}
 
 	reportBestSolution(solutionContainer{
-		solution:   bestSolution,
-		iterations: 0,
+		Solution:   bestSolution,
+		Error:      nil,
+		Iterations: 0,
 	})
 
 	var solutionsMutex sync.Mutex
@@ -410,10 +417,12 @@ func (s *parallelSolverImpl) Solve(
 						}
 						for sol := range solutionChannel {
 							syncResultChannel <- solutionContainer{
-								solution:   sol,
-								iterations: int(totalIterations.Load()),
+								Solution:   sol,
+								Error:      sol.Error,
+								Iterations: int(totalIterations.Load()),
 							}
 						}
+
 					}(runCount)
 				}
 			}
@@ -432,15 +441,26 @@ func (s *parallelSolverImpl) Solve(
 			close(resultChannel)
 		}()
 		for solverResult := range syncResultChannel {
-			if solverResult.solution.Score() >= bestSolution.Score() {
+			if solverResult.Error != nil {
+				reportBestSolution(solutionContainer{
+					Solution:   nil,
+					Error:      solverResult.Error,
+					Iterations: solverResult.Iterations,
+				})
+				cancel()
 				continue
 			}
 
-			bestSolution = solverResult.solution.Copy()
+			if solverResult.Solution.Score() >= bestSolution.Score() {
+				continue
+			}
+
+			bestSolution = solverResult.Solution.Copy()
 
 			reportBestSolution(solutionContainer{
-				solution:   solverResult.solution.Copy(),
-				iterations: solverResult.iterations,
+				Solution:   solverResult.Solution.Copy(),
+				Error:      solverResult.Error,
+				Iterations: solverResult.Iterations,
 			})
 		}
 	}()

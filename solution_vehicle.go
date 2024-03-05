@@ -17,7 +17,7 @@ type SolutionVehicle interface {
 	// vehicle after the first solution stop of the vehicle. The move is
 	// first feasible move after the first solution stop based on the
 	// estimates of the constraint, this move is not necessarily executable.
-	FirstMove(SolutionPlanUnit) SolutionMove
+	FirstMove(SolutionPlanUnit) (SolutionMove, error)
 
 	// BestMove returns the best move for the given solution plan unit on
 	// the invoking vehicle. The best move is the move that has the lowest
@@ -102,7 +102,7 @@ func toSolutionVehicle(
 func (v solutionVehicleImpl) firstMovePlanStopsUnit(
 	planUnit *solutionPlanStopsUnitImpl,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
-) SolutionMove {
+) (SolutionMove, error) {
 	stop := false
 	var bestMove SolutionMove = newNotExecutableSolutionMoveStops(planUnit)
 	SolutionMoveStopsGenerator(
@@ -128,12 +128,12 @@ func (v solutionVehicleImpl) firstMovePlanStopsUnit(
 			return stop
 		},
 	)
-	return bestMove
+	return bestMove, nil
 }
 
 func (v solutionVehicleImpl) firstMovePlanUnitsUnit(
 	planUnit *solutionPlanUnitsUnitImpl,
-) SolutionMove {
+) (SolutionMove, error) {
 	if planUnit.ModelPlanUnitsUnit().PlanOneOf() {
 		return v.firstMovePlanOneOfUnit(planUnit)
 	}
@@ -142,33 +142,40 @@ func (v solutionVehicleImpl) firstMovePlanUnitsUnit(
 
 func (v solutionVehicleImpl) firstMovePlanOneOfUnit(
 	planUnit *solutionPlanUnitsUnitImpl,
-) SolutionMove {
+) (SolutionMove, error) {
 	planUnits := common.Shuffle(
 		v.solution.Random(),
 		planUnit.SolutionPlanUnits(),
 	)
 	for _, planUnit := range planUnits {
-		move := v.FirstMove(planUnit)
+		move, err := v.FirstMove(planUnit)
+		if err != nil {
+			return nil, err
+		}
 		if move.IsExecutable() {
-			return move
+			return move, nil
 		}
 	}
-	return NotExecutableMove
+	return NotExecutableMove, nil
 }
 
 func (v solutionVehicleImpl) firstMovePlanAllUnit(
 	planUnit *solutionPlanUnitsUnitImpl,
-) SolutionMove {
+) (SolutionMove, error) {
 	planUnits := common.Shuffle(
 		v.solution.model.Random(),
 		planUnit.SolutionPlanUnits(),
 	)
 	moves := make(SolutionMoves, 0, len(planUnits))
+	var err error
 	for idx, propositionPlanUnit := range planUnits {
 		var move SolutionMove
 
 		if idx == 0 || planUnit.modelPlanUnitsUnit.SameVehicle() {
-			move = v.FirstMove(propositionPlanUnit)
+			move, err = v.FirstMove(propositionPlanUnit)
+			if err != nil {
+				return nil, err
+			}
 		} else {
 			move = v.solution.BestMove(context.Background(), propositionPlanUnit)
 		}
@@ -176,27 +183,27 @@ func (v solutionVehicleImpl) firstMovePlanAllUnit(
 		if move.IsExecutable() {
 			if planned, err := move.Execute(context.Background()); err != nil || !planned {
 				if unplanned, err := revertMoves(moves); !unplanned || err != nil {
-					panic(fmt.Errorf("unplanning moves failed %w", err))
+					return nil, fmt.Errorf("unplanning moves failed %w", err)
 				}
-				return NotExecutableMove
+				return NotExecutableMove, nil
 			}
 		} else {
 			if unplanned, err := revertMoves(moves); !unplanned || err != nil {
-				panic(fmt.Errorf("unplanning moves failed %w", err))
+				return nil, fmt.Errorf("unplanning moves failed %w", err)
 			}
-			return NotExecutableMove
+			return NotExecutableMove, nil
 		}
 		moves = append(moves, move)
 	}
 	if unplanned, err := revertMoves(moves); !unplanned || err != nil {
-		panic(fmt.Errorf("unplanning moves failed %w", err))
+		return nil, fmt.Errorf("unplanning moves failed %w", err)
 	}
 	// This can happen in case of ctx.Done()
 	if len(moves) != len(planUnits) {
-		return NotExecutableMove
+		return NotExecutableMove, nil
 	}
 
-	return newSolutionMoveUnits(planUnit, moves)
+	return newSolutionMoveUnits(planUnit, moves), nil
 }
 
 // moveContainer holds essential information to construct a move from in bestMovePlanSingleStop.
@@ -226,7 +233,7 @@ func updateMoveInPlace(move SolutionMoveStops, moveContainer moveContainer) {
 	move.(*solutionMoveStopsImpl).value = moveContainer.value
 }
 
-func (v *solutionVehicleImpl) bestMovePlanSingleStop(
+func (v solutionVehicleImpl) bestMovePlanSingleStop(
 	_ context.Context,
 	planUnit *solutionPlanStopsUnitImpl,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
@@ -385,7 +392,7 @@ func (v solutionVehicleImpl) bestMovePlanMultipleStops(
 	return bestMove
 }
 
-func (v *solutionVehicleImpl) bestMovePlanStopsUnit(
+func (v solutionVehicleImpl) bestMovePlanStopsUnit(
 	ctx context.Context,
 	planUnit *solutionPlanStopsUnitImpl,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
@@ -397,7 +404,7 @@ func (v *solutionVehicleImpl) bestMovePlanStopsUnit(
 	return v.bestMovePlanMultipleStops(ctx, planUnit, preAllocatedMoveContainer)
 }
 
-func (v *solutionVehicleImpl) bestMovePlanUnitsUnit(
+func (v solutionVehicleImpl) bestMovePlanUnitsUnit(
 	ctx context.Context,
 	planUnit *solutionPlanUnitsUnitImpl,
 ) SolutionMove {
@@ -477,7 +484,7 @@ func (v solutionVehicleImpl) bestMovePlanAllUnit(
 
 func (v solutionVehicleImpl) FirstMove(
 	planUnit SolutionPlanUnit,
-) SolutionMove {
+) (SolutionMove, error) {
 	switch planUnit.(type) {
 	case SolutionPlanStopsUnit:
 		allocations := NewPreAllocatedMoveContainer(planUnit)
@@ -485,7 +492,7 @@ func (v solutionVehicleImpl) FirstMove(
 	case SolutionPlanUnitsUnit:
 		return v.firstMovePlanUnitsUnit(planUnit.(*solutionPlanUnitsUnitImpl))
 	}
-	return NotExecutableMove
+	return NotExecutableMove, nil
 }
 
 func (v solutionVehicleImpl) BestMove(

@@ -47,7 +47,8 @@ type VehicleTypeDistanceExpression interface {
 	DistanceExpression
 	VehicleTypeExpression
 
-	SetDistance(ModelVehicleType, common.Distance)
+	SetDistance(ModelVehicleType, common.Distance) error
+
 	DistanceForVehicleType(ModelVehicleType) common.Distance
 }
 

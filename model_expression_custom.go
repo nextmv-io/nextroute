@@ -11,7 +11,7 @@ type ConstantExpression interface {
 	ModelExpression
 
 	// SetValue sets the value of the expression.
-	SetValue(value float64)
+	SetValue(value float64) error
 }
 
 // DefaultExpression is an expression that has a default value if no other
@@ -30,7 +30,7 @@ type FromStopExpression interface {
 	SetValue(
 		stop ModelStop,
 		value float64,
-	)
+	) error
 }
 
 // StopExpression is an expression that has a value for each to stop.
@@ -41,7 +41,7 @@ type StopExpression interface {
 	SetValue(
 		stop ModelStop,
 		value float64,
-	)
+	) error
 }
 
 // VehicleTypeExpression is the base expression for
@@ -59,7 +59,7 @@ type VehicleTypeValueExpression interface {
 	SetValue(
 		vehicle ModelVehicleType,
 		value float64,
-	)
+	) error
 }
 
 // FromToExpression is an expression that has a value for each combination
@@ -73,7 +73,7 @@ type FromToExpression interface {
 		from ModelStop,
 		to ModelStop,
 		value float64,
-	)
+	) error
 }
 
 // VehicleFromToExpression is an expression that has a value for each
@@ -88,7 +88,7 @@ type VehicleFromToExpression interface {
 		from ModelStop,
 		to ModelStop,
 		value float64,
-	)
+	) error
 }
 
 // NewConstantExpression returns an expression that always returns the same
@@ -297,9 +297,9 @@ func (s *fromExpression) DefaultValue() float64 {
 func (s *fromExpression) SetValue(
 	stop ModelStop,
 	value float64,
-) {
+) error {
 	if stop.Model().IsLocked() {
-		panic(
+		return fmt.Errorf(
 			fmt.Sprintf(
 				"cannot set value of stop '%v' on '%v' after model is locked",
 				stop,
@@ -316,6 +316,8 @@ func (s *fromExpression) SetValue(
 		stop.Model().NumberOfStops(),
 	)
 	s.values[index] = value
+
+	return nil
 }
 
 func (s *fromExpression) Value(
@@ -375,14 +377,12 @@ func (s *toExpression) DefaultValue() float64 {
 func (s *toExpression) SetValue(
 	stop ModelStop,
 	value float64,
-) {
+) error {
 	if stop.Model().IsLocked() {
-		panic(
-			fmt.Sprintf(
-				"cannot set value of stop '%v' on '%v' after model is locked",
-				stop,
-				s,
-			),
+		return fmt.Errorf(
+			"cannot set value of stop '%v' on '%v' after model is locked",
+			stop,
+			s,
 		)
 	}
 	s.hasNegativeValues = s.hasNegativeValues || value < 0
@@ -394,6 +394,8 @@ func (s *toExpression) SetValue(
 		stop.Model().NumberOfStops(),
 	)
 	s.values[index] = value
+
+	return nil
 }
 
 // expandSlice will first check if the slice is already long enough
@@ -467,24 +469,15 @@ func (v *vehicleTypeExpressionImpl) DefaultValue() float64 {
 	return v.defaultValue
 }
 
-func (v *vehicleTypeExpressionImpl) SetDistance(
-	vehicle ModelVehicleType,
-	distance common.Distance,
-) {
-	v.SetValue(vehicle, distance.Value(common.Meters))
-}
-
 func (v *vehicleTypeExpressionImpl) SetValue(
 	vehicle ModelVehicleType,
 	value float64,
-) {
+) error {
 	if vehicle.Model().IsLocked() {
-		panic(
-			fmt.Sprintf(
-				"cannot set value of vehicle '%v' on '%v' after model is locked",
-				vehicle,
-				v,
-			),
+		return fmt.Errorf(
+			"cannot set value of vehicle '%v' on '%v' after model is locked",
+			vehicle,
+			v,
 		)
 	}
 	v.hasNegativeValues = v.hasNegativeValues || value < 0
@@ -492,6 +485,8 @@ func (v *vehicleTypeExpressionImpl) SetValue(
 	index := vehicle.Index()
 	v.values = expandSlice(v.values, v.defaultValue, index, len(vehicle.Model().(*modelImpl).vehicleTypes))
 	v.values[index] = value
+
+	return nil
 }
 
 func (v *vehicleTypeExpressionImpl) ValueForVehicleType(
@@ -560,14 +555,12 @@ func (v *vehicleTypeDistanceExpressionImpl) DefaultValue() float64 {
 func (v *vehicleTypeDistanceExpressionImpl) SetDistance(
 	vehicle ModelVehicleType,
 	value common.Distance,
-) {
+) error {
 	if vehicle.Model().IsLocked() {
-		panic(
-			fmt.Sprintf(
-				"cannot set value of vehicle '%v' on '%v' after model is locked",
-				vehicle,
-				v,
-			),
+		return fmt.Errorf(
+			"cannot set value of vehicle '%v' on '%v' after model is locked",
+			vehicle,
+			v,
 		)
 	}
 	v.hasNegativeValues = v.hasNegativeValues || value.Value(common.Meters) < 0
@@ -575,6 +568,7 @@ func (v *vehicleTypeDistanceExpressionImpl) SetDistance(
 	index := vehicle.Index()
 	v.values = expandSlice(v.values, v.defaultValue, index, len(vehicle.Model().(*modelImpl).vehicleTypes))
 	v.values[index] = value
+	return nil
 }
 
 func (v *vehicleTypeDistanceExpressionImpl) ValueForVehicleType(
@@ -662,13 +656,11 @@ func (m *fromToExpression) SetValue(
 	from ModelStop,
 	to ModelStop,
 	value float64,
-) {
+) error {
 	if from.Model().IsLocked() {
-		panic(
-			fmt.Sprintf(
-				"cannot set value on '%v' after model is locked",
-				m,
-			),
+		return fmt.Errorf(
+			"cannot set value on '%v' after model is locked",
+			m,
 		)
 	}
 
@@ -679,6 +671,8 @@ func (m *fromToExpression) SetValue(
 	m.hasNegativeValues = m.hasNegativeValues || value < 0
 	m.hasPositiveValues = m.hasPositiveValues || value > 0
 	m.values[from.Index()][to.Index()] = value
+
+	return nil
 }
 
 func (m *fromToExpression) Value(
@@ -728,8 +722,9 @@ func (c *constantExpression) SetName(n string) {
 	c.name = n
 }
 
-func (c *constantExpression) SetValue(value float64) {
+func (c *constantExpression) SetValue(value float64) error {
 	c.value = value
+	return nil
 }
 
 func (c *constantExpression) Value(
@@ -795,13 +790,11 @@ func (m *vehicleTypeFromToExpression) SetValue(
 	from ModelStop,
 	to ModelStop,
 	value float64,
-) {
+) error {
 	if from.Model().IsLocked() {
-		panic(
-			fmt.Sprintf(
-				"cannot set value on '%v' after model is locked",
-				m,
-			),
+		return fmt.Errorf(
+			"cannot set value on '%v' after model is locked",
+			m,
 		)
 	}
 
@@ -815,6 +808,8 @@ func (m *vehicleTypeFromToExpression) SetValue(
 	m.hasNegativeValues = m.hasNegativeValues || value < 0
 	m.hasPositiveValues = m.hasPositiveValues || value > 0
 	m.values[vehicle.Index()][from.Index()][to.Index()] = value
+
+	return nil
 }
 
 func (m *vehicleTypeFromToExpression) Value(

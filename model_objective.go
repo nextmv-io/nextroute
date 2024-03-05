@@ -118,10 +118,6 @@ func (m *modelObjectiveSumImpl) EstimateDeltaValue(move SolutionMoveStops) float
 	return estimateDeltaScore
 }
 
-func (m *modelObjectiveSumImpl) InternalValue(_ *solutionImpl) float64 {
-	panic("use Solution.ObjectiveValue or solution.Score to query objective value")
-}
-
 func (m *modelObjectiveSumImpl) Value(_ Solution) float64 {
 	panic("use Solution.ObjectiveValue or solution.Score to query objective value")
 }
@@ -158,7 +154,10 @@ func (m *modelObjectiveSumImpl) NewTerm(
 
 		if registered, ok := term.Objective().(RegisteredModelExpressions); ok {
 			for _, expression := range registered.ModelExpressions() {
-				m.model.addExpression(expression)
+				err := m.model.addExpression(expression)
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 		if _, ok := term.Objective().(ObjectiveStopDataUpdater); ok {

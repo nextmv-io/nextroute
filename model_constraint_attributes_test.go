@@ -54,23 +54,53 @@ func TestAttributesConstraint_EstimateIsViolated(t *testing.T) {
 		return planUnit.NumberOfStops() == 1
 	})
 
-	cnstr.SetStopAttributes(singleStopPlanUnits[0].Stops()[0], []string{attribute0})
-	cnstr.SetStopAttributes(singleStopPlanUnits[1].Stops()[0], []string{attribute1})
-	cnstr.SetStopAttributes(singleStopPlanUnits[2].Stops()[0], []string{})
+	err = cnstr.SetStopAttributes(singleStopPlanUnits[0].Stops()[0], []string{attribute0})
+	if err != nil {
+		t.Error(err)
+	}
+	err = cnstr.SetStopAttributes(singleStopPlanUnits[1].Stops()[0], []string{attribute1})
+	if err != nil {
+		t.Error(err)
+	}
+	err = cnstr.SetStopAttributes(singleStopPlanUnits[2].Stops()[0], []string{})
+	if err != nil {
+		t.Error(err)
+	}
 
 	sequencePlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() > 1
 	})
 
-	cnstr.SetStopAttributes(sequencePlanUnits[0].Stops()[0], []string{attribute0, attribute1})
-	cnstr.SetStopAttributes(sequencePlanUnits[0].Stops()[1], []string{attribute1, attribute2})
+	err = cnstr.SetStopAttributes(sequencePlanUnits[0].Stops()[0], []string{attribute0, attribute1})
+	if err != nil {
+		t.Error(err)
+	}
+	err = cnstr.SetStopAttributes(sequencePlanUnits[0].Stops()[1], []string{attribute1, attribute2})
+	if err != nil {
+		t.Error(err)
+	}
 
-	cnstr.SetStopAttributes(sequencePlanUnits[1].Stops()[0], []string{attribute1})
-	cnstr.SetStopAttributes(sequencePlanUnits[1].Stops()[1], []string{attribute1, attribute2})
+	err = cnstr.SetStopAttributes(sequencePlanUnits[1].Stops()[0], []string{attribute1})
+	if err != nil {
+		t.Error(err)
+	}
+	err = cnstr.SetStopAttributes(sequencePlanUnits[1].Stops()[1], []string{attribute1, attribute2})
+	if err != nil {
+		t.Error(err)
+	}
 
-	cnstr.SetVehicleTypeAttributes(model.VehicleTypes()[0], []string{attribute0, attribute1})
-	cnstr.SetVehicleTypeAttributes(model.VehicleTypes()[1], []string{attribute1, attribute2})
-	cnstr.SetVehicleTypeAttributes(model.VehicleTypes()[2], []string{})
+	err = cnstr.SetVehicleTypeAttributes(model.VehicleTypes()[0], []string{attribute0, attribute1})
+	if err != nil {
+		t.Error(err)
+	}
+	err = cnstr.SetVehicleTypeAttributes(model.VehicleTypes()[1], []string{attribute1, attribute2})
+	if err != nil {
+		t.Error(err)
+	}
+	err = cnstr.SetVehicleTypeAttributes(model.VehicleTypes()[2], []string{})
+	if err != nil {
+		t.Error(err)
+	}
 
 	solution, err := nextroute.NewSolution(model)
 	if err != nil {
@@ -399,7 +429,10 @@ func TestAttributesConstraint(t *testing.T) {
 	vehicleTypeAttributes := []string{"attribute-1", "attribute-2"}
 
 	for _, vt := range model.VehicleTypes() {
-		constraint.SetVehicleTypeAttributes(vt, vehicleTypeAttributes)
+		err = constraint.SetVehicleTypeAttributes(vt, vehicleTypeAttributes)
+		if err != nil {
+			t.Error(err)
+		}
 		attributes := constraint.VehicleTypeAttributes(vt)
 		if len(attributes) != 2 {
 			t.Errorf(
@@ -427,13 +460,22 @@ func TestAttributesConstraint(t *testing.T) {
 		}
 	}
 
-	constraint.SetVehicleTypeAttributes(model.VehicleTypes()[0], []string{})
-	constraint.SetStopAttributes(model.Stops()[0], []string{})
+	err = constraint.SetVehicleTypeAttributes(model.VehicleTypes()[0], []string{})
+	if err != nil {
+		t.Error(err)
+	}
+	err = constraint.SetStopAttributes(model.Stops()[0], []string{})
+	if err != nil {
+		t.Error(err)
+	}
 
 	stopAttributes := []string{"attribute-2", "attribute-3"}
 
 	for _, stop := range model.Stops() {
-		constraint.SetStopAttributes(stop, stopAttributes)
+		err = constraint.SetStopAttributes(stop, stopAttributes)
+		if err != nil {
+			t.Error(err)
+		}
 
 		attributes := constraint.StopAttributes(stop)
 
@@ -463,10 +505,13 @@ func TestAttributesConstraint(t *testing.T) {
 		}
 	}
 
-	constraint.SetStopAttributes(
+	err = constraint.SetStopAttributes(
 		model.Stops()[0],
 		[]string{"A", "B", "C", "A", "B", "C"},
 	)
+	if err != nil {
+		t.Error(err)
+	}
 
 	if len(constraint.StopAttributes(model.Stops()[0])) != 3 {
 		t.Errorf(
@@ -475,10 +520,13 @@ func TestAttributesConstraint(t *testing.T) {
 		)
 	}
 
-	constraint.SetVehicleTypeAttributes(
+	err = constraint.SetVehicleTypeAttributes(
 		model.VehicleTypes()[0],
 		[]string{"A", "B", "C", "A", "B", "C"},
 	)
+	if err != nil {
+		t.Error(err)
+	}
 
 	if len(constraint.VehicleTypeAttributes(model.VehicleTypes()[0])) != 3 {
 		t.Errorf(

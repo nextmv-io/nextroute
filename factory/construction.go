@@ -301,14 +301,14 @@ func (d defaultModelFactoryImpl) NewModel(
 
 // NewStopCluster returns a new stop cluster for the given stops.
 func NewStopCluster(
-	stops []schema.Stop) StopCluster {
+	stops []schema.Stop) (StopCluster, error) {
 	if len(stops) == 0 {
-		panic("cannot create stop cluster with no stops")
+		return nil, fmt.Errorf("cannot create stop cluster with no stops")
 	}
 	return stopCluster{
 		stops:    slices.Clone(stops),
 		centroid: CentroidLocation(stops),
-	}
+	}, nil
 }
 
 // NewPlanUnitStopClusterGenerator returns a list of stop clusters based
@@ -339,9 +339,13 @@ func (s *planUnitStopClusterGeneratorImpl) Generate(
 
 	for _, solutionPlanUnit := range solution.UnPlannedPlanUnits().SolutionPlanUnits() {
 		stops := getInputStops(solutionPlanUnit.ModelPlanUnit())
+		cluster, err := NewStopCluster(stops)
+		if err != nil {
+			return nil, err
+		}
 		clusters = append(
 			clusters,
-			NewStopCluster(stops),
+			cluster,
 		)
 	}
 	return clusters, nil
@@ -705,7 +709,7 @@ func newSolution(
 		return nil, err
 	}
 
-	return solutions.Last(), nil
+	return solutions.Last()
 }
 
 // HaversineDistance returns the distance between two locations using the
