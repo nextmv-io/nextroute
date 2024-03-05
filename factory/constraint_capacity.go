@@ -77,7 +77,7 @@ func addCapacityConstraint(
 		return nil, err
 	}
 
-	setExpressionValues(
+	err = setExpressionValues(
 		names,
 		quantities,
 		capacities,
@@ -87,6 +87,9 @@ func addCapacityConstraint(
 		quantityExpressions,
 		capacityExpressions,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	return model, nil
 }
@@ -371,14 +374,17 @@ func setExpressionValues(
 	vehicles nextroute.ModelVehicles,
 	quantityExpressions map[string]nextroute.StopExpression,
 	capacityExpressions map[string]nextroute.VehicleTypeValueExpression,
-) {
+) error {
 	for s, stop := range stops {
 		for name := range names {
 			if value, ok := quantities[s][name]; ok {
 				if value == 0 {
 					continue
 				}
-				quantityExpressions[name].SetValue(stop, value)
+				err := quantityExpressions[name].SetValue(stop, value)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -386,13 +392,20 @@ func setExpressionValues(
 	for v, vehicle := range vehicles {
 		for name := range names {
 			if value, ok := capacities[v][name]; ok {
-				capacityExpressions[name].SetValue(vehicle.VehicleType(), value)
+				err := capacityExpressions[name].SetValue(vehicle.VehicleType(), value)
+				if err != nil {
+					return err
+				}
 			}
 			if level, ok := startLevels[v][name]; ok {
-				quantityExpressions[name].SetValue(vehicle.First(), level)
+				err := quantityExpressions[name].SetValue(vehicle.First(), level)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
+	return nil
 }
 
 func convertToFloat(unknown any) (float64, bool) {

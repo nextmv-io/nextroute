@@ -48,7 +48,10 @@ func addDistanceLimitConstraint(
 		// Get distance expression and set limit for the vehicle type.
 		distanceExpression := data.DistanceExpression
 		composed.Set(vehicleType, distanceExpression)
-		limit.SetDistance(vehicleType, common.NewDistance(float64(*maxDistance), common.Meters))
+		err := limit.SetDistance(vehicleType, common.NewDistance(float64(*maxDistance), common.Meters))
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if !hasDistanceLimit {

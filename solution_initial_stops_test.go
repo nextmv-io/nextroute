@@ -59,7 +59,10 @@ func TestSolutionInitialStops_Feasible(t *testing.T) {
 	// warehouse -> s1 -> warehouse will violate the latest end constraint
 	// but the initial solution should be valid it is
 	// warehouse -> s1 -> s2 -> warehouse
-	travelDurationExpression.SetValue(s1, warehouse, (2 * time.Hour).Seconds())
+	err = travelDurationExpression.SetValue(s1, warehouse, (2 * time.Hour).Seconds())
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	s2, err := model.NewStop(dummyLocation)
 	if err != nil {
@@ -178,8 +181,14 @@ func TestSolutionInitialStops_InFeasible(t *testing.T) {
 	}
 	// warehouse -> s1 -> warehouse and  warehouse -> s1 -> s2 -> warehouse
 	// will violate the latest end constraint
-	travelDurationExpression.SetValue(s1, warehouse, (2 * time.Hour).Seconds())
-	travelDurationExpression.SetValue(s2, warehouse, (2 * time.Hour).Seconds())
+	err = travelDurationExpression.SetValue(s1, warehouse, (2 * time.Hour).Seconds())
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = travelDurationExpression.SetValue(s2, warehouse, (2 * time.Hour).Seconds())
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	constraint, err := nextroute.NewLatestEnd(latestEndExpression)
 	if err != nil {

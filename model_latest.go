@@ -23,7 +23,7 @@ type LatestEnd interface {
 
 	// SetFactor adds a factor with which a deviating stop is multiplied. This
 	// is only taken into account if the construct is used as an objective.
-	SetFactor(factor float64, stop ModelStop)
+	SetFactor(factor float64, stop ModelStop) error
 
 	// Factor returns the multiplication factor for the given stop expression.
 	Factor(stop ModelStop) float64
@@ -47,7 +47,7 @@ type LatestStart interface {
 
 	// SetFactor adds a factor with which a deviating stop is multiplied. This
 	// is only taken into account if the construct is used as an objective.
-	SetFactor(factor float64, stop ModelStop)
+	SetFactor(factor float64, stop ModelStop) error
 
 	// Factor returns the multiplication factor for the given stop expression.
 	Factor(stop ModelStop) float64
@@ -71,7 +71,7 @@ type LatestArrival interface {
 
 	// SetFactor adds a factor with which a deviating stop is multiplied. This
 	// is only taken into account if the construct is used as an objective.
-	SetFactor(factor float64, stop ModelStop)
+	SetFactor(factor float64, stop ModelStop) error
 
 	// Factor returns the multiplication factor for the given stop expression.
 	Factor(stop ModelStop) float64
@@ -129,10 +129,11 @@ type latestImpl struct {
 	temporalReference TemporalReference
 }
 
-func (l *latestImpl) SetFactor(factor float64, stop ModelStop) {
+func (l *latestImpl) SetFactor(factor float64, stop ModelStop) error {
 	if factor >= 0 {
-		l.latenessFactor.SetValue(stop, factor)
+		return l.latenessFactor.SetValue(stop, factor)
 	}
+	return nil
 }
 
 func (l *latestImpl) Factor(stop ModelStop) float64 {
