@@ -1,3 +1,5 @@
+// © 2019-present nextmv.io inc
+
 package factory
 
 import (
@@ -856,7 +858,7 @@ func validateResources(input schema.Input, modelOptions Options) error {
 	}
 
 	for _, stop := range input.Stops {
-		quantity, err := resources(stop, "Quantity", -1)
+		quantity, err := resources(stop, "Quantity", 1)
 		if err != nil {
 			return err
 		}
@@ -881,7 +883,7 @@ func validateResources(input schema.Input, modelOptions Options) error {
 
 	if input.AlternateStops != nil {
 		for _, stop := range *input.AlternateStops {
-			quantity, err := resources(stop, "Quantity", -1)
+			quantity, err := resources(stop, "Quantity", 1)
 			if err != nil {
 				return err
 			}
@@ -907,24 +909,26 @@ func validateResources(input schema.Input, modelOptions Options) error {
 
 	if !modelOptions.Validate.Disable.Resources {
 		for name, info := range resourcesInfo {
-			if info.anyStops && info.allStopsNegative && info.allStartLevelsZero {
+			if info.anyStops && info.allStopsPositive && info.allStartLevelsZero {
 				return nmerror.NewInputDataError(fmt.Errorf(
-					"resource `%s` start level is zero,"+
-						" all stop quantities are negative,"+
-						" need to have at least one stop with positive quantity for resource `%s`"+
-						" to plan a stop with negative quantity",
-					name,
+					"resource `%s` is starting without any capacity being"+
+						" used. All your stops have a positive quantity and"+
+						" are considered as dropoff stops. You need to have"+
+						" at least one pickup stop (negative quantity) or a"+
+						" start level > 0 to plan a stop with a positive"+
+						" quantity",
 					name,
 				))
 			}
 
-			if info.anyStops && info.allStopsPositive && info.allStartLevelsAtCapacity {
+			if info.anyStops && info.allStopsNegative && info.allStartLevelsAtCapacity {
 				return nmerror.NewInputDataError(fmt.Errorf(
-					"resource `%s` start level is at capacity,"+
-						" all stop quantities are positive,"+
-						" need to have at least one stop with negative quantity for resource `%s`"+
-						" to plan a stop with positive quantity",
-					name,
+					"resource `%s` is starting with all of the capacity"+
+						" being used. All your stops have a negative quantity"+
+						" and are considered as pickup stops. You need to have"+
+						" at least one dropoff stop (positive quantity) or a"+
+						" start level < max capacity to plan a stop with a"+
+						" negative quantity",
 					name,
 				))
 			}

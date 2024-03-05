@@ -1,3 +1,5 @@
+// © 2019-present nextmv.io inc
+
 package nextroute
 
 // Identifier is an interface that can be used for identifying objects.

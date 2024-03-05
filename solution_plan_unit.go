@@ -1,3 +1,5 @@
+// © 2019-present nextmv.io inc
+
 package nextroute
 
 // SolutionPlanUnit is a set of stops that are planned to be visited by

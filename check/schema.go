@@ -1,3 +1,5 @@
+// © 2019-present nextmv.io inc
+
 // Package check contains the schema for the check configuration.
 package check
 
