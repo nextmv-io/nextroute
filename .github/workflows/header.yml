@@ -12,6 +12,6 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: check header in .py files
+      - name: check header in .go files
         run: |
           python .nextmv/check_header.py
