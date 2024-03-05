@@ -1,3 +1,4 @@
+// © 2019-present nextmv.io inc
 package check
 
 import "github.com/nextmv-io/nextroute"

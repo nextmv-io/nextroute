@@ -1,3 +1,4 @@
+// © 2019-present nextmv.io inc
 // Package schema provides the input and output schema for
 package schema
 

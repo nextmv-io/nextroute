@@ -1,3 +1,4 @@
+// © 2019-present nextmv.io inc
 /*
 Package factory holds functionality for creating a ready-to-go nextroute model.
 

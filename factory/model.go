@@ -1,3 +1,4 @@
+// © 2019-present nextmv.io inc
 // Package factory is a package containing factory functions for creating
 // nextroute models.
 package factory

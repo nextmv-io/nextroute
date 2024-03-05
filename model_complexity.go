@@ -1,3 +1,4 @@
+// © 2019-present nextmv.io inc
 package nextroute
 
 // Cost is type to indicate the cost of a function.

@@ -1,3 +1,4 @@
+// © 2019-present nextmv.io inc
 package nextroute
 
 import "sync/atomic"

@@ -1,3 +1,4 @@
+// © 2019-present nextmv.io inc
 // Package schema contains the core schemas for nextroute.
 package schema
 

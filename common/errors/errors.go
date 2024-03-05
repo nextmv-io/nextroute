@@ -1,3 +1,4 @@
+// © 2019-present nextmv.io inc
 // Package errors contains errors contains information about errors returned by nextmv functions.
 package errors
 
