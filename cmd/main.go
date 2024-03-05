@@ -1,3 +1,5 @@
+// © 2019-present nextmv.io inc
+
 // Package main allows you to run a nextroute solver from the command line.
 package main
 

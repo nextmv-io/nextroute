@@ -1,3 +1,5 @@
+// © 2019-present nextmv.io inc
+
 package nextroute
 
 // VehiclesObjective is an objective that uses the number of vehicles as an

@@ -1,3 +1,5 @@
+// © 2019-present nextmv.io inc
+
 package nextroute
 
 // Copier is the interface that all objects that can be copied must implement.

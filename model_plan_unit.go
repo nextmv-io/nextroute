@@ -1,3 +1,5 @@
+// © 2019-present nextmv.io inc
+
 package nextroute
 
 // ModelPlanUnit is a plan unit. It is a unit defining what should be planned .
