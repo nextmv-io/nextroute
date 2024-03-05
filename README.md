@@ -6,7 +6,7 @@ under various constraints.
 ## License
 
 Please note that nextroute is provided as _source-available_ software (not
-_open-source_). For further information, please refer to the [LICENSE](./LICENSE)
+_open-source_). For further information, please refer to the [LICENSE](./LICENSE.md)
 file.
 
 ## Usage
