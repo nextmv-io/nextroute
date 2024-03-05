@@ -24,8 +24,14 @@ func addMinStopsObjective(
 		if vehicle.MinStopsPenalty == nil || *vehicle.MinStopsPenalty == 0.0 {
 			continue
 		}
-		minStops.SetValue(model.VehicleTypes()[v], float64(*vehicle.MinStops))
-		minStopsPenalty.SetValue(model.VehicleTypes()[v], *vehicle.MinStopsPenalty)
+		err := minStops.SetValue(model.VehicleTypes()[v], float64(*vehicle.MinStops))
+		if err != nil {
+			return nil, err
+		}
+		err = minStopsPenalty.SetValue(model.VehicleTypes()[v], *vehicle.MinStopsPenalty)
+		if err != nil {
+			return nil, err
+		}
 		present = true
 	}
 
