@@ -1,0 +1,17 @@
+name: header
+on: [push]
+jobs:
+  check-header:
+    runs-on: ubuntu-latest
+    steps:
+      - name: git clone
+        uses: actions/checkout@v4
+
+      - name: set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: check header in .go files
+        run: |
+          python .nextmv/check_header.py
