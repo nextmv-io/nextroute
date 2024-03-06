@@ -64,15 +64,15 @@ jobs:
           git push origin $VERSION
         working-directory: ./nextroute
 
-      # - name: create release
-      #   run: |
-      #     PRERELEASE_FLAG=""
-      #     if [ ${{ inputs.IS_PRE_RELEASE }} = true ]; then
-      #       PRERELEASE_FLAG="--prerelease"
-      #     fi
+      - name: create release
+        run: |
+          PRERELEASE_FLAG=""
+          if [ ${{ inputs.IS_PRE_RELEASE }} = true ]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
 
-      #     gh release create $VERSION \
-      #     --verify-tag \
-      #     --generate-notes \
-      #     --title $VERSION $PRERELEASE_FLAG
-      #   working-directory: ./nextroute
+          gh release create $VERSION \
+          --verify-tag \
+          --generate-notes \
+          --title $VERSION $PRERELEASE_FLAG
+        working-directory: ./nextroute
