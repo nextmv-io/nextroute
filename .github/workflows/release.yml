@@ -58,11 +58,11 @@ jobs:
 
           git rev-parse --short HEAD
 
-      # - name: push release tag
-      #   run: |
-      #     git tag $VERSION
-      #     git push origin $VERSION
-      #   working-directory: ./nextroute
+      - name: push release tag
+        run: |
+          git tag $VERSION
+          git push origin $VERSION
+        working-directory: ./nextroute
 
       # - name: create release
       #   run: |
