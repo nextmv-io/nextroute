@@ -57,8 +57,7 @@ func noPositionsHint() *stopPositionHintImpl {
 }
 
 // SkipVehiclePositionsHint returns a new StopPositionsHint that skips the
-// vehicle if skipVehicle is true. Is skipVehicle is false the solver will try
-// to find the next stop.
+// vehicle.
 func SkipVehiclePositionsHint() StopPositionsHint {
 	return skipVehiclePositionsHint()
 }

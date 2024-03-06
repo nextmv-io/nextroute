@@ -43,6 +43,10 @@ type SolutionStop interface {
 	// meaning.
 	CumulativeValue(expression ModelExpression) float64
 
+	// DurationValue returns the duration of the stop as a float64. If the stop
+	// is unplanned, the duration has no semantic meaning.
+	DurationValue() float64
+
 	// End returns the end time of the stop. If the stop is unplanned, the end
 	// time has no semantic meaning.
 	End() time.Time

@@ -153,10 +153,6 @@ func (l *attributesConstraintImpl) SetVehicleTypeAttributes(
 	return nil
 }
 
-func (l *attributesConstraintImpl) CheckCost() Cost {
-	return Constant
-}
-
 func (l *attributesConstraintImpl) EstimationCost() Cost {
 	return Constant
 }
