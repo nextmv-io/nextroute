@@ -54,21 +54,23 @@ type ModelObjectiveSum interface {
 	// factor.
 	NewTerm(factor float64, objective ModelObjective) (ModelObjectiveTerm, error)
 
-	// ObjectiveTerms returns the model objectives that are part of the sum.
+	// Terms returns the model objective terms that are part of the sum.
 	Terms() ModelObjectiveTerms
 }
 
 // ModelObjectiveTerm is a term in a model objective sum.
 type ModelObjectiveTerm interface {
+	// Factor returns the factor by which the objective is multiplied.
 	Factor() float64
+	// Objective returns the objective that is multiplied by the factor.
 	Objective() ModelObjective
 }
 
 // ModelObjectiveTerms is a slice of model objective terms.
 type ModelObjectiveTerms []ModelObjectiveTerm
 
-// ObjectiveDataUpdater is is a deprecated interface. Please use
-// ObjectiveStopDataUpdater instead.
+// ObjectiveDataUpdater is deprecated.
+// Deprecated: Please use ObjectiveStopDataUpdater instead.
 type ObjectiveDataUpdater interface {
 	// UpdateObjectiveData is deprecated.
 	UpdateObjectiveData(s SolutionStop) (Copier, error)

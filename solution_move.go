@@ -112,7 +112,7 @@ func (m solutionMoveImpl) IncrementValueSeen(_ int) SolutionMove {
 
 // takeBestInPlace takes the best move and a candidate move.
 // It tries to modify best in place, if the underlying type allows it.
-// Otherwise it makes a deep copy of that and returns it.
+// Otherwise, it makes a deep copy of that and returns it.
 func takeBestInPlace(best, that SolutionMove) SolutionMove {
 	if !that.IsExecutable() {
 		return best
@@ -138,7 +138,8 @@ func takeBestInPlace(best, that SolutionMove) SolutionMove {
 	return tryReplaceBy(best, that, best.ValueSeen()+that.ValueSeen())
 }
 
-// tryReplaceBy the move in src to dst by mutating dst if possible. Otherwise makes a copy.
+// tryReplaceBy the move in src to dst by mutating dst if possible. Otherwise,
+// makes a copy.
 func tryReplaceBy(dst, src SolutionMove, newValueSeen int) SolutionMove {
 	// first we try to mutate in place
 	if dstImpl, ok := dst.(*solutionMoveStopsImpl); ok {

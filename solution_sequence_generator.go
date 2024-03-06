@@ -11,6 +11,12 @@ import (
 // SequenceGeneratorChannel generates all possible sequences of solution stops
 // for a given plan planUnit.
 //
+// If there are more possible sequences than the maximum number of sequences
+// allowed by the model, the generator will stop generating sequences after
+// the maximum number of sequences has been reached. The maximum number of
+// sequences is set by the model's [Model.SequenceSampleSize] function.
+// The sequences are generated in a random order.
+//
 // Example:
 //
 //	quit := make(chan struct{})

@@ -8,7 +8,7 @@ import (
 
 // MaximumWaitVehicleConstraint is a constraint that limits the accumulated time
 // a vehicle can wait at stops on its route. Wait is defined as the time between
-// arriving at a the location of stop and starting (to work),
+// arriving at a location of stop and starting (to work),
 // [SolutionStop.StartValue()] - [SolutionStop.ArrivalValue()].
 type MaximumWaitVehicleConstraint interface {
 	ModelConstraint
