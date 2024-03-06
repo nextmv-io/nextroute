@@ -29,7 +29,10 @@ func addMaximumStopsConstraint(
 
 		present = true
 
-		limit.SetValue(vehicleType, float64(*maxStops))
+		err := limit.SetValue(vehicleType, float64(*maxStops))
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if !present {

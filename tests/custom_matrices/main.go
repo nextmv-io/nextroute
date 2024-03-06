@@ -98,7 +98,10 @@ func solver(
 	if err != nil {
 		return runSchema.Output{}, err
 	}
-	last := solutions.Last()
+	last, err := solutions.Last()
+	if err != nil {
+		return runSchema.Output{}, err
+	}
 
 	output, err := check.Format(
 		ctx,

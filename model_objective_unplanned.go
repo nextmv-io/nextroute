@@ -2,6 +2,8 @@
 
 package nextroute
 
+import "fmt"
+
 // UnPlannedObjective is an objective that uses the un-planned stops as an
 // objective. Each unplanned stop is scored by the given expression.
 type UnPlannedObjective interface {
@@ -22,26 +24,34 @@ type unplannedObjectiveImpl struct {
 	costs      []float64
 }
 
-func (t *unplannedObjectiveImpl) calculateCosts(planUnit ModelPlanUnit) float64 {
+func (t *unplannedObjectiveImpl) calculateCosts(
+	planUnit ModelPlanUnit,
+) (float64, error) {
 	switch unit := planUnit.(type) {
 	case ModelPlanStopsUnit:
 		cost := 0.0
 		for _, stop := range unit.Stops() {
 			cost += t.expression.Value(nil, nil, stop)
 		}
-		return cost
+		return cost, nil
 	case ModelPlanUnitsUnit:
 		cost := 0.0
 		for _, planUnit := range unit.PlanUnits() {
-			cost += t.calculateCosts(planUnit)
+			c, err := t.calculateCosts(planUnit)
+			if err != nil {
+				return 0, err
+			}
+			cost += c
 		}
 		if unit.PlanOneOf() {
 			// we take the average cost of planing one unit
-			return cost / float64(len(unit.PlanUnits()))
+			return cost / float64(len(unit.PlanUnits())), nil
 		}
-		return cost
+		return cost, nil
 	default:
-		panic("planUnit type is not recognized for the unplanned objective")
+		return 0, fmt.Errorf(
+			"model plan unit type is not recognized for the unplanned objective",
+		)
 	}
 }
 
@@ -49,7 +59,11 @@ func (t *unplannedObjectiveImpl) Lock(model Model) error {
 	units := model.PlanUnits()
 	t.costs = make([]float64, len(units))
 	for _, planUnit := range units {
-		t.costs[planUnit.Index()] = t.calculateCosts(planUnit)
+		cost, err := t.calculateCosts(planUnit)
+		if err != nil {
+			return err
+		}
+		t.costs[planUnit.Index()] = cost
 	}
 	return nil
 }

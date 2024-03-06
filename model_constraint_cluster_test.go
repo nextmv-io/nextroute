@@ -54,15 +54,18 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 	}
 
 	solutionSingleStopPlanUnit0 := solution.SolutionPlanStopsUnit(singleStopPlanUnits[0])
+
+	position, err := nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionSingleStopPlanUnit0.SolutionStops()[0],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	moveSingleOnVehicle0, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit0,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionSingleStopPlanUnit0.SolutionStops()[0],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position},
 	)
 
 	if err != nil {
@@ -82,15 +85,17 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 	}
 
 	solutionSingleStopPlanUnit1 := solution.SolutionPlanStopsUnit(singleStopPlanUnits[1])
+	position, err = nextroute.NewStopPosition(
+		solution.Vehicles()[1].First(),
+		solutionSingleStopPlanUnit1.SolutionStops()[0],
+		solution.Vehicles()[1].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	moveSingleOnVehicle1, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit1,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[1].First(),
-				solutionSingleStopPlanUnit1.SolutionStops()[0],
-				solution.Vehicles()[1].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position},
 	)
 
 	if err != nil {
@@ -110,15 +115,17 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 	}
 
 	solutionSingleStopPlanUnit2 := solution.SolutionPlanStopsUnit(singleStopPlanUnits[2])
+	position, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionSingleStopPlanUnit2.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	moveSingleOnVehicle2, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit2,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionSingleStopPlanUnit2.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -129,16 +136,17 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 	if violated, _ := cnstr.EstimateIsViolated(moveSingleOnVehicle2); !violated {
 		t.Error("constraint should be violated")
 	}
-
+	position, err = nextroute.NewStopPosition(
+		solution.Vehicles()[1].First(),
+		solutionSingleStopPlanUnit2.SolutionStops()[0],
+		solution.Vehicles()[1].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	moveSingleOnVehicle3, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit2,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[1].First(),
-				solutionSingleStopPlanUnit2.SolutionStops()[0],
-				solution.Vehicles()[1].First().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -152,21 +160,25 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 		return planUnit.NumberOfStops() > 1
 	})
 	solutionSequencePlanUnit := solution.SolutionPlanStopsUnit(sequencePlanUnits[0])
-
+	position1, err := nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionSequencePlanUnit.SolutionStops()[0],
+		solutionSequencePlanUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err := nextroute.NewStopPosition(
+		solutionSequencePlanUnit.SolutionStops()[0],
+		solutionSequencePlanUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	moveSequenceOnVehicle0, err := nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionSequencePlanUnit.SolutionStops()[0],
-				solutionSequencePlanUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionSequencePlanUnit.SolutionStops()[0],
-				solutionSequencePlanUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -185,21 +197,25 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 	}
 
 	solutionSequencePlanUnit = solution.SolutionPlanStopsUnit(sequencePlanUnits[1])
-
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionSequencePlanUnit.SolutionStops()[0],
+		solutionSequencePlanUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solutionSequencePlanUnit.SolutionStops()[0],
+		solutionSequencePlanUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	moveSequenceOnVehicle0, err = nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionSequencePlanUnit.SolutionStops()[0],
-				solutionSequencePlanUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionSequencePlanUnit.SolutionStops()[0],
-				solutionSequencePlanUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)

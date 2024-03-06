@@ -44,8 +44,14 @@ func TestMaximumStopsConstraint_EstimateIsViolated(t *testing.T) {
 		t.Error(err)
 	}
 
-	maximumStops.SetValue(model.VehicleTypes()[0], 1)
-	maximumStops.SetValue(model.VehicleTypes()[1], 2)
+	err = maximumStops.SetValue(model.VehicleTypes()[0], 1)
+	if err != nil {
+		t.Error(err)
+	}
+	err = maximumStops.SetValue(model.VehicleTypes()[1], 2)
+	if err != nil {
+		t.Error(err)
+	}
 
 	err = model.AddConstraint(cnstr)
 	if err != nil {
@@ -65,30 +71,33 @@ func TestMaximumStopsConstraint_EstimateIsViolated(t *testing.T) {
 	}
 
 	solutionSingleStopPlanUnit := solution.SolutionPlanStopsUnit(singleStopPlanUnits[0])
-
-	moveSingleOnVehicle0, err := nextroute.NewMoveStops(
-		solutionSingleStopPlanUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionSingleStopPlanUnit.SolutionStops()[0],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+	position, err := nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionSingleStopPlanUnit.SolutionStops()[0],
+		solution.Vehicles()[0].Last(),
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	moveSingleOnVehicle0, err := nextroute.NewMoveStops(
+		solutionSingleStopPlanUnit,
+		[]nextroute.StopPosition{position},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position, err = nextroute.NewStopPosition(
+		solution.Vehicles()[1].First(),
+		solutionSingleStopPlanUnit.SolutionStops()[0],
+		solution.Vehicles()[1].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	moveSingleOnVehicle1, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[1].First(),
-				solutionSingleStopPlanUnit.SolutionStops()[0],
-				solution.Vehicles()[1].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -103,21 +112,42 @@ func TestMaximumStopsConstraint_EstimateIsViolated(t *testing.T) {
 	}
 
 	solutionSequencePlanUnit := solution.SolutionPlanStopsUnit(sequencePlanUnits[0])
-
+	position1, err := nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionSequencePlanUnit.SolutionStops()[0],
+		solutionSequencePlanUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err := nextroute.NewStopPosition(
+		solutionSequencePlanUnit.SolutionStops()[0],
+		solutionSequencePlanUnit.SolutionStops()[1],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	moveSequenceOnVehicle0, err := nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionSequencePlanUnit.SolutionStops()[0],
-				solutionSequencePlanUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionSequencePlanUnit.SolutionStops()[0],
-				solutionSequencePlanUnit.SolutionStops()[1],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[1].First(),
+		solutionSequencePlanUnit.SolutionStops()[0],
+		solutionSequencePlanUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solutionSequencePlanUnit.SolutionStops()[0],
+		solutionSequencePlanUnit.SolutionStops()[1],
+		solution.Vehicles()[1].Last(),
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -125,18 +155,7 @@ func TestMaximumStopsConstraint_EstimateIsViolated(t *testing.T) {
 
 	moveSequenceOnVehicle1, err := nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[1].First(),
-				solutionSequencePlanUnit.SolutionStops()[0],
-				solutionSequencePlanUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionSequencePlanUnit.SolutionStops()[0],
-				solutionSequencePlanUnit.SolutionStops()[1],
-				solution.Vehicles()[1].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -167,39 +186,49 @@ func TestMaximumStopsConstraint_EstimateIsViolated(t *testing.T) {
 
 	solutionSequencePlanUnit = solution.SolutionPlanStopsUnit(sequencePlanUnits[1])
 
-	moveSequenceOnVehicle0, err = nextroute.NewMoveStops(
-		solutionSequencePlanUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionSequencePlanUnit.SolutionStops()[0],
-				solutionSequencePlanUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionSequencePlanUnit.SolutionStops()[0],
-				solutionSequencePlanUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next(),
-			),
-		},
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionSequencePlanUnit.SolutionStops()[0],
+		solutionSequencePlanUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solutionSequencePlanUnit.SolutionStops()[0],
+		solutionSequencePlanUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next(),
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	moveSequenceOnVehicle0, err = nextroute.NewMoveStops(
+		solutionSequencePlanUnit,
+		[]nextroute.StopPosition{position1, position2},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[1].First(),
+		solutionSequencePlanUnit.SolutionStops()[0],
+		solutionSequencePlanUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solutionSequencePlanUnit.SolutionStops()[0],
+		solutionSequencePlanUnit.SolutionStops()[1],
+		solution.Vehicles()[1].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	moveSequenceOnVehicle1, err = nextroute.NewMoveStops(
 		solutionSequencePlanUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[1].First(),
-				solutionSequencePlanUnit.SolutionStops()[0],
-				solutionSequencePlanUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionSequencePlanUnit.SolutionStops()[0],
-				solutionSequencePlanUnit.SolutionStops()[1],
-				solution.Vehicles()[1].First().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)

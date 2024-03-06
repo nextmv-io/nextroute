@@ -48,7 +48,10 @@ func solver(
 	if err != nil {
 		return customOutput{}, err
 	}
-	last := solutions.Last()
+	last, err := solutions.Last()
+	if err != nil {
+		return customOutput{}, err
+	}
 	out := toOutput(last)
 
 	return out, nil

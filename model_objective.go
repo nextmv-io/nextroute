@@ -120,10 +120,6 @@ func (m *modelObjectiveSumImpl) EstimateDeltaValue(move SolutionMoveStops) float
 	return estimateDeltaScore
 }
 
-func (m *modelObjectiveSumImpl) InternalValue(_ *solutionImpl) float64 {
-	panic("use Solution.ObjectiveValue or solution.Score to query objective value")
-}
-
 func (m *modelObjectiveSumImpl) Value(_ Solution) float64 {
 	panic("use Solution.ObjectiveValue or solution.Score to query objective value")
 }
@@ -155,26 +151,33 @@ func (m *modelObjectiveSumImpl) NewTerm(
 			reflect.TypeOf(objective).String(),
 		))
 	}
-	if factor != 0 {
-		m.terms = append(m.terms, term)
 
-		if registered, ok := term.Objective().(RegisteredModelExpressions); ok {
-			for _, expression := range registered.ModelExpressions() {
-				m.model.addExpression(expression)
+	if factor == 0 {
+		return term, nil
+	}
+
+	m.terms = append(m.terms, term)
+
+	if registered, ok := term.Objective().(RegisteredModelExpressions); ok {
+		for _, expression := range registered.ModelExpressions() {
+			err := m.model.addExpression(expression)
+			if err != nil {
+				return nil, err
 			}
 		}
-		if _, ok := term.Objective().(ObjectiveStopDataUpdater); ok {
-			m.model.objectivesWithStopUpdater = append(
-				m.model.objectivesWithStopUpdater,
-				term.Objective(),
-			)
-		}
-		if _, ok := term.Objective().(ObjectiveSolutionDataUpdater); ok {
-			m.model.objectivesWithSolutionUpdater = append(
-				m.model.objectivesWithSolutionUpdater,
-				term.Objective(),
-			)
-		}
 	}
+	if _, ok := term.Objective().(ObjectiveStopDataUpdater); ok {
+		m.model.objectivesWithStopUpdater = append(
+			m.model.objectivesWithStopUpdater,
+			term.Objective(),
+		)
+	}
+	if _, ok := term.Objective().(ObjectiveSolutionDataUpdater); ok {
+		m.model.objectivesWithSolutionUpdater = append(
+			m.model.objectivesWithSolutionUpdater,
+			term.Objective(),
+		)
+	}
+
 	return term, nil
 }

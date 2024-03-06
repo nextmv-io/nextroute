@@ -20,7 +20,10 @@ func addActivationPenaltyObjective(
 		if vehicle.ActivationPenalty == nil || *vehicle.ActivationPenalty == 0 {
 			continue
 		}
-		activationPenalty.SetValue(model.VehicleTypes()[v], float64(*vehicle.ActivationPenalty))
+		err := activationPenalty.SetValue(model.VehicleTypes()[v], float64(*vehicle.ActivationPenalty))
+		if err != nil {
+			return nil, err
+		}
 		present = true
 	}
 

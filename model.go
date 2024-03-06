@@ -345,21 +345,22 @@ func (m *modelImpl) NewVehicleType(
 	return vehicle, nil
 }
 
-func (m *modelImpl) addExpression(expression ModelExpression) {
+func (m *modelImpl) addExpression(expression ModelExpression) error {
 	if existingExpression, ok := m.expressions[expression.Index()]; ok {
 		if existingExpression.Name() != expression.Name() {
-			panic(fmt.Sprintf(
+			return fmt.Errorf(
 				"expression index %d already exists with name %s,"+
 					" expression indices must be unique,"+
 					" did you forget to use NewModelExpressionIndex() on"+
 					" a custom expression",
 				expression.Index(),
 				existingExpression.Name(),
-			))
+			)
 		}
 	} else {
 		m.expressions[expression.Index()] = expression
 	}
+	return nil
 }
 
 func (m *modelImpl) setConstraintEstimationOrder() {
@@ -424,7 +425,10 @@ func (m *modelImpl) AddConstraint(constraint ModelConstraint) error {
 
 	if registered, ok := constraint.(RegisteredModelExpressions); ok {
 		for _, expression := range registered.ModelExpressions() {
-			m.addExpression(expression)
+			err := m.addExpression(expression)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

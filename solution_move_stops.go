@@ -466,13 +466,24 @@ func NewMoveStops(
 	stopPositions StopPositions,
 ) (SolutionMoveStops, error) {
 	if planUnit == nil {
-		panic("planUnit must not be nil")
+		return nil, fmt.Errorf("planUnit is nil")
 	}
 	if len(stopPositions) != len(planUnit.SolutionStops()) {
-		panic("no stopPositions")
+		return nil, fmt.Errorf(
+			"stopPositions length %v must be equal to planUnit.SolutionStops length %v",
+			len(stopPositions),
+			len(planUnit.SolutionStops()),
+		)
 	}
 	if !stopPositions[0].Previous().IsPlanned() {
-		panic("first previous stop must be planned")
+		return nil, fmt.Errorf("previous stop %s of first stop position must be planned",
+			stopPositions[0].Previous().ModelStop().ID(),
+		)
+	}
+	if !stopPositions[len(stopPositions)-1].Next().IsPlanned() {
+		return nil, fmt.Errorf("next stop %s of last stop positions must be planned",
+			stopPositions[len(stopPositions)-1].Next().ModelStop().ID(),
+		)
 	}
 
 	stops := common.Map(stopPositions, func(i StopPosition) ModelStop {
@@ -486,78 +497,126 @@ func NewMoveStops(
 
 	if !allowed {
 		return nil, fmt.Errorf(
-			"move is not allowed, the stops are in a sequence violating the DAG",
+			"move is not allowed, " +
+				"the stops are in a sequence violating the Directed Acyclic Graph of the plan unit",
 		)
 	}
 
 	vehicle := stopPositions[0].(stopPositionImpl).previous().vehicle()
 
-	var lastPlannedPreviousStop SolutionStop
+	lastPlannedPreviousStop := stopPositions[0].Previous()
+
+	position := stopPositions[0].Previous().Position()
 
 	for index, sp := range stopPositions {
 		stopPosition := sp.(stopPositionImpl)
-		if stopPosition.previous().IsPlanned() {
-			lastPlannedPreviousStop = stopPosition.previous()
+		if stopPosition.Stop().IsPlanned() {
+			return nil,
+				fmt.Errorf(
+					"stop %v of stop position %v is already planned",
+					stopPosition.Stop().ModelStop().ID(),
+					index,
+				)
 		}
 
+		if stopPosition.previous().IsPlanned() {
+			if stopPosition.previous().Position() < position {
+				return nil,
+					fmt.Errorf("previous stop %s of stop position %v is planned at position %v,"+
+						" which is before or at the last planned previous stop %s at position %v",
+						stopPosition.previous().ModelStop().ID(),
+						index,
+						stopPosition.previous().Position(),
+						lastPlannedPreviousStop.ModelStop().ID(),
+						lastPlannedPreviousStop.Position(),
+					)
+			}
+			position = stopPosition.previous().Position()
+
+			lastPlannedPreviousStop = stopPosition.previous()
+		}
+		if stopPosition.next().IsPlanned() {
+			if stopPosition.next().Position() < position {
+				return nil,
+					fmt.Errorf("next stop %s of stop position %v is planned at position %v,"+
+						" which is before or at the last planned previous stop %s at position %v",
+						stopPosition.next().ModelStop().ID(),
+						index,
+						stopPosition.next().Position(),
+						lastPlannedPreviousStop.ModelStop().ID(),
+						lastPlannedPreviousStop.Position(),
+					)
+			}
+			position = stopPosition.next().Position()
+		}
 		if stopPosition.next().IsPlanned() && !stopPosition.previous().IsPlanned() {
 			if lastPlannedPreviousStop.Position() != stopPosition.next().Position()-1 {
-				panic("the two planned stops surrounding the stops to be planned must be adjacent")
+				return nil,
+					fmt.Errorf("stop positions are not allowed, planned previous stop %v is not adjacent"+
+						" to the planned next stop %v of the next stop position",
+						lastPlannedPreviousStop.ModelStop().ID(),
+						stopPosition.next().ModelStop().ID(),
+					)
 			}
 		}
 
 		if stopPosition.next().IsPlanned() && stopPosition.previous().IsPlanned() {
 			if stopPosition.next().Position() != stopPosition.previous().Position()+1 {
-				panic("the two planned stops surrounding the stop to be planned must be adjacent")
+				return nil,
+					fmt.Errorf("stop positions are not allowed, planned previous stop %v is not adjacent"+
+						" to the planned next stop %v of stop position %v",
+						stopPosition.previous().ModelStop().ID(),
+						stopPosition.next().ModelStop().ID(),
+						index,
+					)
 			}
-		}
-		if index == 0 && !stopPosition.previous().IsPlanned() {
-			panic("first previous stop must be planned")
-		}
-
-		if index == len(stopPositions)-1 && !stopPosition.next().IsPlanned() {
-			panic("last next stop must be planned")
 		}
 
 		if !stopPosition.previous().IsPlanned() {
 			if stopPositions[index-1].Stop() != stopPosition.previous() {
-				panic("the previous stop must be the stop of the previous stop position if it is unplanned")
+				return nil,
+					fmt.Errorf("the previous stop %s of stop position %v"+
+						" must be the stop %s of the previous stop position %v if it is unplanned",
+						stopPosition.previous().ModelStop().ID(),
+						index,
+						stopPositions[index-1].Stop().ModelStop().ID(),
+						index-1,
+					)
 			}
 		}
 
 		if !stopPosition.next().IsPlanned() {
 			if stopPositions[index+1].Stop() != stopPosition.next() {
-				panic("the next stop must be the stop of the next stop position if it is unplanned")
+				return nil,
+					fmt.Errorf("the next stop %s of stop position %v"+
+						" must be the stop %s of the next stop position %v if it is unplanned",
+						stopPosition.next().ModelStop().ID(),
+						index,
+						stopPositions[index+1].Stop().ModelStop().ID(),
+						index+1,
+					)
 			}
 		}
 
-		if stopPosition.Stop().IsPlanned() {
-			panic(
-				fmt.Errorf(
-					"stop %v is already planned",
-					stopPosition.Stop(),
-				),
-			)
-		}
 		if stopPosition.previous().IsPlanned() && stopPosition.previous().vehicle().index != vehicle.index {
-			panic(
+			return nil,
 				fmt.Errorf(
-					"stop %v vehicle mismatch: %v != %v",
-					stopPosition.previous(),
-					stopPosition.previous().vehicle(),
-					vehicle,
-				),
-			)
+					"planned previous stop %v of stop position %v vehicle mismatch: %v != %v",
+					stopPosition.previous().ModelStop().ID(),
+					index,
+					stopPosition.previous().vehicle().ModelVehicle().ID(),
+					vehicle.ModelVehicle().ID(),
+				)
 		}
 		if stopPosition.next().IsPlanned() && stopPosition.next().vehicle().index != vehicle.index {
-			panic(
+			return nil,
 				fmt.Errorf(
-					"stop %v vehicle mismatch: %v != %v",
-					stopPosition.next(),
-					stopPosition.next().vehicle(),
-					vehicle,
-				),
-			)
+					"planned next stop %v of stop position %v vehicle mismatch: %v != %v",
+					stopPosition.next().ModelStop().ID(),
+					index,
+					stopPosition.next().vehicle().ModelVehicle().ID(),
+					vehicle.ModelVehicle().ID(),
+				)
 		}
 	}
 

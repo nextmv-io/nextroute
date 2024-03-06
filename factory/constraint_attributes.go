@@ -24,7 +24,10 @@ func addAttributesConstraint(
 			continue
 		}
 
-		constraint.SetStopAttributes(model.Stops()[s], *stop.CompatibilityAttributes)
+		err := constraint.SetStopAttributes(model.Stops()[s], *stop.CompatibilityAttributes)
+		if err != nil {
+			return nil, err
+		}
 		presentInStops = true
 	}
 
@@ -34,7 +37,10 @@ func addAttributesConstraint(
 			continue
 		}
 
-		constraint.SetVehicleTypeAttributes(model.VehicleTypes()[v], *vehicle.CompatibilityAttributes)
+		err = constraint.SetVehicleTypeAttributes(model.VehicleTypes()[v], *vehicle.CompatibilityAttributes)
+		if err != nil {
+			return nil, err
+		}
 		presentInVehicles = true
 	}
 

@@ -174,7 +174,7 @@ func addCapacityObjective(
 		return nil, err
 	}
 
-	setExpressionValues(
+	err = setExpressionValues(
 		names,
 		quantities,
 		capacities,
@@ -184,6 +184,10 @@ func addCapacityObjective(
 		quantityExpressions,
 		capacityExpressions,
 	)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return model, nil
 }

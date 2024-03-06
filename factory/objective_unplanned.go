@@ -56,7 +56,10 @@ func addUnplannedPenaltyStops(
 		if err != nil {
 			return err
 		}
-		unplannedPenaltyExpression.SetValue(stop, float64(*inputStop.UnplannedPenalty))
+		err = unplannedPenaltyExpression.SetValue(stop, float64(*inputStop.UnplannedPenalty))
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -90,11 +93,17 @@ func addUnplannedPenaltyAlternateStops(
 			alternateInputStop := stop.Data().(alternateInputStop)
 
 			if alternateInputStop.stop.UnplannedPenalty == nil {
-				unplannedPenaltyExpression.SetValue(stop, defaultUnplannedPenaltyAlternateStop)
+				err = unplannedPenaltyExpression.SetValue(stop, defaultUnplannedPenaltyAlternateStop)
+				if err != nil {
+					return err
+				}
 				continue
 			}
 
-			unplannedPenaltyExpression.SetValue(stop, float64(*alternateInputStop.stop.UnplannedPenalty))
+			err = unplannedPenaltyExpression.SetValue(stop, float64(*alternateInputStop.stop.UnplannedPenalty))
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil

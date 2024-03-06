@@ -86,7 +86,10 @@ func addEarlinessTargetStops(
 			return false, err
 		}
 
-		factorExpression.SetValue(stop, *inputStop.EarlyArrivalTimePenalty)
+		err = factorExpression.SetValue(stop, *inputStop.EarlyArrivalTimePenalty)
+		if err != nil {
+			return false, err
+		}
 		targetTimeExpression.SetTime(stop, *inputStop.TargetArrivalTime)
 	}
 
@@ -140,7 +143,10 @@ func addEarlinessTargetsAlternateStops(
 				continue
 			}
 			hasEarlinessTarget = true
-			factorExpression.SetValue(stop, *alternateInputStop.stop.EarlyArrivalTimePenalty)
+			err = factorExpression.SetValue(stop, *alternateInputStop.stop.EarlyArrivalTimePenalty)
+			if err != nil {
+				return false, err
+			}
 			targetTimeExpression.SetTime(stop, *alternateInputStop.stop.TargetArrivalTime)
 		}
 	}
@@ -210,7 +216,10 @@ func addLatenessTargetStops(
 			return false, err
 		}
 		objective.Latest().SetTime(stop, *inputStop.TargetArrivalTime)
-		objective.SetFactor(*inputStop.LateArrivalTimePenalty, stop)
+		err = objective.SetFactor(*inputStop.LateArrivalTimePenalty, stop)
+		if err != nil {
+			return false, err
+		}
 
 		hasTargets = true
 	}
@@ -265,7 +274,10 @@ func addLatenessTargetsAlternateStops(
 			}
 			hasTarget = true
 			objective.Latest().SetTime(stop, *alternateInputStop.stop.TargetArrivalTime)
-			objective.SetFactor(*alternateInputStop.stop.LateArrivalTimePenalty, stop)
+			err = objective.SetFactor(*alternateInputStop.stop.LateArrivalTimePenalty, stop)
+			if err != nil {
+				return false, err
+			}
 		}
 	}
 

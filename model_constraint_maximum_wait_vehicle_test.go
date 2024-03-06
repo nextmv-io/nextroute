@@ -81,15 +81,17 @@ func TestMaximumWaitVehicleConstraint_EstimateIsViolated(t *testing.T) {
 	// Try to assign all stops and check success for expectation.
 	success := []bool{true, false, false, true}
 	for i, solutionPlanUnit := range solutionPlanUnits {
+		position, err := nextroute.NewStopPosition(
+			solution.Vehicles()[0].Last().Previous(),
+			solutionPlanUnit.SolutionStops()[0],
+			solution.Vehicles()[0].Last(),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
 		move, err := nextroute.NewMoveStops(
 			solutionPlanUnit,
-			[]nextroute.StopPosition{
-				nextroute.NewStopPosition(
-					solution.Vehicles()[0].Last().Previous(),
-					solutionPlanUnit.SolutionStops()[0],
-					solution.Vehicles()[0].Last(),
-				),
-			},
+			[]nextroute.StopPosition{position},
 		)
 		if err != nil {
 			t.Fatal(err)

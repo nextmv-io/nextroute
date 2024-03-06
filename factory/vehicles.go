@@ -56,16 +56,22 @@ func addVehicles(
 			vehicle.First().SetMeasureIndex(len(input.Stops) + len(*input.AlternateStops) + idx*2)
 			vehicle.Last().SetMeasureIndex(len(input.Stops) + len(*input.AlternateStops) + idx*2 + 1)
 
-			constraint.SetVehicleTypeAttributes(
+			err = constraint.SetVehicleTypeAttributes(
 				vehicleType,
 				[]string{alternateVehicleAttribute(idx)},
 			)
+			if err != nil {
+				return nil, err
+			}
 			for _, alternateID := range *inputVehicle.AlternateStops {
 				alternateStop, err := model.Stop(data.stopIDToIndex[alternateStopID(alternateID, inputVehicle)])
 				if err != nil {
 					return nil, err
 				}
-				constraint.SetStopAttributes(alternateStop, []string{alternateVehicleAttribute(idx)})
+				err = constraint.SetStopAttributes(alternateStop, []string{alternateVehicleAttribute(idx)})
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 	}

@@ -21,7 +21,7 @@ type ModelStop interface {
 	// is the common.Haversine distance between the stops. All the stops
 	// in the model are used in the slice. Slice with similar distance are
 	// sorted by their index (increasing).
-	ClosestStops() ModelStops
+	ClosestStops() (ModelStops, error)
 
 	// HasPlanStopsUnit returns true if the stop belongs to a plan unit. For example,
 	// start and end stops of a vehicle do not belong to a plan unit.
@@ -135,7 +135,7 @@ func (s *stopImpl) IsFixed() bool {
 	return s.fixed
 }
 
-func (s *stopImpl) cacheClosestStops() {
+func (s *stopImpl) cacheClosestStops() error {
 	if s.HasPlanStopsUnit() {
 		n := 20
 		modelStopsDistanceQueries, err := NewModelStopsDistanceQueries(
@@ -144,30 +144,38 @@ func (s *stopImpl) cacheClosestStops() {
 			}),
 		)
 		if err != nil {
-			panic(err)
+			return err
 		}
 		s.closest, err = modelStopsDistanceQueries.NearestStops(s, n)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	}
+	return nil
 }
 
-func (s *stopImpl) closestStops() ModelStops {
+func (s *stopImpl) closestStops() (ModelStops, error) {
 	if s.closest == nil {
 		s.model.mutex.Lock()
 		defer s.model.mutex.Unlock()
 		if s.closest == nil {
-			s.cacheClosestStops()
+			err := s.cacheClosestStops()
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-	return s.closest
+	return s.closest, nil
 }
 
-func (s *stopImpl) ClosestStops() ModelStops {
-	closest := make(ModelStops, len(s.closestStops()))
-	copy(closest, s.closestStops())
-	return s.closest
+func (s *stopImpl) ClosestStops() (ModelStops, error) {
+	closestStops, err := s.closestStops()
+	if err != nil {
+		return nil, err
+	}
+	closest := make(ModelStops, len(closestStops))
+	copy(closest, closestStops)
+	return s.closest, nil
 }
 
 func (s *stopImpl) HasPlanStopsUnit() bool {
@@ -215,8 +223,9 @@ func (s *stopImpl) Windows() [][2]time.Time {
 
 func (s *stopImpl) SetWindows(windows [][2]time.Time) error {
 	if s.model.IsLocked() {
-		panic("model is isLocked, a model is isLocked once a solution" +
-			" has been created using this model")
+		return fmt.Errorf("can not set window of stop %s once the model is locked",
+			s.ID(),
+		)
 	}
 
 	if len(windows) == 0 {
@@ -266,8 +275,9 @@ func (s *stopImpl) SetWindows(windows [][2]time.Time) error {
 
 func (s *stopImpl) SetEarliestStart(t time.Time) error {
 	if s.model.IsLocked() {
-		panic("model is isLocked, a model is isLocked once a solution" +
-			" has been created using this model")
+		return fmt.Errorf("can not set earliest start of stop %s once the model is locked",
+			s.ID(),
+		)
 	}
 
 	s.earliestStartTime = t.Sub(s.model.Epoch()).Seconds()

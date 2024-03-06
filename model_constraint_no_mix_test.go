@@ -130,20 +130,27 @@ func TestNoMixConstraint(t *testing.T) {
 		t.Fatal(err)
 	}
 	solutionPlanStopsUnit := solution.SolutionPlanStopsUnit(sequencePlanUnits[0])
+
+	position1, err := nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err := nextroute.NewStopPosition(
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	move, err := nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -162,20 +169,26 @@ func TestNoMixConstraint(t *testing.T) {
 	}
 
 	solutionPlanStopsUnit = solution.SolutionPlanStopsUnit(sequencePlanUnits[1])
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -185,20 +198,26 @@ func TestNoMixConstraint(t *testing.T) {
 		t.Fatal("constraint is violated, it should fit [+B][-B]+A-A")
 	}
 
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -207,20 +226,26 @@ func TestNoMixConstraint(t *testing.T) {
 	if !isViolated {
 		t.Fatal("constraint is not violated, it should not fit [+B]+A[-B]-A")
 	}
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -229,20 +254,26 @@ func TestNoMixConstraint(t *testing.T) {
 	if !isViolated {
 		t.Fatal("constraint is not violated, it should not fit +A[+B][-B]-A")
 	}
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next().Next(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next().Next(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -251,20 +282,25 @@ func TestNoMixConstraint(t *testing.T) {
 	if !isViolated {
 		t.Fatal("constraint is not violated, it should not fit +A[+B]-A[-B]")
 	}
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].Last().Previous(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].Last().Previous(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -283,20 +319,26 @@ func TestNoMixConstraint(t *testing.T) {
 
 	solutionPlanStopsUnit = solution.SolutionPlanStopsUnit(sequencePlanUnits[2])
 
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -305,21 +347,25 @@ func TestNoMixConstraint(t *testing.T) {
 	if isViolated {
 		t.Fatal("constraint is violated, it should fit [+A][-A]+A-A+B-BB")
 	}
-
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -328,20 +374,25 @@ func TestNoMixConstraint(t *testing.T) {
 	if isViolated {
 		t.Fatal("constraint is violated, it should fit  [+A]+A[-A]-A+B-B")
 	}
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next().Next(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next().Next(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next().Next().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -350,21 +401,25 @@ func TestNoMixConstraint(t *testing.T) {
 	if isViolated {
 		t.Fatal("constraint is violated, it should not fit  [+A]+A-A[-A]+B-B")
 	}
-
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].Last().Previous().Previous(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].Last().Previous(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].Last().Previous().Previous(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].Last().Previous(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -373,21 +428,25 @@ func TestNoMixConstraint(t *testing.T) {
 	if !isViolated {
 		t.Fatal("constraint is violated, it should not fit  [+A]+A-A+B[-A]-B")
 	}
-
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].Last().Previous(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].Last().Previous(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -396,21 +455,25 @@ func TestNoMixConstraint(t *testing.T) {
 	if !isViolated {
 		t.Fatal("constraint is violated, it should not fit  [+A]+A-A+B-B[-A]")
 	}
-
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -419,21 +482,25 @@ func TestNoMixConstraint(t *testing.T) {
 	if isViolated {
 		t.Fatal("constraint is violated, it should fit +A[+A][-A]-A+B-BB")
 	}
-
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next().Next(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next().Next(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next().Next().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -442,20 +509,25 @@ func TestNoMixConstraint(t *testing.T) {
 	if isViolated {
 		t.Fatal("constraint is violated, it should fit  +A[+A]-A[-A]+B-B")
 	}
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next().Next().Next(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next().Next().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next().Next().Next(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next().Next().Next().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -464,21 +536,25 @@ func TestNoMixConstraint(t *testing.T) {
 	if !isViolated {
 		t.Fatal("constraint is not violated, it should not fit  +A[+A]-A+B[-A]-B")
 	}
-
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].Last().Previous(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].Last().Previous(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -488,20 +564,26 @@ func TestNoMixConstraint(t *testing.T) {
 		t.Fatal("constraint is violated, it should not fit  +A[+A]-A+B-B[-A]")
 	}
 
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next().Next(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next().Next(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next().Next().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -510,21 +592,25 @@ func TestNoMixConstraint(t *testing.T) {
 	if isViolated {
 		t.Fatal("constraint is violated, it should fit +A-A[+A][-A]+B-B")
 	}
-
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next().Next(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next().Next().Next(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].First().Next().Next().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next().Next(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next().Next().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next().Next().Next(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].First().Next().Next().Next().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -533,21 +619,25 @@ func TestNoMixConstraint(t *testing.T) {
 	if !isViolated {
 		t.Fatal("constraint is not violated, it should not fit +A-A[+A]+B[-A]-B")
 	}
-
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next().Next(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].Last().Previous(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next().Next(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next().Next().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].Last().Previous(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -556,44 +646,48 @@ func TestNoMixConstraint(t *testing.T) {
 	if !isViolated {
 		t.Fatal("constraint is not violated, it should not fit +A-A[+A]+B-B[-A]")
 	}
-
-	move, err = nextroute.NewMoveStops(
-		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next().Next().Next(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next().Next().Next().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].Last().Previous().Previous(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].Last().Previous(),
-			),
-		},
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next().Next().Next(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next().Next().Next().Next(),
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
-	isViolated, _ = cnstr.EstimateIsViolated(move)
-	if !isViolated {
-		t.Fatal("constraint is not violated, it should not fit +A-A+B[+A][-A]-B")
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].Last().Previous().Previous(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].Last().Previous(),
+	)
+	if err != nil {
+		t.Fatal(err)
 	}
-
+	_, err = nextroute.NewMoveStops(
+		solutionPlanStopsUnit,
+		[]nextroute.StopPosition{position1, position2},
+	)
+	if err == nil {
+		t.Fatal("planned stop must be after the previous planned stop, stop s3 is not")
+	}
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First().Next().Next().Next(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next().Next().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].Last().Previous(),
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First().Next().Next().Next(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next().Next().Next().Next(),
-			),
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].Last().Previous(),
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -602,21 +696,25 @@ func TestNoMixConstraint(t *testing.T) {
 	if !isViolated {
 		t.Fatal("constraint is not violated, it should not fit +A-A+B[+A]-B[-A]")
 	}
-
+	position1, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].Last().Previous(),
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		solutionPlanStopsUnit.SolutionStops()[0],
+		solutionPlanStopsUnit.SolutionStops()[1],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	move, err = nextroute.NewMoveStops(
 		solutionPlanStopsUnit,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].Last().Previous(),
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-			),
-			nextroute.NewStopPosition(
-				solutionPlanStopsUnit.SolutionStops()[0],
-				solutionPlanStopsUnit.SolutionStops()[1],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position1, position2},
 	)
 	if err != nil {
 		t.Fatal(err)

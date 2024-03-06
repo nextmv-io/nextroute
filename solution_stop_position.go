@@ -6,41 +6,59 @@ import (
 	"fmt"
 )
 
-// NewStopPosition returns a new StopPosition. Exposed for testing, should not
-// be exposed in SDK.
+// NewStopPosition returns a new StopPosition.
 func NewStopPosition(
 	p SolutionStop,
 	s SolutionStop,
 	n SolutionStop,
-) StopPosition {
+) (StopPosition, error) {
+	if p == nil {
+		return nil, fmt.Errorf("previous stop is nil")
+	}
+	if s == nil {
+		return nil, fmt.Errorf("stop is nil")
+	}
+	if n == nil {
+		return nil, fmt.Errorf("next stop is nil")
+	}
 	previous := p.(solutionStopImpl)
 	stop := s.(solutionStopImpl)
 	next := n.(solutionStopImpl)
+	if previous.Solution() != stop.Solution() {
+		return nil, fmt.Errorf(
+			"previous %v and stop %v are on different solutions",
+			previous,
+			stop,
+		)
+	}
+	if stop.Solution() != next.Solution() {
+		return nil, fmt.Errorf(
+			"stop %v and next %v are on different solutions",
+			stop,
+			next,
+		)
+	}
 	if stop.IsPlanned() {
-		panic(fmt.Sprintf("stop %v is planned", stop))
+		return nil, fmt.Errorf("stop %v is planned", stop)
 	}
 	if previous.IsPlanned() &&
 		next.IsPlanned() {
 		if previous.vehicle().index != next.vehicle().index {
-			panic(
-				fmt.Sprintf(
-					"previous %v and next %v are planned but on different input",
-					previous,
-					next,
-				),
+			return nil, fmt.Errorf(
+				"previous %v and next %v are planned but on different vehicle",
+				previous,
+				next,
 			)
 		}
 		if previous.Position() >= next.Position() {
-			panic(
-				fmt.Sprintf(
-					"previous %v and next %v are planned but previous is not before next",
-					previous,
-					next,
-				),
+			return nil, fmt.Errorf(
+				"previous %v and next %v are planned but previous is not before next",
+				previous,
+				next,
 			)
 		}
 	}
-	return newStopPosition(previous, stop, next)
+	return newStopPosition(previous, stop, next), nil
 }
 
 func newStopPosition(

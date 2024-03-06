@@ -55,15 +55,17 @@ func TestClusterObjective_EstimateDeltaValue(t *testing.T) {
 	}
 
 	solutionSingleStopPlanUnit0 := solution.SolutionPlanStopsUnit(singleStopPlanUnits[0])
+	position, err := nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionSingleStopPlanUnit0.SolutionStops()[0],
+		solution.Vehicles()[0].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	moveSingleOnVehicle0, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit0,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionSingleStopPlanUnit0.SolutionStops()[0],
-				solution.Vehicles()[0].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -82,15 +84,17 @@ func TestClusterObjective_EstimateDeltaValue(t *testing.T) {
 	}
 
 	solutionSingleStopPlanUnit1 := solution.SolutionPlanStopsUnit(singleStopPlanUnits[1])
+	position, err = nextroute.NewStopPosition(
+		solution.Vehicles()[1].First(),
+		solutionSingleStopPlanUnit1.SolutionStops()[0],
+		solution.Vehicles()[1].Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	moveSingleOnVehicle1, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit1,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[1].First(),
-				solutionSingleStopPlanUnit1.SolutionStops()[0],
-				solution.Vehicles()[1].Last(),
-			),
-		},
+		[]nextroute.StopPosition{position},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -109,15 +113,17 @@ func TestClusterObjective_EstimateDeltaValue(t *testing.T) {
 	}
 
 	solutionSingleStopPlanUnit2 := solution.SolutionPlanStopsUnit(singleStopPlanUnits[2])
+	position, err = nextroute.NewStopPosition(
+		solution.Vehicles()[0].First(),
+		solutionSingleStopPlanUnit2.SolutionStops()[0],
+		solution.Vehicles()[0].First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	moveSingleOnVehicle2, err := nextroute.NewMoveStops(
 		solutionSingleStopPlanUnit2,
-		[]nextroute.StopPosition{
-			nextroute.NewStopPosition(
-				solution.Vehicles()[0].First(),
-				solutionSingleStopPlanUnit2.SolutionStops()[0],
-				solution.Vehicles()[0].First().Next(),
-			),
-		},
+		[]nextroute.StopPosition{position},
 	)
 	if err != nil {
 		t.Fatal(err)
