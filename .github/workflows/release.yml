@@ -56,7 +56,9 @@ jobs:
           cd nextroute
           git checkout ${{ github.ref_name }}
 
-      - name: commit new version
+          git rev-parse --short HEAD
+
+      - name: push release tag
         run: |
           git tag $VERSION
           git push origin $VERSION
