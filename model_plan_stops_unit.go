@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // ModelPlanStopsUnit is a set of stops. It is a set of stops

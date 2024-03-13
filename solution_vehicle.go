@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // SolutionVehicle is a vehicle in a solution.

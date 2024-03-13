@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // SolutionPlanStopsUnit is a set of stops that are planned to be visited by

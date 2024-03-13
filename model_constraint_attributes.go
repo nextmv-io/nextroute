@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // AttributesConstraint is a constraint that limits the vehicles a plan unit

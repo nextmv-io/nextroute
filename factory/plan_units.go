@@ -7,9 +7,9 @@ import (
 	"slices"
 
 	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/common"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
 	"github.com/nextmv-io/nextroute/schema"
-	"github.com/nextmv-io/sdk/common"
 )
 
 func addPlanUnits(

@@ -3,7 +3,7 @@
 package nextroute
 
 import (
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // UnplanIsland un-plans planUnit and all stops (with their plan-units)

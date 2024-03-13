@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/common"
 	"github.com/nextmv-io/nextroute/schema"
-	"github.com/nextmv-io/sdk/common"
 )
 
 // addMaximumWaitStopConstraint adds a MaximumWaitStopConstraint to the model.

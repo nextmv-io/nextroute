@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // Move is a type alias for SolutionMoveStops. It is used to make the

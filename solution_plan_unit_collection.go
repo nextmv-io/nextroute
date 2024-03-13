@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"slices"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // ImmutableSolutionPlanUnitCollection is a collection of solution plan

@@ -12,7 +12,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // Solution is a solution to a model.

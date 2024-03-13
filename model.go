@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // Model defines routing problem.

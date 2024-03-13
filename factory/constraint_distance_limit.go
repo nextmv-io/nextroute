@@ -7,8 +7,8 @@ import (
 	"math"
 
 	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/common"
 	"github.com/nextmv-io/nextroute/schema"
-	"github.com/nextmv-io/sdk/common"
 )
 
 // addDistanceLimitConstraint adds a distance limit for routes to the model.

@@ -2,7 +2,7 @@
 
 package nextroute
 
-import "github.com/nextmv-io/sdk/common"
+import "github.com/nextmv-io/nextroute/common"
 
 // haversineDistance processes the locations to make sure that they are valid
 // to return the corresponding distance.

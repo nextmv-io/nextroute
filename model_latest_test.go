@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 const latestEndName = "latest_end"
