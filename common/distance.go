@@ -1,3 +1,5 @@
+// © 2019-present nextmv.io inc
+
 // Package common contains common types and functions.
 package common
 

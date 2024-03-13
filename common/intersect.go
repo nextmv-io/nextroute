@@ -1,3 +1,5 @@
+// © 2019-present nextmv.io inc
+
 package common
 
 // Intersect returns the intersection of two slices.
