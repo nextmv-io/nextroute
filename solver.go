@@ -9,7 +9,6 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/nextmv-io/sdk/alns"
 	"github.com/nextmv-io/sdk/run"
 )
 
@@ -108,7 +107,7 @@ func (s *solverWrapperImpl) Solve(
 	return s.solver.Solve(ctx, interpretedSolveOptions, startSolutions...)
 }
 
-func (s *solverWrapperImpl) Progression() []alns.ProgressionEntry {
+func (s *solverWrapperImpl) Progression() []ProgressionEntry {
 	return s.solver.Progression()
 }
 

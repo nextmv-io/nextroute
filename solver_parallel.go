@@ -9,7 +9,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nextmv-io/sdk/alns"
 	"github.com/nextmv-io/sdk/run"
 )
 
@@ -62,7 +61,7 @@ func (p *parallelSolverWrapperImpl) SolveEvents() SolveEvents {
 	return p.solver.SolveEvents()
 }
 
-func (p *parallelSolverWrapperImpl) Progression() []alns.ProgressionEntry {
+func (p *parallelSolverWrapperImpl) Progression() []ProgressionEntry {
 	return p.solver.Progression()
 }
 
