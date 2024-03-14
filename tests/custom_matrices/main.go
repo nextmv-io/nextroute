@@ -10,9 +10,9 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/nextroute/check"
+	"github.com/nextmv-io/nextroute/common"
 	"github.com/nextmv-io/nextroute/factory"
 	"github.com/nextmv-io/nextroute/schema"
-	"github.com/nextmv-io/sdk/common"
 	"github.com/nextmv-io/sdk/run"
 	runSchema "github.com/nextmv-io/sdk/run/schema"
 )

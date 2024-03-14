@@ -7,8 +7,7 @@ import (
 	"math"
 	"time"
 
-	common_internal "github.com/nextmv-io/nextroute/common"
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // ModelStop is a stop to be assigned to a vehicle.
@@ -96,7 +95,7 @@ type ModelStop interface {
 type ModelStops []ModelStop
 
 type stopImpl struct {
-	windowChecker common_internal.IntervalChecker
+	windowChecker common.IntervalChecker
 	planUnit      ModelPlanStopsUnit
 	location      common.Location
 	modelDataImpl
@@ -264,7 +263,7 @@ func (s *stopImpl) SetWindows(windows [][2]time.Time) error {
 	}
 	s.windows = windowsInSeconds
 
-	checker, err := common_internal.NewIntervalCheckerSliceLookup(windowsInSeconds)
+	checker, err := common.NewIntervalCheckerSliceLookup(windowsInSeconds)
 	if err != nil {
 		return err
 	}

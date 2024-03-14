@@ -5,7 +5,7 @@ package nextroute
 import (
 	"context"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // SolveOperatorUnPlan is a solve operator that un-plans units.

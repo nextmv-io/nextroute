@@ -10,7 +10,7 @@ import (
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/nextroute/check/schema"
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // ModelCheck is the check of a model returning a [Output].

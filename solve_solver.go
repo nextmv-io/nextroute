@@ -9,7 +9,6 @@ import (
 	"slices"
 	"time"
 
-	"github.com/nextmv-io/sdk/alns"
 	"github.com/nextmv-io/sdk/run"
 )
 
@@ -90,17 +89,17 @@ type solveImpl struct {
 	random         *rand.Rand
 	solveOperators SolveOperators
 	parameters     SolveParameters
-	progression    []alns.ProgressionEntry
+	progression    []ProgressionEntry
 }
 
 func (s *solveImpl) OnImprovement(solveInformation SolveInformation) {
-	s.progression = append(s.progression, alns.ProgressionEntry{
+	s.progression = append(s.progression, ProgressionEntry{
 		ElapsedSeconds: time.Since(solveInformation.Start()).Seconds(),
 		Value:          solveInformation.Solver().BestSolution().Score(),
 	})
 }
 
-func (s *solveImpl) Progression() []alns.ProgressionEntry {
+func (s *solveImpl) Progression() []ProgressionEntry {
 	return slices.Clone(s.progression)
 }
 

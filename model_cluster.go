@@ -5,7 +5,7 @@ package nextroute
 import (
 	"fmt"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // Cluster is both a constraint and an objective that limits/prefers the

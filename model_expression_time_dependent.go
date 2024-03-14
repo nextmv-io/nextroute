@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/nextmv-io/nextroute/common"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
-	"github.com/nextmv-io/sdk/common"
 )
 
 const maxTimeDependentExpressionInterval = 24 * 7 * time.Hour

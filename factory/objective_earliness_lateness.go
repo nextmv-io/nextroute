@@ -4,8 +4,8 @@ package factory
 
 import (
 	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/common"
 	"github.com/nextmv-io/nextroute/schema"
-	"github.com/nextmv-io/sdk/common"
 )
 
 // addEarlinessObjective adds an earliness penalty (per stop) objective to the

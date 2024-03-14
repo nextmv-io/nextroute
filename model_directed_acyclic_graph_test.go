@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 type groupedStopsTest struct {

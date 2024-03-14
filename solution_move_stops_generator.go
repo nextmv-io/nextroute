@@ -3,7 +3,7 @@
 package nextroute
 
 import (
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // SolutionMoveStopsGeneratorChannel generates all possible moves for a given

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // Arc is a directed connection between two nodes ([ModelStops]) that specifies

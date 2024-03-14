@@ -13,7 +13,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/nextmv-io/sdk/alns"
 	"github.com/nextmv-io/sdk/run"
 )
 
@@ -189,7 +188,7 @@ func (o *parallelSolverObservedImpl) OnNewSolution(
 type parallelSolverImpl struct {
 	parallelSolverObservedImpl
 	model               Model
-	progression         []alns.ProgressionEntry
+	progression         []ProgressionEntry
 	solveEvents         SolveEvents
 	solveOptionsFactory SolveOptionsFactory
 	solverFactory       SolverFactory
@@ -199,7 +198,7 @@ func (s *parallelSolverImpl) Model() Model {
 	return s.model
 }
 
-func (s *parallelSolverImpl) Progression() []alns.ProgressionEntry {
+func (s *parallelSolverImpl) Progression() []ProgressionEntry {
 	return slices.Clone(s.progression)
 }
 
@@ -320,7 +319,7 @@ func (s *parallelSolverImpl) Solve(
 			Error:    solutionContainer.Error,
 		}
 		if solutionContainer.Solution != nil {
-			s.progression = append(s.progression, alns.ProgressionEntry{
+			s.progression = append(s.progression, ProgressionEntry{
 				ElapsedSeconds: time.Since(start).Seconds(),
 				Value:          solutionContainer.Solution.Score(),
 				Iterations:     solutionContainer.Iterations,

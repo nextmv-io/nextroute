@@ -5,7 +5,7 @@ package nextroute
 import (
 	"fmt"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 	"gonum.org/v1/gonum/spatial/kdtree"
 )
 

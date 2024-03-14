@@ -5,7 +5,7 @@ package nextroute
 import (
 	"fmt"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // NewHaversineExpression returns a new HaversineExpression.

@@ -9,8 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nextmv-io/sdk/alns"
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 	"github.com/nextmv-io/sdk/run"
 	"github.com/nextmv-io/sdk/run/schema"
 	"github.com/nextmv-io/sdk/run/statistics"
@@ -78,7 +77,7 @@ func Format(
 
 	seriesData := common.Map(
 		progressionValues,
-		func(progressionEntry alns.ProgressionEntry) statistics.DataPoint {
+		func(progressionEntry ProgressionEntry) statistics.DataPoint {
 			return statistics.DataPoint{
 				X: statistics.Float64(progressionEntry.ElapsedSeconds),
 				Y: statistics.Float64(progressionEntry.Value),
@@ -87,7 +86,7 @@ func Format(
 	)
 	iterationsSeriesData := common.Map(
 		progressionValues,
-		func(progressionEntry alns.ProgressionEntry) statistics.DataPoint {
+		func(progressionEntry ProgressionEntry) statistics.DataPoint {
 			return statistics.DataPoint{
 				X: statistics.Float64(progressionEntry.ElapsedSeconds),
 				Y: statistics.Float64(progressionEntry.Iterations),

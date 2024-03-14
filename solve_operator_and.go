@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // SolveOperatorAnd is a solve-operator which executes a set of solve-operators

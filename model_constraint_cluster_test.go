@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/nextmv-io/nextroute"
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 func TestClusterConstraint_EstimateIsViolated(t *testing.T) {

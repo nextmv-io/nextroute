@@ -8,7 +8,7 @@ import (
 	"math"
 	"slices"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // NewSweepSolution returns a solution for the given model using the sweep

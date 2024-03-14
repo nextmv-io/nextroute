@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // ModelStatistics provides statistics for a model.
