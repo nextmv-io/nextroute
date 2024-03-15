@@ -95,6 +95,7 @@ type customUnplanImpl struct {
 	nextroute.SolveOperator
 }
 
+// NewCustomUnPlanSearchOperator creates a new custom unplan search operator.
 func NewCustomUnPlanSearchOperator() nextroute.SolveOperator {
 	return &customUnplanImpl{
 		nextroute.NewSolveOperator(
@@ -132,6 +133,7 @@ type customPlanImpl struct {
 	nextroute.SolveOperator
 }
 
+// NewCustomPlanSearchOperator creates a new custom plan search operator.
 func NewCustomPlanSearchOperator() nextroute.SolveOperator {
 	return &customPlanImpl{
 		SolveOperator: nextroute.NewSolveOperator(
