@@ -5,7 +5,7 @@ package common_test
 import (
 	"testing"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 func TestBoundingBox(t *testing.T) {
