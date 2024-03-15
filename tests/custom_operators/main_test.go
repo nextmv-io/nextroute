@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/nextmv-io/platform/integration/golden"
+	"github.com/nextmv-io/sdk/golden"
 )
 
 func TestMain(m *testing.M) {
