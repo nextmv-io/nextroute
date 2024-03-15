@@ -38,12 +38,18 @@ func solver(
 		return runSchema.Output{}, err
 	}
 	solver, err := nextroute.NewSkeletonSolver(model)
+	if err != nil {
+		return runSchema.Output{}, err
+	}
 	solver.AddSolveOperators(
 		NewCustomUnPlanSearchOperator(),
 		NewCustomPlanSearchOperator(),
 	)
 
 	parallelSolver, err := nextroute.NewSkeletonParallelSolver(model)
+	if err != nil {
+		return runSchema.Output{}, err
+	}
 	parallelSolver.SetSolverFactory(
 		func(
 			information nextroute.ParallelSolveInformation,
