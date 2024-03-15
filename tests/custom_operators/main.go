@@ -1,17 +1,25 @@
-// package main holds the implementation of the nextroute template.
 package main
 
 import (
 	"context"
 	"log"
+	"time"
 
-	"github.com/nextmv-io/sdk/nextroute"
-	"github.com/nextmv-io/sdk/nextroute/check"
-	"github.com/nextmv-io/sdk/nextroute/factory"
-	"github.com/nextmv-io/sdk/nextroute/schema"
+	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/check"
+	"github.com/nextmv-io/nextroute/common"
+	"github.com/nextmv-io/nextroute/factory"
+	"github.com/nextmv-io/nextroute/schema"
 	"github.com/nextmv-io/sdk/run"
 	runSchema "github.com/nextmv-io/sdk/run/schema"
 )
+
+type options struct {
+	Model  factory.Options                `json:"model,omitempty"`
+	Solve  nextroute.ParallelSolveOptions `json:"solve,omitempty"`
+	Format nextroute.FormatOptions        `json:"format,omitempty"`
+	Check  check.Options                  `json:"check,omitempty"`
+}
 
 func main() {
 	runner := run.CLI(solver)
@@ -19,13 +27,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-type options struct {
-	Model  factory.Options                `json:"model,omitempty"`
-	Solve  nextroute.ParallelSolveOptions `json:"solve,omitempty"`
-	Format nextroute.FormatOptions        `json:"format,omitempty"`
-	Check  check.Options                  `json:"check,omitempty"`
 }
 
 func solver(
@@ -37,26 +38,48 @@ func solver(
 	if err != nil {
 		return runSchema.Output{}, err
 	}
-
-	// solver, err := nextroute.NewParallelSolver(model)
-	solver, err := createParallelSolver(model)
-	if err != nil {
-		return runSchema.Output{}, err
-	}
-
-	solutions, err := solver.Solve(ctx, options.Solve)
-	if err != nil {
-		return runSchema.Output{}, err
-	}
-	last := solutions.Last()
-
-	output, err := check.Format(
-		ctx,
-		options,
-		options.Check,
-		solver,
-		last,
+	solver, err := nextroute.NewSkeletonSolver(model)
+	solver.AddSolveOperators(
+		NewCustomUnPlanSearchOperator(),
+		NewCustomPlanSearchOperator(),
 	)
+
+	parallelSolver, err := nextroute.NewSkeletonParallelSolver(model)
+	parallelSolver.SetSolverFactory(
+		func(
+			information nextroute.ParallelSolveInformation,
+			solution nextroute.Solution,
+		) (nextroute.Solver, error) {
+			solver, err := nextroute.NewSkeletonSolver(model)
+			if err != nil {
+				return nil, err
+			}
+			solver.AddSolveOperators(
+				NewCustomUnPlanSearchOperator(),
+				NewCustomPlanSearchOperator(),
+			)
+			return solver, nil
+		},
+	)
+
+	parallelSolver.SetSolveOptionsFactory(
+		func(
+			information nextroute.ParallelSolveInformation,
+		) (nextroute.SolveOptions, error) {
+			return nextroute.SolveOptions{
+				Iterations: 1000,
+				Duration:   1 * time.Minute,
+			}, nil
+		},
+	)
+
+	solutions, err := parallelSolver.Solve(ctx, options.Solve)
+	last, err := solutions.Last()
+	if err != nil {
+		return runSchema.Output{}, err
+	}
+
+	output, err := check.Format(ctx, options, options.Check, solver, last)
 	if err != nil {
 		return runSchema.Output{}, err
 	}
@@ -66,22 +89,22 @@ func solver(
 }
 
 type customUnplanImpl struct {
-	nextroute.SearchOperator
+	nextroute.SolveOperator
 }
 
-func NewCustomUnPlanSearchOperator() nextroute.SearchOperator {
+func NewCustomUnPlanSearchOperator() nextroute.SolveOperator {
 	return &customUnplanImpl{
-		SolveOperator: NewSolveOperator(
+		nextroute.NewSolveOperator(
 			1.0,
 			false,
-			SolveParameters{},
+			nextroute.SolveParameters{},
 		),
 	}
 }
 
 func (d *customUnplanImpl) Execute(
 	ctx context.Context,
-	runTimeInformation SolveInformation,
+	runTimeInformation nextroute.SolveInformation,
 ) error {
 	workSolution := runTimeInformation.
 		Solver().
@@ -103,147 +126,52 @@ func (d *customUnplanImpl) Execute(
 }
 
 type customPlanImpl struct {
-	nextroute.SearchOperator
+	nextroute.SolveOperator
 }
 
-func NewCustomPlanSearchOperator() nextroute.SearchOperator {
+func NewCustomPlanSearchOperator() nextroute.SolveOperator {
 	return &customPlanImpl{
-		SolveOperator: NewSolveOperator(
+		SolveOperator: nextroute.NewSolveOperator(
 			1.0,
 			false,
-			SolveParameters{},
+			nextroute.SolveParameters{},
 		),
 	}
 }
 
 func (d *customPlanImpl) Execute(
 	ctx context.Context,
-	runTimeInformation SolveInformation,
+	runTimeInformation nextroute.SolveInformation,
 ) error {
 	workSolution := runTimeInformation.
 		Solver().
 		WorkSolution()
 
-	randomPlannedPlanUnit := workSolution.PlannedPlanUnits().RandomElement()
+	unPlannedPlannedPlanUnits := workSolution.
+		UnPlannedPlanUnits().
+		SolutionPlanUnits()
 
-	bestMove := workSolution.BestMove(ctx, randomPlannedPlanUnit)
+	unPlannedPlannedPlanUnits = common.Shuffle(
+		workSolution.Random(),
+		unPlannedPlannedPlanUnits,
+	)
 
-	if bestMove.IsExecutable() {
-		_, err := bestMove.Execute(ctx)
-		if err != nil {
-			return err
+	for _, unPlannedPlannedPlanUnit := range unPlannedPlannedPlanUnits {
+		select {
+		case <-ctx.Done():
+			break
+		default:
+			bestMove := workSolution.BestMove(
+				ctx,
+				unPlannedPlannedPlanUnit,
+			)
+			if bestMove.IsExecutable() {
+				_, err := bestMove.Execute(ctx)
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 	return nil
-}
-
-func solver(
-	ctx context.Context,
-	input schema.Input,
-	options options,
-) (runSchema.Output, error) {
-	model, err := factory.NewModel(input, options.Model)
-	if err != nil {
-		return runSchema.Output{}, err
-	}
-
-	// solver, err := nextroute.NewParallelSolver(model)
-	solver, err := createParallelSolver(model)
-	if err != nil {
-		return runSchema.Output{}, err
-	}
-
-	solutions, err := solver.Solve(ctx, options.Solve)
-	if err != nil {
-		return runSchema.Output{}, err
-	}
-	last := solutions.Last()
-
-	output, err := check.Format(
-		ctx,
-		options,
-		options.Check,
-		solver,
-		last,
-	)
-	if err != nil {
-		return runSchema.Output{}, err
-	}
-	output.Statistics.Result.Custom = factory.DefaultCustomResultStatistics(last)
-
-	return output, nil
-}
-
-func createParallelSolver(
-	model nextroute.Model,
-) (nextroute.ParallelSolver, error) {
-	// Create a new parallel solver.
-	parallelSolver, err := nextroute.NewSkeletonParallelSolver(
-		model,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	// Set the solver factory for the parallel solver. This factory is used to
-	// create new solver instances for each cycle. The information contains data
-	// about the current cycle and which solver of the n solvers is being
-	// created. The solution is the best solution of the previous cycle (and
-	// globally best).
-	//
-	// In this example we create identical solvers with custom operators, but
-	// you can also create different solvers with different operators. There
-	// is a random component in the operators, so the solvers will behave
-	// differently.
-	parallelSolver.SetSolverFactory(
-		func(
-			information nextroute.ParallelSolveInformation,
-			solution nextroute.Solution,
-		) (nextroute.Solver, error) {
-			return createSolver(model)
-		},
-	)
-
-	// The solve options factory is used to create new solve options for each
-	// solver invocation in a cycle. The information contains data about the
-	// current cycle and the solution of the previous cycle.
-	parallelSolver.SetSolveOptionsFactory(
-		nextroute.DefaultSolveOptionsFactory(),
-	)
-
-	return parallelSolver, nil
-}
-
-func createSolver(
-	modelTable ModelTable,
-) (nextroute.Solver, error) {
-	// Create a new solver.
-	solver, err := nextroute.NewSkeletonSolver(
-		modelTable.Model(),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create and add the custom operators to the solver.
-	unplanOperator, err := NewCustomUnPlanSearchOperator(
-		modelTable,
-		2,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	planOperator, err := NewCustomPlanSearchOperator(
-		modelTable,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	solver.AddSolveOperators(
-		unplanOperator,
-		planOperator,
-	)
-	return solver, nil
 }
