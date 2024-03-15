@@ -74,6 +74,9 @@ func solver(
 	)
 
 	solutions, err := parallelSolver.Solve(ctx, options.Solve)
+	if err != nil {
+		return runSchema.Output{}, err
+	}
 	last, err := solutions.Last()
 	if err != nil {
 		return runSchema.Output{}, err
