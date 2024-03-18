@@ -1,29 +1,33 @@
 {
-  "folders": [{
-    "path": ".",
-    "name": "nextroute"
-  }, ],
+  "folders": [
+    {
+      "path": ".",
+      "name": "nextroute"
+    },
+  ],
   "settings": {
     "go.lintTool": "golangci-lint",
     "go.lintFlags": ["--fast"]
   },
   "launch": {
     "version": "0.2.0",
-    "configurations": [{
-      "name": "nextroute",
-      "type": "go",
-      "request": "launch",
-      "mode": "auto",
-      "program": "${workspaceFolder}/tests/custom_operators",
-      "args": [
-        "-runner.input.path",
-        "input.json",
-        "-solve.duration",
-        "5s",
-        "-runner.output.path",
-        "output.json"
-      ]
-    }],
+    "configurations": [
+      {
+        "name": "nextroute",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder}/cmd",
+        "args": [
+          "-runner.input.path",
+          "input.json",
+          "-solve.duration",
+          "5s",
+          "-runner.output.path",
+          "output.json"
+        ]
+      }
+    ],
     "compounds": []
   }
 }
