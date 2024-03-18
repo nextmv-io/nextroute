@@ -102,7 +102,7 @@ func NewCustomUnPlanSearchOperator() nextroute.SolveOperator {
 	return &customUnplanImpl{
 		nextroute.NewSolveOperator(
 			1.0,
-			false,
+			true,
 			nextroute.SolveParameters{},
 		),
 	}
@@ -140,7 +140,7 @@ func NewCustomPlanSearchOperator() nextroute.SolveOperator {
 	return &customPlanImpl{
 		SolveOperator: nextroute.NewSolveOperator(
 			1.0,
-			false,
+			true,
 			nextroute.SolveParameters{},
 		),
 	}
