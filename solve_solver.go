@@ -5,11 +5,11 @@ package nextroute
 import (
 	"context"
 	"fmt"
-	"github.com/nextmv-io/nextroute/common"
 	"math/rand"
 	"slices"
 	"time"
 
+	"github.com/nextmv-io/nextroute/common"
 	"github.com/nextmv-io/sdk/run"
 )
 
