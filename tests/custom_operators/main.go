@@ -55,8 +55,8 @@ func solver(
 	}
 	parallelSolver.SetSolverFactory(
 		func(
-			information nextroute.ParallelSolveInformation,
-			solution nextroute.Solution,
+			_ nextroute.ParallelSolveInformation,
+			_ nextroute.Solution,
 		) (nextroute.Solver, error) {
 			solver, err := nextroute.NewSkeletonSolver(model)
 			if err != nil {
@@ -72,7 +72,7 @@ func solver(
 
 	parallelSolver.SetSolveOptionsFactory(
 		func(
-			information nextroute.ParallelSolveInformation,
+			_ nextroute.ParallelSolveInformation,
 		) (nextroute.SolveOptions, error) {
 			return nextroute.SolveOptions{
 				Iterations: 1000,
