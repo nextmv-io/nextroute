@@ -6,7 +6,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/nextmv-io/sdk/common"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 func TestStatistics(t *testing.T) {
