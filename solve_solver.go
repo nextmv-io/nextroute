@@ -9,6 +9,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/nextmv-io/nextroute/common"
 	"github.com/nextmv-io/sdk/run"
 )
 
@@ -231,6 +232,16 @@ func (s *solveImpl) Solve(
 	if len(s.solveOperators) == 0 {
 		return nil, fmt.Errorf("solver is empty, no solve operators provided")
 	}
+
+	if !common.HasTrue(s.solveOperators, func(operator SolveOperator) bool {
+		return operator.CanResultInImprovement()
+	}) {
+		return nil, fmt.Errorf(
+			"no solve operator can result in improvement," +
+				" enable CanResultInImprovement on at least one solve operator",
+		)
+	}
+
 	newWorkSolution := startSolutions[0].Copy()
 	s.bestSolution = startSolutions[0].Copy()
 	s.workSolution = newWorkSolution

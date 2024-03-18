@@ -7,10 +7,9 @@ import (
 	"math"
 	"math/big"
 	"math/rand"
+	"slices"
 	"sync"
 	"time"
-
-	"golang.org/x/exp/slices"
 )
 
 // Filter filters a slice using a predicate function.
