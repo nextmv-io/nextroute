@@ -1,3 +1,6 @@
+// © 2019-present nextmv.io inc
+
+// package main holds the implementation of the nextroute template.
 package main
 
 import (
@@ -109,7 +112,7 @@ func NewCustomUnPlanSearchOperator() nextroute.SolveOperator {
 }
 
 func (d *customUnplanImpl) Execute(
-	ctx context.Context,
+	_ context.Context,
 	runTimeInformation nextroute.SolveInformation,
 ) error {
 	workSolution := runTimeInformation.
@@ -166,7 +169,6 @@ func (d *customPlanImpl) Execute(
 	for _, unPlannedPlannedPlanUnit := range unPlannedPlannedPlanUnits {
 		select {
 		case <-ctx.Done():
-			break
 		default:
 			bestMove := workSolution.BestMove(
 				ctx,
