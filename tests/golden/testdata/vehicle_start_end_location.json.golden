@@ -75,10 +75,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 375.47202306044016,
+            "base": 375.4720230604402,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 375.47202306044016
+            "value": 375.4720230604402
           },
           {
             "factor": 1,
@@ -86,7 +86,7 @@
             "value": 0
           }
         ],
-        "value": 375.47202306044016
+        "value": 375.4720230604402
       },
       "unplanned": [],
       "vehicles": [
@@ -255,7 +255,7 @@
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 375.47202306044016
+      "value": 375.4720230604402
     },
     "run": {
       "duration": 0.123,
