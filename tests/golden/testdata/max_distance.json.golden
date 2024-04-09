@@ -75,10 +75,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 148.9095949929201,
+            "base": 148.90959499292012,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 148.9095949929201
+            "value": 148.90959499292012
           },
           {
             "base": 6000000,
