@@ -248,6 +248,10 @@ func (s *solveImpl) Solve(
 	s.random = rand.New(rand.NewSource(newWorkSolution.Random().Int63()))
 
 	start := ctx.Value(run.Start).(time.Time)
+	ctx, _ = context.WithDeadline(
+		ctx,
+		start.Add(solveOptions.Duration),
+	)
 
 	solveInformation := &solveInformationImpl{
 		iteration:      0,
