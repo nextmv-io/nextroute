@@ -192,8 +192,8 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if !b {
-		t.Error("move could not be executed")
+	if b {
+		t.Error("move resulted in planned planunit although it results in infeasible solution")
 	}
 
 	solutionSequencePlanUnit = solution.SolutionPlanStopsUnit(sequencePlanUnits[1])
@@ -221,16 +221,16 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if violated, _ := cnstr.EstimateIsViolated(moveSequenceOnVehicle0); violated {
-		t.Error("constraint is violated")
+	if violated, _ := cnstr.EstimateIsViolated(moveSequenceOnVehicle0); !violated {
+		t.Error("constraint is not violated")
 	}
 
 	b, err = moveSequenceOnVehicle0.Execute(context.Background())
 	if err != nil {
 		t.Error(err)
 	}
-	if !b {
-		t.Error("move could not be executed")
+	if b {
+		t.Error("move is executed and planned")
 	}
 }
 
