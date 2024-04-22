@@ -111,6 +111,10 @@ type CustomResultStatistics struct {
 	// UnplannedStops is the number of stops that were not planned in the
 	// solution.
 	UnplannedStops int `json:"unplanned_stops"`
+	// UnplannedPlanUnits is the number of plan units that were not planned in the
+	// solution. A plan unit can consist of multiple stops. e.g. a pickup and
+	// dropoff stop.
+	UnplannedPlanUnits int `json:"unplanned_units"`
 	// MaxTravelDuration is the maximum travel duration of a vehicle in the
 	// solution.
 	MaxTravelDuration int `json:"max_travel_duration"`
