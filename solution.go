@@ -821,9 +821,9 @@ func resetStopInterfaceCache(solution *solutionImpl) {
 		[]SolutionStop,
 		len(solution.stop),
 	)
-	for idx, value := range solution.stop {
+	for idx := range solution.stop {
 		solution.stopByIndexCache[idx] = solutionStopImpl{
-			index:    value,
+			index:    idx,
 			solution: solution,
 		}
 	}

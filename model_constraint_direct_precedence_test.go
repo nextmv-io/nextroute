@@ -90,5 +90,4 @@ func TestDirectPrecedenceConstraint_EstimateIsViolated(t *testing.T) {
 	if planned {
 		t.Error("expected move to not be planned")
 	}
-
 }

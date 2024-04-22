@@ -75,9 +75,13 @@ func (l *directPrecedencesConstraintImpl) EstimateIsViolated(
 	modelImpl := move.PlanStopsUnit().Solution().Model().(*modelImpl)
 	stopPositions := move.StopPositions()
 	for _, stopPosition := range stopPositions {
-		stop := stopPosition.Stop().ModelStop()
+		modelStop := stopPosition.Stop().ModelStop()
+		previousModelStop := stopPosition.Previous().ModelStop()
+		if disallowed := modelImpl.disallowedSuccessors[previousModelStop.Index()][modelStop.Index()]; disallowed {
+			return true, noPositionsHint()
+		}
 		nextModelStop := stopPosition.Next().ModelStop()
-		if disallowed := modelImpl.disallowedSuccessors[stop.Index()][nextModelStop.Index()]; disallowed {
+		if disallowed := modelImpl.disallowedSuccessors[modelStop.Index()][nextModelStop.Index()]; disallowed {
 			return true, noPositionsHint()
 		}
 	}
@@ -89,8 +93,17 @@ func (l *directPrecedencesConstraintImpl) DoesStopHaveViolations(
 ) bool {
 	modelImpl := stop.Solution().Model().(*modelImpl)
 	stopImpl := stop.(solutionStopImpl)
+	if !stop.IsFirst() {
+		previousModelStop := stopImpl.previous().modelStop()
+		if disallowed := modelImpl.disallowedSuccessors[previousModelStop.Index()][stop.ModelStopIndex()]; disallowed {
+			return true
+		}
+	}
+	if stop.IsLast() {
+		return false
+	}
 	nextModelStop := stopImpl.next().modelStop()
-	if disallowed := modelImpl.disallowedSuccessors[stop.Index()][nextModelStop.Index()]; disallowed {
+	if disallowed := modelImpl.disallowedSuccessors[stop.ModelStopIndex()][nextModelStop.Index()]; disallowed {
 		return true
 	}
 	return false
