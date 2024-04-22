@@ -292,14 +292,13 @@ func DefaultCustomResultStatistics(solution nextroute.Solution) schema.CustomRes
 	)
 
 	return schema.CustomResultStatistics{
-		ActivatedVehicles:  vehicleCount,
-		UnplannedPlanUnits: solution.UnPlannedPlanUnits().Size(),
-		UnplannedStops:     len(unplannedStops),
-		MaxTravelDuration:  maxTravelDuration,
-		MaxDuration:        maxDuration,
-		MinTravelDuration:  minTravelDuration,
-		MinDuration:        minDuration,
-		MaxStopsInVehicle:  maxStops,
-		MinStopsInVehicle:  minStops,
+		ActivatedVehicles: vehicleCount,
+		UnplannedStops:    len(unplannedStops),
+		MaxTravelDuration: maxTravelDuration,
+		MaxDuration:       maxDuration,
+		MinTravelDuration: minTravelDuration,
+		MinDuration:       minDuration,
+		MaxStopsInVehicle: maxStops,
+		MinStopsInVehicle: minStops,
 	}
 }
