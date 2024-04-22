@@ -193,7 +193,7 @@ func TestClusterConstraint_EstimateIsViolated(t *testing.T) {
 		t.Error(err)
 	}
 	if b {
-		t.Error("move is executed")
+		t.Error("move resulted in planned planunit although it results in infeasible solution")
 	}
 
 	solutionSequencePlanUnit = solution.SolutionPlanStopsUnit(sequencePlanUnits[1])
