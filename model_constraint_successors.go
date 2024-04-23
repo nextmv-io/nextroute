@@ -4,36 +4,30 @@ package nextroute
 
 import "fmt"
 
-// DirectPrecedencesConstraint is a constraint that limits the vehicles a plan unit
-// can be added to. The Attribute constraint configures compatibility
-// attributes for stops and vehicles separately. This is done by specifying
-// a list of attributes for stops and vehicles, respectively. Stops that
-// have configured attributes are only compatible with vehicles that match
-// at least one of them. Stops that do not have any specified attributes are
-// compatible with any vehicle. Vehicles that do not have any specified
-// attributes are only compatible with stops without attributes.
-type DirectPrecedencesConstraint interface {
+// SuccessorConstraint is a constraint that disallows certain stops to be
+// planned after other stops.
+type SuccessorConstraint interface {
 	ModelConstraint
 	DisallowSuccessors(ModelStop, ModelStops) error
 }
 
-// NewDirectPrecedencesConstraint returns a new DirectPrecedencesConstraint.
-func NewDirectPrecedencesConstraint() (DirectPrecedencesConstraint, error) {
-	return &directPrecedencesConstraintImpl{
+// NewSuccessorConstraint returns a new SuccessorConstraint.
+func NewSuccessorConstraint() (SuccessorConstraint, error) {
+	return &successorConstraintImpl{
 		modelConstraintImpl: newModelConstraintImpl(
-			"direct_precedences",
+			"successor",
 			ModelExpressions{},
 		),
 		disallowedSuccessors: make(map[ModelStop]ModelStops),
 	}, nil
 }
 
-type directPrecedencesConstraintImpl struct {
+type successorConstraintImpl struct {
 	modelConstraintImpl
 	disallowedSuccessors map[ModelStop]ModelStops
 }
 
-func (l *directPrecedencesConstraintImpl) Lock(model Model) error {
+func (l *successorConstraintImpl) Lock(model Model) error {
 	modelImpl := model.(*modelImpl)
 	// copy the information from disallowedSuccessors to the model
 	for stop, successors := range l.disallowedSuccessors {
@@ -44,7 +38,7 @@ func (l *directPrecedencesConstraintImpl) Lock(model Model) error {
 	return nil
 }
 
-func (l *directPrecedencesConstraintImpl) DisallowSuccessors(
+func (l *successorConstraintImpl) DisallowSuccessors(
 	stop ModelStop,
 	successors ModelStops,
 ) error {
@@ -61,15 +55,15 @@ func (l *directPrecedencesConstraintImpl) DisallowSuccessors(
 	return nil
 }
 
-func (l *directPrecedencesConstraintImpl) String() string {
+func (l *successorConstraintImpl) String() string {
 	return l.name
 }
 
-func (l *directPrecedencesConstraintImpl) EstimationCost() Cost {
+func (l *successorConstraintImpl) EstimationCost() Cost {
 	return LinearStop
 }
 
-func (l *directPrecedencesConstraintImpl) EstimateIsViolated(
+func (l *successorConstraintImpl) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	modelImpl := move.PlanStopsUnit().Solution().Model().(*modelImpl)
@@ -84,13 +78,13 @@ func (l *directPrecedencesConstraintImpl) EstimateIsViolated(
 	return false, noPositionsHint()
 }
 
-func (l *directPrecedencesConstraintImpl) DoesStopHaveViolations(
+func (l *successorConstraintImpl) DoesStopHaveViolations(
 	stop SolutionStop,
 ) bool {
 	modelImpl := stop.Solution().Model().(*modelImpl)
 	stopImpl := stop.(solutionStopImpl)
-	nextModelStop := stopImpl.next().modelStop()
-	if disallowed := modelImpl.disallowedSuccessors[stop.Index()][nextModelStop.Index()]; disallowed {
+	previousModelStop := stopImpl.previous().modelStop()
+	if disallowed := modelImpl.disallowedSuccessors[previousModelStop.Index()][stop.ModelStop().Index()]; disallowed {
 		return true
 	}
 	return false

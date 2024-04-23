@@ -43,14 +43,18 @@ type DirectedAcyclicGraph interface {
 	// otherwise returns false.
 	IsAllowed(stops ModelStops) (bool, error)
 
+	// HasDirectArc returns true if there is a direct arc between the origin and
+	// destination stops, otherwise returns false.
+	HasDirectArc(origin, destination ModelStop) bool
+
 	// ModelStops returns all [ModelStops] in the graph.
 	ModelStops() ModelStops
 	// AddArc adds a new [Arc] in the graph if it was not already added. The new
 	// [Arc] should not cause a cycle.
 	AddArc(origin, destination ModelStop) error
-	// AddDirectArc adds a new [Arc] in the graph if it was not already added.
-	// The new [Arc] should not cause a cycle. The destination stop should be
-	// the next stop after the origin stop.
+	// AddDirectArc adds a new [Arc] marked direct in the graph if it was not
+	// already added. The new [Arc] should not cause a cycle. The destination
+	// stop should be the next stop after the origin stop.
 	AddDirectArc(origin, destination ModelStop) error
 	// OutboundArcs returns all [Arcs] that have the given [ModelStop] as their
 	// origin.
@@ -60,44 +64,41 @@ type DirectedAcyclicGraph interface {
 // NewDirectedAcyclicGraph connects NewDirectedAcyclicGraph.
 func NewDirectedAcyclicGraph() DirectedAcyclicGraph {
 	return &directedAcyclicGraphImpl{
-		arcs:          []Arc{},
-		adjacencyList: map[int][]int{},
-		outboundArcs:  map[int]Arcs{},
+		arcs:               []Arc{},
+		adjacencyList:      map[int][]int{},
+		outboundArcs:       map[int]Arcs{},
+		outboundDirectArcs: map[int]Arc{},
+		inboundDirectArcs:  map[int]Arc{},
 	}
 }
 
 // directedAcyclicGraphImpl implements DirectedAcyclicGraph.
 type directedAcyclicGraphImpl struct {
-	adjacencyList map[int][]int
-	outboundArcs  map[int]Arcs
-	arcs          Arcs
+	adjacencyList      map[int][]int
+	outboundArcs       map[int]Arcs
+	outboundDirectArcs map[int]Arc
+	inboundDirectArcs  map[int]Arc
+	arcs               Arcs
 }
 
 func (d *directedAcyclicGraphImpl) addArc(origin, destination ModelStop, isDirect bool) error {
-	for _, arc := range d.arcs {
-		if arc.Origin().Index() == origin.Index() &&
-			arc.Destination().Index() == destination.Index() &&
-			arc.IsDirect() == isDirect {
-			return nil
-		}
-	}
-	// both origin and destination stops can only have one direct arc
 	if isDirect {
-		for _, arc := range d.arcs {
-			if arc.Origin().Index() == origin.Index() && arc.IsDirect() {
+		if arc, alreadyDefined := d.outboundDirectArcs[origin.Index()]; alreadyDefined {
+			if arc.Destination().Index() != destination.Index() {
 				return fmt.Errorf(
 					"origin stop already has a direct arc: %v -> %v",
 					origin,
 					arc.Destination(),
 				)
 			}
-			if arc.Destination().Index() == destination.Index() && arc.IsDirect() {
-				return fmt.Errorf(
-					"destination stop already has a direct arc: %v -> %v",
-					arc.Origin(),
-					destination,
-				)
-			}
+			return nil
+		}
+		if arc, alreadyDefined := d.inboundDirectArcs[destination.Index()]; alreadyDefined {
+			return fmt.Errorf(
+				"destination stop already has a direct arc: %v -> %v",
+				arc.Origin(),
+				destination,
+			)
 		}
 	}
 
@@ -117,7 +118,10 @@ func (d *directedAcyclicGraphImpl) addArc(origin, destination ModelStop, isDirec
 	}
 	d.arcs = append(d.arcs, arc)
 	d.outboundArcs[origin.Index()] = append(d.outboundArcs[origin.Index()], arc)
-
+	if isDirect {
+		d.outboundDirectArcs[origin.Index()] = arc
+		d.inboundDirectArcs[destination.Index()] = arc
+	}
 	return nil
 }
 
@@ -128,6 +132,13 @@ func (d *directedAcyclicGraphImpl) AddArc(origin, destination ModelStop) error {
 	}
 
 	return nil
+}
+
+func (d *directedAcyclicGraphImpl) HasDirectArc(origin, destination ModelStop) bool {
+	if arc, ok := d.outboundDirectArcs[origin.Index()]; ok {
+		return arc.Destination().Index() == destination.Index()
+	}
+	return false
 }
 
 func (d *directedAcyclicGraphImpl) AddDirectArc(origin, destination ModelStop) error {
@@ -202,9 +213,11 @@ func (d *directedAcyclicGraphImpl) IsAllowed(stops ModelStops) (bool, error) {
 	}
 
 	c := directedAcyclicGraphImpl{
-		adjacencyList: make(map[int][]int),
-		outboundArcs:  make(map[int]Arcs),
-		arcs:          make(Arcs, 0, len(d.arcs)),
+		adjacencyList:      make(map[int][]int, len(d.adjacencyList)),
+		outboundArcs:       make(map[int]Arcs, len(d.outboundArcs)),
+		outboundDirectArcs: make(map[int]Arc, len(d.outboundDirectArcs)),
+		inboundDirectArcs:  make(map[int]Arc, len(d.inboundDirectArcs)),
+		arcs:               make(Arcs, 0, len(d.arcs)),
 	}
 	for _, arc := range d.arcs {
 		err := c.addArc(arc.Origin(), arc.Destination(), arc.IsDirect())

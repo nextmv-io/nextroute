@@ -414,6 +414,400 @@ func TestMoveGeneratorMultipleStops(t *testing.T) {
 	}
 }
 
+func TestMoveGeneratorMustBeNeighbors1(t *testing.T) {
+	model, err := createModel(singleVehiclePlanSequenceModel())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, planUnit := range model.PlanUnits() {
+		planStopsUnit := planUnit.(nextroute.ModelPlanStopsUnit)
+		err = planStopsUnit.DirectedAcyclicGraph().AddDirectArc(
+			planStopsUnit.Stops()[0],
+			planStopsUnit.Stops()[1],
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	solution, err := nextroute.NewSolution(model)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	v := solution.Vehicles()[0]
+	planUnit0 := solution.UnPlannedPlanUnits().RandomElement().(nextroute.SolutionPlanStopsUnit)
+	position1, err := nextroute.NewStopPosition(
+		v.First(),
+		planUnit0.SolutionStops()[0],
+		planUnit0.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err := nextroute.NewStopPosition(
+		planUnit0.SolutionStops()[0],
+		planUnit0.SolutionStops()[1],
+		v.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	move, err := nextroute.NewMoveStops(
+		planUnit0,
+		nextroute.StopPositions{position1, position2},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testMoves(
+		t,
+		v,
+		planUnit0,
+		[]nextroute.SolutionMoveStops{
+			move,
+		},
+	)
+
+	planned, err := move.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Error("move should be planned")
+	}
+
+	planUnit1 := solution.UnPlannedPlanUnits().RandomElement().(nextroute.SolutionPlanStopsUnit)
+	position1, err = nextroute.NewStopPosition(
+		v.First(),
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+		v.First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m1, err := nextroute.NewMoveStops(
+		planUnit1,
+		nextroute.StopPositions{position1, position2},
+	)
+	position1, err = nextroute.NewStopPosition(
+		v.Last().Previous(),
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+		v.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m2, err := nextroute.NewMoveStops(
+		planUnit1,
+		nextroute.StopPositions{position1, position2},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testMoves(
+		t,
+		v,
+		planUnit1,
+		[]nextroute.SolutionMoveStops{m1, m2},
+	)
+}
+
+func TestMoveGeneratorMustBeNeighbors2(t *testing.T) {
+	model, err := createModel(singleVehiclePlanSequenceModel())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	modelPlanUnit0 := model.PlanUnits()[0].(nextroute.ModelPlanStopsUnit)
+	modelPlanUnit1 := model.PlanUnits()[1].(nextroute.ModelPlanStopsUnit)
+	err = modelPlanUnit1.DirectedAcyclicGraph().AddDirectArc(
+		modelPlanUnit1.Stops()[0],
+		modelPlanUnit1.Stops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	solution, err := nextroute.NewSolution(model)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	v := solution.Vehicles()[0]
+	planUnit0 := solution.SolutionPlanUnit(modelPlanUnit0).(nextroute.SolutionPlanStopsUnit)
+	position1, err := nextroute.NewStopPosition(
+		v.First(),
+		planUnit0.SolutionStops()[0],
+		planUnit0.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err := nextroute.NewStopPosition(
+		planUnit0.SolutionStops()[0],
+		planUnit0.SolutionStops()[1],
+		v.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	move, err := nextroute.NewMoveStops(
+		planUnit0,
+		nextroute.StopPositions{position1, position2},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testMoves(
+		t,
+		v,
+		planUnit0,
+		[]nextroute.SolutionMoveStops{
+			move,
+		},
+	)
+
+	planned, err := move.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Error("move should be planned")
+	}
+
+	planUnit1 := solution.SolutionPlanUnit(modelPlanUnit1).(nextroute.SolutionPlanStopsUnit)
+	position1, err = nextroute.NewStopPosition(
+		v.First(),
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+		v.First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m1, err := nextroute.NewMoveStops(
+		planUnit1,
+		nextroute.StopPositions{position1, position2},
+	)
+
+	position1, err = nextroute.NewStopPosition(
+		v.First().Next(),
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+		v.First().Next().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m2, err := nextroute.NewMoveStops(
+		planUnit1,
+		nextroute.StopPositions{position1, position2},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position1, err = nextroute.NewStopPosition(
+		v.Last().Previous(),
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+		v.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m3, err := nextroute.NewMoveStops(
+		planUnit1,
+		nextroute.StopPositions{position1, position2},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testMoves(
+		t,
+		v,
+		planUnit1,
+		[]nextroute.SolutionMoveStops{m1, m2, m3},
+	)
+}
+
+func TestMoveGeneratorMustBeNeighbors3(t *testing.T) {
+	model, err := createModel(singleVehiclePlanSequenceModel())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	modelPlanUnit0 := model.PlanUnits()[0].(nextroute.ModelPlanStopsUnit)
+	modelPlanUnit1 := model.PlanUnits()[1].(nextroute.ModelPlanStopsUnit)
+	err = modelPlanUnit0.DirectedAcyclicGraph().AddDirectArc(
+		modelPlanUnit0.Stops()[0],
+		modelPlanUnit0.Stops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	solution, err := nextroute.NewSolution(model)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	v := solution.Vehicles()[0]
+	planUnit0 := solution.SolutionPlanUnit(modelPlanUnit0).(nextroute.SolutionPlanStopsUnit)
+	position1, err := nextroute.NewStopPosition(
+		v.First(),
+		planUnit0.SolutionStops()[0],
+		planUnit0.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err := nextroute.NewStopPosition(
+		planUnit0.SolutionStops()[0],
+		planUnit0.SolutionStops()[1],
+		v.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	move, err := nextroute.NewMoveStops(
+		planUnit0,
+		nextroute.StopPositions{position1, position2},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testMoves(
+		t,
+		v,
+		planUnit0,
+		[]nextroute.SolutionMoveStops{
+			move,
+		},
+	)
+
+	planned, err := move.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Error("move should be planned")
+	}
+
+	planUnit1 := solution.SolutionPlanUnit(modelPlanUnit1).(nextroute.SolutionPlanStopsUnit)
+	position1, err = nextroute.NewStopPosition(
+		v.First(),
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+		v.First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m1, err := nextroute.NewMoveStops(
+		planUnit1,
+		nextroute.StopPositions{position1, position2},
+	)
+
+	position1, err = nextroute.NewStopPosition(
+		v.First(),
+		planUnit1.SolutionStops()[0],
+		v.First().Next(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		v.Last().Previous(),
+		planUnit1.SolutionStops()[1],
+		v.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m2, err := nextroute.NewMoveStops(
+		planUnit1,
+		nextroute.StopPositions{position1, position2},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position1, err = nextroute.NewStopPosition(
+		v.Last().Previous(),
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	position2, err = nextroute.NewStopPosition(
+		planUnit1.SolutionStops()[0],
+		planUnit1.SolutionStops()[1],
+		v.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m3, err := nextroute.NewMoveStops(
+		planUnit1,
+		nextroute.StopPositions{position1, position2},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testMoves(
+		t,
+		v,
+		planUnit1,
+		[]nextroute.SolutionMoveStops{m1, m2, m3},
+	)
+}
+
 func testMoves(
 	t *testing.T,
 	vehicle nextroute.SolutionVehicle,
@@ -434,7 +828,7 @@ func testMoves(
 			}
 			if len(move.StopPositions()) != len(moves[count].StopPositions()) {
 				t.Errorf("move %d is not correct, expected %v, got %v",
-					count,
+					count+1,
 					moves[count],
 					move,
 				)
@@ -442,19 +836,19 @@ func testMoves(
 			for i, stopPosition := range move.StopPositions() {
 				if moves[count].StopPositions()[i].Previous() != stopPosition.Previous() {
 					t.Errorf("move %d is not correct, stop position %v, previous stop",
-						count,
+						count+1,
 						i,
 					)
 				}
 				if moves[count].StopPositions()[i].Stop() != stopPosition.Stop() {
 					t.Errorf("move %d is not correct, stop position %v, stop",
-						count,
+						count+1,
 						i,
 					)
 				}
 				if moves[count].StopPositions()[i].Next() != stopPosition.Next() {
 					t.Errorf("move %d is not correct, stop position %v, next stop",
-						count,
+						count+1,
 						i,
 					)
 				}

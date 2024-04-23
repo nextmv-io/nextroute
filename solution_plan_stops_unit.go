@@ -232,6 +232,7 @@ func (p *solutionPlanStopsUnitImpl) unplan() (bool, error) {
 					"failed undoing failed unplan",
 				)
 		}
+		return false, nil
 	}
 	return true, nil
 }

@@ -125,17 +125,7 @@ func SolutionMoveStopsGenerator(
 
 	locations := make([]int, 0, len(source))
 
-	combineAscending(locations, len(source), len(target)-1, func(locations []int) {
-		for idx, location := range locations {
-			positions[idx].previousStopIndex = target[location-1].index
-			positions[idx].nextStopIndex = target[location].index
-			if idx > 0 && locations[idx-1] == location {
-				positions[idx].previousStopIndex = source[idx-1].index
-			}
-			if idx < len(locations)-1 && locations[idx+1] == location {
-				positions[idx].nextStopIndex = source[idx+1].index
-			}
-		}
+	generate(positions, locations, source, target, func(locations []int) {
 		m.(*solutionMoveStopsImpl).reset()
 		m.(*solutionMoveStopsImpl).planUnit = planUnit
 		m.(*solutionMoveStopsImpl).stopPositions = positions
@@ -145,37 +135,86 @@ func SolutionMoveStopsGenerator(
 	}, shouldStop)
 }
 
-// combineAscending generates all combinations of n elements from m where
-// the elements are in ascending order.
-// 2,3 (2 elements can be at 3 locations) will generate:
-// [1 1] first at first location, second at first location
-// [1 2] first at first location, second at second location
-// [1 3] first at first location, second at third location
-// [2 2] first at second location, second at second location
-// [2 3] first at second location, second at third location
-// [3 3] first at third location, second at third location
-// 3, 2 (3 elements can be at 2 locations) will generate:
-// [1 1 1] first at first location, second at first location, third at first location
-// [1 1 2] first at first location, second at first location, third at second location
-// [1 2 2] first at first location, second at second location, third at second location
-// [2 2 2] first at second location, second at second location, third at second location
-// Being at the same location means element are next to each other.
-// The function yield is called for each combination of size n.
-func combineAscending(combination []int, n int, m int, yield func([]int), shouldStop func() bool) {
+func isNotAllowed(from, to SolutionStop) bool {
+	fromModelStop := from.ModelStop()
+	toModelStop := to.ModelStop()
+	model := fromModelStop.Model()
+
+	return model.(*modelImpl).disallowedSuccessors[fromModelStop.Index()][toModelStop.Index()]
+}
+
+func mustBeNeighbours(from, to SolutionStop) bool {
+	if !from.ModelStop().HasPlanStopsUnit() {
+		return false
+	}
+
+	return from.ModelStop().
+		PlanStopsUnit().
+		DirectedAcyclicGraph().
+		HasDirectArc(from.ModelStop(), to.ModelStop())
+}
+
+func generate(
+	stopPositions []stopPositionImpl,
+	combination []int,
+	source []solutionStopImpl,
+	target []solutionStopImpl,
+	yield func([]int),
+	shouldStop func() bool,
+) {
 	if shouldStop() {
 		return
 	}
-	if len(combination) == n {
+
+	if len(combination) == len(source) {
 		yield(combination)
 		return
 	}
+
 	start := 0
 	if len(combination) > 0 {
 		start = combination[len(combination)-1] - 1
 	}
-	for i := start; i < m; i++ {
+
+	for i := start; i < len(target)-1; i++ {
+		if i > 0 && mustBeNeighbours(target[i], target[i+1]) {
+			continue
+		}
 		combination = append(combination, i+1)
-		combineAscending(combination, n, m, yield, shouldStop)
+
+		positionIdx := len(combination) - 1
+
+		stopPositions[positionIdx].previousStopIndex = target[combination[positionIdx]-1].index
+		stopPositions[positionIdx].nextStopIndex = target[combination[positionIdx]].index
+
+		if positionIdx > 0 {
+			if combination[positionIdx] == combination[positionIdx-1] {
+				stopPositions[positionIdx].previousStopIndex = stopPositions[positionIdx-1].stopIndex
+				stopPositions[positionIdx-1].nextStopIndex = stopPositions[positionIdx].stopIndex
+			} else {
+				stopPositions[positionIdx-1].nextStopIndex = target[combination[positionIdx-1]].index
+				if mustBeNeighbours(stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx].Stop()) {
+					combination = combination[:positionIdx]
+					break
+				}
+			}
+
+			if isNotAllowed(stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx-1].Next()) {
+				combination = combination[:positionIdx]
+				if stopPositions[positionIdx-1].nextStopIndex != stopPositions[positionIdx].previousStopIndex {
+					break
+				}
+				continue
+			}
+		}
+
+		if isNotAllowed(stopPositions[positionIdx].Previous(), stopPositions[positionIdx].Stop()) {
+			combination = combination[:positionIdx]
+			continue
+		}
+
+		generate(stopPositions, combination, source, target, yield, shouldStop)
+
 		combination = combination[:len(combination)-1]
 	}
 }
