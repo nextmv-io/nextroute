@@ -632,26 +632,16 @@ func NewMoveStops(
 	for i, stopPosition := range stopPositions {
 		stopPositionsImpl[i] = stopPosition.(stopPositionImpl)
 	}
-
-	return newMove(
-		planUnit.(*solutionPlanStopsUnitImpl),
-		stopPositionsImpl,
-		0.0,
-		0,
-	), nil
-}
-
-func newMove(
-	planUnit *solutionPlanStopsUnitImpl,
-	stopPositions []stopPositionImpl,
-	value float64,
-	valueSeen int,
-) *solutionMoveStopsImpl {
-	return &solutionMoveStopsImpl{
-		planUnit:      planUnit,
-		stopPositions: stopPositions,
-		value:         value,
-		valueSeen:     valueSeen,
+	move := &solutionMoveStopsImpl{
+		planUnit:      planUnit.(*solutionPlanStopsUnitImpl),
+		stopPositions: stopPositionsImpl,
+		value:         0.0,
+		valueSeen:     0,
 		allowed:       true,
 	}
+	value, allowed, _ := planUnit.(*solutionPlanStopsUnitImpl).solution().checkConstraintsAndEstimateDeltaScore(move)
+	move.value = value
+	move.allowed = allowed
+	move.valueSeen = 1
+	return move, nil
 }
