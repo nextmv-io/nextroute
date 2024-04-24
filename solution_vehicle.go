@@ -107,7 +107,7 @@ func (v solutionVehicleImpl) firstMovePlanStopsUnit(
 ) (SolutionMove, error) {
 	stop := false
 	var bestMove SolutionMove = newNotExecutableSolutionMoveStops(planUnit)
-	SolutionMoveStopsGenerator(
+	solutionMoveStopsGenerator(
 		v,
 		planUnit,
 		func(nextMove SolutionMoveStops) {
@@ -353,7 +353,7 @@ func (v solutionVehicleImpl) bestMoveSequence(
 ) SolutionMove {
 	var bestMove SolutionMove = newNotExecutableSolutionMoveStops(planUnit)
 	stop := false
-	SolutionMoveStopsGenerator(
+	solutionMoveStopsGenerator(
 		v,
 		planUnit,
 		func(nextMove SolutionMoveStops) {

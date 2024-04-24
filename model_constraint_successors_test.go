@@ -9,7 +9,7 @@ import (
 	"github.com/nextmv-io/nextroute"
 )
 
-func TestNewSuccessorConstraintConstraint_EstimateIsViolated(t *testing.T) {
+func TestNewSuccessorConstraint_EstimateIsViolated(t *testing.T) {
 	model, err := createModel(
 		input(
 			vehicleTypes("truck"),
