@@ -55,48 +55,70 @@ func addPrecedenceInformation(
 // precedence processes the "Precedes" or "Succeeds" field of a stop. It return
 // the precedence (succeeds or precedes) as a slice of strings, even for a
 // single string.
-func precedence(stop schema.Stop, name string) ([]string, error) {
+func precedence(stop schema.Stop, name string) ([]precedenceData, error) {
 	field := reflect.ValueOf(stop).FieldByName(name).Interface()
-	var precedence []string
+	var precedence []precedenceData
 	if field == nil {
 		return precedence, nil
 	}
 
-	parsed, ok := field.([]any)
-	if ok {
-		for i, v := range parsed {
-			value, ok := v.(string)
-			if !ok {
+	// field can be a string, a slice of strings or a slice of structs of type
+	// precedenceData.
+	switch field := field.(type) {
+	case string:
+		precedence = append(precedence, precedenceData{id: field})
+		return precedence, nil
+	case []any:
+		for i, element := range field {
+			switch element := element.(type) {
+			case string:
+				precedence = append(precedence, precedenceData{id: element})
+			case map[string]any:
+				if id, ok := element["id"].(string); ok {
+					if direct, ok := element["direct"].(bool); ok {
+						precedence = append(precedence, precedenceData{id: id, direct: direct})
+					} else {
+						precedence = append(precedence, precedenceData{id: id})
+					}
+					continue
+				} else {
+					return nil,
+						nmerror.NewInputDataError(fmt.Errorf(
+							"could not obtain %s from stop %s, "+
+								"element %v in slice is missing field id",
+							name,
+							stop.ID,
+							i,
+						))
+				}
+			default:
 				return nil,
 					nmerror.NewInputDataError(fmt.Errorf(
 						"could not obtain %s from stop %s, "+
-							"element %v in slice is not string, got %v",
+							"element %v in slice is neither string nor struct, got %v",
 						name,
 						stop.ID,
 						i,
-						v,
+						element,
 					))
 			}
-			precedence = append(precedence, value)
 		}
-
 		return precedence, nil
+	default:
+		return nil,
+			fmt.Errorf(
+				"could not obtain %s from stop %s, "+
+					"it is not of type string or slice of string or slice of structs with fields id and direct, got %v",
+				name,
+				stop.ID,
+				field,
+			)
 	}
+}
 
-	value, ok := field.(string)
-	if ok {
-		precedence = append(precedence, value)
-		return precedence, nil
-	}
-
-	return nil,
-		fmt.Errorf(
-			"could not obtain %s from stop %s, "+
-				"it is neither slice of string or string, got %v",
-			name,
-			stop.ID,
-			field,
-		)
+type precedenceData struct {
+	id     string
+	direct bool
 }
 
 // getSequences returns all the sequences for a stop, based on the "precedes"
@@ -113,7 +135,8 @@ func getSequences(stop schema.Stop) ([]sequence, error) {
 		for i, p := range precedes {
 			predecessorSequences[i] = sequence{
 				predecessor: stop.ID,
-				successor:   p,
+				successor:   p.id,
+				direct:      p.direct,
 			}
 		}
 		sequences = append(sequences, predecessorSequences...)
@@ -128,8 +151,9 @@ func getSequences(stop schema.Stop) ([]sequence, error) {
 		successorSequences := make([]sequence, len(succeeds))
 		for i, s := range succeeds {
 			successorSequences[i] = sequence{
-				predecessor: s,
+				predecessor: s.id,
 				successor:   stop.ID,
+				direct:      s.direct,
 			}
 		}
 

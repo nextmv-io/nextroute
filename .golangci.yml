@@ -303,3 +303,7 @@ issues:
       linters:
         - govet
       text: structtag
+    # We want to keep the error message as is.
+    - path: precedence\.go
+      linters:
+        - goconst

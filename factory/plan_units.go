@@ -238,7 +238,11 @@ func buildDirectedAcyclicGraph(
 			return nil, err
 		}
 
-		if err = dag.AddArc(origin, destination); err != nil {
+		if sequence.direct {
+			if err = dag.AddDirectArc(origin, destination); err != nil {
+				return nil, err
+			}
+		} else if err = dag.AddArc(origin, destination); err != nil {
 			return nil, err
 		}
 	}
