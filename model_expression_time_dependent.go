@@ -192,9 +192,6 @@ func (t *timeDependentDurationExpressionImpl) Value(
 	if t.IsDependentOnTime() {
 		panic("asking for a value on a time dependent expression, require a time to be passed in, use ValueAtTime")
 	}
-	if !from.Location().IsValid() || !to.Location().IsValid() {
-		return 0.0
-	}
 	return t.defaultExpression.Value(vehicleType, from, to)
 }
 
@@ -205,9 +202,6 @@ func (t *timeDependentDurationExpressionImpl) Duration(
 	if t.IsDependentOnTime() {
 		panic("asking for a duration on a time dependent expression," +
 			" requires a time to be passed in")
-	}
-	if !from.Location().IsValid() || !to.Location().IsValid() {
-		return 0.0
 	}
 	return t.defaultExpression.Duration(vehicleType, from, to)
 }
@@ -440,9 +434,6 @@ func (t *timeDependentDurationExpressionImpl) ValueAtTime(
 	vehicleType ModelVehicleType,
 	from, to ModelStop,
 ) float64 {
-	if !from.Location().IsValid() || !to.Location().IsValid() {
-		return 0.0
-	}
 	return t.ValueAtValue(
 		t.model.TimeToValue(atTime),
 		vehicleType,
@@ -458,10 +449,6 @@ func (t *timeDependentDurationExpressionImpl) ValueAtValue(
 ) float64 {
 	if len(t.elements) == 0 {
 		return t.defaultExpression.Value(vehicleType, from, to)
-	}
-
-	if !from.Location().IsValid() || !to.Location().IsValid() {
-		return 0.0
 	}
 
 	element := t.getElementAtValue(value)
@@ -534,9 +521,6 @@ func (t *timeIndependentDurationExpressionImpl) Duration(
 	vehicleType ModelVehicleType,
 	from, to ModelStop,
 ) time.Duration {
-	if !from.Location().IsValid() || !to.Location().IsValid() {
-		return 0.0
-	}
 	return t.expression.Duration(vehicleType, from, to)
 }
 
@@ -552,9 +536,6 @@ func (t *timeIndependentDurationExpressionImpl) Value(
 	vehicleType ModelVehicleType,
 	from, to ModelStop,
 ) float64 {
-	if !from.Location().IsValid() || !to.Location().IsValid() {
-		return 0.0
-	}
 	return t.expression.Value(vehicleType, from, to)
 }
 
@@ -600,9 +581,6 @@ func (t *timeIndependentDurationExpressionImpl) ValueAtTime(
 	vehicleType ModelVehicleType,
 	from, to ModelStop,
 ) float64 {
-	if !from.Location().IsValid() || !to.Location().IsValid() {
-		return 0.0
-	}
 	return t.expression.Value(vehicleType, from, to)
 }
 
@@ -611,9 +589,6 @@ func (t *timeIndependentDurationExpressionImpl) ValueAtValue(
 	vehicleType ModelVehicleType,
 	from, to ModelStop,
 ) float64 {
-	if !from.Location().IsValid() || !to.Location().IsValid() {
-		return 0.0
-	}
 	return t.expression.Value(vehicleType, from, to)
 }
 

@@ -247,16 +247,10 @@ func (d *distanceExpression) SetName(n string) {
 }
 
 func (d *distanceExpression) Value(v ModelVehicleType, from, to ModelStop) float64 {
-	if !from.Location().IsValid() || !to.Location().IsValid() {
-		return 0.0
-	}
 	return d.modelExpression.Value(v, from, to)
 }
 
 func (d *distanceExpression) Distance(v ModelVehicleType, from, to ModelStop) common.Distance {
-	if !from.Location().IsValid() || !to.Location().IsValid() {
-		return common.NewDistance(0.0, d.unit)
-	}
 	return common.NewDistance(d.Value(v, from, to), d.unit)
 }
 

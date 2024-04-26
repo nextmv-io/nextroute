@@ -39,9 +39,6 @@ func (h *haversineExpression) Distance(
 	vehicleType ModelVehicleType,
 	from, to ModelStop,
 ) common.Distance {
-	if !from.Location().IsValid() || !to.Location().IsValid() {
-		return common.NewDistance(0.0, common.Meters)
-	}
 	return common.NewDistance(h.Value(vehicleType, from, to), common.Meters)
 }
 
@@ -62,7 +59,7 @@ func (h *haversineExpression) Value(
 	from ModelStop,
 	to ModelStop,
 ) float64 {
-	if !from.Location().IsValid() || !to.Location().IsValid() {
+	if from == nil || to == nil || !from.Location().IsValid() || !to.Location().IsValid() {
 		return 0.0
 	}
 	return haversineDistance(from.Location(), to.Location()).

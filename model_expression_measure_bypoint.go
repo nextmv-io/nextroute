@@ -52,6 +52,9 @@ func (m *measureByPointExpression) SetName(n string) {
 }
 
 func (m *measureByPointExpression) Value(_ ModelVehicleType, from, to ModelStop) float64 {
+	if from == nil || to == nil {
+		return 0.0
+	}
 	locFrom := from.Location()
 	locTo := to.Location()
 	if !locFrom.IsValid() || !locTo.IsValid() {
