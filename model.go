@@ -403,6 +403,20 @@ func (m *modelImpl) AddConstraint(constraint ModelConstraint) error {
 				reflect.TypeOf(constraint).String(),
 			)
 		}
+		if _, ok := constraint.(SuccessorConstraint); ok {
+			if _, alreadyOneAdded := existingConstraint.(SuccessorConstraint); alreadyOneAdded {
+				return fmt.Errorf(
+					"only one SuccessorConstraint can be added to the model",
+				)
+			}
+		}
+		if _, ok := constraint.(InterleaveConstraint); ok {
+			if _, alreadyOneAdded := existingConstraint.(InterleaveConstraint); alreadyOneAdded {
+				return fmt.Errorf(
+					"only one InterleaveConstraint can be added to the model",
+				)
+			}
+		}
 	}
 	if _, ok := constraint.(ConstraintDataUpdater); ok {
 		return fmt.Errorf(

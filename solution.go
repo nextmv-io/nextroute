@@ -124,9 +124,17 @@ func NewSolution(
 		}
 	}
 
-	solution := &solutionImpl{
-		model: m,
+	var solutionInterleaveConstraint SolutionConstraintInterleaved
+	for _, constraint := range model.constraints {
+		if interleaveConstraint, ok := constraint.(InterleaveConstraint); ok {
+			solutionInterleaveConstraint = newSolutionConstraintInterleaved(interleaveConstraint)
+			break
+		}
+	}
 
+	solution := &solutionImpl{
+		model:                    m,
+		interleaveConstraint:     solutionInterleaveConstraint,
 		vehicleIndices:           make([]int, 0, len(model.vehicles)),
 		vehicles:                 make([]solutionVehicleImpl, 0, len(model.vehicles)),
 		solutionVehicles:         make([]SolutionVehicle, 0, len(model.vehicles)),
@@ -585,6 +593,7 @@ type solutionImpl struct {
 	objectiveSolutionData  map[ModelObjective]Copier
 	constraintSolutionData map[ModelConstraint]Copier
 	cumulativeValues       [][]float64
+	interleaveConstraint   SolutionConstraintInterleaved
 
 	// TODO: explore if stopToPlanUnit should rather contain interfaces
 	stopToPlanUnit       []*solutionPlanStopsUnitImpl
