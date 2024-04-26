@@ -89,6 +89,9 @@ func (t *timeExpressionImpl) Value(
 	vehicleType ModelVehicleType,
 	from, to ModelStop,
 ) float64 {
+	if !from.Location().IsValid() || !to.Location().IsValid() {
+		return 0.0
+	}
 	return t.expression.Value(vehicleType, from, to)
 }
 
@@ -96,6 +99,9 @@ func (t *timeExpressionImpl) Time(
 	vehicleType ModelVehicleType,
 	from, to ModelStop,
 ) time.Time {
+	if !from.Location().IsValid() || !to.Location().IsValid() {
+		return t.epoch
+	}
 	value := t.expression.Value(vehicleType, from, to)
 	return t.epoch.Add(
 		time.Duration(value) * vehicleType.Model().DurationUnit(),
@@ -136,6 +142,9 @@ func (s *stopTimeExpressionImpl) Value(
 	_,
 	to ModelStop,
 ) float64 {
+	if !to.Location().IsValid() {
+		return 0.0
+	}
 	idx := to.Index()
 	if idx >= 0 && idx < len(s.hasValue) && s.hasValue[idx] {
 		return s.values[idx]
