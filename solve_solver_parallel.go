@@ -278,7 +278,11 @@ func (s *parallelSolverImpl) Solve(
 		}
 	}
 
-	start := ctx.Value(run.Start).(time.Time)
+	start := time.Now()
+
+	if ctx.Value(run.Start) != nil {
+		start = ctx.Value(run.Start).(time.Time)
+	}
 
 	ctx, cancel := context.WithDeadline(
 		ctx,
