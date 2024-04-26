@@ -257,7 +257,6 @@ func (s *solveImpl) Solve(
 		ctx,
 		start.Add(solveOptions.Duration),
 	)
-	defer cancel()
 
 	solveInformation := &solveInformationImpl{
 		iteration:      0,
@@ -278,7 +277,10 @@ func (s *solveImpl) Solve(
 		Error:    nil,
 	}
 	go func() {
-		defer close(solutions)
+		defer func() {
+			close(solutions)
+			cancel()
+		}()
 
 	Loop:
 		for iteration := 0; iteration < solveOptions.Iterations; iteration++ {
@@ -295,6 +297,7 @@ func (s *solveImpl) Solve(
 				select {
 				case <-ctx.Done():
 					s.solveEvents.ContextDone.Trigger(solveInformation)
+					cancel()
 					break Loop
 				default:
 					improved, e := s.invoke(ctx, solveOperator, solveInformation)
@@ -320,6 +323,7 @@ func (s *solveImpl) Solve(
 			s.solveEvents.Iterated.Trigger(solveInformation)
 		}
 		s.solveEvents.Done.Trigger(solveInformation)
+		cancel()
 	}()
 
 	return solutions, err
