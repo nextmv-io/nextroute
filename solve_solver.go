@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/nextmv-io/nextroute/common"
-	"github.com/nextmv-io/sdk/run"
 )
 
 // IntParameterOptions are the options for an integer parameter.
@@ -248,10 +247,6 @@ func (s *solveImpl) Solve(
 	s.random = rand.New(rand.NewSource(newWorkSolution.Random().Int63()))
 
 	start := time.Now()
-
-	if ctx.Value(run.Start) != nil {
-		start = ctx.Value(run.Start).(time.Time)
-	}
 
 	ctx, cancel := context.WithDeadline(
 		ctx,
