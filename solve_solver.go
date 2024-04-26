@@ -297,7 +297,6 @@ func (s *solveImpl) Solve(
 				select {
 				case <-ctx.Done():
 					s.solveEvents.ContextDone.Trigger(solveInformation)
-					cancel()
 					break Loop
 				default:
 					improved, e := s.invoke(ctx, solveOperator, solveInformation)
@@ -323,7 +322,6 @@ func (s *solveImpl) Solve(
 			s.solveEvents.Iterated.Trigger(solveInformation)
 		}
 		s.solveEvents.Done.Trigger(solveInformation)
-		cancel()
 	}()
 
 	return solutions, err
