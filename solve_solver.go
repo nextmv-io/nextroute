@@ -247,7 +247,17 @@ func (s *solveImpl) Solve(
 	s.workSolution = newWorkSolution
 	s.random = rand.New(rand.NewSource(newWorkSolution.Random().Int63()))
 
-	start := ctx.Value(run.Start).(time.Time)
+	start := time.Now()
+
+	if ctx.Value(run.Start) != nil {
+		start = ctx.Value(run.Start).(time.Time)
+	}
+
+	ctx, cancel := context.WithDeadline(
+		ctx,
+		start.Add(solveOptions.Duration),
+	)
+	defer cancel()
 
 	solveInformation := &solveInformationImpl{
 		iteration:      0,
