@@ -310,3 +310,6 @@ issues:
     - path: model_directed_acyclic_graph\.go
       linters:
         - nestif
+    - path: solution_move_stops_generator\.go
+      linters:
+        - nestif

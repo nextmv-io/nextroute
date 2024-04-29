@@ -125,7 +125,7 @@ func SolutionMoveStopsGenerator(
 
 	locations := make([]int, 0, len(source))
 
-	generate(positions, locations, source, target, func(locations []int) {
+	generate(positions, locations, source, target, func() {
 		m.(*solutionMoveStopsImpl).reset()
 		m.(*solutionMoveStopsImpl).planUnit = planUnit
 		m.(*solutionMoveStopsImpl).stopPositions = positions
@@ -159,7 +159,7 @@ func generate(
 	combination []int,
 	source []solutionStopImpl,
 	target []solutionStopImpl,
-	yield func([]int),
+	yield func(),
 	shouldStop func() bool,
 ) {
 	if shouldStop() {
@@ -167,7 +167,7 @@ func generate(
 	}
 
 	if len(combination) == len(source) {
-		yield(combination)
+		yield()
 		return
 	}
 
@@ -194,7 +194,6 @@ func generate(
 			} else {
 				stopPositions[positionIdx-1].nextStopIndex = target[combination[positionIdx-1]].index
 				if mustBeNeighbours(stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx].Stop()) {
-					combination = combination[:positionIdx]
 					break
 				}
 			}
