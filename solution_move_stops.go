@@ -459,11 +459,20 @@ func (m *solutionMoveStopsImpl) deltaTravelDurationValue() float64 {
 	return travelDuration
 }
 
-// NewMoveStops creates a new move. Exported to be used in tests not be used in
-// SDK.
+// NewMoveStops creates a new move and checks if the move is allowed and if so
+// estimates the delta score.
 func NewMoveStops(
 	planUnit SolutionPlanStopsUnit,
 	stopPositions StopPositions,
+) (SolutionMoveStops, error) {
+	return newMoveStops(planUnit, stopPositions, true)
+}
+
+// newMoveStops creates a new move.
+func newMoveStops(
+	planUnit SolutionPlanStopsUnit,
+	stopPositions StopPositions,
+	checkConstraintsAndEstimateDeltaScore bool,
 ) (SolutionMoveStops, error) {
 	if planUnit == nil {
 		return nil, fmt.Errorf("planUnit is nil")
@@ -631,9 +640,11 @@ func NewMoveStops(
 		valueSeen:     0,
 		allowed:       true,
 	}
-	value, allowed, _ := planUnit.(*solutionPlanStopsUnitImpl).solution().checkConstraintsAndEstimateDeltaScore(move)
-	move.value = value
-	move.allowed = allowed
-	move.valueSeen = 1
+	if checkConstraintsAndEstimateDeltaScore {
+		value, allowed, _ := planUnit.(*solutionPlanStopsUnitImpl).solution().checkConstraintsAndEstimateDeltaScore(move)
+		move.value = value
+		move.allowed = allowed
+		move.valueSeen = 1
+	}
 	return move, nil
 }
