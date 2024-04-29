@@ -146,7 +146,6 @@ func TestSuccessorMovesGenerated(t *testing.T) {
 	)
 	if err != nil {
 		t.Error(err)
-
 	}
 	move, err := nextroute.NewMoveStops(
 		solutionStop0.PlanStopsUnit(),
@@ -196,7 +195,7 @@ func TestSuccessorMovesGenerated(t *testing.T) {
 	nextroute.SolutionMoveStopsGeneratorTest(
 		vehicle0,
 		solutionStop1.PlanStopsUnit(),
-		func(move nextroute.SolutionMoveStops) {
+		func(_ nextroute.SolutionMoveStops) {
 			count++
 		},
 		solutionStop1.PlanStopsUnit().SolutionStops(),
@@ -266,7 +265,6 @@ func TestMultipleDisallowedSuccessors(t *testing.T) {
 	)
 	if err != nil {
 		t.Error(err)
-
 	}
 	move, err := nextroute.NewMoveStops(
 		solutionStop0.PlanStopsUnit(),
@@ -315,7 +313,6 @@ func TestMultipleDisallowedSuccessors(t *testing.T) {
 	)
 	if err != nil {
 		t.Error(err)
-
 	}
 	move, err = nextroute.NewMoveStops(
 		solutionStop1.PlanStopsUnit(),
@@ -327,7 +324,7 @@ func TestMultipleDisallowedSuccessors(t *testing.T) {
 		t.Error(err)
 	}
 
-	planned, err = move.Execute(context.Background())
+	_, err = move.Execute(context.Background())
 	if err != nil {
 		t.Error(err)
 	}
@@ -412,7 +409,6 @@ func TestUnplanSuccessorConstrained(t *testing.T) {
 	)
 	if err != nil {
 		t.Error(err)
-
 	}
 	move, err := nextroute.NewMoveStops(
 		solutionStop0.PlanStopsUnit(),
@@ -440,7 +436,6 @@ func TestUnplanSuccessorConstrained(t *testing.T) {
 	)
 	if err != nil {
 		t.Error(err)
-
 	}
 	move, err = nextroute.NewMoveStops(
 		solutionStop2.PlanStopsUnit(),
@@ -468,7 +463,6 @@ func TestUnplanSuccessorConstrained(t *testing.T) {
 	)
 	if err != nil {
 		t.Error(err)
-
 	}
 	move, err = nextroute.NewMoveStops(
 		solutionStop1.PlanStopsUnit(),
@@ -488,7 +482,7 @@ func TestUnplanSuccessorConstrained(t *testing.T) {
 		t.Error("expected move to be planned")
 	}
 
-	unplanned, err := solutionStop2.PlanStopsUnit().(nextroute.SolutionPlanStopsUnit).UnPlan()
+	unplanned, err := solutionStop2.PlanStopsUnit().UnPlan()
 	if err != nil {
 		t.Error(err)
 	}
