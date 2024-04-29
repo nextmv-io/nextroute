@@ -173,7 +173,7 @@
         "min_duration": 620,
         "min_stops_in_vehicle": 1,
         "min_travel_duration": 20,
-        "unplanned_stops": 2
+        "unplanned_stops": 4
       },
       "duration": 0.123,
       "value": 80620.0061571598
