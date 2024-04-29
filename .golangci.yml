@@ -307,3 +307,6 @@ issues:
     - path: precedence\.go
       linters:
         - goconst
+    - path: model_directed_acyclic_graph\.go
+      linters:
+        - nestif
