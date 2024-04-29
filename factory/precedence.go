@@ -75,12 +75,8 @@ func precedence(stop schema.Stop, name string) ([]precedenceData, error) {
 				precedence = append(precedence, precedenceData{id: element})
 			case map[string]any:
 				if id, ok := element["id"].(string); ok {
-					if direct, ok := element["direct"].(bool); ok {
-						precedence = append(precedence, precedenceData{id: id, direct: direct})
-					} else {
-						precedence = append(precedence, precedenceData{id: id})
-					}
-					continue
+					direct, _ := element["direct"].(bool)
+					precedence = append(precedence, precedenceData{id: id, direct: direct})
 				} else {
 					return nil,
 						nmerror.NewInputDataError(fmt.Errorf(
