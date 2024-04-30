@@ -42,10 +42,12 @@ type group struct {
 }
 
 // sequence represents two stops that must be part of the same planUnit. The
-// predecessor must be visited before the successor.
+// predecessor must be visited before the successor; the direct field indicates
+// if the successor must be the direct successor of the predecessor.
 type sequence struct {
 	predecessor string
 	successor   string
+	direct      bool
 }
 
 // latestStartExpression returns the StopTimeExpression that represents the

@@ -387,11 +387,11 @@ func validateStop(idx int, stop schema.Stop, stopIDs map[string]bool) error {
 	}
 
 	for _, p := range precedes {
-		if !stopIDs[p] {
+		if !stopIDs[p.id] {
 			return nmerror.NewInputDataError(fmt.Errorf(
 				"stop `%s` precedes references unknown stop %s",
 				stop.ID,
-				p,
+				p.id,
 			))
 		}
 
@@ -403,11 +403,11 @@ func validateStop(idx int, stop schema.Stop, stopIDs map[string]bool) error {
 		}
 	}
 	for _, s := range succeeds {
-		if !stopIDs[s] {
+		if !stopIDs[s.id] {
 			return nmerror.NewInputDataError(fmt.Errorf(
 				"stop `%s` succeeds references unknown stop %s",
 				stop.ID,
-				s,
+				s.id,
 			))
 		}
 

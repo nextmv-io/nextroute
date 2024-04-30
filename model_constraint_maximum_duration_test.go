@@ -98,7 +98,7 @@ func TestMaximumDurationConstraint_EstimateIsViolated(t *testing.T) {
 		t.Fatal(err)
 	}
 	moveSingleOnVehicle, err = nextroute.NewMoveStops(
-		solutionSingleStopPlanUnit0,
+		solutionSingleStopPlanUnit1,
 		[]nextroute.StopPosition{position},
 	)
 	if err != nil {

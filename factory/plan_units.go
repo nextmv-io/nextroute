@@ -145,7 +145,7 @@ func allSequences(data modelData) [][]sequence {
 			continue
 			// both predecessor and successor are already in a unit and not the same unit.
 		} else if unitIndex1 != -1 && unitIndex2 != -1 && unitIndex1 != unitIndex2 {
-			units, inUnit = mergeUnits(unitIndex1, unitIndex2, units, inUnit)
+			units, inUnit = mergeUnits(unitIndex1, unitIndex2, units, inUnit, dataSequence)
 			continue
 			// both predecessor and successor are already in a unit and the same unit.
 		} else if unitIndex1 != -1 && unitIndex2 != -1 && unitIndex1 == unitIndex2 {
@@ -181,6 +181,7 @@ func mergeUnits(
 	unitIndex2 int,
 	units []unitInformation,
 	inUnit map[string]int,
+	datasequence sequence,
 ) ([]unitInformation, map[string]int) {
 	if unitIndex1 > unitIndex2 {
 		unitIndex1, unitIndex2 = unitIndex2, unitIndex1
@@ -197,6 +198,7 @@ func mergeUnits(
 		units[unitIndex1].stops[stop] = struct{}{}
 	}
 	units[unitIndex1].sequences = append(units[unitIndex1].sequences, oldUnit.sequences...)
+	units[unitIndex1].sequences = append(units[unitIndex1].sequences, datasequence)
 	return units, inUnit
 }
 
@@ -238,7 +240,11 @@ func buildDirectedAcyclicGraph(
 			return nil, err
 		}
 
-		if err = dag.AddArc(origin, destination); err != nil {
+		if sequence.direct {
+			if err = dag.AddDirectArc(origin, destination); err != nil {
+				return nil, err
+			}
+		} else if err = dag.AddArc(origin, destination); err != nil {
 			return nil, err
 		}
 	}

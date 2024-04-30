@@ -42,18 +42,18 @@ func SequenceGeneratorChannel(
 			return
 		default:
 			used := make([]bool, len(solutionStops))
-			counter := map[int]int{}
+			inDegree := map[int]int{}
 			modelPlanUnit := planUnit.ModelPlanUnit().(*planMultipleStopsImpl)
 			dag := modelPlanUnit.dag.(*directedAcyclicGraphImpl)
 			for _, arc := range dag.arcs {
-				counter[arc.Destination().Index()]++
+				inDegree[arc.Destination().Index()]++
 			}
 
 			sequenceGenerator(
 				solutionStops,
 				make([]SolutionStop, 0, len(solutionStops)),
 				used,
-				counter,
+				inDegree,
 				dag,
 				solution.Random(),
 				&maxSequences,
@@ -74,7 +74,7 @@ func SequenceGeneratorChannel(
 func sequenceGenerator(
 	stops, sequence SolutionStops,
 	used []bool,
-	counter map[int]int,
+	inDegree map[int]int,
 	dag DirectedAcyclicGraph,
 	random *rand.Rand,
 	maxSequences *int64,
@@ -91,28 +91,28 @@ func sequenceGenerator(
 
 	for _, idx := range stopOrder {
 		stop := stops[idx]
-		if !used[idx] && counter[stop.ModelStop().Index()] == 0 {
+		if !used[idx] && inDegree[stop.ModelStop().Index()] == 0 {
 			used[idx] = true
 			outboundArcs := dag.OutboundArcs(stop.ModelStop())
 			if len(outboundArcs) == 1 {
 				arc := outboundArcs[0]
-				counter[arc.Destination().Index()]--
+				inDegree[arc.Destination().Index()]--
 			} else {
 				outboundArcOrder := random.Perm(len(outboundArcs))
 				for _, arcsIdx := range outboundArcOrder {
 					arc := outboundArcs[arcsIdx]
-					counter[arc.Destination().Index()]--
+					inDegree[arc.Destination().Index()]--
 				}
 			}
 
-			sequenceGenerator(stops, append(sequence, stop), used, counter, dag, random, maxSequences, yield)
+			sequenceGenerator(stops, append(sequence, stop), used, inDegree, dag, random, maxSequences, yield)
 			// reached the maximum number of sequences
 			if *maxSequences == 0 {
 				return
 			}
 			used[idx] = false
 			for _, arc := range outboundArcs {
-				counter[arc.Destination().Index()]++
+				inDegree[arc.Destination().Index()]++
 			}
 		}
 	}
