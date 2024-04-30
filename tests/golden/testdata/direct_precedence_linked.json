@@ -29,9 +29,7 @@
     {
       "id": "Kinkaku-ji",
       "location": { "lon": 135.728898, "lat": 35.039705 },
-      "precedes": [
-        { "id": "Nijō Castle", "direct": true }
-      ]
+      "precedes": [{ "id": "Nijō Castle", "direct": true }]
     },
     {
       "id": "Arashiyama Bamboo Forest",
