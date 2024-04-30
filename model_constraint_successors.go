@@ -45,6 +45,9 @@ func (l *successorConstraintImpl) DisallowSuccessors(
 	if stop == nil {
 		return fmt.Errorf("stop cannot be nil")
 	}
+	if stop.Model().IsLocked() {
+		return fmt.Errorf(lockErrorMessage, "disallow successors")
+	}
 	if successors == nil {
 		return fmt.Errorf("successors cannot be nil")
 	}
