@@ -313,3 +313,6 @@ issues:
     - path: solution_move_stops_generator\.go
       linters:
         - nestif
+    - path: solution_sequence_generator\.go
+      linters:
+        - nestif
