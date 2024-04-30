@@ -99,8 +99,11 @@ func addPlanUnits(
 		if err != nil {
 			return nil, err
 		}
-		if len(units) > 1 {
-			_, err := model.NewPlanAllPlanUnits(true, units...)
+		uniquePlanUnits := common.UniqueDefined(units, func(t nextroute.ModelPlanUnit) int {
+			return t.Index()
+		})
+		if len(uniquePlanUnits) > 1 {
+			_, err := model.NewPlanAllPlanUnits(true, uniquePlanUnits...)
 			if err != nil {
 				return nil, err
 			}
