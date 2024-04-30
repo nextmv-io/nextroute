@@ -6,6 +6,7 @@ package main
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/nextroute/check"
@@ -76,6 +77,7 @@ func solver(
 		) (nextroute.SolveOptions, error) {
 			return nextroute.SolveOptions{
 				Iterations: 1000,
+				Duration:   10 * time.Minute,
 			}, nil
 		},
 	)

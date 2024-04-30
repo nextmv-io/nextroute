@@ -5,6 +5,8 @@ package schema
 
 import (
 	"time"
+
+	"github.com/nextmv-io/sdk/measure"
 )
 
 // Input is the default input schema for nextroute.
@@ -224,6 +226,11 @@ type Location struct {
 	Lon float64 `json:"lon" minimum:"-180" maximum:"180"`
 	// Lat latitude of the location.
 	Lat float64 `json:"lat" minimum:"-90" maximum:"90"`
+}
+
+// ToPoint converts a schema.Location to a measure.Point.
+func (l Location) ToPoint() measure.Point {
+	return measure.Point{l.Lon, l.Lat}
 }
 
 // DurationGroup represents a group of stops that get additional duration

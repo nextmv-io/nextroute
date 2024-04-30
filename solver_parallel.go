@@ -45,6 +45,10 @@ type parallelSolverWrapperImpl struct {
 	solver ParallelSolver
 }
 
+func (p *parallelSolverWrapperImpl) ParallelSolveEvents() ParallelSolveEvents {
+	return p.solver.ParallelSolveEvents()
+}
+
 func (p *parallelSolverWrapperImpl) Model() Model {
 	return p.solver.Model()
 }

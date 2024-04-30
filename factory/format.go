@@ -286,9 +286,14 @@ func DefaultCustomResultStatistics(solution nextroute.Solution) schema.CustomRes
 		}
 	}
 
+	unplannedStops := common.MapSlice(
+		solution.UnPlannedPlanUnits().SolutionPlanUnits(),
+		toSolutionOutputStops,
+	)
+
 	return schema.CustomResultStatistics{
 		ActivatedVehicles: vehicleCount,
-		UnplannedStops:    solution.UnPlannedPlanUnits().Size(),
+		UnplannedStops:    len(unplannedStops),
 		MaxTravelDuration: maxTravelDuration,
 		MaxDuration:       maxDuration,
 		MinTravelDuration: minTravelDuration,

@@ -470,7 +470,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 					)
 				}
 			}
-			move, err := NewMoveStops(planUnit, stopPositions)
+			move, err := newMoveStops(planUnit, stopPositions, false)
 			if err != nil {
 				return err
 			}
