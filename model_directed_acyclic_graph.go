@@ -82,15 +82,6 @@ type directedAcyclicGraphImpl struct {
 }
 
 func (d *directedAcyclicGraphImpl) addArc(origin, destination ModelStop, isDirect bool) error {
-	if origin == nil {
-		return fmt.Errorf("origin stop cannot be nil")
-	}
-	if destination == nil {
-		return fmt.Errorf("destination stop cannot be nil")
-	}
-	if origin.Model().IsLocked() {
-		return fmt.Errorf(lockErrorMessage, "add arc")
-	}
 	if isDirect {
 		if arc, alreadyDefined := d.outboundDirectArcs[origin.Index()]; alreadyDefined {
 			if arc.Destination().Index() != destination.Index() {
@@ -135,6 +126,15 @@ func (d *directedAcyclicGraphImpl) addArc(origin, destination ModelStop, isDirec
 }
 
 func (d *directedAcyclicGraphImpl) AddArc(origin, destination ModelStop) error {
+	if origin == nil {
+		return fmt.Errorf("origin stop cannot be nil")
+	}
+	if destination == nil {
+		return fmt.Errorf("destination stop cannot be nil")
+	}
+	if origin.Model().IsLocked() {
+		return fmt.Errorf(lockErrorMessage, "add arc")
+	}
 	err := d.addArc(origin, destination, false)
 	if err != nil {
 		return err
@@ -151,6 +151,15 @@ func (d *directedAcyclicGraphImpl) HasDirectArc(origin, destination ModelStop) b
 }
 
 func (d *directedAcyclicGraphImpl) AddDirectArc(origin, destination ModelStop) error {
+	if origin == nil {
+		return fmt.Errorf("origin stop cannot be nil")
+	}
+	if destination == nil {
+		return fmt.Errorf("destination stop cannot be nil")
+	}
+	if origin.Model().IsLocked() {
+		return fmt.Errorf(lockErrorMessage, "add arc")
+	}
 	err := d.addArc(origin, destination, true)
 	if err != nil {
 		return err
