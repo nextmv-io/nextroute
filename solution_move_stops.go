@@ -519,6 +519,14 @@ func newMoveStops(
 
 	for index, sp := range stopPositions {
 		stopPosition := sp.(stopPositionImpl)
+		if stopPosition.Stop().PlanStopsUnit() != planUnit {
+			return nil,
+				fmt.Errorf(
+					"stop %v of stop position %v is not part of the provided plan unit",
+					stopPosition.Stop().ModelStop().ID(),
+					index,
+				)
+		}
 		if stopPosition.Stop().IsPlanned() {
 			return nil,
 				fmt.Errorf(

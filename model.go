@@ -259,6 +259,7 @@ type modelImpl struct {
 	sequenceSampleSize             int
 	mutex                          sync.RWMutex
 	isLocked                       bool
+	disallowedSuccessors           [][]bool
 }
 
 func (m *modelImpl) Vehicles() ModelVehicles {
@@ -615,6 +616,13 @@ func (m *modelImpl) lock() error {
 	if m.isLocked {
 		return nil
 	}
+
+	// initialize disallowedSuccessors
+	m.disallowedSuccessors = make([][]bool, m.NumberOfStops())
+	for i := range m.disallowedSuccessors {
+		m.disallowedSuccessors[i] = make([]bool, m.NumberOfStops())
+	}
+
 	m.setConstraintEstimationOrder()
 	for _, constraint := range m.constraints {
 		if locker, ok := constraint.(Locker); ok {

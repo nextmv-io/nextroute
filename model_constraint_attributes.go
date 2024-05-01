@@ -136,7 +136,7 @@ func (l *attributesConstraintImpl) SetStopAttributes(
 	stopAttributes []string,
 ) error {
 	if stop.Model().IsLocked() {
-		return fmt.Errorf("cannot set stop attributes after model is locked")
+		return fmt.Errorf(lockErrorMessage, "set stop attributes")
 	}
 	l.stopAttributes[stop.Index()] = common.Unique(stopAttributes)
 	return nil
@@ -147,7 +147,7 @@ func (l *attributesConstraintImpl) SetVehicleTypeAttributes(
 	vehicleAttributes []string,
 ) error {
 	if vehicleType.Model().IsLocked() {
-		return fmt.Errorf("cannot set vehicle type attributes after model is locked")
+		return fmt.Errorf(lockErrorMessage, "set vehicle type attributes")
 	}
 	l.vehicleTypeAttributes[vehicleType.Index()] = common.Unique(vehicleAttributes)
 	return nil

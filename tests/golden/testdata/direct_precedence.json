@@ -18,8 +18,8 @@
       "id": "Kyoto Imperial Palace",
       "location": { "lon": 135.762057, "lat": 35.025431 },
       "precedes": [
-        { "id": "Gionmachi", "direct": true },
-        { "id": "Kinkaku-ji", "direct": false }
+        { "id": "Gionmachi" },
+        { "id": "Kinkaku-ji", "direct": true }
       ]
     },
     {

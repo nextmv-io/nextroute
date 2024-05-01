@@ -303,3 +303,16 @@ issues:
       linters:
         - govet
       text: structtag
+    # We want to keep the error message as is.
+    - path: precedence\.go
+      linters:
+        - goconst
+    - path: model_directed_acyclic_graph\.go
+      linters:
+        - nestif
+    - path: solution_move_stops_generator\.go
+      linters:
+        - nestif
+    - path: solution_sequence_generator\.go
+      linters:
+        - nestif

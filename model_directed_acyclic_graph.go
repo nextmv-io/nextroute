@@ -17,6 +17,9 @@ type Arc interface {
 	Origin() ModelStop
 	// Destination returns the destination node ([ModelStop]) of the arc.
 	Destination() ModelStop
+	// IsDirect returns true if the Destination has to be a direct successor of
+	// the Origin, otherwise returns false.
+	IsDirect() bool
 }
 
 // Arcs is a collection of [Arc]s.
@@ -40,11 +43,19 @@ type DirectedAcyclicGraph interface {
 	// otherwise returns false.
 	IsAllowed(stops ModelStops) (bool, error)
 
+	// HasDirectArc returns true if there is a direct arc between the origin and
+	// destination stops, otherwise returns false.
+	HasDirectArc(origin, destination ModelStop) bool
+
 	// ModelStops returns all [ModelStops] in the graph.
 	ModelStops() ModelStops
 	// AddArc adds a new [Arc] in the graph if it was not already added. The new
 	// [Arc] should not cause a cycle.
 	AddArc(origin, destination ModelStop) error
+	// AddDirectArc adds a new [Arc] marked direct in the graph if it was not
+	// already added. The new [Arc] should not cause a cycle. The destination
+	// stop should be the next stop after the origin stop.
+	AddDirectArc(origin, destination ModelStop) error
 	// OutboundArcs returns all [Arcs] that have the given [ModelStop] as their
 	// origin.
 	OutboundArcs(stop ModelStop) Arcs
@@ -53,23 +64,41 @@ type DirectedAcyclicGraph interface {
 // NewDirectedAcyclicGraph connects NewDirectedAcyclicGraph.
 func NewDirectedAcyclicGraph() DirectedAcyclicGraph {
 	return &directedAcyclicGraphImpl{
-		arcs:          []Arc{},
-		adjacencyList: map[int][]int{},
-		outboundArcs:  map[int]Arcs{},
+		arcs:               []Arc{},
+		adjacencyList:      map[int][]int{},
+		outboundArcs:       map[int]Arcs{},
+		outboundDirectArcs: map[int]Arc{},
+		inboundDirectArcs:  map[int]Arc{},
 	}
 }
 
 // directedAcyclicGraphImpl implements DirectedAcyclicGraph.
 type directedAcyclicGraphImpl struct {
-	adjacencyList map[int][]int
-	outboundArcs  map[int]Arcs
-	arcs          Arcs
+	adjacencyList      map[int][]int
+	outboundArcs       map[int]Arcs
+	outboundDirectArcs map[int]Arc
+	inboundDirectArcs  map[int]Arc
+	arcs               Arcs
 }
 
-func (d *directedAcyclicGraphImpl) AddArc(origin, destination ModelStop) error {
-	for _, arc := range d.arcs {
-		if arc.Origin().Index() == origin.Index() && arc.Destination().Index() == destination.Index() {
+func (d *directedAcyclicGraphImpl) addArc(origin, destination ModelStop, isDirect bool) error {
+	if isDirect {
+		if arc, alreadyDefined := d.outboundDirectArcs[origin.Index()]; alreadyDefined {
+			if arc.Destination().Index() != destination.Index() {
+				return fmt.Errorf(
+					"origin stop already has a direct arc: %v -> %v",
+					origin,
+					arc.Destination(),
+				)
+			}
 			return nil
+		}
+		if arc, alreadyDefined := d.inboundDirectArcs[destination.Index()]; alreadyDefined {
+			return fmt.Errorf(
+				"destination stop already has a direct arc: %v -> %v",
+				arc.Origin(),
+				destination,
+			)
 		}
 	}
 
@@ -85,9 +114,56 @@ func (d *directedAcyclicGraphImpl) AddArc(origin, destination ModelStop) error {
 	arc := arcImpl{
 		origin:      origin,
 		destination: destination,
+		isDirect:    isDirect,
 	}
 	d.arcs = append(d.arcs, arc)
 	d.outboundArcs[origin.Index()] = append(d.outboundArcs[origin.Index()], arc)
+	if isDirect {
+		d.outboundDirectArcs[origin.Index()] = arc
+		d.inboundDirectArcs[destination.Index()] = arc
+	}
+	return nil
+}
+
+func (d *directedAcyclicGraphImpl) AddArc(origin, destination ModelStop) error {
+	if origin == nil {
+		return fmt.Errorf("origin stop cannot be nil")
+	}
+	if destination == nil {
+		return fmt.Errorf("destination stop cannot be nil")
+	}
+	if origin.Model().IsLocked() {
+		return fmt.Errorf(lockErrorMessage, "add arc")
+	}
+	err := d.addArc(origin, destination, false)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (d *directedAcyclicGraphImpl) HasDirectArc(origin, destination ModelStop) bool {
+	if arc, ok := d.outboundDirectArcs[origin.Index()]; ok {
+		return arc.Destination().Index() == destination.Index()
+	}
+	return false
+}
+
+func (d *directedAcyclicGraphImpl) AddDirectArc(origin, destination ModelStop) error {
+	if origin == nil {
+		return fmt.Errorf("origin stop cannot be nil")
+	}
+	if destination == nil {
+		return fmt.Errorf("destination stop cannot be nil")
+	}
+	if origin.Model().IsLocked() {
+		return fmt.Errorf(lockErrorMessage, "add arc")
+	}
+	err := d.addArc(origin, destination, true)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -155,12 +231,14 @@ func (d *directedAcyclicGraphImpl) IsAllowed(stops ModelStops) (bool, error) {
 	}
 
 	c := directedAcyclicGraphImpl{
-		adjacencyList: make(map[int][]int),
-		outboundArcs:  make(map[int]Arcs),
-		arcs:          make(Arcs, 0, len(d.arcs)),
+		adjacencyList:      make(map[int][]int, len(d.adjacencyList)),
+		outboundArcs:       make(map[int]Arcs, len(d.outboundArcs)),
+		outboundDirectArcs: make(map[int]Arc, len(d.outboundDirectArcs)),
+		inboundDirectArcs:  make(map[int]Arc, len(d.inboundDirectArcs)),
+		arcs:               make(Arcs, 0, len(d.arcs)),
 	}
 	for _, arc := range d.arcs {
-		err := c.AddArc(arc.Origin(), arc.Destination())
+		err := c.addArc(arc.Origin(), arc.Destination(), arc.IsDirect())
 		if err != nil {
 			return false, err
 		}
@@ -170,6 +248,18 @@ LoopStops:
 	for idx := 1; idx < len(stops); idx++ {
 		origin, destination := stops[idx-1], stops[idx]
 		for _, arc := range c.arcs {
+			// if arc is a direct arc, then destination should be the next stop
+			// after origin
+			if arc.IsDirect() {
+				if arc.Origin().Index() == origin.Index() &&
+					arc.Destination().Index() != destination.Index() {
+					return false, nil
+				}
+				if arc.Destination().Index() == destination.Index() &&
+					arc.Origin().Index() != origin.Index() {
+					return false, nil
+				}
+			}
 			if arc.Origin().Index() == origin.Index() && arc.Destination().Index() == destination.Index() {
 				continue LoopStops
 			}
@@ -244,6 +334,7 @@ func (d *directedAcyclicGraphImpl) isCyclicUtil(vertex int, visited map[int]bool
 type arcImpl struct {
 	origin      ModelStop
 	destination ModelStop
+	isDirect    bool
 }
 
 func (a arcImpl) Origin() ModelStop {
@@ -252,4 +343,8 @@ func (a arcImpl) Origin() ModelStop {
 
 func (a arcImpl) Destination() ModelStop {
 	return a.destination
+}
+
+func (a arcImpl) IsDirect() bool {
+	return a.isDirect
 }
