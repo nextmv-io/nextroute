@@ -140,10 +140,7 @@ func disallowedSuccessors(from, to SolutionStop) bool {
 	fromModelStop := from.ModelStop()
 	toModelStop := to.ModelStop()
 	model := fromModelStop.Model()
-	solution := from.Solution()
-	disallowed, _ := solution.(*solutionImpl).interleaveConstraint.(*solutionConstraintInterleavedImpl).disallowedSuccessors(from, to)
-
-	return disallowed || model.(*modelImpl).disallowedSuccessors[fromModelStop.Index()][toModelStop.Index()]
+	return model.(*modelImpl).disallowedSuccessors[fromModelStop.Index()][toModelStop.Index()]
 }
 
 func mustBeDirectSuccessor(from, to SolutionStop) bool {
