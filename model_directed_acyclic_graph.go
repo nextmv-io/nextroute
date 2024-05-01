@@ -121,33 +121,20 @@ func (d *directedAcyclicGraphImpl) addArc(origin, destination ModelStop, isDirec
 	if isDirect {
 		d.outboundDirectArcs[origin.Index()] = arc
 		d.inboundDirectArcs[destination.Index()] = arc
-
-		// add all outbound arcs from the origin (except the new direct arc) as
-		// outbound arcs from the destination
-		// this ensure that when building the sequence of stops, the direct arcs
-		// are considered first
-		for _, a := range d.outboundArcs[origin.Index()] {
-			if a.Destination().Index() != destination.Index() {
-				err := d.addArc(destination, a.Destination(), false)
-				if err != nil {
-					return err
-				}
-			}
-		}
-	} else {
-		// if the origin already has a direct arc, then the new arc should also
-		// be added as an outbound arc from the destination
-		if arc, ok := d.outboundDirectArcs[origin.Index()]; ok {
-			err := d.addArc(destination, arc.Destination(), false)
-			if err != nil {
-				return err
-			}
-		}
 	}
 	return nil
 }
 
 func (d *directedAcyclicGraphImpl) AddArc(origin, destination ModelStop) error {
+	if origin == nil {
+		return fmt.Errorf("origin stop cannot be nil")
+	}
+	if destination == nil {
+		return fmt.Errorf("destination stop cannot be nil")
+	}
+	if origin.Model().IsLocked() {
+		return fmt.Errorf(lockErrorMessage, "add arc")
+	}
 	err := d.addArc(origin, destination, false)
 	if err != nil {
 		return err
@@ -164,6 +151,15 @@ func (d *directedAcyclicGraphImpl) HasDirectArc(origin, destination ModelStop) b
 }
 
 func (d *directedAcyclicGraphImpl) AddDirectArc(origin, destination ModelStop) error {
+	if origin == nil {
+		return fmt.Errorf("origin stop cannot be nil")
+	}
+	if destination == nil {
+		return fmt.Errorf("destination stop cannot be nil")
+	}
+	if origin.Model().IsLocked() {
+		return fmt.Errorf(lockErrorMessage, "add arc")
+	}
 	err := d.addArc(origin, destination, true)
 	if err != nil {
 		return err

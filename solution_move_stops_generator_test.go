@@ -499,6 +499,9 @@ func TestMoveGeneratorMustBeNeighbors1(t *testing.T) {
 		planUnit1,
 		nextroute.StopPositions{position1, position2},
 	)
+	if err != nil {
+		t.Fatal(err)
+	}
 	position1, err = nextroute.NewStopPosition(
 		v.Last().Previous(),
 		planUnit1.SolutionStops()[0],
@@ -614,6 +617,9 @@ func TestMoveGeneratorMustBeNeighbors2(t *testing.T) {
 		planUnit1,
 		nextroute.StopPositions{position1, position2},
 	)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	position1, err = nextroute.NewStopPosition(
 		v.First().Next(),
@@ -753,6 +759,9 @@ func TestMoveGeneratorMustBeNeighbors3(t *testing.T) {
 		planUnit1,
 		nextroute.StopPositions{position1, position2},
 	)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	position1, err = nextroute.NewStopPosition(
 		v.First(),
