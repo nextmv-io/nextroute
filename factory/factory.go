@@ -48,6 +48,10 @@ func getModifiersFromOptions(options Options) []modelModifier {
 		modifiers = append(modifiers, addInitialSolution)
 	}
 
+	if options.Constraints.Enable.Interleave {
+		modifiers = append(modifiers, addInterleaveConstraint)
+	}
+
 	return modifiers
 }
 

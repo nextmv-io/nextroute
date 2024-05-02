@@ -24,7 +24,8 @@ type Options struct {
 			StartTimeWindows   bool     `json:"start_time_windows" usage:"ignore the start time windows constraint"`
 		} `json:"disable"`
 		Enable struct {
-			Cluster bool `json:"cluster" usage:"enable the cluster constraint"`
+			Cluster    bool `json:"cluster" usage:"enable the cluster constraint"`
+			Interleave bool `json:"interleave" usage:"enable no overlapping of stop groups"`
 		} `json:"enable"`
 	} `json:"constraints"`
 	Objectives struct {

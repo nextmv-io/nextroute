@@ -117,8 +117,428 @@ func TestNewInterleaveConstraint(t *testing.T) {
 	}
 }
 
+func TestInterleaveConstraint0(t *testing.T) {
+	model, planUnits, modelStops := createModel1(t, false)
+	xPlanUnit := planUnits[0]
+	aPlanUnit := xPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[0]
+	//bPlanUnit := xPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[1]
+
+	yPlanUnit := planUnits[1]
+	cPlanUnit := yPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[0]
+	dPlanUnit := yPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[1]
+
+	//zPlanUnit := planUnits[2]
+	//ePlanUnit := zPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[0]
+	//fPlanUnit := zPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[1]
+
+	a := modelStops[0]
+	//b := modelStops[1]
+	c := modelStops[2]
+	d := modelStops[3]
+	//e := modelStops[4]
+	//f := modelStops[5]
+
+	solution, err := nextroute.NewSolution(model)
+	if err != nil {
+		t.Error(err)
+	}
+
+	solutionVehicle := solution.Vehicles()[0]
+
+	aSolutionStop := solution.SolutionStop(a)
+	//bSolutionStop := solution.SolutionStop(b)
+	cSolutionStop := solution.SolutionStop(c)
+	dSolutionStop := solution.SolutionStop(d)
+	//eSolutionStop := solution.SolutionStop(e)
+	//fSolutionStop := solution.SolutionStop(f)
+
+	// xSolutionPlanUnit := solution.SolutionPlanUnit(xPlanUnit)
+	aSolutionPlanUnit := solution.SolutionPlanUnit(aPlanUnit).(nextroute.SolutionPlanStopsUnit)
+	//bSolutionPlanUnit := solution.SolutionPlanUnit(bPlanUnit).(nextroute.SolutionPlanStopsUnit)
+
+	//ySolutionPlanUnit := solution.SolutionPlanUnit(yPlanUnit)
+	cSolutionPlanUnit := solution.SolutionPlanUnit(cPlanUnit).(nextroute.SolutionPlanStopsUnit)
+	dSolutionPlanUnit := solution.SolutionPlanUnit(dPlanUnit).(nextroute.SolutionPlanStopsUnit)
+
+	//zSolutionPlanUnit := solution.SolutionPlanUnit(yPlanUnit)
+	//eSolutionPlanUnit := solution.SolutionPlanUnit(ePlanUnit).(nextroute.SolutionPlanStopsUnit)
+	//fSolutionPlanUnit := solution.SolutionPlanUnit(fPlanUnit).(nextroute.SolutionPlanStopsUnit)
+
+	// F - c - L
+	stopPositionc, err := nextroute.NewStopPosition(
+		solutionVehicle.First(),
+		cSolutionStop,
+		solutionVehicle.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	move, err := nextroute.NewMoveStops(
+		cSolutionPlanUnit,
+		nextroute.StopPositions{stopPositionc},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !move.IsExecutable() {
+		t.Fatal("expected move to be executable")
+	}
+
+	planned, err := move.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Fatal("expected move to be planned")
+	}
+
+	// F - c - d - L
+	stopPositiond, err := nextroute.NewStopPosition(
+		cSolutionStop,
+		dSolutionStop,
+		solutionVehicle.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	move, err = nextroute.NewMoveStops(
+		dSolutionPlanUnit,
+		nextroute.StopPositions{stopPositiond},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !move.IsExecutable() {
+		t.Fatal("expected move to be executable")
+	}
+
+	planned, err = move.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Fatal("expected move to be planned")
+	}
+
+	// F - c - a - d - L
+	stopPositiona, err := nextroute.NewStopPosition(
+		cSolutionStop,
+		aSolutionStop,
+		dSolutionStop,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	move, err = nextroute.NewMoveStops(
+		aSolutionPlanUnit,
+		nextroute.StopPositions{stopPositiona},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !move.IsExecutable() {
+		t.Fatal("expected move to be executable")
+	}
+
+	planned, err = move.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Fatal("expected move to be planned")
+	}
+}
+
 func TestInterleaveConstraint1(t *testing.T) {
-	model, planUnits, modelStops := createInterleaveModel(t)
+	model, planUnits, modelStops := createModel1(t, true)
+
+	xPlanUnit := planUnits[0]
+	aPlanUnit := xPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[0]
+	bPlanUnit := xPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[1]
+
+	yPlanUnit := planUnits[1]
+	cPlanUnit := yPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[0]
+	dPlanUnit := yPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[1]
+
+	zPlanUnit := planUnits[2]
+	ePlanUnit := zPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[0]
+	fPlanUnit := zPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[1]
+
+	a := modelStops[0]
+	b := modelStops[1]
+	c := modelStops[2]
+	d := modelStops[3]
+	e := modelStops[4]
+	f := modelStops[5]
+
+	solution, err := nextroute.NewSolution(model)
+	if err != nil {
+		t.Error(err)
+	}
+
+	solutionVehicle := solution.Vehicles()[0]
+
+	aSolutionStop := solution.SolutionStop(a)
+	bSolutionStop := solution.SolutionStop(b)
+	cSolutionStop := solution.SolutionStop(c)
+	dSolutionStop := solution.SolutionStop(d)
+	eSolutionStop := solution.SolutionStop(e)
+	fSolutionStop := solution.SolutionStop(f)
+
+	// xSolutionPlanUnit := solution.SolutionPlanUnit(xPlanUnit)
+	aSolutionPlanUnit := solution.SolutionPlanUnit(aPlanUnit).(nextroute.SolutionPlanStopsUnit)
+	bSolutionPlanUnit := solution.SolutionPlanUnit(bPlanUnit).(nextroute.SolutionPlanStopsUnit)
+
+	//ySolutionPlanUnit := solution.SolutionPlanUnit(yPlanUnit)
+	cSolutionPlanUnit := solution.SolutionPlanUnit(cPlanUnit).(nextroute.SolutionPlanStopsUnit)
+	dSolutionPlanUnit := solution.SolutionPlanUnit(dPlanUnit).(nextroute.SolutionPlanStopsUnit)
+
+	//zSolutionPlanUnit := solution.SolutionPlanUnit(yPlanUnit)
+	eSolutionPlanUnit := solution.SolutionPlanUnit(ePlanUnit).(nextroute.SolutionPlanStopsUnit)
+	fSolutionPlanUnit := solution.SolutionPlanUnit(fPlanUnit).(nextroute.SolutionPlanStopsUnit)
+
+	// F - a - L
+	stopPositiona, err := nextroute.NewStopPosition(
+		solutionVehicle.First(),
+		aSolutionStop,
+		solutionVehicle.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	move, err := nextroute.NewMoveStops(
+		aSolutionPlanUnit,
+		nextroute.StopPositions{stopPositiona},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !move.IsExecutable() {
+		t.Fatal("expected move to be executable")
+	}
+
+	planned, err := move.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Fatal("expected move to be planned")
+	}
+
+	// F - a - b - L
+	stopPositionb, err := nextroute.NewStopPosition(
+		aSolutionStop,
+		bSolutionStop,
+		solutionVehicle.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	move, err = nextroute.NewMoveStops(
+		bSolutionPlanUnit,
+		nextroute.StopPositions{stopPositionb},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !move.IsExecutable() {
+		t.Fatal("expected move to be executable")
+	}
+
+	planned, err = move.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Fatal("expected move to be planned")
+	}
+
+	// F - a - b - c - L
+	stopPositionc, err := nextroute.NewStopPosition(
+		bSolutionStop,
+		cSolutionStop,
+		solutionVehicle.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	move, err = nextroute.NewMoveStops(
+		cSolutionPlanUnit,
+		nextroute.StopPositions{stopPositionc},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !move.IsExecutable() {
+		t.Fatal("expected move to be executable")
+	}
+
+	planned, err = move.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Fatal("expected move to be planned")
+	}
+
+	// F - a - b - c - d - L
+	stopPositiond, err := nextroute.NewStopPosition(
+		cSolutionStop,
+		dSolutionStop,
+		solutionVehicle.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	move, err = nextroute.NewMoveStops(
+		dSolutionPlanUnit,
+		nextroute.StopPositions{stopPositiond},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !move.IsExecutable() {
+		t.Fatal("expected move to be executable")
+	}
+
+	planned, err = move.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Fatal("expected move to be planned")
+	}
+
+	// F - e - a - b - c - d - L allowed
+	stopPositione, err := nextroute.NewStopPosition(
+		solutionVehicle.First(),
+		eSolutionStop,
+		aSolutionStop,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	move, err = nextroute.NewMoveStops(
+		eSolutionPlanUnit,
+		nextroute.StopPositions{stopPositione},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !move.IsExecutable() {
+		t.Fatal("expected move to be executable")
+	}
+
+	// F - a - e - b - c - d - L not allowed
+	stopPositione, err = nextroute.NewStopPosition(
+		aSolutionStop,
+		eSolutionStop,
+		bSolutionStop,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	move, err = nextroute.NewMoveStops(
+		eSolutionPlanUnit,
+		nextroute.StopPositions{stopPositione},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if move.IsExecutable() {
+		t.Fatal("expected move not to be executable")
+	}
+
+	// F - a - b - e  - c - d - L allowed
+	stopPositione, err = nextroute.NewStopPosition(
+		bSolutionStop,
+		eSolutionStop,
+		cSolutionStop,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	move, err = nextroute.NewMoveStops(
+		eSolutionPlanUnit,
+		nextroute.StopPositions{stopPositione},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !move.IsExecutable() {
+		t.Fatal("expected move to be executable")
+	}
+
+	// F - a - b - c - e - d - L not allowed
+	stopPositione, err = nextroute.NewStopPosition(
+		cSolutionStop,
+		eSolutionStop,
+		dSolutionStop,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	move, err = nextroute.NewMoveStops(
+		eSolutionPlanUnit,
+		nextroute.StopPositions{stopPositione},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if move.IsExecutable() {
+		t.Fatal("expected move to be not executable")
+	}
+
+	// F - a - b  - c - d - e - L allowed
+	stopPositione, err = nextroute.NewStopPosition(
+		dSolutionStop,
+		eSolutionStop,
+		solutionVehicle.Last(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	move, err = nextroute.NewMoveStops(
+		eSolutionPlanUnit,
+		nextroute.StopPositions{stopPositione},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !move.IsExecutable() {
+		t.Fatal("expected move to be executable")
+	}
+
+	_ = fSolutionStop
+	_ = fSolutionPlanUnit
+}
+
+func TestInterleaveConstraint2(t *testing.T) {
+	model, planUnits, modelStops := createModel2(t)
 	xPlanUnit := planUnits[0]
 	yPlanUnit := planUnits[1]
 	iPlanUnit := planUnits[2]
@@ -697,7 +1117,7 @@ func TestInterleaveConstraint1(t *testing.T) {
 	}
 }
 
-// createInterleaveModel creates a model with 10 stops, 4 plan units, 2 vehicles.
+// createModel2 creates a model with 10 stops, 4 plan units, 2 vehicles.
 // Creates 10 stops A, B, C, D, E, F, G, H, I, J
 // Creates 4 plan units:
 // 1. Plan units unit x consisting out of 3 plan stops units:
@@ -717,7 +1137,11 @@ func TestInterleaveConstraint1(t *testing.T) {
 // - Disallows interleaving of plan unit x and j with plan unit y
 // Adds the interleave constraint to the model
 // Returns the model, plan units [x,y, i, j], and stops [A, B, C, D, E, F, G, H, I, J]
-func createInterleaveModel(t *testing.T) (nextroute.Model, nextroute.ModelPlanUnits, nextroute.ModelStops) {
+func createModel2(t *testing.T) (
+	nextroute.Model,
+	nextroute.ModelPlanUnits,
+	nextroute.ModelStops,
+) {
 	model, err := nextroute.NewModel()
 	if err != nil {
 		t.Fatal(err)
@@ -887,4 +1311,144 @@ func createInterleaveModel(t *testing.T) (nextroute.Model, nextroute.ModelPlanUn
 	return model,
 		nextroute.ModelPlanUnits{xPlanUnit, yPlanUnit, iPlanUnit, jPlanUnit},
 		nextroute.ModelStops{a, b, c, d, e, f, g, h, i, j}
+}
+
+func createModel1(t *testing.T, postAll bool) (
+	nextroute.Model,
+	nextroute.ModelPlanUnits,
+	nextroute.ModelStops,
+) {
+	model, err := nextroute.NewModel()
+	if err != nil {
+		t.Fatal(err)
+	}
+	center, err := common.NewLocation(0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, err := model.NewStop(center)
+	a.SetID("a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := model.NewStop(center)
+	b.SetID("b")
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := model.NewStop(center)
+	c.SetID("c")
+	if err != nil {
+		t.Fatal(err)
+	}
+	d, err := model.NewStop(center)
+	d.SetID("d")
+	if err != nil {
+		t.Fatal(err)
+	}
+	e, err := model.NewStop(center)
+	e.SetID("e")
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, err := model.NewStop(center)
+	f.SetID("f")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	a_pu, err := model.NewPlanSingleStop(a)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b_pu, err := model.NewPlanSingleStop(b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	xPlanUnit, err := model.NewPlanAllPlanUnits(true, a_pu, b_pu)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c_pu, err := model.NewPlanSingleStop(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	d_pu, err := model.NewPlanSingleStop(d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	yPlanUnit, err := model.NewPlanAllPlanUnits(true, c_pu, d_pu)
+	if err != nil {
+		t.Fatal(err)
+	}
+	e_pu, err := model.NewPlanSingleStop(e)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f_pu, err := model.NewPlanSingleStop(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	zPlanUnit, err := model.NewPlanAllPlanUnits(true, e_pu, f_pu)
+	if err != nil {
+		t.Fatal(err)
+	}
+	interleaveConstraint, err := nextroute.NewInterleaveConstraint()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = interleaveConstraint.DisallowInterleaving(xPlanUnit, []nextroute.ModelPlanUnit{yPlanUnit, zPlanUnit})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if postAll {
+		err = interleaveConstraint.DisallowInterleaving(yPlanUnit, []nextroute.ModelPlanUnit{xPlanUnit, zPlanUnit})
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = interleaveConstraint.DisallowInterleaving(zPlanUnit, []nextroute.ModelPlanUnit{xPlanUnit, yPlanUnit})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	err = model.AddConstraint(interleaveConstraint)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	vt, err := model.NewVehicleType(
+		nextroute.NewTimeIndependentDurationExpression(
+			nextroute.NewTravelDurationExpression(
+				nextroute.NewHaversineExpression(),
+				common.NewSpeed(
+					10.0,
+					common.MetersPerSecond,
+				),
+			),
+		),
+		nextroute.NewDurationExpression(
+			"travelDuration",
+			nextroute.NewStopDurationExpression("serviceDuration", 0.0),
+			common.Second,
+		),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	warehouse, err := model.NewStop(center)
+	if err != nil {
+		t.Fatal(err)
+	}
+	warehouse.SetID("warehouse")
+
+	v, err := model.NewVehicle(vt, model.Epoch(), warehouse, warehouse)
+	v.SetID("v1")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return model,
+		nextroute.ModelPlanUnits{xPlanUnit, yPlanUnit, zPlanUnit},
+		nextroute.ModelStops{a, b, c, d, e, f}
 }

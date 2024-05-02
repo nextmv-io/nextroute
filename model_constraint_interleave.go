@@ -14,6 +14,7 @@ type InterleaveConstraint interface {
 	// DisallowInterleaving disallows the given planUnits to be interleaved.
 	DisallowInterleaving(source ModelPlanUnit, targets []ModelPlanUnit) error
 
+	// DisallowedInterleaves returns the disallowed interleaves.
 	DisallowedInterleaves() []DisallowedInterleave
 
 	// SourceDisallowedInterleaves returns the disallowed interleaves for the
@@ -79,7 +80,9 @@ type interleaveConstraintImpl struct {
 	targetDisallowedInterleaves map[ModelPlanUnit][]DisallowedInterleave
 }
 
-func (l *interleaveConstraintImpl) SourceDisallowedInterleaves(source ModelPlanUnit) []DisallowedInterleave {
+func (l *interleaveConstraintImpl) SourceDisallowedInterleaves(
+	source ModelPlanUnit,
+) []DisallowedInterleave {
 	if l.sourceDisallowedInterleaves != nil {
 		if disallowedInterleaves, ok := l.sourceDisallowedInterleaves[source]; ok {
 			return disallowedInterleaves
@@ -98,7 +101,9 @@ func (l *interleaveConstraintImpl) SourceDisallowedInterleaves(source ModelPlanU
 	return found
 }
 
-func (l *interleaveConstraintImpl) TargetDisallowedInterleaves(target ModelPlanUnit) []DisallowedInterleave {
+func (l *interleaveConstraintImpl) TargetDisallowedInterleaves(
+	target ModelPlanUnit,
+) []DisallowedInterleave {
 	if l.targetDisallowedInterleaves != nil {
 		if disallowedInterleaves, ok := l.targetDisallowedInterleaves[target]; ok {
 			return disallowedInterleaves
@@ -119,7 +124,11 @@ func (l *interleaveConstraintImpl) DisallowedInterleaves() []DisallowedInterleav
 	return l.disallowedInterleaves
 }
 
-func addToMap(planUnit ModelPlanUnit, mapUnit map[ModelPlanUnit][]DisallowedInterleave, disallowedInterleave DisallowedInterleave) {
+func addToMap(
+	planUnit ModelPlanUnit,
+	mapUnit map[ModelPlanUnit][]DisallowedInterleave,
+	disallowedInterleave DisallowedInterleave,
+) {
 	if modelPlanUnitsUnit, ok := planUnit.(ModelPlanUnitsUnit); ok {
 		for _, pu := range modelPlanUnitsUnit.PlanUnits() {
 			addToMap(pu, mapUnit, disallowedInterleave)
@@ -169,25 +178,33 @@ func verifyPlanUnitAllOnSameVehicle(planUnit ModelPlanUnit, preFix string) error
 
 func (l *interleaveConstraintImpl) DisallowInterleaving(target ModelPlanUnit, sources []ModelPlanUnit) error {
 	if target == nil {
-		return fmt.Errorf("source cannot be nil")
+		return fmt.Errorf("target cannot be nil")
 	}
 
-	// TODO: cover all cases
+	if sources == nil {
+		return fmt.Errorf("sources cannot be nil")
+	}
+
+	if len(sources) == 0 {
+		return nil
+	}
+
+	if _, hasPlanUnitsUnit := target.PlanUnitsUnit(); hasPlanUnitsUnit {
+		return fmt.Errorf("target cannot be a plan unit part of a PlanUnitsUnit")
+	}
+
 	if modelPlanStopsUnit, ok := target.(ModelPlanStopsUnit); ok {
 		if modelPlanStopsUnit.Stops()[0].Model().IsLocked() {
 			return fmt.Errorf(lockErrorMessage, "DisallowInterleaving")
 		}
 	}
 
-	if sources == nil {
-		return fmt.Errorf("sources cannot be nil")
-	}
-	if len(sources) == 0 {
-		return nil
-	}
 	for idx, source := range sources {
 		if source == nil {
 			return fmt.Errorf("source[%v] cannot be nil", idx)
+		}
+		if _, hasPlanUnitsUnit := source.PlanUnitsUnit(); hasPlanUnitsUnit {
+			return fmt.Errorf("source at index %v cannot be a plan unit part of a PlanUnitsUnit", idx)
 		}
 		if source == target {
 			return fmt.Errorf("target is also in a source")
@@ -243,50 +260,54 @@ func (l *interleaveConstraintImpl) EstimationCost() Cost {
 	return LinearStop
 }
 
-//func nameMove(move Move) string {
-//	result := ""
-//	for idx, stopPosition := range move.StopPositions() {
-//		if idx > 0 {
-//			result += " .. "
-//		}
-//		result += stopPosition.Previous().ModelStop().ID() + " - ["
-//		result += stopPosition.Stop().ModelStop().ID() + "] - "
-//		result += stopPosition.Next().ModelStop().ID()
-//	}
-//	return result
-//}
-//
-//func namePlanStopsUnit(planStopsUnit ModelPlanStopsUnit) string {
-//	result := "["
-//	for idx, stop := range planStopsUnit.Stops() {
-//		if idx > 0 {
-//			result += ", "
-//		}
-//		result += stop.ID()
-//	}
-//	result += "]"
-//	return result
-//}
+func isViolatedPositions(sourceFirstPosition, sourceLastPosition, targetFirstPosition, targetLastPosition int) bool {
+	//        S===S
+	//     T=========T
+	if sourceFirstPosition > targetFirstPosition &&
+		sourceLastPosition < targetLastPosition {
+		return true
+	}
 
+	//   S=====S
+	//     T=========T
+	if sourceFirstPosition < targetFirstPosition &&
+		sourceLastPosition > targetFirstPosition &&
+		sourceLastPosition < targetLastPosition {
+		return true
+	}
+	//            S=====S
+	//     T=========T
+	if sourceFirstPosition > targetFirstPosition &&
+		sourceFirstPosition < targetLastPosition &&
+		sourceLastPosition > targetLastPosition {
+		return true
+	}
+
+	return false
+}
 func (l *interleaveConstraintImpl) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	solution := move.Solution()
-	//fmt.Println("\U0001FAE3 Move: ",
-	//	nameMove(move),
-	//	"for unit",
-	//	namePlanStopsUnit(move.PlanStopsUnit().ModelPlanUnit().(ModelPlanStopsUnit)),
-	//)
 
-	// FirstPlanUnit and LastPlanUnit are the first and last stops of the plan unit of
-	// the move. In case the move planUnit is a part of a PlanUnitsUnit, the first and last
-	// stops should include the already planned stops of the other plan units of the PlanUnitsUnit.
-	firstPlanUnit := move.Previous()
-	lastPlanUnit := move.Next()
+	solutionMoveStops := move.(*solutionMoveStopsImpl)
 
-	if modelPlanUnitsUnit, hasModelPlanUnitsUnit := move.PlanStopsUnit().ModelPlanUnit().PlanUnitsUnit(); hasModelPlanUnitsUnit {
-		// fmt.Println("  ☐ Move is for a plan unit that is part of a PlanUnitsUnit")
-		// first and last stop of the already planned plan-units of PlanUnitsUnit
+	generator := newSolutionStopGenerator(*solutionMoveStops, true, true)
+	defer generator.release()
+
+	newPositions := make(map[SolutionStop]int)
+
+	position := 0
+	for solutionStop, ok := generator.next(); ok; solutionStop, ok = generator.next() {
+		newPositions[solutionStop] = position
+		position += 1
+	}
+
+	newPlanUnitSpanFirstPosition := move.Previous().Position() + 1
+	newPlanUnitSpanLastPosition := move.Next().Position() + len(move.PlanStopsUnit().SolutionStops()) - 1
+
+	if modelPlanUnitsUnit, hasModelPlanUnitsUnit :=
+		move.PlanStopsUnit().ModelPlanUnit().PlanUnitsUnit(); hasModelPlanUnitsUnit {
 		var first, last SolutionStop
 		for _, planUnit := range modelPlanUnitsUnit.PlanUnits() {
 			if planUnit.Index() == move.PlanStopsUnit().ModelPlanUnit().Index() {
@@ -298,63 +319,85 @@ func (l *interleaveConstraintImpl) EstimateIsViolated(
 					if solutionPlanStopsUnit.SolutionStops()[0].Vehicle() != move.Vehicle() {
 						continue
 					}
-					// fmt.Println("    ☐ Getting first and last of planned unit",
-					//	namePlanStopsUnit(solutionPlanStopsUnit.ModelPlanStopsUnit()),
-					// )
+
 					first, last = determineFirstLastSolutionStops(first, last, solutionPlanStopsUnit)
-					if first != nil &&
-						move.Previous().Position() >= first.Position() &&
-						move.Next().Position() <= last.Position() {
-						// fmt.Println("    ✅ Move is in the middle of already planned plan units of PlanUnitsUnit")
-						return false, noPositionsHint()
+					if first == nil {
+						continue
 					}
 				}
 			}
 		}
-		if first != nil && first.Position() <= firstPlanUnit.Position() {
-			firstPlanUnit = first
+		if first != nil && newPositions[first] <= newPlanUnitSpanFirstPosition {
+			newPlanUnitSpanFirstPosition = newPositions[first]
 		}
-		if last != nil && last.Position() >= lastPlanUnit.Position() {
-			lastPlanUnit = last
+		if last != nil && newPositions[last] >= newPlanUnitSpanLastPosition {
+			newPlanUnitSpanLastPosition = newPositions[last]
 		}
 	}
 
-	// check if the target is disallowed to be interleaved with the source
-	if targetDisallowedInterleaves, isTargetPlanUnit := l.targetDisallowedInterleaves[move.PlanStopsUnit().ModelPlanUnit()]; isTargetPlanUnit {
-		// fmt.Println("  ☐ Move is for a plan unit that is a target for a source")
-		var first, last SolutionStop
-
+	// Check if the plan unit we are moving is a target
+	if targetDisallowedInterleaves, isTargetPlanUnit :=
+		l.targetDisallowedInterleaves[move.PlanStopsUnit().ModelPlanUnit()]; isTargetPlanUnit {
 		for _, disallowedInterleave := range targetDisallowedInterleaves {
 			for _, sourcePlanUnit := range disallowedInterleave.Sources() {
 				sourceSolutionPlanUnit := move.Solution().SolutionPlanUnit(sourcePlanUnit)
 				if sourceSolutionPlanUnit.IsPlanned() {
+					var sourceSpanFirst, sourceSpanLast SolutionStop
 					solutionPlanStopsUnits := sourceSolutionPlanUnit.PlannedPlanStopsUnits()
 					for _, solutionPlanStopsUnit := range solutionPlanStopsUnits {
 						if solutionPlanStopsUnit.SolutionStops()[0].Vehicle() != move.Vehicle() {
 							continue
 						}
-						// fmt.Println("    ☐ Planned source",
-						//	namePlanStopsUnit(solutionPlanStopsUnit.ModelPlanStopsUnit()),
-						//	"can not interleave with target",
-						//	namePlanStopsUnit(move.PlanStopsUnit().ModelPlanUnit().(ModelPlanStopsUnit)),
-						// )
-						first, last = determineFirstLastSolutionStops(first, last, solutionPlanStopsUnit)
+						sourceSpanFirst, sourceSpanLast = determineFirstLastSolutionStops(
+							sourceSpanFirst,
+							sourceSpanLast,
+							solutionPlanStopsUnit,
+						)
+						newSourceSpanFirstPosition := newPositions[sourceSpanFirst]
+						newSourceSpanLastPosition := newPositions[sourceSpanLast]
+
+						if isViolatedPositions(
+							newSourceSpanFirstPosition,
+							newSourceSpanLastPosition,
+							newPlanUnitSpanFirstPosition,
+							newPlanUnitSpanLastPosition,
+						) {
+							return true, noPositionsHint()
+						}
 					}
 				}
 			}
 		}
+	}
 
-		if first != nil {
-			if lastPlanUnit.Position() <= first.Position() || firstPlanUnit.Position() >= last.Position() {
-				// fmt.Println("    ✅ Sources do not overlap with to be planned target")
-				return false, noPositionsHint()
+	// check if plan unit is a source
+	if sourceDisallowedInterleaves, isSourcePlanUnit :=
+		l.sourceDisallowedInterleaves[move.PlanStopsUnit().ModelPlanUnit()]; isSourcePlanUnit {
+		for _, disallowedInterleave := range sourceDisallowedInterleaves {
+			targetSolutionPlanUnit := solution.SolutionPlanUnit(disallowedInterleave.Target())
+			if targetSolutionPlanUnit.IsPlanned() {
+				var targetSpanFirst, targetSpanLast SolutionStop
+				for _, plannedSolutionStops := range targetSolutionPlanUnit.PlannedPlanStopsUnits() {
+					if plannedSolutionStops.SolutionStops()[0].Vehicle() != move.Vehicle() {
+						continue
+					}
+					targetSpanFirst, targetSpanLast = determineFirstLastSolutionStops(
+						targetSpanFirst,
+						targetSpanLast,
+						plannedSolutionStops,
+					)
+					if isViolatedPositions(
+						newPlanUnitSpanFirstPosition,
+						newPlanUnitSpanLastPosition,
+						newPositions[targetSpanFirst],
+						newPositions[targetSpanLast],
+					) {
+						return true, noPositionsHint()
+					}
+				}
 			}
 		}
-
-		// fmt.Println("    ❌ A source would be interleaved  with to be planned target")
-		return true, noPositionsHint()
 	}
-	// fmt.Println("✅ No violations for move")
 	return false, noPositionsHint()
 }
 
