@@ -135,20 +135,20 @@ func SolutionMoveStopsGenerator(
 	}, shouldStop)
 }
 
-func isNotAllowed(from, to SolutionStop) bool {
-	fromModelStop := from.ModelStop()
-	toModelStop := to.ModelStop()
+func isNotAllowed(from, to solutionStopImpl) bool {
+	fromModelStop := from.modelStop()
+	toModelStop := to.modelStop()
 	model := fromModelStop.Model()
 
 	return model.(*modelImpl).disallowedSuccessors[fromModelStop.Index()][toModelStop.Index()]
 }
 
-func mustBeNeighbours(from, to SolutionStop) bool {
-	if !from.ModelStop().HasPlanStopsUnit() {
+func mustBeNeighbours(from, to solutionStopImpl) bool {
+	if !from.modelStop().HasPlanStopsUnit() {
 		return false
 	}
 
-	return from.ModelStop().
+	return from.modelStop().
 		PlanStopsUnit().
 		DirectedAcyclicGraph().
 		HasDirectArc(from.ModelStop(), to.ModelStop())
@@ -193,12 +193,12 @@ func generate(
 				stopPositions[positionIdx-1].nextStopIndex = stopPositions[positionIdx].stopIndex
 			} else {
 				stopPositions[positionIdx-1].nextStopIndex = target[combination[positionIdx-1]].index
-				if mustBeNeighbours(stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx].Stop()) {
+				if mustBeNeighbours(stopPositions[positionIdx-1].stop(), stopPositions[positionIdx].stop()) {
 					break
 				}
 			}
 
-			if isNotAllowed(stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx-1].Next()) {
+			if isNotAllowed(stopPositions[positionIdx-1].stop(), stopPositions[positionIdx-1].next()) {
 				combination = combination[:positionIdx]
 				if stopPositions[positionIdx-1].nextStopIndex != stopPositions[positionIdx].previousStopIndex {
 					break
@@ -207,7 +207,7 @@ func generate(
 			}
 		}
 
-		if isNotAllowed(stopPositions[positionIdx].Previous(), stopPositions[positionIdx].Stop()) {
+		if isNotAllowed(stopPositions[positionIdx].previous(), stopPositions[positionIdx].stop()) {
 			combination = combination[:positionIdx]
 			continue
 		}
