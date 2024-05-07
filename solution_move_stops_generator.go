@@ -30,7 +30,7 @@ func SolutionMoveStopsGeneratorChannel(
 	ch := make(chan SolutionMoveStops)
 	go func() {
 		defer close(ch)
-		solutionMoveStopsGenerator(
+		SolutionMoveStopsGenerator(
 			vehicle,
 			planUnit,
 			func(move SolutionMoveStops) {
@@ -81,7 +81,7 @@ func SolutionMoveStopsGeneratorTest(
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 	shouldStop func() bool,
 ) {
-	solutionMoveStopsGenerator(
+	SolutionMoveStopsGenerator(
 		vehicle.(solutionVehicleImpl),
 		planUnit.(*solutionPlanStopsUnitImpl),
 		yield,
@@ -91,9 +91,9 @@ func SolutionMoveStopsGeneratorTest(
 	)
 }
 
-// solutionMoveStopsGenerator generates all possible moves for a given vehicle and
+// SolutionMoveStopsGenerator generates all possible moves for a given vehicle and
 // plan unit. The function yield is called for each solutionMoveStopsImpl.
-func solutionMoveStopsGenerator(
+func SolutionMoveStopsGenerator(
 	vehicle solutionVehicleImpl,
 	planUnit *solutionPlanStopsUnitImpl,
 	yield func(move SolutionMoveStops),
@@ -116,39 +116,39 @@ func solutionMoveStopsGenerator(
 		return
 	}
 
-	if cap(m.(*solutionMoveStopsImpl).stopPositions) < len(source) {
-		m.(*solutionMoveStopsImpl).stopPositions = make([]stopPositionImpl, len(source))
-	}
-	m.(*solutionMoveStopsImpl).stopPositions = m.(*solutionMoveStopsImpl).stopPositions[:len(source)]
-
+	// TODO: we can reuse the stopPositions slice from m
+	positions := make([]stopPositionImpl, len(source))
 	for idx := range source {
-		m.(*solutionMoveStopsImpl).stopPositions[idx].stopIndex = source[idx].index
-		m.(*solutionMoveStopsImpl).stopPositions[idx].solution = source[idx].solution
+		positions[idx].stopIndex = source[idx].index
+		positions[idx].solution = source[idx].solution
 	}
 
 	locations := make([]int, 0, len(source))
 
-	generate(m.(*solutionMoveStopsImpl).stopPositions, locations, source, target, func() {
+	generate(positions, locations, source, target, func() {
+		m.(*solutionMoveStopsImpl).reset()
 		m.(*solutionMoveStopsImpl).planUnit = planUnit
+		m.(*solutionMoveStopsImpl).stopPositions = positions
 		m.(*solutionMoveStopsImpl).allowed = false
 		m.(*solutionMoveStopsImpl).valueSeen = 1
 		yield(m)
 	}, shouldStop)
 }
 
-func disallowedSuccessors(from, to SolutionStop) bool {
-	fromModelStop := from.ModelStop()
-	toModelStop := to.ModelStop()
+func isNotAllowed(from, to solutionStopImpl) bool {
+	fromModelStop := from.modelStop()
+	toModelStop := to.modelStop()
 	model := fromModelStop.Model()
+
 	return model.(*modelImpl).disallowedSuccessors[fromModelStop.Index()][toModelStop.Index()]
 }
 
-func mustBeDirectSuccessor(from, to SolutionStop) bool {
-	if !from.ModelStop().HasPlanStopsUnit() {
+func mustBeNeighbours(from, to solutionStopImpl) bool {
+	if !from.modelStop().HasPlanStopsUnit() {
 		return false
 	}
 
-	return from.ModelStop().
+	return from.modelStop().
 		PlanStopsUnit().
 		DirectedAcyclicGraph().
 		HasDirectArc(from.ModelStop(), to.ModelStop())
@@ -177,7 +177,7 @@ func generate(
 	}
 
 	for i := start; i < len(target)-1; i++ {
-		if i > 0 && mustBeDirectSuccessor(target[i], target[i+1]) {
+		if i > 0 && mustBeNeighbours(target[i], target[i+1]) {
 			continue
 		}
 		combination = append(combination, i+1)
@@ -193,25 +193,21 @@ func generate(
 				stopPositions[positionIdx-1].nextStopIndex = stopPositions[positionIdx].stopIndex
 			} else {
 				stopPositions[positionIdx-1].nextStopIndex = target[combination[positionIdx-1]].index
-				if mustBeDirectSuccessor(stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx].Stop()) {
+				if mustBeNeighbours(stopPositions[positionIdx-1].stop(), stopPositions[positionIdx].stop()) {
 					break
 				}
 			}
 
-			if disallowedSuccessors(stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx-1].Next()) {
+			if isNotAllowed(stopPositions[positionIdx-1].stop(), stopPositions[positionIdx-1].next()) {
 				combination = combination[:positionIdx]
 				if stopPositions[positionIdx-1].nextStopIndex != stopPositions[positionIdx].previousStopIndex {
-					// changing the previous stop index of positionIdx is not going to change
-					// stopPositions[positionIdx-1].nextStopIndex
 					break
 				}
-				// changing position of positionIdx is going to change stopPositions[positionIdx-1].nextStopIndex
 				continue
 			}
 		}
 
-		if disallowedSuccessors(stopPositions[positionIdx].Previous(), stopPositions[positionIdx].Stop()) {
-			// try next position for positionIdx
+		if isNotAllowed(stopPositions[positionIdx].previous(), stopPositions[positionIdx].stop()) {
 			combination = combination[:positionIdx]
 			continue
 		}
