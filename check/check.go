@@ -288,6 +288,7 @@ SolutionPlanUnitLoop:
 			} else {
 				if movesFailed {
 					m.output.PlanUnits[solutionPlanUnitIdx].BestMoveFailed = true
+					m.output.Summary.PlanUnitsBestMoveFailed++
 				}
 				m.output.Summary.PlanUnitsHaveNoMove++
 				constraints := make(map[string]int, len(m.solution.Model().Constraints()))
