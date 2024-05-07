@@ -69,8 +69,8 @@ type Summary struct {
 	PlanUnitsBestMoveFailed int `json:"plan_units_best_move_failed"`
 	// MovesFailed is the number of moves that failed. A move can fail if the
 	// estimate of a constraint is incorrect. A constraint is incorrect if
-	// [ModelConstraint.EstimateIsViolated] returns true and one of the
-	// violation checks returns false. Violation checks are implementations of
+	// [ModelConstraint.EstimateIsViolated] returns false and one of the
+	// violation checks returns true. Violation checks are implementations of
 	// one or more of the interfaces [SolutionStopViolationCheck],
 	// [SolutionVehicleViolationCheck] or [SolutionViolationCheck] on the same
 	// constraint. Most constraints do not need and do not have violation
