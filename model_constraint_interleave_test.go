@@ -4,10 +4,10 @@ package nextroute_test
 
 import (
 	"context"
-	"github.com/nextmv-io/nextroute/common"
 	"testing"
 
 	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 func TestNewInterleaveConstraint(t *testing.T) {
@@ -121,22 +121,14 @@ func TestInterleaveConstraint0(t *testing.T) {
 	model, planUnits, modelStops := createModel1(t, false)
 	xPlanUnit := planUnits[0]
 	aPlanUnit := xPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[0]
-	//bPlanUnit := xPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[1]
 
 	yPlanUnit := planUnits[1]
 	cPlanUnit := yPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[0]
 	dPlanUnit := yPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[1]
 
-	//zPlanUnit := planUnits[2]
-	//ePlanUnit := zPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[0]
-	//fPlanUnit := zPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[1]
-
 	a := modelStops[0]
-	//b := modelStops[1]
 	c := modelStops[2]
 	d := modelStops[3]
-	//e := modelStops[4]
-	//f := modelStops[5]
 
 	solution, err := nextroute.NewSolution(model)
 	if err != nil {
@@ -146,23 +138,12 @@ func TestInterleaveConstraint0(t *testing.T) {
 	solutionVehicle := solution.Vehicles()[0]
 
 	aSolutionStop := solution.SolutionStop(a)
-	//bSolutionStop := solution.SolutionStop(b)
 	cSolutionStop := solution.SolutionStop(c)
 	dSolutionStop := solution.SolutionStop(d)
-	//eSolutionStop := solution.SolutionStop(e)
-	//fSolutionStop := solution.SolutionStop(f)
 
-	// xSolutionPlanUnit := solution.SolutionPlanUnit(xPlanUnit)
 	aSolutionPlanUnit := solution.SolutionPlanUnit(aPlanUnit).(nextroute.SolutionPlanStopsUnit)
-	//bSolutionPlanUnit := solution.SolutionPlanUnit(bPlanUnit).(nextroute.SolutionPlanStopsUnit)
-
-	//ySolutionPlanUnit := solution.SolutionPlanUnit(yPlanUnit)
 	cSolutionPlanUnit := solution.SolutionPlanUnit(cPlanUnit).(nextroute.SolutionPlanStopsUnit)
 	dSolutionPlanUnit := solution.SolutionPlanUnit(dPlanUnit).(nextroute.SolutionPlanStopsUnit)
-
-	//zSolutionPlanUnit := solution.SolutionPlanUnit(yPlanUnit)
-	//eSolutionPlanUnit := solution.SolutionPlanUnit(ePlanUnit).(nextroute.SolutionPlanStopsUnit)
-	//fSolutionPlanUnit := solution.SolutionPlanUnit(fPlanUnit).(nextroute.SolutionPlanStopsUnit)
 
 	// F - c - L
 	stopPositionc, err := nextroute.NewStopPosition(
@@ -291,15 +272,12 @@ func TestInterleaveConstraint1(t *testing.T) {
 	eSolutionStop := solution.SolutionStop(e)
 	fSolutionStop := solution.SolutionStop(f)
 
-	// xSolutionPlanUnit := solution.SolutionPlanUnit(xPlanUnit)
 	aSolutionPlanUnit := solution.SolutionPlanUnit(aPlanUnit).(nextroute.SolutionPlanStopsUnit)
 	bSolutionPlanUnit := solution.SolutionPlanUnit(bPlanUnit).(nextroute.SolutionPlanStopsUnit)
 
-	//ySolutionPlanUnit := solution.SolutionPlanUnit(yPlanUnit)
 	cSolutionPlanUnit := solution.SolutionPlanUnit(cPlanUnit).(nextroute.SolutionPlanStopsUnit)
 	dSolutionPlanUnit := solution.SolutionPlanUnit(dPlanUnit).(nextroute.SolutionPlanStopsUnit)
 
-	//zSolutionPlanUnit := solution.SolutionPlanUnit(yPlanUnit)
 	eSolutionPlanUnit := solution.SolutionPlanUnit(ePlanUnit).(nextroute.SolutionPlanStopsUnit)
 	fSolutionPlanUnit := solution.SolutionPlanUnit(fPlanUnit).(nextroute.SolutionPlanStopsUnit)
 
@@ -542,7 +520,7 @@ func TestInterleaveConstraint2(t *testing.T) {
 	xPlanUnit := planUnits[0]
 	yPlanUnit := planUnits[1]
 	iPlanUnit := planUnits[2]
-	//jPlanUnit := planUnits[3]
+
 	a := modelStops[0]
 	b := modelStops[1]
 	c := modelStops[2]
@@ -552,11 +530,10 @@ func TestInterleaveConstraint2(t *testing.T) {
 	g := modelStops[6]
 	h := modelStops[7]
 	i := modelStops[8]
-	//j := modelStops[9]
 
 	solution, err := nextroute.NewSolution(model)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	solutionVehicle := solution.Vehicles()[0]
@@ -1136,7 +1113,7 @@ func TestInterleaveConstraint2(t *testing.T) {
 // - Disallows interleaving of plan unit y and i with plan unit x
 // - Disallows interleaving of plan unit x and j with plan unit y
 // Adds the interleave constraint to the model
-// Returns the model, plan units [x,y, i, j], and stops [A, B, C, D, E, F, G, H, I, J]
+// Returns the model, plan units [x,y, i, j], and stops [A, B, C, D, E, F, G, H, I, J].
 func createModel2(t *testing.T) (
 	nextroute.Model,
 	nextroute.ModelPlanUnits,
@@ -1357,39 +1334,39 @@ func createModel1(t *testing.T, postAll bool) (
 		t.Fatal(err)
 	}
 
-	a_pu, err := model.NewPlanSingleStop(a)
+	aPlanUnit, err := model.NewPlanSingleStop(a)
 	if err != nil {
 		t.Fatal(err)
 	}
-	b_pu, err := model.NewPlanSingleStop(b)
+	bPlanUnit, err := model.NewPlanSingleStop(b)
 	if err != nil {
 		t.Fatal(err)
 	}
-	xPlanUnit, err := model.NewPlanAllPlanUnits(true, a_pu, b_pu)
+	xPlanUnit, err := model.NewPlanAllPlanUnits(true, aPlanUnit, bPlanUnit)
 	if err != nil {
 		t.Fatal(err)
 	}
-	c_pu, err := model.NewPlanSingleStop(c)
+	cPlanUnit, err := model.NewPlanSingleStop(c)
 	if err != nil {
 		t.Fatal(err)
 	}
-	d_pu, err := model.NewPlanSingleStop(d)
+	dPlanUnit, err := model.NewPlanSingleStop(d)
 	if err != nil {
 		t.Fatal(err)
 	}
-	yPlanUnit, err := model.NewPlanAllPlanUnits(true, c_pu, d_pu)
+	yPlanUnit, err := model.NewPlanAllPlanUnits(true, cPlanUnit, dPlanUnit)
 	if err != nil {
 		t.Fatal(err)
 	}
-	e_pu, err := model.NewPlanSingleStop(e)
+	ePlanUnit, err := model.NewPlanSingleStop(e)
 	if err != nil {
 		t.Fatal(err)
 	}
-	f_pu, err := model.NewPlanSingleStop(f)
+	fPlanUnit, err := model.NewPlanSingleStop(f)
 	if err != nil {
 		t.Fatal(err)
 	}
-	zPlanUnit, err := model.NewPlanAllPlanUnits(true, e_pu, f_pu)
+	zPlanUnit, err := model.NewPlanAllPlanUnits(true, ePlanUnit, fPlanUnit)
 	if err != nil {
 		t.Fatal(err)
 	}

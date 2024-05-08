@@ -107,7 +107,7 @@ func (v solutionVehicleImpl) firstMovePlanStopsUnit(
 ) (SolutionMove, error) {
 	stop := false
 	var bestMove SolutionMove = newNotExecutableSolutionMoveStops(planUnit)
-	solutionMoveStopsGenerator(
+	SolutionMoveStopsGenerator(
 		v,
 		planUnit,
 		func(nextMove SolutionMoveStops) {
@@ -241,7 +241,7 @@ func (v solutionVehicleImpl) bestMovePlanSingleStop(
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 ) SolutionMoveStops {
 	candidateStop := planUnit.solutionStops[0]
-	move := preAllocatedMoveContainer.singleStopPosSolutionMoveStop
+	move := preAllocatedMoveContainer.solutionMoveStops
 	move.(*solutionMoveStopsImpl).reset()
 	// ensure that stopPositions is a length 1 slice
 	move.(*solutionMoveStopsImpl).stopPositions = append(
@@ -353,7 +353,7 @@ func (v solutionVehicleImpl) bestMoveSequence(
 ) SolutionMove {
 	var bestMove SolutionMove = newNotExecutableSolutionMoveStops(planUnit)
 	stop := false
-	solutionMoveStopsGenerator(
+	SolutionMoveStopsGenerator(
 		v,
 		planUnit,
 		func(nextMove SolutionMoveStops) {

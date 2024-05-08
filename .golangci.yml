@@ -148,6 +148,13 @@ issues:
       linters:
         - gocyclo
     # Next route tests and methods contain complex code hard to simplify.
+    - path: model_constraint_interleave\.go
+      linters:
+        - nestif
+    - path: solution_move_stops_generator\.go
+      linters:
+        - nestif
+        - gocyclo
     - path: model_expression_time_dependent_test\.go
       linters:
         - gocyclo

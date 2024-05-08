@@ -1054,9 +1054,9 @@ func (s *solutionImpl) UnPlannedPlanUnits() ImmutableSolutionPlanUnitCollection 
 // PreAllocatedMoveContainer is used to reduce allocations.
 // It contains objects that can be used instead of allocating new ones.
 type PreAllocatedMoveContainer struct {
-	// singleStopPosSolutionMoveStop has the underlying type *solutionMoveStopsImpl.
+	// solutionMoveStops has the underlying type *solutionMoveStopsImpl.
 	// and has a length 1 stopPositions slice.
-	singleStopPosSolutionMoveStop SolutionMoveStops
+	solutionMoveStops SolutionMoveStops
 }
 
 // NewPreAllocatedMoveContainer creates a new PreAllocatedMoveContainer.
@@ -1067,7 +1067,7 @@ func NewPreAllocatedMoveContainer(planUnit SolutionPlanUnit) *PreAllocatedMoveCo
 	case SolutionPlanStopsUnit:
 		m := newNotExecutableSolutionMoveStops(planUnit.(*solutionPlanStopsUnitImpl))
 		m.stopPositions = make([]stopPositionImpl, 1, 2)
-		allocations.singleStopPosSolutionMoveStop = m
+		allocations.solutionMoveStops = m
 	case SolutionPlanUnitsUnit:
 	}
 	return &allocations

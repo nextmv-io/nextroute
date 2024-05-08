@@ -4,8 +4,9 @@ package nextroute
 
 import (
 	"fmt"
-	"github.com/nextmv-io/nextroute/common"
 	"math"
+
+	"github.com/nextmv-io/nextroute/common"
 )
 
 // InterleaveConstraint is a constraint that disallows certain target to be
@@ -110,60 +111,62 @@ func (i *interleaveConstraintData) Copy() Copier {
 }
 
 func (l *interleaveConstraintImpl) UpdateConstraintStopData(s SolutionStop) (Copier, error) {
-	if s.IsLast() {
-		data := interleaveConstraintData{
-			solutionPlanStopUnits: make(map[int]interleaveSolutionStopSpan),
+	if !s.IsLast() {
+		return nil, nil
+	}
+
+	data := interleaveConstraintData{
+		solutionPlanStopUnits: make(map[int]interleaveSolutionStopSpan),
+	}
+
+	modelPlanStopsUnits := map[SolutionPlanStopsUnit]struct{}{}
+
+	stop := s.Vehicle().First().Next()
+	for !stop.IsLast() {
+		planStopsUnit := stop.PlanStopsUnit()
+
+		stop = stop.Next()
+
+		if _, ok := modelPlanStopsUnits[planStopsUnit]; ok {
+			continue
 		}
 
-		modelPlanStopsUnits := map[SolutionPlanStopsUnit]struct{}{}
-		stop := s.Vehicle().First().Next()
-		for !stop.IsLast() {
+		if modelPlanUnitsUnit, ok := planStopsUnit.ModelPlanStopsUnit().PlanUnitsUnit(); ok {
+			modelPlanStopsUnits[planStopsUnit] = struct{}{}
 
-			planStopsUnit := stop.PlanStopsUnit()
+			planUnitsUnitFirst := math.MaxInt64
+			planUnitsUnitLast := math.MinInt64
 
-			stop = stop.Next()
+			for _, planUnit := range modelPlanUnitsUnit.PlanUnits() {
+				if modelPlanStopsUnit, ok := planUnit.(ModelPlanStopsUnit); ok {
+					solutionPlanStopsUnit := s.Solution().SolutionPlanStopsUnit(modelPlanStopsUnit)
+					if solutionPlanStopsUnit.IsPlanned() {
+						solutionStops := solutionPlanStopsUnit.SolutionStops()
+						first := solutionStops[0].Position()
+						last := solutionStops[len(solutionStops)-1].Position()
 
-			if _, ok := modelPlanStopsUnits[planStopsUnit]; ok {
-				continue
-			}
+						data.solutionPlanStopUnits[modelPlanStopsUnit.Index()] = interleaveSolutionStopSpan{
+							first: first,
+							last:  last,
+						}
 
-			if modelPlanUnitsUnit, ok := planStopsUnit.ModelPlanStopsUnit().PlanUnitsUnit(); ok {
-				modelPlanStopsUnits[planStopsUnit] = struct{}{}
-
-				planUnitsUnitFirst := math.MaxInt64
-				planUnitsUnitLast := math.MinInt64
-
-				for _, planUnit := range modelPlanUnitsUnit.PlanUnits() {
-					if modelPlanStopsUnit, ok := planUnit.(ModelPlanStopsUnit); ok {
-						solutionPlanStopsUnit := s.Solution().SolutionPlanStopsUnit(modelPlanStopsUnit).(SolutionPlanStopsUnit)
-						if solutionPlanStopsUnit.IsPlanned() {
-							first := solutionPlanStopsUnit.SolutionStops()[0].Position()
-							last := solutionPlanStopsUnit.SolutionStops()[len(solutionPlanStopsUnit.SolutionStops())-1].Position()
-
-							data.solutionPlanStopUnits[modelPlanStopsUnit.Index()] = interleaveSolutionStopSpan{
-								first: first,
-								last:  last,
-							}
-
-							if first < planUnitsUnitFirst {
-								planUnitsUnitFirst = first
-							}
-							if last > planUnitsUnitLast {
-								planUnitsUnitLast = last
-							}
+						if first < planUnitsUnitFirst {
+							planUnitsUnitFirst = first
+						}
+						if last > planUnitsUnitLast {
+							planUnitsUnitLast = last
 						}
 					}
 				}
-				data.solutionPlanStopUnits[modelPlanUnitsUnit.Index()] = interleaveSolutionStopSpan{
-					first: planUnitsUnitFirst,
-					last:  planUnitsUnitLast,
-				}
 			}
-
+			data.solutionPlanStopUnits[modelPlanUnitsUnit.Index()] = interleaveSolutionStopSpan{
+				first: planUnitsUnitFirst,
+				last:  planUnitsUnitLast,
+			}
 		}
-		return &data, nil
 	}
-	return nil, nil
+
+	return &data, nil
 }
 
 func (l *interleaveConstraintImpl) SourceDisallowedInterleaves(
@@ -178,8 +181,8 @@ func (l *interleaveConstraintImpl) SourceDisallowedInterleaves(
 
 	found := make([]DisallowedInterleave, 0)
 	for _, disallowedInterleave := range l.disallowedInterleaves {
-		for _, source := range disallowedInterleave.Sources() {
-			if source == source {
+		for _, s := range disallowedInterleave.Sources() {
+			if source == s {
 				found = append(found, disallowedInterleave)
 			}
 		}
@@ -231,7 +234,7 @@ func addToMap(
 	mapUnit[planUnit] = disallowedInterleaves
 }
 
-func (l *interleaveConstraintImpl) Lock(model Model) error {
+func (l *interleaveConstraintImpl) Lock(_ Model) error {
 	l.sourceDisallowedInterleaves = make(map[ModelPlanUnit][]DisallowedInterleave)
 	l.targetDisallowedInterleaves = make(map[ModelPlanUnit][]DisallowedInterleave)
 
@@ -315,10 +318,7 @@ func (l *interleaveConstraintImpl) DisallowInterleaving(target ModelPlanUnit, so
 	}
 
 	index := common.FindIndex(l.disallowedInterleaves, func(disallowedInterleave DisallowedInterleave) bool {
-		if disallowedInterleave.Target() == target {
-			return true
-		}
-		return false
+		return disallowedInterleave.Target() == target
 	})
 	if index < 0 {
 		l.disallowedInterleaves = append(l.disallowedInterleaves, newDisallowedInterleave(target, sources))
@@ -394,7 +394,7 @@ func (l *interleaveConstraintImpl) EstimateIsViolated(
 		if solutionStop.IsPlanned() {
 			oldPositions = append(oldPositions, solutionStop)
 		}
-		position += 1
+		position++
 	}
 
 	newPlanUnitSpanFirstPosition := move.Previous().Position() + 1
@@ -405,7 +405,6 @@ func (l *interleaveConstraintImpl) EstimateIsViolated(
 	// spans the new positions of the plan unit we are moving, if so we are good
 	if modelPlanUnitsUnit, hasModelPlanUnitsUnit :=
 		move.PlanStopsUnit().ModelPlanUnit().PlanUnitsUnit(); hasModelPlanUnitsUnit {
-
 		if _, ok := data.solutionPlanStopUnits[modelPlanUnitsUnit.Index()]; ok {
 			firstSolutionStop := oldPositions[data.solutionPlanStopUnits[modelPlanUnitsUnit.Index()].first]
 			if newPositions[firstSolutionStop] < newPlanUnitSpanFirstPosition {
