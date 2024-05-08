@@ -247,7 +247,7 @@ func (l *maximumImpl) EstimateIsViolated(
 
 	stop, _ := moveImpl.next()
 
-	if stop.CumulativeValue(expression) < level {
+	if stop.CumulativeValue(expression) != level {
 		stop = stop.next()
 
 		for !stop.IsLast() {
