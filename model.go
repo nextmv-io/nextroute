@@ -60,6 +60,10 @@ type Model interface {
 	// locked after a solution has been created using the model.
 	IsLocked() bool
 
+	// InterleaveConstraint returns the interleave constraint of the model if
+	// it exists, otherwise returns nil.
+	InterleaveConstraint() InterleaveConstraint
+
 	// NewPlanSequence creates a new plan sequence. A plan sequence is a plan
 	// unit. A plan unit is a collection of stops which are always planned and
 	// unplanned as a single unit. In this case they have to be planned as a
@@ -213,7 +217,8 @@ func NewModel() (Model, error) {
 		// planunit without any relationship, we will still fully explore all
 		// permutations. To find a better number we would have to run
 		// experiments on pathologic cases.
-		sequenceSampleSize: 24,
+		sequenceSampleSize:   24,
+		interleaveConstraint: nil,
 	}
 
 	if m.epoch.Second() != 0 || m.epoch.Nanosecond() != 0 {
@@ -260,6 +265,7 @@ type modelImpl struct {
 	mutex                          sync.RWMutex
 	isLocked                       bool
 	disallowedSuccessors           [][]bool
+	interleaveConstraint           InterleaveConstraint
 }
 
 func (m *modelImpl) Vehicles() ModelVehicles {
@@ -391,6 +397,10 @@ func (m *modelImpl) addToCheckAt(checkAt CheckedAt, constraint ModelConstraint) 
 	m.constraintMap[checkAt] = append(m.constraintMap[checkAt], constraint)
 }
 
+func (m *modelImpl) InterleaveConstraint() InterleaveConstraint {
+	return m.interleaveConstraint
+}
+
 func (m *modelImpl) AddConstraint(constraint ModelConstraint) error {
 	if m.IsLocked() {
 		return fmt.Errorf(lockErrorMessage, "constraint")
@@ -411,12 +421,15 @@ func (m *modelImpl) AddConstraint(constraint ModelConstraint) error {
 			}
 		}
 		if _, ok := constraint.(InterleaveConstraint); ok {
-			if _, alreadyOneAdded := existingConstraint.(InterleaveConstraint); alreadyOneAdded {
+			if m.interleaveConstraint != nil {
 				return fmt.Errorf(
 					"only one InterleaveConstraint can be added to the model",
 				)
 			}
 		}
+	}
+	if _, ok := constraint.(InterleaveConstraint); ok {
+		m.interleaveConstraint = constraint.(InterleaveConstraint)
 	}
 	if _, ok := constraint.(ConstraintDataUpdater); ok {
 		return fmt.Errorf(

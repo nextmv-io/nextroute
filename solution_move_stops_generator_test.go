@@ -877,3 +877,238 @@ func testMoves(
 		)
 	}
 }
+
+func TestSolutionMoveStopsGeneratorInterleaved(
+	t *testing.T,
+) {
+	model, planUnits, _ := createModel2(t)
+	xPlanUnit := planUnits[0]
+	yPlanUnit := planUnits[1]
+	iPlanUnit := planUnits[2]
+	jPlanUnit := planUnits[3]
+
+	solution, err := nextroute.NewSolution(model)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	v := solution.Vehicles()[0]
+
+	xSolutionPlanUnit := solution.SolutionPlanUnit(xPlanUnit)
+
+	move := v.BestMove(context.Background(), xSolutionPlanUnit)
+	if move == nil {
+		t.Fatal("move should not be nil")
+	}
+	if !move.IsExecutable() {
+		t.Fatal("move should be executable")
+	}
+	planned, err := move.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Fatal("move should be planned")
+	}
+
+	// i can not be interleaved anywhere in 'warehouse - a - b - c - d - e - warehouse'
+	// but can go first or last
+	iSolutionPlanUnit := solution.SolutionPlanUnit(iPlanUnit).(nextroute.SolutionPlanStopsUnit)
+
+	moveCount := 0
+
+	alloc := nextroute.NewPreAllocatedMoveContainer(iSolutionPlanUnit)
+	nextroute.SolutionMoveStopsGeneratorTest(
+		v,
+		iSolutionPlanUnit,
+		func(move nextroute.SolutionMoveStops) {
+			moveCount += 1
+			if moveCount > 2 {
+				t.Fatal("move count should not exceed 2")
+			}
+			if moveCount == 1 {
+				if move.StopPositions()[0].Previous() != v.First() {
+					t.Fatal("previous stop should be the first stop")
+				}
+			}
+			if moveCount == 2 {
+				if move.StopPositions()[0].Next() != v.Last() {
+					t.Fatal("next stop should be the last stop")
+				}
+			}
+		},
+		iSolutionPlanUnit.SolutionStops(),
+		alloc,
+		func() bool {
+			return false
+		},
+	)
+
+	// j can go anywhere in 'warehouse - a - b - c - d - e - warehouse'
+	jSolutionPlanUnit := solution.SolutionPlanUnit(jPlanUnit).(nextroute.SolutionPlanStopsUnit)
+
+	moveCount = 0
+
+	alloc = nextroute.NewPreAllocatedMoveContainer(jSolutionPlanUnit)
+	nextroute.SolutionMoveStopsGeneratorTest(
+		v,
+		jSolutionPlanUnit,
+		func(move nextroute.SolutionMoveStops) {
+			moveCount += 1
+			if moveCount > 6 {
+				t.Fatal("move count should not exceed 6")
+			}
+		},
+		jSolutionPlanUnit.SolutionStops(),
+		alloc,
+		func() bool {
+			return false
+		},
+	)
+	if moveCount != 6 {
+		t.Fatal("move count should be 6")
+	}
+
+	hPlanUnit := yPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[1]
+
+	hSolutionPlanUnit := solution.SolutionPlanUnit(hPlanUnit).(nextroute.SolutionPlanStopsUnit)
+
+	// h can go only at start and end of 'warehouse - a - b - c - d - e - warehouse'
+	// h is part of Y and Y can not be interleaved with X and a,b,c,d and e are
+	// part of X so h can only go at start and end
+	moveCount = 0
+
+	alloc = nextroute.NewPreAllocatedMoveContainer(hSolutionPlanUnit)
+	nextroute.SolutionMoveStopsGeneratorTest(
+		v,
+		hSolutionPlanUnit,
+		func(move nextroute.SolutionMoveStops) {
+			moveCount += 1
+		},
+		hSolutionPlanUnit.SolutionStops(),
+		alloc,
+		func() bool {
+			return false
+		},
+	)
+	if moveCount != 2 {
+		t.Fatal("move for h count should be 2, it is", moveCount)
+	}
+
+	fgPlanUnit := yPlanUnit.(nextroute.ModelPlanUnitsUnit).PlanUnits()[0]
+
+	fgSolutionPlanUnit := solution.SolutionPlanUnit(fgPlanUnit).(nextroute.SolutionPlanStopsUnit)
+
+	// fg can can not interleave a-..- e in in 'warehouse - a - b - c - d - e - warehouse'
+	// and fg can not be interleaved by any a-..-e, so 2 moves
+
+	moveCount = 0
+
+	alloc = nextroute.NewPreAllocatedMoveContainer(fgSolutionPlanUnit)
+	nextroute.SolutionMoveStopsGeneratorTest(
+		v,
+		fgSolutionPlanUnit,
+		func(move nextroute.SolutionMoveStops) {
+			moveCount += 1
+		},
+		fgSolutionPlanUnit.SolutionStops(),
+		alloc,
+		func() bool {
+			return false
+		},
+	)
+	if moveCount != 2 {
+		t.Fatal("move for fg count should be 2, it is", moveCount)
+	}
+
+	hFirstPosition, err := nextroute.NewStopPosition(v.First(), hSolutionPlanUnit.SolutionStops()[0], v.First().Next())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	moveH, err := nextroute.NewMoveStops(
+		hSolutionPlanUnit,
+		nextroute.StopPositions{
+			hFirstPosition,
+		},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	planned, err = moveH.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Fatal("move should be planned")
+	}
+	//fmt.Println(common.Map(v.SolutionStops(), func(stop nextroute.SolutionStop) string {
+	//	return stop.ModelStop().ID()
+	//}))
+
+	moveCount = 0
+
+	nextroute.SolutionMoveStopsGeneratorTest(
+		v,
+		fgSolutionPlanUnit,
+		func(move nextroute.SolutionMoveStops) {
+			moveCount += 1
+		},
+		fgSolutionPlanUnit.SolutionStops(),
+		alloc,
+		func() bool {
+			return false
+		},
+	)
+	if moveCount != 3 {
+		t.Fatal("move for fg count should be 3, it is", moveCount)
+	}
+
+	unplanned, err := hSolutionPlanUnit.UnPlan()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !unplanned {
+		t.Fatal("h should be unplanned")
+	}
+
+	hLastPosition, err := nextroute.NewStopPosition(v.Last().Previous(), hSolutionPlanUnit.SolutionStops()[0], v.Last())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	moveH, err = nextroute.NewMoveStops(
+		hSolutionPlanUnit,
+		nextroute.StopPositions{
+			hLastPosition,
+		},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	planned, err = moveH.Execute(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !planned {
+		t.Fatal("move should be planned")
+	}
+
+	moveCount = 0
+
+	nextroute.SolutionMoveStopsGeneratorTest(
+		v,
+		fgSolutionPlanUnit,
+		func(move nextroute.SolutionMoveStops) {
+			moveCount += 1
+		},
+		fgSolutionPlanUnit.SolutionStops(),
+		alloc,
+		func() bool {
+			return false
+		},
+	)
+	if moveCount != 4 {
+		t.Fatal("move for fg count should be 4, it is", moveCount)
+	}
+}

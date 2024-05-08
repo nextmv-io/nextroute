@@ -102,6 +102,11 @@ func numberOfStops(planUnit nextroute.ModelPlanUnit) int {
 		return len(planStopsUnit.Stops())
 	}
 	count := 0
+	if planUnitsUnit, isPlanUnitsUnit := planUnit.(nextroute.ModelPlanUnitsUnit); isPlanUnitsUnit {
+		for _, unit := range planUnitsUnit.PlanUnits() {
+			count += numberOfStops(unit)
+		}
+	}
 	if planUnitsUnit, isPlanUnitsUnit := planUnit.PlanUnitsUnit(); isPlanUnitsUnit {
 		for _, unit := range planUnitsUnit.PlanUnits() {
 			count += numberOfStops(unit)

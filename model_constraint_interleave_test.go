@@ -4,10 +4,10 @@ package nextroute_test
 
 import (
 	"context"
-	"github.com/nextmv-io/nextroute/common"
 	"testing"
 
 	"github.com/nextmv-io/nextroute"
+	"github.com/nextmv-io/nextroute/common"
 )
 
 func TestNewInterleaveConstraint(t *testing.T) {
@@ -556,7 +556,7 @@ func TestInterleaveConstraint2(t *testing.T) {
 
 	solution, err := nextroute.NewSolution(model)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	solutionVehicle := solution.Vehicles()[0]
