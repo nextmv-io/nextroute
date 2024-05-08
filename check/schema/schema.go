@@ -113,6 +113,7 @@ type PlanUnit struct {
 	Constraints map[string]int `json:"constraints,omitempty"`
 }
 
+// VehiclesWithMovesDetail shows details of the vehicles that have moves.
 type VehiclesWithMovesDetail struct {
 	// Vehicle is the ID of the vehicle.
 	VehicleID string `json:"vehicle_id"`
@@ -126,10 +127,12 @@ type VehiclesWithMovesDetail struct {
 	FailedConstraints []string `json:"failed_constraints,omitempty"`
 	// WasPlannable is true if the move was plannable, false otherwise.
 	WasPlannable bool `json:"was_plannable"`
-	// Positions defines where
+	// Positions defines where the stop should be inserted.
 	Positions []Position `json:"positions"`
 }
 
+// Position is the equivalent of a StopPosition. It expresses after which stop
+// and before which other stop a stop should be inserted.
 type Position struct {
 	// Previous is the ID of the stop after which the stop should be inserted.
 	Previous string `json:"previous"`
