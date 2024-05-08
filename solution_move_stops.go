@@ -201,6 +201,7 @@ func (m *solutionMoveStopsImpl) Execute(_ context.Context) (bool, error) {
 	}
 
 	if constraint != nil {
+		m.planUnit.solution().model.OnPlanFailed(m, constraint)
 		if _, isElementOfPlanUnitsUnit := m.planUnit.ModelPlanUnit().PlanUnitsUnit(); !isElementOfPlanUnitsUnit {
 			m.planUnit.solution().unPlannedPlanUnits.add(m.planUnit)
 			m.planUnit.solution().plannedPlanUnits.remove(m.planUnit)
@@ -222,7 +223,6 @@ func (m *solutionMoveStopsImpl) Execute(_ context.Context) (bool, error) {
 			)
 		}
 
-		m.planUnit.solution().model.OnPlanFailed(m, constraint)
 		return false, nil
 	}
 	m.planUnit.solution().model.OnPlanSucceeded(m)
