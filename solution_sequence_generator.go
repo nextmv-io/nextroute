@@ -5,7 +5,6 @@ package nextroute
 import (
 	"math/rand"
 	"slices"
-	"sync/atomic"
 )
 
 // SequenceGeneratorChannel generates all possible sequences of solution stops
@@ -29,53 +28,54 @@ func SequenceGeneratorChannel(
 	pu SolutionPlanUnit,
 	quit <-chan struct{},
 ) chan SolutionStops {
-	planUnit := pu.(*solutionPlanStopsUnitImpl)
-	solution := planUnit.solution()
-	maxSequences := int64(solution.Model().SequenceSampleSize())
-	solutionStops := planUnit.SolutionStops()
 	ch := make(chan SolutionStops)
 	go func() {
 		defer close(ch)
-		switch planUnit.ModelPlanStopsUnit().NumberOfStops() {
-		case 1:
-			ch <- solutionStops
-			return
-		default:
-			used := make([]bool, len(solutionStops))
-			inDegree := map[int]int{}
-			modelPlanUnit := planUnit.ModelPlanUnit().(*planMultipleStopsImpl)
-			dag := modelPlanUnit.dag.(*directedAcyclicGraphImpl)
-			for _, solutionStop := range solutionStops {
-				inDegree[solutionStop.ModelStop().Index()] = 0
+		sequenceGeneratorSync(pu, func(solutionStops SolutionStops) {
+			select {
+			case <-quit:
+				return
+			case ch <- slices.Clone(solutionStops):
 			}
-			for _, arc := range dag.arcs {
-				inDegree[arc.Destination().Index()]++
-			}
-
-			sequenceGenerator(
-				solutionStops,
-				make([]SolutionStop, 0, len(solutionStops)),
-				used,
-				inDegree,
-				dag,
-				solution.Random(),
-				&maxSequences,
-				func(solutionStops SolutionStops) {
-					select {
-					case <-quit:
-						return
-					case ch <- solutionStops:
-					}
-				},
-				-1,
-			)
-		}
+		})
 	}()
 
 	return ch
 }
 
-func sequenceGenerator(
+func sequenceGeneratorSync(pu SolutionPlanUnit, yield func(SolutionStops)) {
+	planUnit := pu.(*solutionPlanStopsUnitImpl)
+	solutionStops := planUnit.SolutionStops()
+	if planUnit.ModelPlanStopsUnit().NumberOfStops() == 1 {
+		yield(solutionStops)
+		return
+	}
+	solution := planUnit.solution()
+	maxSequences := int64(solution.Model().SequenceSampleSize())
+	nSolutionStops := len(solutionStops)
+	used := make([]bool, nSolutionStops)
+	inDegree := make(map[int]int, nSolutionStops)
+	modelPlanUnit := planUnit.ModelPlanUnit().(*planMultipleStopsImpl)
+	dag := modelPlanUnit.dag.(*directedAcyclicGraphImpl)
+	for _, arc := range dag.arcs {
+		inDegree[arc.Destination().Index()]++
+	}
+
+	recSequenceGenerator(
+		solutionStops,
+		make([]SolutionStop, 0, nSolutionStops),
+		used,
+		inDegree,
+		dag,
+		solution.Random(),
+		&maxSequences,
+		yield,
+		-1,
+	)
+	return
+}
+
+func recSequenceGenerator(
 	stops, sequence SolutionStops,
 	used []bool,
 	inDegree map[int]int,
@@ -85,14 +85,19 @@ func sequenceGenerator(
 	yield func(SolutionStops),
 	directSuccessor int,
 ) {
-	if len(sequence) == len(stops) {
-		if atomic.AddInt64(maxSequences, -1) >= 0 {
-			yield(slices.Clone(sequence))
+	nStops := len(stops)
+	if *maxSequences == 0 {
+		return
+	}
+	if len(sequence) == nStops {
+		*maxSequences--
+		if *maxSequences >= 0 {
+			yield(sequence)
 		}
 		return
 	}
 
-	stopOrder := random.Perm(len(stops))
+	stopOrder := random.Perm(nStops)
 
 	// we know the direct successor, so we move it to the front of the random
 	// sequence
@@ -128,7 +133,9 @@ func sequenceGenerator(
 					}
 				}
 			}
-			sequenceGenerator(stops, append(sequence, stop), used, inDegree, dag, random, maxSequences, yield, directSuccessor)
+			recSequenceGenerator(
+				stops, append(sequence, stop), used, inDegree, dag, random, maxSequences, yield, directSuccessor,
+			)
 			// reached the maximum number of sequences
 			if *maxSequences == 0 {
 				return

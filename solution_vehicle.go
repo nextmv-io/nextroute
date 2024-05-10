@@ -385,12 +385,10 @@ func (v solutionVehicleImpl) bestMovePlanMultipleStops(
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 ) SolutionMove {
 	var bestMove SolutionMove = newNotExecutableSolutionMoveStops(planUnit)
-	quitSequenceGenerator := make(chan struct{})
-	defer close(quitSequenceGenerator)
-	for sequence := range SequenceGeneratorChannel(planUnit, quitSequenceGenerator) {
+	sequenceGeneratorSync(planUnit, func(sequence SolutionStops) {
 		newMove := v.bestMoveSequence(ctx, planUnit, sequence, preAllocatedMoveContainer)
 		bestMove = takeBestInPlace(bestMove, newMove)
-	}
+	})
 	return bestMove
 }
 
