@@ -4,6 +4,7 @@ package factory
 
 import (
 	"fmt"
+
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/nextroute/schema"
 )
