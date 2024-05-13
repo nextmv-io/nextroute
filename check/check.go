@@ -87,8 +87,8 @@ func SolutionCheck(
 
 type checkImpl struct {
 	solution  nextroute.Solution
-	verbosity Verbosity
 	output    schema.Output
+	verbosity Verbosity
 }
 
 func (m *checkImpl) checkStartSolution() {
@@ -168,14 +168,17 @@ func (m *checkImpl) checkSolutionPlanUnits(
 		}
 	}
 
-	observer := newObserver()
+	planUnitsObserver := newObserver()
+	moveObserver := newObserver()
 
 	if int(m.verbosity) >= int(Medium) {
 		defer func() {
-			m.solution.Model().RemoveSolutionObserver(observer)
+			m.solution.Model().RemoveSolutionObserver(planUnitsObserver)
+			m.solution.Model().RemoveSolutionObserver(moveObserver)
 		}()
 
-		m.solution.Model().AddSolutionObserver(observer)
+		m.solution.Model().AddSolutionObserver(planUnitsObserver)
+		m.solution.Model().AddSolutionObserver(moveObserver)
 	}
 
 SolutionPlanUnitLoop:
@@ -185,7 +188,7 @@ SolutionPlanUnitLoop:
 			m.output.Remark = "timeout"
 			break SolutionPlanUnitLoop
 		default:
-			observer.Reset()
+			planUnitsObserver.Reset()
 
 			m.output.PlanUnits = append(
 				m.output.PlanUnits,
@@ -201,7 +204,7 @@ SolutionPlanUnitLoop:
 				m.output.PlanUnits[solutionPlanUnitIdx].VehiclesHaveMoves = &vehiclesHaveMoves
 			}
 			if int(m.verbosity) >= int(High) {
-				m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves = &[]string{}
+				m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves = []*schema.VehiclesWithMovesDetail{}
 			}
 
 			moveMinimumValue := math.MaxFloat64
@@ -209,8 +212,9 @@ SolutionPlanUnitLoop:
 			movesFailed := false
 		VehicleLoop:
 			for solutionVehicleIdx, solutionVehicle := range m.solution.Vehicles() {
-				move := solutionVehicle.BestMove(ctx, solutionPlanUnit)
-				if !move.IsExecutable() {
+				bestMove := solutionVehicle.BestMove(ctx, solutionPlanUnit)
+
+				if !bestMove.IsExecutable() {
 					continue
 				}
 
@@ -218,22 +222,56 @@ SolutionPlanUnitLoop:
 					*m.output.PlanUnits[solutionPlanUnitIdx].VehiclesHaveMoves++
 				}
 
+				value := bestMove.Value()
+				vehicleDetails := &schema.VehiclesWithMovesDetail{
+					VehicleID:              solutionVehicle.ModelVehicle().ID(),
+					DeltaObjectiveEstimate: &value,
+					FailedConstraints:      []string{},
+				}
+
+				if solutionMoveStops, ok := bestMove.(nextroute.SolutionMoveStops); ok {
+					stopPositions := solutionMoveStops.StopPositions()
+					vehicleDetails.Positions = make([]schema.Position, len(stopPositions))
+					for stopIdx, stopPosition := range stopPositions {
+						vehicleDetails.Positions[stopIdx] = schema.Position{
+							Stop:     stopPosition.Stop().ModelStop().ID(),
+							Previous: stopPosition.Previous().ModelStop().ID(),
+							Next:     stopPosition.Next().ModelStop().ID(),
+						}
+					}
+				}
+
 				if m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves != nil {
-					*m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves = append(
-						*m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves,
-						solutionVehicle.ModelVehicle().ID(),
+					m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves = append(
+						m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves,
+						vehicleDetails,
 					)
 				}
 
-				if move.IsImprovement() {
-					executed, err := move.Execute(ctx)
+				if bestMove.IsImprovement() {
+					actualScoreBeforeMove := m.solution.Score()
+					moveObserver.Reset()
+
+					planned, err := bestMove.Execute(ctx)
 					if err != nil {
 						return err
 					}
-					if executed {
-						moveIsImprovement = true
 
-						m.output.PlanUnits[solutionPlanUnitIdx].HasBestMove = true
+					for _, constraint := range moveObserver.OnPlanFailedConstraints() {
+						name := fmt.Sprintf("%v", constraint)
+						vehicleDetails.FailedConstraints = append(
+							vehicleDetails.FailedConstraints,
+							name,
+						)
+					}
+
+					if planned {
+						moveIsImprovement = true
+						vehicleDetails.WasPlannable = true
+						deltaObjective := m.solution.Score() - actualScoreBeforeMove
+						vehicleDetails.DeltaObjective = &deltaObjective
+
+						m.output.PlanUnits[solutionPlanUnitIdx].HasPlannableBestMove = true
 
 						if len(m.output.Vehicles) > solutionVehicleIdx {
 							*m.output.Vehicles[solutionVehicleIdx].PlanUnitsHaveMoves++
@@ -243,15 +281,15 @@ SolutionPlanUnitLoop:
 							return err
 						}
 
-						if int(m.verbosity) >= int(Medium) && move.Value() < moveMinimumValue {
-							moveMinimumValue = move.Value()
+						if int(m.verbosity) >= int(Medium) && bestMove.Value() < moveMinimumValue {
+							moveMinimumValue = bestMove.Value()
 							id := solutionVehicle.ModelVehicle().ID()
 							nextCheckObjective := schema.Objective{
 								Vehicle: &id,
-								Value:   move.Value(),
+								Value:   bestMove.Value(),
 								Terms:   make([]schema.ObjectiveTerm, len(m.solution.Model().Objective().Terms())),
 							}
-							if solutionMoveStops, ok := move.(nextroute.SolutionMoveStops); ok {
+							if solutionMoveStops, ok := bestMove.(nextroute.SolutionMoveStops); ok {
 								for termIdx, term := range m.solution.Model().Objective().Terms() {
 									base := term.Objective().EstimateDeltaValue(solutionMoveStops)
 									nextCheckObjective.Terms[termIdx] = schema.ObjectiveTerm{
@@ -265,7 +303,7 @@ SolutionPlanUnitLoop:
 								nextCheckObjective.Terms = make([]schema.ObjectiveTerm, 0)
 							}
 
-							nextCheckObjective.Value += move.Value()
+							nextCheckObjective.Value += bestMove.Value()
 							m.output.PlanUnits[solutionPlanUnitIdx].BestMoveObjective = &nextCheckObjective
 						}
 
@@ -273,26 +311,30 @@ SolutionPlanUnitLoop:
 							break VehicleLoop
 						}
 					} else {
-						movesFailed = true
+						// this hints at an inconsistency in the constraint
+						// estimation compared to the constraint validation (if
+						// available)
 						m.output.Summary.MovesFailed++
+						m.output.PlanUnits[solutionPlanUnitIdx].BestMoveFailed = true
+						if !movesFailed {
+							movesFailed = true
+							m.output.Summary.PlanUnitsBestMoveFailed++
+						}
 					}
 				}
 			}
 
-			if m.output.PlanUnits[solutionPlanUnitIdx].HasBestMove {
+			if m.output.PlanUnits[solutionPlanUnitIdx].HasPlannableBestMove {
 				m.output.Summary.PlanUnitsBestMoveFound++
 				if !moveIsImprovement {
-					m.output.PlanUnits[solutionPlanUnitIdx].BestMoveIncreasesObjective = true
-					m.output.Summary.PlanUnitsBestMoveIncreasesObjective++
+					m.output.PlanUnits[solutionPlanUnitIdx].PlanningMakesObjectiveWorse = true
+					m.output.Summary.NumberOfPlanUnitsMakingObjectiveWorse++
 				}
 			} else {
-				if movesFailed {
-					m.output.PlanUnits[solutionPlanUnitIdx].BestMoveFailed = true
-				}
 				m.output.Summary.PlanUnitsHaveNoMove++
 				constraints := make(map[string]int, len(m.solution.Model().Constraints()))
-				m.output.PlanUnits[solutionPlanUnitIdx].Constraints = &constraints
-				for _, constraint := range observer.Constraints() {
+				m.output.PlanUnits[solutionPlanUnitIdx].Constraints = constraints
+				for _, constraint := range planUnitsObserver.Constraints() {
 					name := fmt.Sprintf("%v", constraint)
 					if _, ok := constraints[name]; !ok {
 						constraints[name] = 0

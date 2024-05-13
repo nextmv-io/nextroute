@@ -9,8 +9,11 @@ import "github.com/nextmv-io/nextroute"
 type Observer interface {
 	nextroute.SolutionObserver
 
-	// Constraints returns the constraints that have been violated.
+	// Constraints returns the constraints that are estimated to be violated.
 	Constraints() nextroute.ModelConstraints
+
+	// OnPlanFailedConstraints returns the constraints that have failed on plan.
+	OnPlanFailedConstraints() nextroute.ModelConstraints
 
 	// Reset resets the constraints that have been violated.
 	Reset()
@@ -22,7 +25,8 @@ func newObserver() Observer {
 }
 
 type observerImpl struct {
-	constraints nextroute.ModelConstraints
+	estimateIsViolatedConstraints nextroute.ModelConstraints
+	onPlanFailedConstraints       nextroute.ModelConstraints
 }
 
 // OnStopConstraintChecked implements Observer.
@@ -40,11 +44,16 @@ func (*observerImpl) OnVehicleConstraintChecked(
 }
 
 func (o *observerImpl) Constraints() nextroute.ModelConstraints {
-	return o.constraints
+	return o.estimateIsViolatedConstraints
+}
+
+func (o *observerImpl) OnPlanFailedConstraints() nextroute.ModelConstraints {
+	return o.onPlanFailedConstraints
 }
 
 func (o *observerImpl) Reset() {
-	o.constraints = o.constraints[:0]
+	o.estimateIsViolatedConstraints = o.estimateIsViolatedConstraints[:0]
+	o.onPlanFailedConstraints = o.onPlanFailedConstraints[:0]
 }
 
 func (o *observerImpl) OnNewSolution(_ nextroute.Model) {
@@ -75,7 +84,7 @@ func (o *observerImpl) OnEstimatedIsViolated(
 	_ nextroute.StopPositionsHint,
 ) {
 	if violated {
-		o.constraints = append(o.constraints, constraint)
+		o.estimateIsViolatedConstraints = append(o.estimateIsViolatedConstraints, constraint)
 	}
 }
 
@@ -94,7 +103,8 @@ func (o *observerImpl) OnBestMoveFound(_ nextroute.SolutionMove) {
 func (o *observerImpl) OnPlan(_ nextroute.SolutionMove) {
 }
 
-func (o *observerImpl) OnPlanFailed(_ nextroute.SolutionMove, _ nextroute.ModelConstraint) {
+func (o *observerImpl) OnPlanFailed(_ nextroute.SolutionMove, constraint nextroute.ModelConstraint) {
+	o.onPlanFailedConstraints = append(o.onPlanFailedConstraints, constraint)
 }
 
 func (o *observerImpl) OnPlanSucceeded(_ nextroute.SolutionMove) {
