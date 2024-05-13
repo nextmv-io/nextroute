@@ -45,9 +45,9 @@ func SequenceGeneratorChannel(
 
 func sequenceGeneratorSync(pu SolutionPlanUnit, yield func(SolutionStops)) {
 	planUnit := pu.(*solutionPlanStopsUnitImpl)
-	solutionStops := planUnit.SolutionStops()
+	solutionStops := planUnit.solutionStops
 	if planUnit.ModelPlanStopsUnit().NumberOfStops() == 1 {
-		yield(solutionStops)
+		yield(planUnit.SolutionStops())
 		return
 	}
 	solution := planUnit.solution()
@@ -72,11 +72,11 @@ func sequenceGeneratorSync(pu SolutionPlanUnit, yield func(SolutionStops)) {
 		yield,
 		-1,
 	)
-	return
 }
 
 func recSequenceGenerator(
-	stops, sequence SolutionStops,
+	stops []solutionStopImpl,
+	sequence SolutionStops,
 	used []bool,
 	inDegree map[int]int,
 	dag DirectedAcyclicGraph,
@@ -104,7 +104,8 @@ func recSequenceGenerator(
 	if directSuccessor != -1 {
 		for _, stopIdx := range stopOrder {
 			if stops[stopIdx].Index() == directSuccessor {
-				stopOrder = []int{stopIdx}
+				stopOrder = stopOrder[:1]
+				stopOrder[0] = stopIdx
 				break
 			}
 		}
