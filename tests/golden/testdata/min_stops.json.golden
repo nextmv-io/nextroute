@@ -28,7 +28,8 @@
           "vehicle_start_time": false
         },
         "enable": {
-          "cluster": false
+          "cluster": false,
+          "interleave": false
         }
       },
       "objectives": {
@@ -75,10 +76,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty + 1 * min_stops",
         "objectives": [
           {
-            "base": 909.0466359667603,
+            "base": 909.04663596676,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 909.0466359667603
+            "value": 909.04663596676
           },
           {
             "factor": 1,
@@ -91,7 +92,7 @@
             "value": 0
           }
         ],
-        "value": 909.0466359667603
+        "value": 909.04663596676
       },
       "unplanned": [],
       "vehicles": [
@@ -214,7 +215,7 @@
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 909.0466359667603
+      "value": 909.04663596676
     },
     "run": {
       "duration": 0.123,

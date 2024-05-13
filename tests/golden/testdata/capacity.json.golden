@@ -28,7 +28,8 @@
           "vehicle_start_time": false
         },
         "enable": {
-          "cluster": false
+          "cluster": false,
+          "interleave": false
         }
       },
       "objectives": {

@@ -18,7 +18,8 @@
         "start_time_windows": false
       },
       "enable": {
-        "cluster": false
+        "cluster": false,
+        "interleave": false
       }
     },
     "objectives": {
