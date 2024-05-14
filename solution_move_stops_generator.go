@@ -138,20 +138,22 @@ func SolutionMoveStopsGenerator(
 func isNotAllowed(from, to solutionStopImpl) bool {
 	fromModelStop := from.modelStop()
 	toModelStop := to.modelStop()
-	model := fromModelStop.Model()
+	model := fromModelStop.model
 
-	return model.(*modelImpl).disallowedSuccessors[fromModelStop.Index()][toModelStop.Index()]
+	return model.disallowedSuccessors[fromModelStop.index][toModelStop.index]
 }
 
 func mustBeNeighbours(from, to solutionStopImpl) bool {
-	if !from.modelStop().HasPlanStopsUnit() {
+	fromModelStop := from.modelStop()
+	if !fromModelStop.HasPlanStopsUnit() {
 		return false
 	}
+	toModelStop := to.modelStop()
 
-	return from.modelStop().
-		PlanStopsUnit().
-		DirectedAcyclicGraph().
-		HasDirectArc(from.ModelStop(), to.ModelStop())
+	return fromModelStop.
+		planUnit.(*planMultipleStopsImpl).
+		dag.(*directedAcyclicGraphImpl).
+		hasDirectArc(fromModelStop.index, toModelStop.index)
 }
 
 func generate(
