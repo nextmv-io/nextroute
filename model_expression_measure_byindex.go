@@ -52,8 +52,8 @@ func (m *measureByIndexExpression) SetName(n string) {
 }
 
 func (m *measureByIndexExpression) Value(_ ModelVehicleType, from, to ModelStop) float64 {
-	if from == nil || to == nil || !from.Location().IsValid() || !to.Location().IsValid() {
-		return 0.0
-	}
-	return m.measure.Cost(from.(*stopImpl).measureIndex, to.(*stopImpl).measureIndex)
+	return m.measure.Cost(
+		from.(*stopImpl).measureIndex,
+		to.(*stopImpl).measureIndex,
+	)
 }
