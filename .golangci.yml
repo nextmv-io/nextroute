@@ -283,6 +283,10 @@ issues:
     - path: model\.go
       linters:
         - lll
+    # Deactivate gocyclo in model.go for lock func.
+    - path: model\.go
+      linters:
+        - gocyclo
     # Deactivate line length in factory/model.go because of go tags
     - path: factory/model\.go
       linters:
