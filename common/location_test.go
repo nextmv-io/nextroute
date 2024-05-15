@@ -41,6 +41,20 @@ func BenchmarkUnique(b *testing.B) {
 	}
 }
 
+func TestLocation(t *testing.T) {
+	l, err := common.NewLocation(0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !l.IsValid() {
+		t.Error("expected valid location")
+	}
+	invalid := common.NewInvalidLocation()
+	if invalid.IsValid() {
+		t.Error("expected invalid location")
+	}
+}
+
 func TestUnique(t *testing.T) {
 	newLocation := func(lon, lat float64) common.Location {
 		l, err := common.NewLocation(lon, lat)
