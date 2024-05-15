@@ -126,8 +126,7 @@ func SolutionMoveStopsGenerator(
 	locations := make([]int, 0, len(source))
 
 	model := vehicle.solution.model.(*modelImpl)
-	_ = model
-	if true {
+	if model.hasDisallowedSuccessors() || model.hasDirectSuccessors {
 		generate(positions, locations, source, target, func() {
 			m.(*solutionMoveStopsImpl).reset()
 			m.(*solutionMoveStopsImpl).planUnit = planUnit
