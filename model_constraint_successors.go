@@ -29,6 +29,13 @@ type successorConstraintImpl struct {
 
 func (l *successorConstraintImpl) Lock(model Model) error {
 	modelImpl := model.(*modelImpl)
+
+	// initialize disallowedSuccessors
+	modelImpl.disallowedSuccessors = make([][]bool, modelImpl.NumberOfStops())
+	for i := range modelImpl.disallowedSuccessors {
+		modelImpl.disallowedSuccessors[i] = make([]bool, modelImpl.NumberOfStops())
+	}
+
 	// copy the information from disallowedSuccessors to the model
 	for stop, successors := range l.disallowedSuccessors {
 		for _, successor := range successors {
