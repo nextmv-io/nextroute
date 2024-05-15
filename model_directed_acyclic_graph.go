@@ -144,8 +144,12 @@ func (d *directedAcyclicGraphImpl) AddArc(origin, destination ModelStop) error {
 }
 
 func (d *directedAcyclicGraphImpl) HasDirectArc(origin, destination ModelStop) bool {
-	if arc, ok := d.outboundDirectArcs[origin.Index()]; ok {
-		return arc.Destination().Index() == destination.Index()
+	return d.hasDirectArc(origin.Index(), destination.Index())
+}
+
+func (d *directedAcyclicGraphImpl) hasDirectArc(originIndex, destinationIndex int) bool {
+	if arc, ok := d.outboundDirectArcs[originIndex]; ok {
+		return arc.Destination().Index() == destinationIndex
 	}
 	return false
 }

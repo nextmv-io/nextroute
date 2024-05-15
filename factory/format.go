@@ -146,7 +146,9 @@ func toPlannedStopOutput(solutionStop nextroute.SolutionStop) schema.PlannedStop
 		}
 	}
 
-	if data, ok := solutionStop.Vehicle().ModelVehicle().VehicleType().Data().(vehicleTypeData); ok {
+	hasTravelDistance := solutionStop.Previous().ModelStop().Location().IsValid() &&
+		solutionStop.ModelStop().Location().IsValid()
+	if data, ok := solutionStop.Vehicle().ModelVehicle().VehicleType().Data().(vehicleTypeData); ok && hasTravelDistance {
 		distance := data.DistanceExpression.Value(
 			solutionStop.Vehicle().ModelVehicle().VehicleType(),
 			solutionStop.Previous().ModelStop(),
