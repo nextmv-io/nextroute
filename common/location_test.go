@@ -53,6 +53,13 @@ func TestLocation(t *testing.T) {
 	if invalid.IsValid() {
 		t.Error("expected invalid location")
 	}
+	l, err = common.NewLocation(180.1, 0)
+	if err == nil {
+		t.Error("expected error")
+	}
+	if l.IsValid() {
+		t.Error("expected invalid location")
+	}
 }
 
 func TestUnique(t *testing.T) {
