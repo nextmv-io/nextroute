@@ -103,8 +103,8 @@ func (l Location) Equals(other Location) bool {
 	return l.longitude == other.Longitude() && l.latitude == other.Latitude()
 }
 
-// IsValid returns true if the location is valid. A location is valid if the
-// longitude is between (-180, 180) and the latitude is between (-90, 90).
+// IsValid returns true if the location is valid. A location is valid if
+// the bounds of the longitude and latitude are correct.
 func (l Location) IsValid() bool {
 	return isValidLongitude(l.longitude) && isValidLatitude(l.latitude)
 }
