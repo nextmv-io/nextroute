@@ -125,6 +125,35 @@ func SolutionMoveStopsGenerator(
 
 	locations := make([]int, 0, len(source))
 
+	type key struct {
+		from, to int
+	}
+
+	// Initialize the caches
+	neighboursCache := map[key]bool{}
+	notAllowedCache := map[key]bool{}
+
+	// Create memoized versions of the functions
+	memoizedMustBeNeighbours := func(from, to solutionStopImpl) bool {
+		key := key{from: from.index, to: to.index}
+		if result, ok := neighboursCache[key]; ok {
+			return result
+		}
+		result := mustBeNeighbours(from, to)
+		neighboursCache[key] = result
+		return result
+	}
+
+	memoizedIsNotAllowed := func(from, to solutionStopImpl) bool {
+		key := key{from: from.index, to: to.index}
+		if result, ok := notAllowedCache[key]; ok {
+			return result
+		}
+		result := isNotAllowed(from, to)
+		notAllowedCache[key] = result
+		return result
+	}
+
 	generate(positions, locations, source, target, func() {
 		m.(*solutionMoveStopsImpl).reset()
 		m.(*solutionMoveStopsImpl).planUnit = planUnit
@@ -132,7 +161,7 @@ func SolutionMoveStopsGenerator(
 		m.(*solutionMoveStopsImpl).allowed = false
 		m.(*solutionMoveStopsImpl).valueSeen = 1
 		yield(m)
-	}, shouldStop)
+	}, shouldStop, memoizedMustBeNeighbours, memoizedIsNotAllowed)
 }
 
 func isNotAllowed(from, to solutionStopImpl) bool {
@@ -161,6 +190,8 @@ func generate(
 	target []solutionStopImpl,
 	yield func(),
 	shouldStop func() bool,
+	mustBeNeighbours func(from, to solutionStopImpl) bool,
+	isNotAllowed func(from, to solutionStopImpl) bool,
 ) {
 	if shouldStop() {
 		return
@@ -212,7 +243,7 @@ func generate(
 			continue
 		}
 
-		generate(stopPositions, combination, source, target, yield, shouldStop)
+		generate(stopPositions, combination, source, target, yield, shouldStop, mustBeNeighbours, isNotAllowed)
 
 		combination = combination[:len(combination)-1]
 	}
