@@ -3,6 +3,7 @@
 package nextroute
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/nextmv-io/nextroute/common"
@@ -137,6 +138,17 @@ func SolutionMoveStopsGenerator(
 		m.(*solutionMoveStopsImpl).stopPositions, combination, target, func() {
 			m.(*solutionMoveStopsImpl).allowed = false
 			m.(*solutionMoveStopsImpl).valueSeen = 1
+
+			ids := common.Map(m.StopPositions(), func(stopPosition StopPosition) string {
+				return stopPosition.Stop().ModelStop().ID()
+			},
+			)
+
+			fmt.Println("yielding move", m.Vehicle().ModelVehicle().ID(),
+				m.Previous().ModelStop().ID(),
+				ids,
+				m.Next().ModelStop().ID(),
+			)
 			yield(m)
 		},
 		shouldStop,
@@ -236,10 +248,12 @@ func generate(
 						}
 					}
 				}
-				for s := first.Next(); s != last; s = s.Next() {
-					excludePositions[s.Position()-1] = struct{}{}
+				if first != nil {
+					for s := first.Next(); s != last; s = s.Next() {
+						excludePositions[s.Position()-1] = struct{}{}
+					}
+					excludePositions[last.Position()-1] = struct{}{}
 				}
-				excludePositions[last.Position()-1] = struct{}{}
 			}
 		}
 
