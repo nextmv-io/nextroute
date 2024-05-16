@@ -31,7 +31,7 @@ func BenchmarkGolden(b *testing.B) {
 		}
 	}
 	solveOptions := nextroute.ParallelSolveOptions{
-		Iterations:           50,
+		Iterations:           200,
 		Duration:             10 * time.Second,
 		ParallelRuns:         1,
 		StartSolutions:       1,

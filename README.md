@@ -79,6 +79,25 @@ nextmv community clone -a nextroute
 For further information on how to get started, features, deployment, etc.,
 please refer to the [official documentation](https://www.nextmv.io/docs/vehicle-routing).
 
+## Local benchmarking
+
+To run the go benchmarks locally, you can use the following command:
+
+```bash
+go test -benchmem -timeout 20m -run=^$ -count 10 -bench "^Benchmark" ./...
+```
+
+In order to compare changes from a PR with the latest `develop` version, you can use `benchstat`.
+
+```bash
+# on the develop branch (or any other branch)
+go test -benchmem -timeout 20m -run=^$ -count 10 -bench "^Benchmark" ./... | tee develop.txt
+# on the new branch (or any other branch)
+go test -benchmem -timeout 20m -run=^$ -count 10 -bench "^Benchmark" ./... | tee new.txt
+# compare the two
+benchstat develop.txt new.txt
+```
+
 ## Versioning
 
 We try our best to version our software thoughtfully and only break APIs and
