@@ -87,13 +87,16 @@ To run the go benchmarks locally, you can use the following command:
 go test -benchmem -timeout 20m -run=^$ -count 10 -bench "^Benchmark" ./...
 ```
 
-In order to compare changes from a PR with the latest `develop` version, you can use `benchstat`.
+In order to compare changes from a PR with the latest `develop` version, you can
+use `benchstat`.
 
 ```bash
 # on the develop branch (or any other branch)
-go test -benchmem -timeout 20m -run=^$ -count 10 -bench "^Benchmark" ./... | tee develop.txt
+go test -benchmem -timeout 20m -run=^$ -count 10 -bench "^Benchmark" ./...\
+ | tee develop.txt
 # on the new branch (or any other branch)
-go test -benchmem -timeout 20m -run=^$ -count 10 -bench "^Benchmark" ./... | tee new.txt
+go test -benchmem -timeout 20m -run=^$ -count 10 -bench "^Benchmark" ./...\
+ | tee new.txt
 # compare the two
 benchstat develop.txt new.txt
 ```
