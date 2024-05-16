@@ -30,9 +30,8 @@ func BenchmarkGolden(b *testing.B) {
 			benchmarkFiles = append(benchmarkFiles, "testdata/"+file.Name())
 		}
 	}
-	ctx := context.Background()
 	solveOptions := nextroute.ParallelSolveOptions{
-		Iterations:           50,
+		Iterations:           200,
 		Duration:             10 * time.Second,
 		ParallelRuns:         1,
 		StartSolutions:       1,
@@ -48,17 +47,18 @@ func BenchmarkGolden(b *testing.B) {
 			if err := json.Unmarshal(data, &input); err != nil {
 				b.Fatal(err)
 			}
-			model, err := factory.NewModel(input, factory.Options{})
-			if err != nil {
-				b.Fatal(err)
-			}
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
+				model, err := factory.NewModel(input, factory.Options{})
+				if err != nil {
+					b.Fatal(err)
+				}
 				solver, err := nextroute.NewParallelSolver(model)
 				if err != nil {
 					b.Fatal(err)
 				}
+				ctx := context.Background()
 				ctx = context.WithValue(ctx, run.Start, time.Now())
 				b.StartTimer()
 				_, err = solver.Solve(ctx, solveOptions)
