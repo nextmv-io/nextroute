@@ -169,9 +169,17 @@ func NewSolution(
 		),
 	}
 
+	cumulativeStops := make([]float64, len(solution.cumulativeValues)*nrStops)
+	values := make([]float64, len(solution.values)*nrStops)
 	for _, expression := range model.expressions {
-		solution.values[expression.Index()] = make([]float64, nrStops)
-		solution.cumulativeValues[expression.Index()] = make([]float64, nrStops)
+		// solution.values[expression.Index()] = make([]float64, nrStops)
+		// solution.cumulativeValues[expression.Index()] = make([]float64, nrStops)
+		// the below code is equivalent to the above commented code, but allocates only
+		// once outside the loop
+		eIdx := expression.Index()
+		solution.values[eIdx], values = values[:nrStops], values[nrStops:]
+		solution.cumulativeValues[eIdx] = cumulativeStops[:nrStops]
+		cumulativeStops = cumulativeStops[nrStops:]
 	}
 
 	for _, constraint := range model.constraintsWithStopUpdater {
@@ -746,10 +754,24 @@ func (s *solutionImpl) Copy() Solution {
 	}
 
 	resetStopInterfaceCache(solution)
-
-	for _, expression := range model.expressions {
-		solution.cumulativeValues[expression.Index()] = slices.Clone(s.cumulativeValues[expression.Index()])
-		solution.values[expression.Index()] = slices.Clone(s.values[expression.Index()])
+	nrStops := len(s.stop)
+	cumulativeValues := make([]float64, len(s.cumulativeValues)*nrStops)
+	values := make([]float64, len(s.values)*nrStops)
+	for i := range s.values {
+		// solution.cumulativeValues[expression.Index()] = slices.Clone(s.cumulativeValues[expression.Index()])
+		// solution.values[expression.Index()] = slices.Clone(s.values[expression.Index()])
+		// the below code is equivalent to the above commented code but faster because it allocates
+		// the memory for the slices only once.
+		vs := values[:nrStops]
+		for idx, value := range s.values[i] {
+			vs[idx] = value
+		}
+		solution.values[i], values = vs, values[nrStops:]
+		cv := cumulativeValues[:nrStops]
+		for idx, value := range s.cumulativeValues[i] {
+			cv[idx] = value
+		}
+		solution.cumulativeValues[i], cumulativeValues = cv, cumulativeValues[nrStops:]
 	}
 
 	for _, constraint := range model.constraintsWithStopUpdater {
