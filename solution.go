@@ -117,12 +117,7 @@ func NewSolution(
 
 	random := rand.New(rand.NewSource(m.Random().Int63()))
 
-	maxExpressionIndex := -1
-	for _, expression := range model.expressions {
-		if expression.Index() > maxExpressionIndex {
-			maxExpressionIndex = expression.Index()
-		}
-	}
+	nExpressions := len(model.expressions)
 
 	solution := &solutionImpl{
 		model: m,
@@ -143,8 +138,8 @@ func NewSolution(
 		slack:                    make([]float64, 0, nrStops),
 		start:                    make([]float64, 0, nrStops),
 		end:                      make([]float64, 0, nrStops),
-		values:                   make([][]float64, maxExpressionIndex+1),
-		cumulativeValues:         make([][]float64, maxExpressionIndex+1),
+		values:                   make(map[int][]float64, nExpressions),
+		cumulativeValues:         make(map[int][]float64, nExpressions),
 		stopToPlanUnit:           make([]*solutionPlanStopsUnitImpl, nrStops),
 		constraintStopData:       make(map[ModelConstraint][]Copier),
 		objectiveStopData:        make(map[ModelObjective][]Copier),
@@ -579,12 +574,12 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 type solutionImpl struct {
 	model                  Model
 	scores                 map[ModelObjective]float64
-	values                 [][]float64
+	values                 map[int][]float64
 	objectiveStopData      map[ModelObjective][]Copier
 	constraintStopData     map[ModelConstraint][]Copier
 	objectiveSolutionData  map[ModelObjective]Copier
 	constraintSolutionData map[ModelConstraint]Copier
-	cumulativeValues       [][]float64
+	cumulativeValues       map[int][]float64
 
 	// TODO: explore if stopToPlanUnit should rather contain interfaces
 	stopToPlanUnit       []*solutionPlanStopsUnitImpl
@@ -707,7 +702,7 @@ func (s *solutionImpl) Copy() Solution {
 		cumulativeTravelDuration: slices.Clone(
 			s.cumulativeTravelDuration,
 		),
-		cumulativeValues: make([][]float64, len(s.cumulativeValues)),
+		cumulativeValues: make(map[int][]float64, len(s.cumulativeValues)),
 		stopToPlanUnit:   make([]*solutionPlanStopsUnitImpl, len(s.stopToPlanUnit)),
 		end:              slices.Clone(s.end),
 		first:            slices.Clone(s.first),
@@ -719,7 +714,7 @@ func (s *solutionImpl) Copy() Solution {
 		start:            slices.Clone(s.start),
 		stop:             slices.Clone(s.stop),
 		stopPosition:     slices.Clone(s.stopPosition),
-		values:           make([][]float64, len(s.values)),
+		values:           make(map[int][]float64, len(s.values)),
 		vehicleIndices:   slices.Clone(s.vehicleIndices),
 		random:           random,
 		fixedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
