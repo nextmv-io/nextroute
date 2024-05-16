@@ -68,21 +68,11 @@ type SolutionMoveStops interface {
 // planned). A stop position states that the stop should be moved from the
 // unplanned set to the planned set by positioning it directly before the
 // Next.
-type StopPosition interface {
-	// Previous denotes the upcoming stop's previous stop if the associated move
-	// involving the stop position is executed. It's worth noting that
-	// the previous stop may not have been planned yet.
-	Previous() SolutionStop
-
-	// Next denotes the upcoming stop's next stop if the associated move
-	// involving the stop position is executed. It's worth noting that
-	// the next stop may not have been planned yet.
-	Next() SolutionStop
-
-	// Stop returns the stop which is not yet part of the solution. This stop
-	// is not planned yet if the move where the invoking stop position belongs
-	// to, has not been executed yet.
-	Stop() SolutionStop
+type StopPosition struct {
+	solution          *solutionImpl
+	previousStopIndex int
+	stopIndex         int
+	nextStopIndex     int
 }
 
 // StopPositions is a slice of stop positions.
@@ -98,7 +88,7 @@ func newNotExecutableSolutionMoveStops(planUnit *solutionPlanStopsUnitImpl) *sol
 
 type solutionMoveStopsImpl struct {
 	planUnit      *solutionPlanStopsUnitImpl
-	stopPositions []stopPositionImpl
+	stopPositions []StopPosition
 	valueSeen     int
 	value         float64
 	allowed       bool
@@ -293,12 +283,6 @@ func (m *solutionMoveStopsImpl) StopPositionAt(index int) StopPosition {
 
 func (m *solutionMoveStopsImpl) StopPositionsLength() int {
 	return len(m.stopPositions)
-}
-
-func (m *solutionMoveStopsImpl) stopPositionsImpl() []stopPositionImpl {
-	stopPositions := make([]stopPositionImpl, len(m.stopPositions))
-	copy(stopPositions, m.stopPositions)
-	return stopPositions
 }
 
 func (m *solutionMoveStopsImpl) IsExecutable() bool {
@@ -511,14 +495,14 @@ func newMoveStops(
 		)
 	}
 
-	vehicle := stopPositions[0].(stopPositionImpl).previous().vehicle()
+	vehicle := stopPositions[0].previous().vehicle()
 
 	lastPlannedPreviousStop := stopPositions[0].Previous()
 
 	position := stopPositions[0].Previous().Position()
 
 	for index, sp := range stopPositions {
-		stopPosition := sp.(stopPositionImpl)
+		stopPosition := sp
 		if stopPosition.Stop().PlanStopsUnit() != planUnit {
 			return nil,
 				fmt.Errorf(
@@ -637,9 +621,9 @@ func newMoveStops(
 		}
 	}
 
-	stopPositionsImpl := make([]stopPositionImpl, len(stopPositions))
+	stopPositionsImpl := make([]StopPosition, len(stopPositions))
 	for i, stopPosition := range stopPositions {
-		stopPositionsImpl[i] = stopPosition.(stopPositionImpl)
+		stopPositionsImpl[i] = stopPosition
 	}
 	move := &solutionMoveStopsImpl{
 		planUnit:      planUnit.(*solutionPlanStopsUnitImpl),

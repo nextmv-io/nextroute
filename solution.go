@@ -1067,7 +1067,7 @@ func NewPreAllocatedMoveContainer(planUnit SolutionPlanUnit) *PreAllocatedMoveCo
 	switch planUnit.(type) {
 	case SolutionPlanStopsUnit:
 		m := newNotExecutableSolutionMoveStops(planUnit.(*solutionPlanStopsUnitImpl))
-		m.stopPositions = make([]stopPositionImpl, 1, 2)
+		m.stopPositions = make([]StopPosition, 1, 2)
 		allocations.singleStopPosSolutionMoveStop = m
 	case SolutionPlanUnitsUnit:
 	}
