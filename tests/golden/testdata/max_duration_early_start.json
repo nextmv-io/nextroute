@@ -1,0 +1,24 @@
+{
+  "defaults": {
+    "vehicles": {
+      "speed": 5,
+      "start_time": "2023-01-01T12:00:00Z"
+    },
+    "stops": {
+      "unplanned_penalty": 2000000000
+    }
+  },
+  "stops": [
+    {
+      "id": "Fushimi Inari Taisha",
+      "location": { "lon": 135.772695, "lat": 34.967146 },
+      "start_time_window": ["2023-01-01T18:00:00Z", "2023-01-01T18:05:00Z"]
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1",
+      "max_travel_duration": 3600
+    }
+  ]
+}

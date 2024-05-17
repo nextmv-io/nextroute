@@ -75,6 +75,10 @@ func appendConstraintModifiers(
 		modifiers = append(modifiers, addMaximumDurationConstraint)
 	}
 
+	if !options.Constraints.Disable.MaximumTravelDuration {
+		modifiers = append(modifiers, addMaximumTravelDurationConstraint)
+	}
+
 	if !options.Constraints.Disable.Precedence {
 		modifiers = append(modifiers, addPrecedenceInformation)
 	}

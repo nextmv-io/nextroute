@@ -127,8 +127,12 @@ type Vehicle struct {
 	MaxStops *int `json:"max_stops,omitempty"`
 	// Speed of the vehicle in meters per second.
 	Speed *float64 `json:"speed,omitempty" minimumExclusive:"0"`
-	// MaxDuration maximum duration in seconds that the vehicle can travel.
+	// MaxDuration maximum duration in seconds that the vehicle can travel after
+	// its start time.
 	MaxDuration *int `json:"max_duration,omitempty" minimum:"0"`
+	// MaxTravelDuration maximum duration in seconds that the vehicle can
+	// travel between first and last stop.
+	MaxTravelDuration *int `json:"max_travel_duration,omitempty" minimum:"0"`
 	// MaxWait maximum aggregated waiting time that the vehicle can wait across route stops.
 	MaxWait *int `json:"max_wait,omitempty" minimum:"0"`
 	// ActivationPenalty penalty of using the vehicle.
