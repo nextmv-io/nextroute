@@ -217,7 +217,7 @@ func (l *clusterImpl) estimateDeltaScore(
 ) (deltaScore float64, stopPositionsHint StopPositionsHint) {
 	solutionImpl := move.Solution().(*solutionImpl)
 	moveImpl := move.(*solutionMoveStopsImpl)
-	stopPositions := moveImpl.stopPositionsImpl()
+	stopPositions := moveImpl.stopPositions
 	deltaScore = 0.0
 
 	for _, stopPosition := range stopPositions {

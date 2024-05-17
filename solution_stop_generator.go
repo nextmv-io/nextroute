@@ -75,7 +75,7 @@ func newSolutionStopGenerator(
 
 type solutionStopGeneratorImpl struct {
 	nextStop                solutionStopImpl
-	stopPositions           []stopPositionImpl
+	stopPositions           []StopPosition
 	activeStopPositionIndex int
 	startAtFirst            bool
 	endAtLast               bool

@@ -117,7 +117,7 @@ func SolutionMoveStopsGenerator(
 	}
 
 	// TODO: we can reuse the stopPositions slice from m
-	positions := make([]stopPositionImpl, len(source))
+	positions := make([]StopPosition, len(source))
 	for idx := range source {
 		positions[idx].stopIndex = source[idx].index
 		positions[idx].solution = source[idx].solution
@@ -181,7 +181,7 @@ func mustBeNeighbours(model *modelImpl, from, to solutionStopImpl) bool {
 }
 
 func generate(
-	stopPositions []stopPositionImpl,
+	stopPositions []StopPosition,
 	combination []int,
 	source []solutionStopImpl,
 	target []solutionStopImpl,

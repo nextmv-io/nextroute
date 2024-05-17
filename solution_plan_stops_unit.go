@@ -184,7 +184,7 @@ func (p *solutionPlanStopsUnitImpl) StopPositions() StopPositions {
 var unplanSolutionMove = sync.Pool{
 	New: func() any {
 		return &solutionMoveStopsImpl{
-			stopPositions: make([]stopPositionImpl, 0, 64),
+			stopPositions: make([]StopPosition, 0, 64),
 		}
 	},
 }

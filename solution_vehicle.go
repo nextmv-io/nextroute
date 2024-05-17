@@ -246,7 +246,7 @@ func (v solutionVehicleImpl) bestMovePlanSingleStop(
 	// ensure that stopPositions is a length 1 slice
 	move.(*solutionMoveStopsImpl).stopPositions = append(
 		move.(*solutionMoveStopsImpl).stopPositions,
-		stopPositionImpl{},
+		StopPosition{},
 	)
 	stop := v.first()
 
@@ -658,7 +658,7 @@ func (v solutionVehicleImpl) Unplan() (bool, error) {
 	}
 	if constraint != nil {
 		for i := len(stopPositions) - 1; i >= 0; i-- {
-			stopPosition := stopPositions[i].(stopPositionImpl)
+			stopPosition := stopPositions[i]
 			beforeStop := stopPosition.next()
 			stopPosition.stop().attach(
 				beforeStop.PreviousIndex(),
