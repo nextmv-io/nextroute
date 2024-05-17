@@ -102,6 +102,7 @@ func NewSolution(
 	nrStops := 0
 	nrFixedPlanUnits := 0
 	nrPropositionPlanUnits := 0
+	nrVehicles := len(model.vehicles)
 
 	for _, planUnit := range model.PlanUnits() {
 		if planStopsUnit, ok := planUnit.(ModelPlanStopsUnit); ok {
@@ -127,11 +128,11 @@ func NewSolution(
 	solution := &solutionImpl{
 		model: m,
 
-		vehicleIndices:           make([]int, 0, len(model.vehicles)),
-		vehicles:                 make([]solutionVehicleImpl, 0, len(model.vehicles)),
-		solutionVehicles:         make([]SolutionVehicle, 0, len(model.vehicles)),
-		first:                    make([]int, 0, len(model.vehicles)),
-		last:                     make([]int, 0, len(model.vehicles)),
+		vehicleIndices:           make([]int, 0, nrVehicles),
+		vehicles:                 make([]solutionVehicleImpl, 0, nrVehicles),
+		solutionVehicles:         make([]SolutionVehicle, 0, nrVehicles),
+		first:                    make([]int, 0, nrVehicles),
+		last:                     make([]int, 0, nrVehicles),
 		stop:                     make([]int, 0, nrStops),
 		stopByIndexCache:         make([]SolutionStop, 0, nrStops),
 		inVehicle:                make([]int, 0, nrStops),
@@ -697,31 +698,50 @@ func (s *solutionImpl) Copy() Solution {
 	s.randomMutex.Lock()
 	random := rand.New(rand.NewSource(s.random.Int63()))
 	s.randomMutex.Unlock()
+
+	// in order to reduce the number of allocations, we allocate
+	// larger chunks of memory for the slices and then slice them
+	// to the correct size
+	nrStops := len(s.stop)
+	nrVehicles := len(s.vehicles)
+	ints := make([]int, 5*nrStops+3*nrVehicles)
+	first, ints := common.CopySliceFrom(ints, s.first)
+	vehicleIndices, ints := common.CopySliceFrom(ints, s.vehicleIndices)
+	last, ints := common.CopySliceFrom(ints, s.last)
+	inVehicle, ints := common.CopySliceFrom(ints, s.inVehicle)
+	previous, ints := common.CopySliceFrom(ints, s.previous)
+	next, ints := common.CopySliceFrom(ints, s.next)
+	stopPosition, ints := common.CopySliceFrom(ints, s.stopPosition)
+	stop, _ := common.CopySliceFrom(ints, s.stop)
+	floats := make([]float64, 5*nrStops)
+	start, floats := common.CopySliceFrom(floats, s.start)
+	end, floats := common.CopySliceFrom(floats, s.end)
+	arrival, floats := common.CopySliceFrom(floats, s.arrival)
+	slack, floats := common.CopySliceFrom(floats, s.slack)
+	cumulativeTravelDuration, _ := common.CopySliceFrom(floats, s.cumulativeTravelDuration)
 	solution := &solutionImpl{
-		arrival:                slices.Clone(s.arrival),
-		slack:                  slices.Clone(s.slack),
-		constraintStopData:     make(map[ModelConstraint][]Copier, len(s.constraintStopData)),
-		objectiveStopData:      make(map[ModelObjective][]Copier, len(s.objectiveStopData)),
-		constraintSolutionData: make(map[ModelConstraint]Copier, len(s.constraintSolutionData)),
-		objectiveSolutionData:  make(map[ModelObjective]Copier, len(s.objectiveSolutionData)),
-		cumulativeTravelDuration: slices.Clone(
-			s.cumulativeTravelDuration,
-		),
-		cumulativeValues: make([][]float64, len(s.cumulativeValues)),
-		stopToPlanUnit:   make([]*solutionPlanStopsUnitImpl, len(s.stopToPlanUnit)),
-		end:              slices.Clone(s.end),
-		first:            slices.Clone(s.first),
-		inVehicle:        slices.Clone(s.inVehicle),
-		last:             slices.Clone(s.last),
-		model:            model,
-		next:             slices.Clone(s.next),
-		previous:         slices.Clone(s.previous),
-		start:            slices.Clone(s.start),
-		stop:             slices.Clone(s.stop),
-		stopPosition:     slices.Clone(s.stopPosition),
-		values:           make([][]float64, len(s.values)),
-		vehicleIndices:   slices.Clone(s.vehicleIndices),
-		random:           random,
+		arrival:                  arrival,
+		slack:                    slack,
+		constraintStopData:       make(map[ModelConstraint][]Copier, len(s.constraintStopData)),
+		objectiveStopData:        make(map[ModelObjective][]Copier, len(s.objectiveStopData)),
+		constraintSolutionData:   make(map[ModelConstraint]Copier, len(s.constraintSolutionData)),
+		objectiveSolutionData:    make(map[ModelObjective]Copier, len(s.objectiveSolutionData)),
+		cumulativeTravelDuration: cumulativeTravelDuration,
+		cumulativeValues:         make([][]float64, len(s.cumulativeValues)),
+		stopToPlanUnit:           make([]*solutionPlanStopsUnitImpl, len(s.stopToPlanUnit)),
+		end:                      end,
+		first:                    first,
+		inVehicle:                inVehicle,
+		last:                     last,
+		model:                    model,
+		next:                     next,
+		previous:                 previous,
+		start:                    start,
+		stop:                     stop,
+		stopPosition:             stopPosition,
+		values:                   make([][]float64, len(s.values)),
+		vehicleIndices:           vehicleIndices,
+		random:                   random,
 		fixedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
 			random, s.fixedPlanUnits.Size(),
 		),

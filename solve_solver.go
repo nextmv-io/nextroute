@@ -281,14 +281,11 @@ func (s *solveImpl) Solve(
 		for iteration := 0; iteration < solveOptions.Iterations; iteration++ {
 			solveInformation.iteration = iteration
 			solveInformation.deltaScore = 0.0
-			solveInformation.solveOperators = make(
-				SolveOperators,
-				0,
-				len(s.solveOperators),
-			)
-
+			// we do not clear the elements of solveOperators as they are
+			// stable across iterations. We do not risk a memory leak here.
+			solveInformation.solveOperators = solveInformation.solveOperators[:0]
 			s.solveEvents.Iterating.Trigger(solveInformation)
-			for _, solveOperator := range s.SolveOperators() {
+			for _, solveOperator := range s.solveOperators {
 				select {
 				case <-ctx.Done():
 					s.solveEvents.ContextDone.Trigger(solveInformation)
