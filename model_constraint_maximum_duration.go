@@ -105,8 +105,11 @@ func (l *maximumDurationConstraintImpl) DoesVehicleHaveViolations(vehicle Soluti
 	if vehicle.IsEmpty() {
 		return false
 	}
-	return vehicle.First().Next().StartValue()-vehicle.Last().EndValue() >
-		l.maximum.Value(vehicle.ModelVehicle().VehicleType(), nil, nil)
+	// TODO: improve
+	endValue := vehicle.Last().EndValue() - vehicle.First().Next().StartValue()
+	max := l.maximum.Value(vehicle.ModelVehicle().VehicleType(), nil, nil)
+	return endValue > max
+
 }
 
 func (l *maximumDurationConstraintImpl) IsTemporal() bool {
