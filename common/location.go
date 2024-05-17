@@ -21,6 +21,7 @@ func NewLocation(longitude float64, latitude float64) (Location, error) {
 	return Location{
 		longitude: longitude,
 		latitude:  latitude,
+		valid:     true,
 	}, nil
 }
 
@@ -30,6 +31,7 @@ func NewInvalidLocation() Location {
 	return Location{
 		longitude: math.NaN(),
 		latitude:  math.NaN(),
+		valid:     false,
 	}
 }
 
@@ -77,6 +79,7 @@ func (l Locations) Centroid() (Location, error) {
 type Location struct {
 	longitude float64
 	latitude  float64
+	valid     bool
 }
 
 // String returns a string representation of the location.
@@ -106,7 +109,7 @@ func (l Location) Equals(other Location) bool {
 // IsValid returns true if the location is valid. A location is valid if
 // the bounds of the longitude and latitude are correct.
 func (l Location) IsValid() bool {
-	return isValidLongitude(l.longitude) && isValidLatitude(l.latitude)
+	return l.valid
 }
 
 func isValidLongitude(longitude float64) bool {
