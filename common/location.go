@@ -4,20 +4,21 @@ package common
 
 import (
 	"fmt"
+	"math"
 )
 
 // NewLocation creates a new Location. An error is returned if the longitude is
 // not between (-180, 180) or the latitude is not between (-90, 90).
 func NewLocation(longitude float64, latitude float64) (Location, error) {
-	if longitude < -180 || longitude > 180 {
+	if !isValidLongitude(longitude) {
 		return NewInvalidLocation(),
 			fmt.Errorf("longitude %f must be between -180 and 180", longitude)
 	}
-	if latitude < -90 || latitude > 90 {
+	if !isValidLatitude(latitude) {
 		return NewInvalidLocation(),
 			fmt.Errorf("latitude %f must be between -90 and 90", latitude)
 	}
-	return location{
+	return Location{
 		longitude: longitude,
 		latitude:  latitude,
 		valid:     true,
@@ -27,8 +28,10 @@ func NewLocation(longitude float64, latitude float64) (Location, error) {
 // NewInvalidLocation creates a new invalid Location. Longitude and latitude
 // are not important.
 func NewInvalidLocation() Location {
-	return location{
-		valid: false,
+	return Location{
+		longitude: math.NaN(),
+		latitude:  math.NaN(),
+		valid:     false,
 	}
 }
 
@@ -37,15 +40,15 @@ type Locations []Location
 
 // Unique returns a new slice of Locations with unique locations.
 func (l Locations) Unique() Locations {
-	unique := make(map[string]Location)
+	unique := make(map[Location]struct{}, len(l))
 	for _, location := range l {
-		// TODO: in Go 1.20 we don't need to use fmt.Sprintf here.
-		// This can simply become unique[location] = struct{}{}
-		unique[fmt.Sprintf("%v", location)] = location
+		unique[location] = struct{}{}
 	}
-	result := make(Locations, 0, len(unique))
-	for _, location := range unique {
-		result = append(result, location)
+	result := make(Locations, len(unique))
+	i := 0
+	for location := range unique {
+		result[i] = location
+		i++
 	}
 	return result
 }
@@ -58,44 +61,29 @@ func (l Locations) Centroid() (Location, error) {
 	}
 	lat := 0.0
 	lon := 0.0
-	for l, location := range l {
-		if !location.IsValid() {
-			return NewInvalidLocation(),
-				fmt.Errorf(
-					"location %d (%f, %f) is invalid",
-					l,
-					location.Longitude(),
-					location.Latitude(),
-				)
-		}
+	for _, location := range l {
+		// invalid locations are encoded as NaN, which will propagate
+		// so we can avoid a check here.
 		lat += location.Latitude()
 		lon += location.Longitude()
 	}
-	return NewLocation(lon/float64(len(l)), lat/float64(len(l)))
+	n := float64(len(l))
+	loc, err := NewLocation(lon/n, lat/n)
+	if err != nil {
+		return NewInvalidLocation(), err
+	}
+	return loc, nil
 }
 
-// Location represents a physical location on the earth.
-type Location interface {
-	// Longitude returns the longitude of the location.
-	Longitude() float64
-	// Latitude returns the latitude of the location.
-	Latitude() float64
-	// Equals returns true if the location is equal to the location given as an
-	// argument.
-	Equals(Location) bool
-	// IsValid returns true if the location is valid. A location is valid if
-	// the bounds of the longitude and latitude are correct.
-	IsValid() bool
-}
-
-// Implements Location.
-type location struct {
+// Location represents a location on earth.
+type Location struct {
 	longitude float64
 	latitude  float64
 	valid     bool
 }
 
-func (l location) String() string {
+// String returns a string representation of the location.
+func (l Location) String() string {
 	return fmt.Sprintf(
 		"{lat: %v,lon: %v}",
 		l.latitude,
@@ -103,18 +91,31 @@ func (l location) String() string {
 	)
 }
 
-func (l location) Longitude() float64 {
+// Longitude returns the longitude of the location.
+func (l Location) Longitude() float64 {
 	return l.longitude
 }
 
-func (l location) Latitude() float64 {
+// Latitude returns the latitude of the location.
+func (l Location) Latitude() float64 {
 	return l.latitude
 }
 
-func (l location) Equals(other Location) bool {
+// Equals returns true if the invoking location is equal to the other location.
+func (l Location) Equals(other Location) bool {
 	return l.longitude == other.Longitude() && l.latitude == other.Latitude()
 }
 
-func (l location) IsValid() bool {
+// IsValid returns true if the location is valid. A location is valid if
+// the bounds of the longitude and latitude are correct.
+func (l Location) IsValid() bool {
 	return l.valid
+}
+
+func isValidLongitude(longitude float64) bool {
+	return longitude >= -180 && longitude <= 180
+}
+
+func isValidLatitude(latitude float64) bool {
+	return latitude >= -90 && latitude <= 90
 }
