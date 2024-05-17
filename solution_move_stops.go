@@ -271,9 +271,7 @@ func (m solutionMoveStopsImpl) IncrementValueSeen(inc int) SolutionMove {
 
 func (m *solutionMoveStopsImpl) StopPositions() StopPositions {
 	stopPositions := make(StopPositions, len(m.stopPositions))
-	for i, stopPosition := range m.stopPositions {
-		stopPositions[i] = stopPosition
-	}
+	copy(stopPositions, m.stopPositions)
 	return stopPositions
 }
 
@@ -622,9 +620,7 @@ func newMoveStops(
 	}
 
 	stopPositionsImpl := make([]StopPosition, len(stopPositions))
-	for i, stopPosition := range stopPositions {
-		stopPositionsImpl[i] = stopPosition
-	}
+	copy(stopPositionsImpl, stopPositions)
 	move := &solutionMoveStopsImpl{
 		planUnit:      planUnit.(*solutionPlanStopsUnitImpl),
 		stopPositions: stopPositionsImpl,
