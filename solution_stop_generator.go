@@ -60,7 +60,7 @@ func newSolutionStopGenerator(
 ) *solutionStopGeneratorImpl {
 	nextStop := move.Vehicle().First()
 	if !startAtFirst {
-		nextStop = move.stopPositions[0].previous()
+		nextStop = move.stopPositions[0].Previous()
 	}
 	solutionStopGenerator := solutionGeneratorPool.Get().(*solutionStopGeneratorImpl)
 	solutionStopGenerator.stopPositions = solutionStopGenerator.stopPositions[:0]
@@ -102,9 +102,9 @@ func (s *solutionStopGeneratorImpl) next() (SolutionStop, bool) {
 	returnStop := s.nextStop
 
 	if s.startAtFirst {
-		if s.nextStop == s.stopPositions[s.activeStopPositionIndex].previous() {
+		if s.nextStop == s.stopPositions[s.activeStopPositionIndex].Previous() {
 			s.startAtFirst = false
-			s.nextStop = s.stopPositions[s.activeStopPositionIndex].stop()
+			s.nextStop = s.stopPositions[s.activeStopPositionIndex].Stop()
 		} else {
 			s.nextStop = s.nextStop.Next()
 		}
@@ -112,18 +112,18 @@ func (s *solutionStopGeneratorImpl) next() (SolutionStop, bool) {
 	}
 
 	if s.activeStopPositionIndex < len(s.stopPositions) {
-		if s.nextStop == s.stopPositions[s.activeStopPositionIndex].stop() {
-			s.nextStop = s.stopPositions[s.activeStopPositionIndex].next()
+		if s.nextStop == s.stopPositions[s.activeStopPositionIndex].Stop() {
+			s.nextStop = s.stopPositions[s.activeStopPositionIndex].Next()
 			s.activeStopPositionIndex++
 			return returnStop, true
 		}
-		if s.nextStop == s.stopPositions[s.activeStopPositionIndex].previous() {
-			s.nextStop = s.stopPositions[s.activeStopPositionIndex].stop()
+		if s.nextStop == s.stopPositions[s.activeStopPositionIndex].Previous() {
+			s.nextStop = s.stopPositions[s.activeStopPositionIndex].Stop()
 			s.activeStopPositionIndex++
 			return returnStop, true
 		}
 		if !s.nextStop.IsPlanned() {
-			s.nextStop = s.stopPositions[s.activeStopPositionIndex-1].next()
+			s.nextStop = s.stopPositions[s.activeStopPositionIndex-1].Next()
 		} else {
 			if s.nextStop.IsLast() {
 				s.endReached = true
@@ -136,7 +136,7 @@ func (s *solutionStopGeneratorImpl) next() (SolutionStop, bool) {
 	}
 
 	if !s.nextStop.IsPlanned() {
-		s.nextStop = s.stopPositions[s.activeStopPositionIndex-1].next()
+		s.nextStop = s.stopPositions[s.activeStopPositionIndex-1].Next()
 		return returnStop, true
 	}
 

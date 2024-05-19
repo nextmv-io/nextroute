@@ -67,12 +67,12 @@ func newStopPosition(
 
 func (v StopPosition) String() string {
 	return fmt.Sprintf("stopPosition{%s[%v]->%s[%v]->%s[%v]",
-		v.previous().ModelStop().ID(),
-		v.previous().Index(),
-		v.stop().ModelStop().ID(),
-		v.stop().Index(),
-		v.next().ModelStop().ID(),
-		v.next().Index(),
+		v.Previous().ModelStop().ID(),
+		v.Previous().Index(),
+		v.Stop().ModelStop().ID(),
+		v.Stop().Index(),
+		v.Next().ModelStop().ID(),
+		v.Next().Index(),
 	)
 }
 
@@ -80,38 +80,26 @@ func (v StopPosition) String() string {
 // involving the stop position is executed. It's worth noting that
 // the previous stop may not have been planned yet.
 func (v StopPosition) Previous() SolutionStop {
-	return v.previous()
-}
-
-// Next denotes the upcoming stop's next stop if the associated move
-// involving the stop position is executed. It's worth noting that
-// the next stop may not have been planned yet.
-func (v StopPosition) Next() SolutionStop {
-	return v.next()
-}
-
-// Stop returns the stop which is not yet part of the solution. This stop
-// is not planned yet if the move where the invoking stop position belongs
-// to, has not been executed yet.
-func (v StopPosition) Stop() SolutionStop {
-	return v.stop()
-}
-
-func (v StopPosition) previous() SolutionStop {
 	return SolutionStop{
 		index:    v.previousStopIndex,
 		solution: v.solution,
 	}
 }
 
-func (v StopPosition) next() SolutionStop {
+// Next denotes the upcoming stop's next stop if the associated move
+// involving the stop position is executed. It's worth noting that
+// the next stop may not have been planned yet.
+func (v StopPosition) Next() SolutionStop {
 	return SolutionStop{
 		index:    v.nextStopIndex,
 		solution: v.solution,
 	}
 }
 
-func (v StopPosition) stop() SolutionStop {
+// Stop returns the stop which is not yet part of the solution. This stop
+// is not planned yet if the move where the invoking stop position belongs
+// to, has not been executed yet.
+func (v StopPosition) Stop() SolutionStop {
 	return SolutionStop{
 		index:    v.stopIndex,
 		solution: v.solution,

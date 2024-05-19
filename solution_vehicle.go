@@ -604,8 +604,8 @@ func (v SolutionVehicle) Unplan() (bool, error) {
 	if constraint != nil {
 		for i := len(stopPositions) - 1; i >= 0; i-- {
 			stopPosition := stopPositions[i]
-			beforeStop := stopPosition.next()
-			stopPosition.stop().attach(
+			beforeStop := stopPosition.Next()
+			stopPosition.Stop().attach(
 				beforeStop.PreviousIndex(),
 			)
 		}

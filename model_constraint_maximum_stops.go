@@ -57,7 +57,7 @@ func (l *maximumStopsConstraintImpl) EstimateIsViolated(
 	stopPositions := moveImpl.stopPositions
 	nrStopsToBeAddedToSolution := len(stopPositions)
 
-	beforeStop := stopPositions[len(stopPositions)-1].next()
+	beforeStop := stopPositions[len(stopPositions)-1].Next()
 	vehicle := beforeStop.vehicle()
 
 	vehicleType := vehicle.ModelVehicle().VehicleType().Index()

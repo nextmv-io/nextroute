@@ -279,7 +279,7 @@ func (v SolutionStop) Vehicle() SolutionVehicle {
 	if v.solution.next[v.index] == v.solution.previous[v.index] {
 		panic("cannot get route of unplanned visit")
 	}
-	return v.solution.solutionVehicles[v.solution.inVehicle[v.index]]
+	return v.vehicle()
 }
 
 func (v SolutionStop) vehicle() SolutionVehicle {

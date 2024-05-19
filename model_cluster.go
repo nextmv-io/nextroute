@@ -226,7 +226,7 @@ func (l *clusterImpl) estimateDeltaScore(
 			return deltaScore, constNoPositionsHint
 		}
 
-		candidate := stopPosition.stop()
+		candidate := stopPosition.Stop()
 
 		var c *centroidData
 		if asConstraint {

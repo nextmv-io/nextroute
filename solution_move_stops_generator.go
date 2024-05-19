@@ -221,12 +221,12 @@ func generate(
 				stopPositions[positionIdx-1].nextStopIndex = stopPositions[positionIdx].stopIndex
 			} else {
 				stopPositions[positionIdx-1].nextStopIndex = target[combination[positionIdx-1]].index
-				if mustBeNeighbours(model, stopPositions[positionIdx-1].stop(), stopPositions[positionIdx].stop()) {
+				if mustBeNeighbours(model, stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx].Stop()) {
 					break
 				}
 			}
 
-			if isNotAllowed(model, stopPositions[positionIdx-1].stop(), stopPositions[positionIdx-1].next()) {
+			if isNotAllowed(model, stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx-1].Next()) {
 				combination = combination[:positionIdx]
 				if stopPositions[positionIdx-1].nextStopIndex != stopPositions[positionIdx].previousStopIndex {
 					break
@@ -235,7 +235,7 @@ func generate(
 			}
 		}
 
-		if isNotAllowed(model, stopPositions[positionIdx].previous(), stopPositions[positionIdx].stop()) {
+		if isNotAllowed(model, stopPositions[positionIdx].Previous(), stopPositions[positionIdx].Stop()) {
 			combination = combination[:positionIdx]
 			continue
 		}

@@ -510,7 +510,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 					)
 				}
 				for _, position := range move.(*solutionMoveStopsImpl).stopPositions {
-					position.stop().detach()
+					position.Stop().detach()
 				}
 				infeasiblePlanUnits[solutionPlanUnit] = true
 				continue
