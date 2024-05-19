@@ -101,11 +101,11 @@ func SolutionMoveStopsGenerator(
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 	shouldStop func() bool,
 ) {
-	source := common.Map(stops, func(stop SolutionStop) solutionStopImpl {
-		return stop.(solutionStopImpl)
+	source := common.Map(stops, func(stop SolutionStop) SolutionStop {
+		return stop
 	})
-	target := common.Map(vehicle.SolutionStops(), func(stop SolutionStop) solutionStopImpl {
-		return stop.(solutionStopImpl)
+	target := common.Map(vehicle.SolutionStops(), func(stop SolutionStop) SolutionStop {
+		return stop
 	})
 	m := preAllocatedMoveContainer.singleStopPosSolutionMoveStop
 	m.(*solutionMoveStopsImpl).reset()
@@ -157,14 +157,14 @@ func SolutionMoveStopsGenerator(
 	}
 }
 
-func isNotAllowed(model *modelImpl, from, to solutionStopImpl) bool {
+func isNotAllowed(model *modelImpl, from, to SolutionStop) bool {
 	if !model.hasDisallowedSuccessors() {
 		return false
 	}
 	return model.disallowedSuccessors[from.ModelStopIndex()][to.ModelStopIndex()]
 }
 
-func mustBeNeighbours(model *modelImpl, from, to solutionStopImpl) bool {
+func mustBeNeighbours(model *modelImpl, from, to SolutionStop) bool {
 	if !model.hasDirectSuccessors {
 		return false
 	}
@@ -183,8 +183,8 @@ func mustBeNeighbours(model *modelImpl, from, to solutionStopImpl) bool {
 func generate(
 	stopPositions []StopPosition,
 	combination []int,
-	source []solutionStopImpl,
-	target []solutionStopImpl,
+	source []SolutionStop,
+	target []SolutionStop,
 	yield func(),
 	shouldStop func() bool,
 ) {

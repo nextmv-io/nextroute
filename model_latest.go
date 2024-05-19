@@ -190,7 +190,7 @@ func (l *latestImpl) Value(s Solution) float64 {
 	solution := s.(*solutionImpl)
 	value := 0.0
 	for _, vehicle := range solution.vehicles {
-		solutionStop := vehicle.first().next()
+		solutionStop := vehicle.first().Next()
 		lastSolutionStop := vehicle.last()
 		for {
 			latenessFactor := l.latenessFactor.Value(
@@ -204,7 +204,7 @@ func (l *latestImpl) Value(s Solution) float64 {
 				break
 			}
 
-			solutionStop = solutionStop.next()
+			solutionStop = solutionStop.Next()
 		}
 	}
 
@@ -306,7 +306,7 @@ func (l *latestImpl) estimateDeltaScore(
 }
 
 func (l *latestImpl) DoesStopHaveViolations(s SolutionStop) bool {
-	stop := s.(solutionStopImpl)
+	stop := s
 	if !stop.
 		vehicle().
 		ModelVehicle().

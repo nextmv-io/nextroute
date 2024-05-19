@@ -261,9 +261,9 @@ func (v solutionVehicleImpl) bestMovePlanSingleStop(
 	rand := solution.random
 
 	for !stop.IsLast() {
-		stop = stop.next()
+		stop = stop.Next()
 		pos := newStopPosition(
-			stop.previous(),
+			stop.Previous(),
 			candidateStop,
 			stop,
 		)
@@ -550,15 +550,15 @@ func (v solutionVehicleImpl) Last() SolutionStop {
 	return v.last()
 }
 
-func (v solutionVehicleImpl) first() solutionStopImpl {
-	return solutionStopImpl{
+func (v solutionVehicleImpl) first() SolutionStop {
+	return SolutionStop{
 		index:    v.solution.first[v.index],
 		solution: v.solution,
 	}
 }
 
-func (v solutionVehicleImpl) last() solutionStopImpl {
-	return solutionStopImpl{
+func (v solutionVehicleImpl) last() SolutionStop {
+	return SolutionStop{
 		index:    v.solution.last[v.index],
 		solution: v.solution,
 	}
@@ -589,7 +589,7 @@ func (v solutionVehicleImpl) End() time.Time {
 }
 
 func (v solutionVehicleImpl) Next() SolutionStop {
-	return solutionStopImpl{
+	return SolutionStop{
 		index:    v.solution.model.NumberOfStops() + v.index*2 + 1,
 		solution: v.solution,
 	}
@@ -606,12 +606,12 @@ func (v solutionVehicleImpl) SolutionStops() SolutionStops {
 	return solutionStops
 }
 
-func (v solutionVehicleImpl) solutionStops() []solutionStopImpl {
-	solutionStops := make([]solutionStopImpl, 0, v.NumberOfStops()+2)
+func (v solutionVehicleImpl) solutionStops() []SolutionStop {
+	solutionStops := make([]SolutionStop, 0, v.NumberOfStops()+2)
 	solutionStop := v.first()
 	for !solutionStop.IsLast() {
 		solutionStops = append(solutionStops, solutionStop)
-		solutionStop = solutionStop.next()
+		solutionStop = solutionStop.Next()
 	}
 	solutionStops = append(solutionStops, solutionStop)
 	return solutionStops
@@ -623,7 +623,7 @@ func (v solutionVehicleImpl) ModelVehicle() ModelVehicle {
 
 func (v solutionVehicleImpl) Unplan() (bool, error) {
 	// TODO notify observers
-	solutionStops := common.Filter(v.solutionStops(), func(solutionStop solutionStopImpl) bool {
+	solutionStops := common.Filter(v.solutionStops(), func(solutionStop SolutionStop) bool {
 		return !solutionStop.IsFixed()
 	})
 	if len(solutionStops) == 0 {
@@ -632,18 +632,18 @@ func (v solutionVehicleImpl) Unplan() (bool, error) {
 
 	solution := solutionStops[0].solution
 
-	planUnits := common.Map(solutionStops, func(solutionStop solutionStopImpl) *solutionPlanStopsUnitImpl {
+	planUnits := common.Map(solutionStops, func(solutionStop SolutionStop) *solutionPlanStopsUnitImpl {
 		return solutionStop.planStopsUnit()
 	})
 	for _, planUnit := range planUnits {
 		solution.unPlannedPlanUnits.add(planUnit)
 		solution.plannedPlanUnits.remove(planUnit)
 	}
-	stopPositions := common.Map(solutionStops, func(solutionStop solutionStopImpl) StopPosition {
+	stopPositions := common.Map(solutionStops, func(solutionStop SolutionStop) StopPosition {
 		return newStopPosition(
-			solutionStop.previous(),
+			solutionStop.Previous(),
 			solutionStop,
-			solutionStop.next(),
+			solutionStop.Next(),
 		)
 	})
 

@@ -247,15 +247,15 @@ func (d *solveOperatorUnPlanImpl) unplanLocation(
 	for _, plannedPlanStopsUnit := range plannedPlanStopsUnits {
 		for _, solutionStop := range plannedPlanStopsUnit.(*solutionPlanStopsUnitImpl).solutionStops {
 			location := solutionStop.ModelStop().Location()
-			stop := solutionStop.next()
+			stop := solutionStop.Next()
 			for location.Equals(stop.ModelStop().Location()) && !stop.IsLast() {
 				unPlanUnits = append(unPlanUnits, stop.PlanStopsUnit())
-				stop = stop.next()
+				stop = stop.Next()
 			}
-			stop = solutionStop.previous()
+			stop = solutionStop.Previous()
 			for location.Equals(stop.ModelStop().Location()) && !stop.IsFirst() {
 				unPlanUnits = append(unPlanUnits, stop.PlanStopsUnit())
-				stop = stop.previous()
+				stop = stop.Previous()
 			}
 		}
 	}
