@@ -546,13 +546,6 @@ func (v SolutionVehicle) End() time.Time {
 	return v.Last().End()
 }
 
-func (v SolutionVehicle) Next() SolutionStop {
-	return SolutionStop{
-		index:    v.solution.model.NumberOfStops() + v.index*2 + 1,
-		solution: v.solution,
-	}
-}
-
 // SolutionStops returns the stops in the vehicle. The start and end
 // stops are included in the returned stops.
 func (v SolutionVehicle) SolutionStops() SolutionStops {
