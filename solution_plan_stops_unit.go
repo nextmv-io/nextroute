@@ -96,9 +96,7 @@ func (p *solutionPlanStopsUnitImpl) Stops() ModelStops {
 
 func (p *solutionPlanStopsUnitImpl) SolutionStops() SolutionStops {
 	solutionStops := make(SolutionStops, len(p.solutionStops))
-	for i, solutionStop := range p.solutionStops {
-		solutionStops[i] = solutionStop
-	}
+	copy(solutionStops, p.solutionStops)
 	return solutionStops
 }
 
