@@ -78,10 +78,10 @@ func (l *earlinessObjectiveImpl) TargetTime() StopTimeExpression {
 }
 
 func (l *earlinessObjectiveImpl) Earliness(stop SolutionStop) float64 {
-	return l.earliness(stop.(solutionStopImpl))
+	return l.earliness(stop)
 }
 
-func (l *earlinessObjectiveImpl) earliness(stop solutionStopImpl) float64 {
+func (l *earlinessObjectiveImpl) earliness(stop SolutionStop) float64 {
 	targetTime := l.targetTime.Value(nil, nil, stop.modelStop())
 	compare := 0.
 	switch l.temporalReference {

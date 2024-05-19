@@ -12,18 +12,9 @@ func NewStopPosition(
 	s SolutionStop,
 	n SolutionStop,
 ) (StopPosition, error) {
-	if p == nil {
-		return StopPosition{}, fmt.Errorf("previous stop is nil")
-	}
-	if s == nil {
-		return StopPosition{}, fmt.Errorf("stop is nil")
-	}
-	if n == nil {
-		return StopPosition{}, fmt.Errorf("next stop is nil")
-	}
-	previous := p.(solutionStopImpl)
-	stop := s.(solutionStopImpl)
-	next := n.(solutionStopImpl)
+	previous := p
+	stop := s
+	next := n
 	if previous.Solution() != stop.Solution() {
 		return StopPosition{}, fmt.Errorf(
 			"previous %v and stop %v are on different solutions",
@@ -62,9 +53,9 @@ func NewStopPosition(
 }
 
 func newStopPosition(
-	previous solutionStopImpl,
-	stop solutionStopImpl,
-	next solutionStopImpl,
+	previous SolutionStop,
+	stop SolutionStop,
+	next SolutionStop,
 ) StopPosition {
 	return StopPosition{
 		previousStopIndex: previous.index,
@@ -89,39 +80,39 @@ func (v StopPosition) String() string {
 // involving the stop position is executed. It's worth noting that
 // the previous stop may not have been planned yet.
 func (v StopPosition) Previous() SolutionStop {
-	return v.solution.stopByIndexCache[v.previousStopIndex]
+	return v.previous()
 }
 
 // Next denotes the upcoming stop's next stop if the associated move
 // involving the stop position is executed. It's worth noting that
 // the next stop may not have been planned yet.
 func (v StopPosition) Next() SolutionStop {
-	return v.solution.stopByIndexCache[v.nextStopIndex]
+	return v.next()
 }
 
 // Stop returns the stop which is not yet part of the solution. This stop
 // is not planned yet if the move where the invoking stop position belongs
 // to, has not been executed yet.
 func (v StopPosition) Stop() SolutionStop {
-	return v.solution.stopByIndexCache[v.stopIndex]
+	return v.stop()
 }
 
-func (v StopPosition) previous() solutionStopImpl {
-	return solutionStopImpl{
+func (v StopPosition) previous() SolutionStop {
+	return SolutionStop{
 		index:    v.previousStopIndex,
 		solution: v.solution,
 	}
 }
 
-func (v StopPosition) next() solutionStopImpl {
-	return solutionStopImpl{
+func (v StopPosition) next() SolutionStop {
+	return SolutionStop{
 		index:    v.nextStopIndex,
 		solution: v.solution,
 	}
 }
 
-func (v StopPosition) stop() solutionStopImpl {
-	return solutionStopImpl{
+func (v StopPosition) stop() SolutionStop {
+	return SolutionStop{
 		index:    v.stopIndex,
 		solution: v.solution,
 	}

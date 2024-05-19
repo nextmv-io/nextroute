@@ -143,12 +143,12 @@ func (m *solutionMoveStopsImpl) Next() SolutionStop {
 	if next, ok := m.next(); ok {
 		return next
 	}
-	return nil
+	return SolutionStop{}
 }
 
-func (m *solutionMoveStopsImpl) next() (solutionStopImpl, bool) {
+func (m *solutionMoveStopsImpl) next() (SolutionStop, bool) {
 	if len(m.stopPositions) == 0 {
-		return solutionStopImpl{}, false
+		return SolutionStop{}, false
 	}
 	return m.stopPositions[len(m.stopPositions)-1].next(), true
 }
@@ -156,14 +156,14 @@ func (m *solutionMoveStopsImpl) next() (solutionStopImpl, bool) {
 func (m *solutionMoveStopsImpl) Previous() SolutionStop {
 	previous, ok := m.previous()
 	if !ok {
-		return nil
+		return SolutionStop{}
 	}
 	return previous
 }
 
-func (m *solutionMoveStopsImpl) previous() (solutionStopImpl, bool) {
+func (m *solutionMoveStopsImpl) previous() (SolutionStop, bool) {
 	if len(m.stopPositions) == 0 {
-		return solutionStopImpl{}, false
+		return SolutionStop{}, false
 	}
 	return m.stopPositions[0].previous(), true
 }

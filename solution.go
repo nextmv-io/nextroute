@@ -134,7 +134,6 @@ func NewSolution(
 		first:                    make([]int, 0, nrVehicles),
 		last:                     make([]int, 0, nrVehicles),
 		stop:                     make([]int, 0, nrStops),
-		stopByIndexCache:         make([]SolutionStop, 0, nrStops),
 		inVehicle:                make([]int, 0, nrStops),
 		previous:                 make([]int, 0, nrStops),
 		next:                     make([]int, 0, nrStops),
@@ -192,7 +191,7 @@ func NewSolution(
 		solutionPlanUnit := &solutionPlanStopsUnitImpl{
 			modelPlanStopsUnit: planUnit,
 			solutionStops: make(
-				[]solutionStopImpl,
+				[]SolutionStop,
 				len(planUnit.Stops()),
 			),
 		}
@@ -310,8 +309,6 @@ func NewSolution(
 		}
 	}
 
-	resetStopInterfaceCache(solution)
-
 	if err := solution.addInitialSolution(m); err != nil {
 		return nil, err
 	}
@@ -385,7 +382,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 			common.Map(
 				initialModelStops,
 				func(modelStop ModelStop) SolutionPlanStopsUnit {
-					return s.solutionStop(modelStop).PlanStopsUnit()
+					return s.SolutionStop(modelStop).PlanStopsUnit()
 				}),
 			func(planUnit SolutionPlanStopsUnit) int {
 				return planUnit.ModelPlanStopsUnit().Index()
@@ -428,14 +425,14 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 						)
 					}
 				}
-				solutionStop := s.solutionStop(modelStop)
+				solutionStop := s.SolutionStop(modelStop)
 				if solutionStop.IsPlanned() {
 					previousStop = solutionStop
 				}
 				if modelStop.PlanStopsUnit().Index() == planUnit.ModelPlanStopsUnit().Index() {
 					for nextIdx := modelStopIdx + 1; nextIdx < len(initialModelStops); nextIdx++ {
 						nextModelStop := initialModelStops[nextIdx]
-						nextSolutionStop := s.solutionStop(nextModelStop)
+						nextSolutionStop := s.SolutionStop(nextModelStop)
 						if nextSolutionStop.IsPlanned() ||
 							nextModelStop.PlanStopsUnit().Index() == planUnit.ModelPlanStopsUnit().Index() {
 							stopPositions = append(
@@ -545,7 +542,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 			for _, solutionPlanUnit := range s.unwrapRootPlanUnit(s.stopToPlanUnit[index]).PlannedPlanStopsUnits() {
 				if solutionPlanUnit.IsPlanned() {
 					for _, solutionStop := range solutionPlanUnit.SolutionStops() {
-						solutionStop.(solutionStopImpl).detach()
+						solutionStop.detach()
 					}
 				}
 			}
@@ -597,18 +594,15 @@ type solutionImpl struct {
 	vehicleIndices       []int
 
 	// TODO: explore if vehicles should rather be interfaces, then we can avoid creating new vehicles on the fly
-	vehicles         []solutionVehicleImpl
-	solutionVehicles []SolutionVehicle
-	start            []float64
-	slack            []float64
-	arrival          []float64
-	next             []int
-	stopPosition     []int
-	first            []int
-	stop             []int
-	// solutionStopImpl holds solutionStopImpl indexed by stop index with
-	// a pointer to the current solution.
-	stopByIndexCache         []SolutionStop
+	vehicles                 []solutionVehicleImpl
+	solutionVehicles         []SolutionVehicle
+	start                    []float64
+	slack                    []float64
+	arrival                  []float64
+	next                     []int
+	stopPosition             []int
+	first                    []int
+	stop                     []int
 	cumulativeTravelDuration []float64
 	end                      []float64
 	previous                 []int
@@ -663,15 +657,7 @@ func (s *solutionImpl) SolutionStop(stop ModelStop) SolutionStop {
 	if stop != nil && stop.HasPlanStopsUnit() {
 		return s.SolutionPlanStopsUnit(stop.PlanStopsUnit()).SolutionStop(stop)
 	}
-	return nil
-}
-
-func (s *solutionImpl) solutionStop(stop ModelStop) solutionStopImpl {
-	if stop != nil && stop.HasPlanStopsUnit() {
-		return s.solutionPlanStopsUnit(stop.PlanStopsUnit()).solutionStop(stop)
-	}
-	// TODO: is this correct?
-	return solutionStopImpl{}
+	return SolutionStop{}
 }
 
 func (s *solutionImpl) SolutionVehicle(vehicle ModelVehicle) SolutionVehicle {
@@ -765,8 +751,6 @@ func (s *solutionImpl) Copy() Solution {
 		solution.solutionVehicles[idx] = solution.vehicles[idx]
 	}
 
-	resetStopInterfaceCache(solution)
-
 	for _, expression := range model.expressions {
 		solution.cumulativeValues[expression.Index()] = slices.Clone(s.cumulativeValues[expression.Index()])
 		solution.values[expression.Index()] = slices.Clone(s.values[expression.Index()])
@@ -833,22 +817,6 @@ func (s *solutionImpl) Copy() Solution {
 	return solution
 }
 
-// resetStopInterfaceCache resets the stopByIndexCache.
-// The cache is holds a list of interface values for each stop index
-// to avoid allocations.
-func resetStopInterfaceCache(solution *solutionImpl) {
-	solution.stopByIndexCache = make(
-		[]SolutionStop,
-		len(solution.stop),
-	)
-	for idx := range solution.stop {
-		solution.stopByIndexCache[idx] = solutionStopImpl{
-			index:    idx,
-			solution: solution,
-		}
-	}
-}
-
 func (s *solutionImpl) SetRandom(random *rand.Rand) error {
 	if random == nil {
 		return fmt.Errorf("random is nil")
@@ -889,7 +857,6 @@ func (s *solutionImpl) newVehicle(
 		modelVehicle.First().Index(),
 		modelVehicle.Last().Index(),
 	)
-	resetStopInterfaceCache(s)
 	s.vehicleIndices = append(s.vehicleIndices, modelVehicle.Index())
 	s.vehicles = append(s.vehicles, solutionVehicleImpl{
 		index:    modelVehicle.Index(),
@@ -1209,7 +1176,10 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 	vehicle := s.model.Vehicle(s.vehicleIndices[s.inVehicle[index]]).(*modelVehicleImpl)
 	vehicleType := vehicle.VehicleType()
 
-	solutionStop := s.stopByIndexCache[index]
+	solutionStop := SolutionStop{
+		solution: s,
+		index:    index,
+	}
 
 	for _, constraint := range model.constraintsWithStopUpdater {
 		value, err := constraint.(ConstraintStopDataUpdater).
@@ -1260,7 +1230,11 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 
 		s.stopPosition[next] = s.stopPosition[index] + 1
 
-		solutionStop = s.stopByIndexCache[next]
+		solutionStop = SolutionStop{
+			solution: s,
+			index:    next,
+		}
+
 		for _, constraint := range model.constraintsWithStopUpdater {
 			value, err := constraint.(ConstraintStopDataUpdater).
 				UpdateConstraintStopData(

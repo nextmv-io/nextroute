@@ -44,7 +44,7 @@ func NewSolutionStopGenerator(
 		stopPositions:           slices.Clone(move.(*solutionMoveStopsImpl).stopPositions),
 		startAtFirst:            startAtFirst,
 		endAtLast:               endAtLast,
-		nextStop:                nextStop.(solutionStopImpl),
+		nextStop:                nextStop,
 		activeStopPositionIndex: 0,
 	}
 }
@@ -74,7 +74,7 @@ func newSolutionStopGenerator(
 }
 
 type solutionStopGeneratorImpl struct {
-	nextStop                solutionStopImpl
+	nextStop                SolutionStop
 	stopPositions           []StopPosition
 	activeStopPositionIndex int
 	startAtFirst            bool
@@ -85,7 +85,7 @@ type solutionStopGeneratorImpl struct {
 func (s *solutionStopGeneratorImpl) Next() SolutionStop {
 	next, ok := s.next()
 	if !ok {
-		return nil
+		return SolutionStop{}
 	}
 	return next
 }
@@ -94,9 +94,9 @@ func (s *solutionStopGeneratorImpl) release() {
 	solutionGeneratorPool.Put(s)
 }
 
-func (s *solutionStopGeneratorImpl) next() (solutionStopImpl, bool) {
+func (s *solutionStopGeneratorImpl) next() (SolutionStop, bool) {
 	if s.endReached {
-		return solutionStopImpl{}, false
+		return SolutionStop{}, false
 	}
 
 	returnStop := s.nextStop
@@ -106,7 +106,7 @@ func (s *solutionStopGeneratorImpl) next() (solutionStopImpl, bool) {
 			s.startAtFirst = false
 			s.nextStop = s.stopPositions[s.activeStopPositionIndex].stop()
 		} else {
-			s.nextStop = s.nextStop.next()
+			s.nextStop = s.nextStop.Next()
 		}
 		return returnStop, true
 	}
@@ -128,7 +128,7 @@ func (s *solutionStopGeneratorImpl) next() (solutionStopImpl, bool) {
 			if s.nextStop.IsLast() {
 				s.endReached = true
 			} else {
-				s.nextStop = s.nextStop.next()
+				s.nextStop = s.nextStop.Next()
 			}
 		}
 
@@ -145,7 +145,7 @@ func (s *solutionStopGeneratorImpl) next() (solutionStopImpl, bool) {
 			s.endReached = true
 			s.endAtLast = false
 		} else {
-			s.nextStop = s.nextStop.next()
+			s.nextStop = s.nextStop.Next()
 		}
 		return returnStop, true
 	}

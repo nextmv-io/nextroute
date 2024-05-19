@@ -53,10 +53,10 @@ func copySolutionPlanStopsUnit(
 	solutionPlanUnitImpl := solutionPlanUnit.(*solutionPlanStopsUnitImpl)
 	copyOfSolutionPlanUnit := &solutionPlanStopsUnitImpl{
 		modelPlanStopsUnit: solutionPlanUnitImpl.modelPlanStopsUnit,
-		solutionStops:      make([]solutionStopImpl, len(solutionPlanUnitImpl.solutionStops)),
+		solutionStops:      make([]SolutionStop, len(solutionPlanUnitImpl.solutionStops)),
 	}
 	for idx, solutionStop := range solutionPlanUnitImpl.solutionStops {
-		copyOfSolutionPlanUnit.solutionStops[idx] = solutionStopImpl{
+		copyOfSolutionPlanUnit.solutionStops[idx] = SolutionStop{
 			index:    solutionStop.Index(),
 			solution: solution,
 		}

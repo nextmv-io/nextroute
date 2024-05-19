@@ -225,7 +225,7 @@ func (l *noMixConstraintImpl) Value(solutionStop SolutionStop) MixItem {
 func (l *noMixConstraintImpl) UpdateConstraintStopData(
 	solutionStop SolutionStop,
 ) (Copier, error) {
-	solutionStopImp := solutionStop.(solutionStopImpl)
+	solutionStopImp := solutionStop
 
 	if solutionStopImp.IsFirst() {
 		return &noMixSolutionStopData{
@@ -238,7 +238,7 @@ func (l *noMixConstraintImpl) UpdateConstraintStopData(
 		}, nil
 	}
 
-	previousNoMixData := solutionStopImp.previous().ConstraintData(l).(*noMixSolutionStopData)
+	previousNoMixData := solutionStopImp.Previous().ConstraintData(l).(*noMixSolutionStopData)
 
 	insertMixIngredient, hasInsertMixIngredient := l.insert[solutionStop.ModelStop()]
 	if hasInsertMixIngredient {

@@ -86,10 +86,10 @@ func (t *vehiclesDurationObjectiveImpl) EstimateDeltaValue(
 		return end - vehicle.last().EndValue()
 	}
 
-	for solutionStop := nextmove.next(); !solutionStop.IsLast(); solutionStop = solutionStop.next() {
+	for solutionStop := nextmove.Next(); !solutionStop.IsLast(); solutionStop = solutionStop.Next() {
 		_, _, _, end = vehicleType.TemporalValues(
 			end,
-			solutionStop.previous().ModelStop(),
+			solutionStop.Previous().ModelStop(),
 			solutionStop.ModelStop(),
 		)
 		tempEnd := solutionStop.EndValue()
@@ -102,7 +102,7 @@ func (t *vehiclesDurationObjectiveImpl) EstimateDeltaValue(
 	last := vehicle.last()
 	_, _, _, end = vehicleType.TemporalValues(
 		end,
-		last.previous().ModelStop(),
+		last.Previous().ModelStop(),
 		last.ModelStop(),
 	)
 

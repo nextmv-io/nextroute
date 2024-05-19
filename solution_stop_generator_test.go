@@ -356,7 +356,7 @@ func BenchmarkSolutionStopGenerator(b *testing.B) {
 	sum := 0
 	for i := 0; i < b.N; i++ {
 		generator := nextroute.NewSolutionStopGenerator(move, true, true)
-		for solutionStop := generator.Next(); solutionStop != nil; solutionStop = generator.Next() {
+		for solutionStop := generator.Next(); !solutionStop.IsZero(); solutionStop = generator.Next() {
 			sum++
 		}
 	}
@@ -799,7 +799,7 @@ func testMove(
 
 	generator := nextroute.NewSolutionStopGenerator(move, startAtFirst, endAtLast)
 
-	for stop := generator.Next(); stop != nil; stop = generator.Next() {
+	for stop := generator.Next(); !stop.IsZero(); stop = generator.Next() {
 		if count == len(expected) {
 			t.Fatalf("too many stops, did not expect %v", stop)
 		}

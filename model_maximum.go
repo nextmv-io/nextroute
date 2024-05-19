@@ -161,7 +161,7 @@ func (l *maximumImpl) Maximum() VehicleTypeExpression {
 }
 
 func (l *maximumImpl) DoesStopHaveViolations(s SolutionStop) bool {
-	stop := s.(solutionStopImpl)
+	stop := s
 	// We check if the cumulative value is below zero or above the maximum.
 	// If there are stops with negative values, the cumulative value can be
 	// below zero. Un-planning can result in a cumulative value below zero
@@ -248,7 +248,7 @@ func (l *maximumImpl) EstimateIsViolated(
 	stop, _ := moveImpl.next()
 
 	if stop.CumulativeValue(expression) != level {
-		stop = stop.next()
+		stop = stop.Next()
 
 		for !stop.IsLast() {
 			level += stop.Value(expression)
@@ -258,7 +258,7 @@ func (l *maximumImpl) EstimateIsViolated(
 				return true, constNoPositionsHint
 			}
 
-			stop = stop.next()
+			stop = stop.Next()
 		}
 	}
 

@@ -104,17 +104,17 @@ func (l *clusterImpl) EstimationCost() Cost {
 func (l *clusterImpl) UpdateObjectiveStopData(
 	solutionStop SolutionStop,
 ) (Copier, error) {
-	return l.updateData(solutionStop.(solutionStopImpl), true)
+	return l.updateData(solutionStop, true)
 }
 
 func (l *clusterImpl) UpdateConstraintStopData(
 	solutionStop SolutionStop,
 ) (Copier, error) {
-	return l.updateData(solutionStop.(solutionStopImpl), false)
+	return l.updateData(solutionStop, false)
 }
 
 func (l *clusterImpl) updateData(
-	solutionStop solutionStopImpl,
+	solutionStop SolutionStop,
 	asObjective bool,
 ) (Copier, error) {
 	if solutionStop.IsFirst() {
@@ -129,21 +129,21 @@ func (l *clusterImpl) updateData(
 
 	if solutionStop.IsLast() {
 		if asObjective {
-			centroid := solutionStop.previous().ObjectiveData(l).(*centroidData)
+			centroid := solutionStop.Previous().ObjectiveData(l).(*centroidData)
 			stops := l.getSolutionStops(solutionStop.vehicle())
-			compact := compactness(stops, centroid.location, solutionStopImpl{}, false)
+			compact := compactness(stops, centroid.location, SolutionStop{}, false)
 			centroid.compactness = compact
 			return centroid, nil
 		}
-		return solutionStop.previous().ConstraintData(l).(*centroidData), nil
+		return solutionStop.Previous().ConstraintData(l).(*centroidData), nil
 	}
 	nrStops := solutionStop.Position()
 
 	var centroid *centroidData
 	if asObjective {
-		centroid = solutionStop.previous().ObjectiveData(l).(*centroidData)
+		centroid = solutionStop.Previous().ObjectiveData(l).(*centroidData)
 	} else {
-		centroid = solutionStop.previous().ConstraintData(l).(*centroidData)
+		centroid = solutionStop.Previous().ConstraintData(l).(*centroidData)
 	}
 
 	location, err := common.NewLocation(
@@ -164,9 +164,9 @@ func (l *clusterImpl) updateData(
 }
 
 func compactness(
-	stops []solutionStopImpl,
+	stops []SolutionStop,
 	centroid common.Location,
-	newStop solutionStopImpl,
+	newStop SolutionStop,
 	newStopIsSet bool,
 ) float64 {
 	if newStopIsSet {
@@ -270,8 +270,8 @@ func (l *clusterImpl) estimateDeltaScore(
 	return deltaScore, constNoPositionsHint
 }
 
-func (l *clusterImpl) getSolutionStops(vehicle SolutionVehicle) []solutionStopImpl {
-	stops := make([]solutionStopImpl, 0, vehicle.NumberOfStops())
+func (l *clusterImpl) getSolutionStops(vehicle SolutionVehicle) []SolutionStop {
+	stops := make([]SolutionStop, 0, vehicle.NumberOfStops())
 	for _, stop := range vehicle.SolutionStops() {
 		if stop.IsFirst() && !l.includeFirst {
 			continue
@@ -279,7 +279,7 @@ func (l *clusterImpl) getSolutionStops(vehicle SolutionVehicle) []solutionStopIm
 		if stop.IsLast() && !l.includeLast {
 			continue
 		}
-		stops = append(stops, stop.(solutionStopImpl))
+		stops = append(stops, stop)
 	}
 	return stops
 }
