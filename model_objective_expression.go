@@ -52,7 +52,7 @@ func (e *expressionObjectiveImpl) EstimateDeltaValue(
 	value := 0.0
 
 	first := true
-	var previousSolutionStop solutionStopImpl
+	var previousSolutionStop SolutionStop
 
 	generator := newSolutionStopGenerator(*moveImpl, false, false)
 	defer generator.release()

@@ -28,7 +28,7 @@ func (t *travelDurationObjectiveImpl) Value(solution Solution) float64 {
 
 	score := 0.0
 	for _, vehicle := range solutionImp.vehicles {
-		score += vehicle.last().CumulativeTravelDurationValue()
+		score += vehicle.Last().CumulativeTravelDurationValue()
 	}
 	return score
 }

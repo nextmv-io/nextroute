@@ -21,7 +21,7 @@ import (
 //		) {
 //	 }
 func SolutionMoveStopsGeneratorChannel(
-	vehicle solutionVehicleImpl,
+	vehicle SolutionVehicle,
 	planUnit *solutionPlanStopsUnitImpl,
 	quit <-chan struct{},
 	stops SolutionStops,
@@ -64,7 +64,7 @@ func SolutionMoveStopsGeneratorChannelTest(
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 ) chan SolutionMoveStops {
 	return SolutionMoveStopsGeneratorChannel(
-		vehicle.(solutionVehicleImpl),
+		vehicle,
 		planUnit.(*solutionPlanStopsUnitImpl),
 		quit,
 		stops,
@@ -82,7 +82,7 @@ func SolutionMoveStopsGeneratorTest(
 	shouldStop func() bool,
 ) {
 	SolutionMoveStopsGenerator(
-		vehicle.(solutionVehicleImpl),
+		vehicle,
 		planUnit.(*solutionPlanStopsUnitImpl),
 		yield,
 		stops,
@@ -94,18 +94,18 @@ func SolutionMoveStopsGeneratorTest(
 // SolutionMoveStopsGenerator generates all possible moves for a given vehicle and
 // plan unit. The function yield is called for each solutionMoveStopsImpl.
 func SolutionMoveStopsGenerator(
-	vehicle solutionVehicleImpl,
+	vehicle SolutionVehicle,
 	planUnit *solutionPlanStopsUnitImpl,
 	yield func(move SolutionMoveStops),
 	stops SolutionStops,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 	shouldStop func() bool,
 ) {
-	source := common.Map(stops, func(stop SolutionStop) solutionStopImpl {
-		return stop.(solutionStopImpl)
+	source := common.Map(stops, func(stop SolutionStop) SolutionStop {
+		return stop
 	})
-	target := common.Map(vehicle.SolutionStops(), func(stop SolutionStop) solutionStopImpl {
-		return stop.(solutionStopImpl)
+	target := common.Map(vehicle.SolutionStops(), func(stop SolutionStop) SolutionStop {
+		return stop
 	})
 	m := preAllocatedMoveContainer.singleStopPosSolutionMoveStop
 	m.(*solutionMoveStopsImpl).reset()
@@ -117,7 +117,7 @@ func SolutionMoveStopsGenerator(
 	}
 
 	// TODO: we can reuse the stopPositions slice from m
-	positions := make([]stopPositionImpl, len(source))
+	positions := make([]StopPosition, len(source))
 	for idx := range source {
 		positions[idx].stopIndex = source[idx].index
 		positions[idx].solution = source[idx].solution
@@ -157,14 +157,14 @@ func SolutionMoveStopsGenerator(
 	}
 }
 
-func isNotAllowed(model *modelImpl, from, to solutionStopImpl) bool {
+func isNotAllowed(model *modelImpl, from, to SolutionStop) bool {
 	if !model.hasDisallowedSuccessors() {
 		return false
 	}
 	return model.disallowedSuccessors[from.ModelStopIndex()][to.ModelStopIndex()]
 }
 
-func mustBeNeighbours(model *modelImpl, from, to solutionStopImpl) bool {
+func mustBeNeighbours(model *modelImpl, from, to SolutionStop) bool {
 	if !model.hasDirectSuccessors {
 		return false
 	}
@@ -181,10 +181,10 @@ func mustBeNeighbours(model *modelImpl, from, to solutionStopImpl) bool {
 }
 
 func generate(
-	stopPositions []stopPositionImpl,
+	stopPositions []StopPosition,
 	combination []int,
-	source []solutionStopImpl,
-	target []solutionStopImpl,
+	source []SolutionStop,
+	target []SolutionStop,
 	yield func(),
 	shouldStop func() bool,
 ) {
@@ -221,12 +221,12 @@ func generate(
 				stopPositions[positionIdx-1].nextStopIndex = stopPositions[positionIdx].stopIndex
 			} else {
 				stopPositions[positionIdx-1].nextStopIndex = target[combination[positionIdx-1]].index
-				if mustBeNeighbours(model, stopPositions[positionIdx-1].stop(), stopPositions[positionIdx].stop()) {
+				if mustBeNeighbours(model, stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx].Stop()) {
 					break
 				}
 			}
 
-			if isNotAllowed(model, stopPositions[positionIdx-1].stop(), stopPositions[positionIdx-1].next()) {
+			if isNotAllowed(model, stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx-1].Next()) {
 				combination = combination[:positionIdx]
 				if stopPositions[positionIdx-1].nextStopIndex != stopPositions[positionIdx].previousStopIndex {
 					break
@@ -235,7 +235,7 @@ func generate(
 			}
 		}
 
-		if isNotAllowed(model, stopPositions[positionIdx].previous(), stopPositions[positionIdx].stop()) {
+		if isNotAllowed(model, stopPositions[positionIdx].Previous(), stopPositions[positionIdx].Stop()) {
 			combination = combination[:positionIdx]
 			continue
 		}

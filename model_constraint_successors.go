@@ -92,8 +92,8 @@ func (l *successorConstraintImpl) DoesStopHaveViolations(
 	stop SolutionStop,
 ) bool {
 	modelImpl := stop.Solution().Model().(*modelImpl)
-	stopImpl := stop.(solutionStopImpl)
-	previousModelStop := stopImpl.previous().modelStop()
+	stopImpl := stop
+	previousModelStop := stopImpl.Previous().modelStop()
 	if disallowed := modelImpl.disallowedSuccessors[previousModelStop.Index()][stop.ModelStop().Index()]; disallowed {
 		return true
 	}

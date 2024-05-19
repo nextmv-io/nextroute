@@ -101,7 +101,7 @@ func TestVehicleBestMoveSinglePlanUnit(t *testing.T) {
 
 	solutionVehicle := solution.SolutionVehicle(model.Vehicle(0))
 
-	if solutionVehicle == nil {
+	if solutionVehicle.IsZero() {
 		t.Error("solutionVehicle is nil")
 	}
 
@@ -188,7 +188,7 @@ func TestVehicleBestMoveSequencePlanUnit(t *testing.T) {
 
 	solutionVehicle := solution.SolutionVehicle(model.Vehicle(0))
 
-	if solutionVehicle == nil {
+	if solutionVehicle.IsZero() {
 		t.Error("solutionVehicle is nil")
 	}
 

@@ -60,7 +60,7 @@ func (l *maximumDurationConstraintImpl) EstimateIsViolated(
 
 	maximumValue := l.maximum.Value(vehicleType, nil, nil)
 
-	startValue := vehicle.first().StartValue()
+	startValue := vehicle.First().StartValue()
 	previous, _ := moveImpl.previous()
 	endValue := previous.EndValue()
 

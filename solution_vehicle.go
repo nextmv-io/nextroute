@@ -14,94 +14,25 @@ import (
 )
 
 // SolutionVehicle is a vehicle in a solution.
-type SolutionVehicle interface {
-	// FirstMove creates a move that adds the given plan unit to the
-	// vehicle after the first solution stop of the vehicle. The move is
-	// first feasible move after the first solution stop based on the
-	// estimates of the constraint, this move is not necessarily executable.
-	FirstMove(SolutionPlanUnit) (SolutionMove, error)
-
-	// BestMove returns the best move for the given solution plan unit on
-	// the invoking vehicle. The best move is the move that has the lowest
-	// score. If there are no moves available for the given solution plan
-	// unit, a move is returned which is not executable, SolutionMoveStops.IsExecutable.
-	BestMove(context.Context, SolutionPlanUnit) SolutionMove
-
-	// Duration returns the duration of the vehicle. The duration is the
-	// time the vehicle is on the road. The duration is the time between
-	// the start time and the end time.
-	Duration() time.Duration
-	// DurationValue returns the duration value of the vehicle. The duration
-	// value is the value of the duration of the vehicle. The duration value
-	// is the value in model duration units.
-	DurationValue() float64
-
-	// End returns the end time of the vehicle. The end time is the time
-	// the vehicle ends at the end stop.
-	End() time.Time
-	// EndValue returns the end value of the vehicle. The end value is the
-	// value of the end of the last stop. The end value is the value in
-	// model duration units since the model epoch.
-	EndValue() float64
-
-	// First returns the first stop of the vehicle. The first stop is the
-	// start stop.
-	First() SolutionStop
-
-	// Index returns the index of the vehicle in the solution.
-	Index() int
-	// IsEmpty returns true if the vehicle is empty, false otherwise. A
-	// vehicle is empty if it does not have any stops. The start and end
-	// stops are not considered.
-	IsEmpty() bool
-
-	// Last returns the last stop of the vehicle. The last stop is the end
-	// stop.
-	Last() SolutionStop
-
-	// ModelVehicle returns the modeled vehicle type of the vehicle.
-	ModelVehicle() ModelVehicle
-
-	// NumberOfStops returns the number of stops in the vehicle. The start
-	// and end stops are not considered.
-	NumberOfStops() int
-
-	// SolutionStops returns the stops in the vehicle. The start and end
-	// stops are included in the returned stops.
-	SolutionStops() SolutionStops
-	// Start returns the start time of the vehicle. The start time is
-	// the time the vehicle starts at the start stop, it has been set
-	// in the factory method of the vehicle Solution.NewVehicle.
-	Start() time.Time
-	// StartValue returns the start value of the vehicle. The start value
-	// is the value of the start of the first stop. The start value is
-	// the value in model duration units since the model epoch.
-	StartValue() float64
-
-	// Unplan removes all stops from the vehicle. The start and end stops
-	// are not removed. Fixed stops are not removed.
-	Unplan() (bool, error)
+type SolutionVehicle struct {
+	solution *solutionImpl
+	index    int
 }
 
 // SolutionVehicles is a slice of solution vehicles.
 type SolutionVehicles []SolutionVehicle
 
-type solutionVehicleImpl struct {
-	solution *solutionImpl
-	index    int
-}
-
 func toSolutionVehicle(
 	solution Solution,
 	index int,
 ) SolutionVehicle {
-	return solutionVehicleImpl{
+	return SolutionVehicle{
 		index:    index,
 		solution: solution.(*solutionImpl),
 	}
 }
 
-func (v solutionVehicleImpl) firstMovePlanStopsUnit(
+func (v SolutionVehicle) firstMovePlanStopsUnit(
 	planUnit *solutionPlanStopsUnitImpl,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 ) (SolutionMove, error) {
@@ -133,7 +64,7 @@ func (v solutionVehicleImpl) firstMovePlanStopsUnit(
 	return bestMove, nil
 }
 
-func (v solutionVehicleImpl) firstMovePlanUnitsUnit(
+func (v SolutionVehicle) firstMovePlanUnitsUnit(
 	planUnit *solutionPlanUnitsUnitImpl,
 ) (SolutionMove, error) {
 	if planUnit.ModelPlanUnitsUnit().PlanOneOf() {
@@ -142,7 +73,7 @@ func (v solutionVehicleImpl) firstMovePlanUnitsUnit(
 	return v.firstMovePlanAllUnit(planUnit)
 }
 
-func (v solutionVehicleImpl) firstMovePlanOneOfUnit(
+func (v SolutionVehicle) firstMovePlanOneOfUnit(
 	planUnit *solutionPlanUnitsUnitImpl,
 ) (SolutionMove, error) {
 	planUnits := common.Shuffle(
@@ -161,7 +92,7 @@ func (v solutionVehicleImpl) firstMovePlanOneOfUnit(
 	return NotExecutableMove, nil
 }
 
-func (v solutionVehicleImpl) firstMovePlanAllUnit(
+func (v SolutionVehicle) firstMovePlanAllUnit(
 	planUnit *solutionPlanUnitsUnitImpl,
 ) (SolutionMove, error) {
 	planUnits := common.Shuffle(
@@ -235,7 +166,7 @@ func updateMoveInPlace(move SolutionMoveStops, moveContainer moveContainer) {
 	move.(*solutionMoveStopsImpl).value = moveContainer.value
 }
 
-func (v solutionVehicleImpl) bestMovePlanSingleStop(
+func (v SolutionVehicle) bestMovePlanSingleStop(
 	_ context.Context,
 	planUnit *solutionPlanStopsUnitImpl,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
@@ -246,9 +177,9 @@ func (v solutionVehicleImpl) bestMovePlanSingleStop(
 	// ensure that stopPositions is a length 1 slice
 	move.(*solutionMoveStopsImpl).stopPositions = append(
 		move.(*solutionMoveStopsImpl).stopPositions,
-		stopPositionImpl{},
+		StopPosition{},
 	)
-	stop := v.first()
+	stop := v.First()
 
 	movesPtr := moveContainerPool.Get().(*[]moveContainer)
 	moves := *movesPtr
@@ -261,9 +192,9 @@ func (v solutionVehicleImpl) bestMovePlanSingleStop(
 	rand := solution.random
 
 	for !stop.IsLast() {
-		stop = stop.next()
+		stop = stop.Next()
 		pos := newStopPosition(
-			stop.previous(),
+			stop.Previous(),
 			candidateStop,
 			stop,
 		)
@@ -345,7 +276,7 @@ func (v solutionVehicleImpl) bestMovePlanSingleStop(
 	return move
 }
 
-func (v solutionVehicleImpl) bestMoveSequence(
+func (v SolutionVehicle) bestMoveSequence(
 	_ context.Context,
 	planUnit *solutionPlanStopsUnitImpl,
 	sequence SolutionStops,
@@ -379,7 +310,7 @@ func (v solutionVehicleImpl) bestMoveSequence(
 	return bestMove
 }
 
-func (v solutionVehicleImpl) bestMovePlanMultipleStops(
+func (v SolutionVehicle) bestMovePlanMultipleStops(
 	ctx context.Context,
 	planUnit *solutionPlanStopsUnitImpl,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
@@ -394,7 +325,7 @@ func (v solutionVehicleImpl) bestMovePlanMultipleStops(
 	return bestMove
 }
 
-func (v solutionVehicleImpl) bestMovePlanStopsUnit(
+func (v SolutionVehicle) bestMovePlanStopsUnit(
 	ctx context.Context,
 	planUnit *solutionPlanStopsUnitImpl,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
@@ -406,7 +337,7 @@ func (v solutionVehicleImpl) bestMovePlanStopsUnit(
 	return v.bestMovePlanMultipleStops(ctx, planUnit, preAllocatedMoveContainer)
 }
 
-func (v solutionVehicleImpl) bestMovePlanUnitsUnit(
+func (v SolutionVehicle) bestMovePlanUnitsUnit(
 	ctx context.Context,
 	planUnit *solutionPlanUnitsUnitImpl,
 ) SolutionMove {
@@ -416,7 +347,7 @@ func (v solutionVehicleImpl) bestMovePlanUnitsUnit(
 	return v.bestMovePlanAllUnit(ctx, planUnit)
 }
 
-func (v solutionVehicleImpl) bestMovePlanOneOfUnit(
+func (v SolutionVehicle) bestMovePlanOneOfUnit(
 	ctx context.Context,
 	planUnit *solutionPlanUnitsUnitImpl,
 ) SolutionMove {
@@ -439,7 +370,7 @@ func revertMoves(moves SolutionMoves) (bool, error) {
 	return true, nil
 }
 
-func (v solutionVehicleImpl) bestMovePlanAllUnit(
+func (v SolutionVehicle) bestMovePlanAllUnit(
 	ctx context.Context,
 	planUnit *solutionPlanUnitsUnitImpl,
 ) SolutionMove {
@@ -484,7 +415,11 @@ func (v solutionVehicleImpl) bestMovePlanAllUnit(
 	return newSolutionMoveUnits(planUnit, moves)
 }
 
-func (v solutionVehicleImpl) FirstMove(
+// FirstMove creates a move that adds the given plan unit to the
+// vehicle after the first solution stop of the vehicle. The move is
+// first feasible move after the first solution stop based on the
+// estimates of the constraint, this move is not necessarily executable.
+func (v SolutionVehicle) FirstMove(
 	planUnit SolutionPlanUnit,
 ) (SolutionMove, error) {
 	switch planUnit.(type) {
@@ -497,7 +432,11 @@ func (v solutionVehicleImpl) FirstMove(
 	return NotExecutableMove, nil
 }
 
-func (v solutionVehicleImpl) BestMove(
+// BestMove returns the best move for the given solution plan unit on
+// the invoking vehicle. The best move is the move that has the lowest
+// score. If there are no moves available for the given solution plan
+// unit, a move is returned which is not executable, SolutionMoveStops.IsExecutable.
+func (v SolutionVehicle) BestMove(
 	ctx context.Context,
 	planUnit SolutionPlanUnit,
 ) SolutionMove {
@@ -508,7 +447,7 @@ func (v solutionVehicleImpl) BestMove(
 	return v.bestMove(ctx, planUnit, allocations)
 }
 
-func (v solutionVehicleImpl) bestMove(
+func (v SolutionVehicle) bestMove(
 	ctx context.Context,
 	planUnit SolutionPlanUnit,
 	sharedMoveContainer *PreAllocatedMoveContainer,
@@ -530,72 +469,86 @@ func (v solutionVehicleImpl) bestMove(
 	}
 }
 
-func (v solutionVehicleImpl) IsEmpty() bool {
-	return v.last().Position() == 1
+// IsEmpty returns true if the vehicle is empty, false otherwise. A
+// vehicle is empty if it does not have any stops. The start and end
+// stops are not considered.
+func (v SolutionVehicle) IsEmpty() bool {
+	return v.Last().Position() == 1
 }
 
-func (v solutionVehicleImpl) NumberOfStops() int {
-	return v.last().Position() - 1
+// NumberOfStops returns the number of stops in the vehicle. The start
+// and end stops are not considered.
+func (v SolutionVehicle) NumberOfStops() int {
+	return v.Last().Position() - 1
 }
 
-func (v solutionVehicleImpl) Index() int {
+// Index returns the index of the vehicle in the solution.
+func (v SolutionVehicle) Index() int {
 	return v.index
 }
 
-func (v solutionVehicleImpl) First() SolutionStop {
-	return v.first()
-}
-
-func (v solutionVehicleImpl) Last() SolutionStop {
-	return v.last()
-}
-
-func (v solutionVehicleImpl) first() solutionStopImpl {
-	return solutionStopImpl{
+// First returns the first stop of the vehicle. The first stop is the
+// start stop.
+func (v SolutionVehicle) First() SolutionStop {
+	return SolutionStop{
 		index:    v.solution.first[v.index],
 		solution: v.solution,
 	}
 }
 
-func (v solutionVehicleImpl) last() solutionStopImpl {
-	return solutionStopImpl{
+// Last returns the last stop of the vehicle. The last stop is the end
+// stop.
+func (v SolutionVehicle) Last() SolutionStop {
+	return SolutionStop{
 		index:    v.solution.last[v.index],
 		solution: v.solution,
 	}
 }
 
-func (v solutionVehicleImpl) DurationValue() float64 {
+// DurationValue returns the duration value of the vehicle. The duration
+// value is the value of the duration of the vehicle. The duration value
+// is the value in model duration units.
+func (v SolutionVehicle) DurationValue() float64 {
 	return v.EndValue() - v.StartValue()
 }
 
-func (v solutionVehicleImpl) Duration() time.Duration {
+// Duration returns the duration of the vehicle. The duration is the
+// time the vehicle is on the road. The duration is the time between
+// the start time and the end time.
+func (v SolutionVehicle) Duration() time.Duration {
 	return v.End().Sub(v.Start())
 }
 
-func (v solutionVehicleImpl) StartValue() float64 {
-	return v.first().StartValue()
+// StartValue returns the start value of the vehicle. The start value
+// is the value of the start of the first stop. The start value is
+// the value in model duration units since the model epoch.
+func (v SolutionVehicle) StartValue() float64 {
+	return v.First().StartValue()
 }
 
-func (v solutionVehicleImpl) Start() time.Time {
-	return v.first().Start()
+// Start returns the start time of the vehicle. The start time is
+// the time the vehicle starts at the start stop, it has been set
+// in the factory method of the vehicle Solution.NewVehicle.
+func (v SolutionVehicle) Start() time.Time {
+	return v.First().Start()
 }
 
-func (v solutionVehicleImpl) EndValue() float64 {
-	return v.last().EndValue()
+// EndValue returns the end value of the vehicle. The end value is the
+// value of the end of the last stop. The end value is the value in
+// model duration units since the model epoch.
+func (v SolutionVehicle) EndValue() float64 {
+	return v.Last().EndValue()
 }
 
-func (v solutionVehicleImpl) End() time.Time {
-	return v.last().End()
+// End returns the end time of the vehicle. The end time is the time
+// the vehicle ends at the end stop.
+func (v SolutionVehicle) End() time.Time {
+	return v.Last().End()
 }
 
-func (v solutionVehicleImpl) Next() SolutionStop {
-	return solutionStopImpl{
-		index:    v.solution.model.NumberOfStops() + v.index*2 + 1,
-		solution: v.solution,
-	}
-}
-
-func (v solutionVehicleImpl) SolutionStops() SolutionStops {
+// SolutionStops returns the stops in the vehicle. The start and end
+// stops are included in the returned stops.
+func (v SolutionVehicle) SolutionStops() SolutionStops {
 	solutionStops := make(SolutionStops, 0, v.NumberOfStops()+2)
 	solutionStop := v.First()
 	for !solutionStop.IsLast() {
@@ -606,24 +559,16 @@ func (v solutionVehicleImpl) SolutionStops() SolutionStops {
 	return solutionStops
 }
 
-func (v solutionVehicleImpl) solutionStops() []solutionStopImpl {
-	solutionStops := make([]solutionStopImpl, 0, v.NumberOfStops()+2)
-	solutionStop := v.first()
-	for !solutionStop.IsLast() {
-		solutionStops = append(solutionStops, solutionStop)
-		solutionStop = solutionStop.next()
-	}
-	solutionStops = append(solutionStops, solutionStop)
-	return solutionStops
-}
-
-func (v solutionVehicleImpl) ModelVehicle() ModelVehicle {
+// ModelVehicle returns the modeled vehicle type of the vehicle.
+func (v SolutionVehicle) ModelVehicle() ModelVehicle {
 	return v.solution.model.Vehicle(v.solution.vehicleIndices[v.index])
 }
 
-func (v solutionVehicleImpl) Unplan() (bool, error) {
+// Unplan removes all stops from the vehicle. The start and end stops
+// are not removed. Fixed stops are not removed.
+func (v SolutionVehicle) Unplan() (bool, error) {
 	// TODO notify observers
-	solutionStops := common.Filter(v.solutionStops(), func(solutionStop solutionStopImpl) bool {
+	solutionStops := common.Filter(v.SolutionStops(), func(solutionStop SolutionStop) bool {
 		return !solutionStop.IsFixed()
 	})
 	if len(solutionStops) == 0 {
@@ -632,18 +577,18 @@ func (v solutionVehicleImpl) Unplan() (bool, error) {
 
 	solution := solutionStops[0].solution
 
-	planUnits := common.Map(solutionStops, func(solutionStop solutionStopImpl) *solutionPlanStopsUnitImpl {
+	planUnits := common.Map(solutionStops, func(solutionStop SolutionStop) *solutionPlanStopsUnitImpl {
 		return solutionStop.planStopsUnit()
 	})
 	for _, planUnit := range planUnits {
 		solution.unPlannedPlanUnits.add(planUnit)
 		solution.plannedPlanUnits.remove(planUnit)
 	}
-	stopPositions := common.Map(solutionStops, func(solutionStop solutionStopImpl) StopPosition {
+	stopPositions := common.Map(solutionStops, func(solutionStop SolutionStop) StopPosition {
 		return newStopPosition(
-			solutionStop.previous(),
+			solutionStop.Previous(),
 			solutionStop,
-			solutionStop.next(),
+			solutionStop.Next(),
 		)
 	})
 
@@ -658,9 +603,9 @@ func (v solutionVehicleImpl) Unplan() (bool, error) {
 	}
 	if constraint != nil {
 		for i := len(stopPositions) - 1; i >= 0; i-- {
-			stopPosition := stopPositions[i].(stopPositionImpl)
-			beforeStop := stopPosition.next()
-			stopPosition.stop().attach(
+			stopPosition := stopPositions[i]
+			beforeStop := stopPosition.Next()
+			stopPosition.Stop().attach(
 				beforeStop.PreviousIndex(),
 			)
 		}
@@ -680,4 +625,10 @@ func (v solutionVehicleImpl) Unplan() (bool, error) {
 	}
 
 	return true, nil
+}
+
+// IsZero returns true if the solution vehicle is the zero value.
+// In this case it is not safe to use the solution vehicle.
+func (v SolutionVehicle) IsZero() bool {
+	return v.solution == nil && v.index == 0
 }

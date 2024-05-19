@@ -74,7 +74,7 @@ func (d *solveOperatorUnPlanVehiclesImpl) Execute(
 
 	vehicles := common.Filter(
 		workSolution.vehicles,
-		func(vehicle solutionVehicleImpl) bool {
+		func(vehicle SolutionVehicle) bool {
 			return vehicle.NumberOfStops() > 0
 		},
 	)
@@ -82,7 +82,7 @@ func (d *solveOperatorUnPlanVehiclesImpl) Execute(
 	if len(vehicles) == 0 {
 		return nil
 	}
-	weights := common.Map(vehicles, func(vehicle solutionVehicleImpl) float64 {
+	weights := common.Map(vehicles, func(vehicle SolutionVehicle) float64 {
 		return 1.0 + float64(workSolution.Model().NumberOfStops()-vehicle.NumberOfStops())
 	})
 	alias, err := common.NewAlias(weights)
