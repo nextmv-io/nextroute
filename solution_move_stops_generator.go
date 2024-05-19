@@ -4,8 +4,6 @@ package nextroute
 
 import (
 	"slices"
-
-	"github.com/nextmv-io/nextroute/common"
 )
 
 // SolutionMoveStopsGeneratorChannel generates all possible moves for a given
@@ -103,12 +101,8 @@ func SolutionMoveStopsGenerator(
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 	shouldStop func() bool,
 ) {
-	source := common.Map(stops, func(stop SolutionStop) SolutionStop {
-		return stop
-	})
-	target := common.Map(vehicle.SolutionStops(), func(stop SolutionStop) SolutionStop {
-		return stop
-	})
+	source := stops
+	target := vehicle.SolutionStops()
 	m := preAllocatedMoveContainer.singleStopPosSolutionMoveStop
 	m.(*solutionMoveStopsImpl).reset()
 	m.(*solutionMoveStopsImpl).planUnit = planUnit
