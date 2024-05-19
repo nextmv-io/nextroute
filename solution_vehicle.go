@@ -559,17 +559,6 @@ func (v SolutionVehicle) SolutionStops() SolutionStops {
 	return solutionStops
 }
 
-func (v SolutionVehicle) solutionStops() []SolutionStop {
-	solutionStops := make([]SolutionStop, 0, v.NumberOfStops()+2)
-	solutionStop := v.First()
-	for !solutionStop.IsLast() {
-		solutionStops = append(solutionStops, solutionStop)
-		solutionStop = solutionStop.Next()
-	}
-	solutionStops = append(solutionStops, solutionStop)
-	return solutionStops
-}
-
 // ModelVehicle returns the modeled vehicle type of the vehicle.
 func (v SolutionVehicle) ModelVehicle() ModelVehicle {
 	return v.solution.model.Vehicle(v.solution.vehicleIndices[v.index])
@@ -579,7 +568,7 @@ func (v SolutionVehicle) ModelVehicle() ModelVehicle {
 // are not removed. Fixed stops are not removed.
 func (v SolutionVehicle) Unplan() (bool, error) {
 	// TODO notify observers
-	solutionStops := common.Filter(v.solutionStops(), func(solutionStop SolutionStop) bool {
+	solutionStops := common.Filter(v.SolutionStops(), func(solutionStop SolutionStop) bool {
 		return !solutionStop.IsFixed()
 	})
 	if len(solutionStops) == 0 {
