@@ -94,9 +94,8 @@ func (l *maximumTravelDurationConstraintImpl) EstimateIsViolated(
 }
 
 func (l *maximumTravelDurationConstraintImpl) DoesVehicleHaveViolations(vehicle SolutionVehicle) bool {
-	vehicleImpl := vehicle.(solutionVehicleImpl)
-	return vehicleImpl.last().CumulativeTravelDurationValue() >
-		l.maximum.Value(vehicleImpl.ModelVehicle().VehicleType(), nil, nil)
+	return vehicle.Last().CumulativeTravelDurationValue() >
+		l.maximum.Value(vehicle.ModelVehicle().VehicleType(), nil, nil)
 }
 
 func (l *maximumTravelDurationConstraintImpl) IsTemporal() bool {

@@ -58,7 +58,7 @@ func (t *vehiclesDurationObjectiveImpl) EstimateDeltaValue(
 
 	first := true
 	end := 0.0
-	previousStop := vehicle.first()
+	previousStop := vehicle.First()
 
 	generator := newSolutionStopGenerator(*solutionMoveStops, false, isDependentOnTime)
 	defer generator.release()
@@ -83,7 +83,7 @@ func (t *vehiclesDurationObjectiveImpl) EstimateDeltaValue(
 	nextmove, _ := solutionMoveStops.next()
 
 	if nextmove.IsLast() || isDependentOnTime {
-		return end - vehicle.last().EndValue()
+		return end - vehicle.Last().EndValue()
 	}
 
 	for solutionStop := nextmove.Next(); !solutionStop.IsLast(); solutionStop = solutionStop.Next() {
@@ -99,7 +99,7 @@ func (t *vehiclesDurationObjectiveImpl) EstimateDeltaValue(
 		}
 	}
 
-	last := vehicle.last()
+	last := vehicle.Last()
 	_, _, _, end = vehicleType.TemporalValues(
 		end,
 		last.Previous().ModelStop(),

@@ -58,7 +58,7 @@ func newSolutionStopGenerator(
 	startAtFirst bool,
 	endAtLast bool,
 ) *solutionStopGeneratorImpl {
-	nextStop := move.vehicle().first()
+	nextStop := move.Vehicle().First()
 	if !startAtFirst {
 		nextStop = move.stopPositions[0].previous()
 	}

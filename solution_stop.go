@@ -282,8 +282,8 @@ func (v SolutionStop) Vehicle() SolutionVehicle {
 	return v.solution.solutionVehicles[v.solution.inVehicle[v.index]]
 }
 
-func (v SolutionStop) vehicle() solutionVehicleImpl {
-	return solutionVehicleImpl{
+func (v SolutionStop) vehicle() SolutionVehicle {
+	return SolutionVehicle{
 		index:    v.solution.inVehicle[v.index],
 		solution: v.solution,
 	}

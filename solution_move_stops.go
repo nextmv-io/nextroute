@@ -130,12 +130,12 @@ func (m *solutionMoveStopsImpl) Solution() Solution {
 
 func (m *solutionMoveStopsImpl) Vehicle() SolutionVehicle {
 	if len(m.stopPositions) == 0 {
-		return nil
+		return SolutionVehicle{}
 	}
 	return m.stopPositions[len(m.stopPositions)-1].next().Vehicle()
 }
 
-func (m *solutionMoveStopsImpl) vehicle() solutionVehicleImpl {
+func (m *solutionMoveStopsImpl) vehicle() SolutionVehicle {
 	return m.stopPositions[len(m.stopPositions)-1].next().vehicle()
 }
 

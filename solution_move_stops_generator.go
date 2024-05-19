@@ -21,7 +21,7 @@ import (
 //		) {
 //	 }
 func SolutionMoveStopsGeneratorChannel(
-	vehicle solutionVehicleImpl,
+	vehicle SolutionVehicle,
 	planUnit *solutionPlanStopsUnitImpl,
 	quit <-chan struct{},
 	stops SolutionStops,
@@ -64,7 +64,7 @@ func SolutionMoveStopsGeneratorChannelTest(
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 ) chan SolutionMoveStops {
 	return SolutionMoveStopsGeneratorChannel(
-		vehicle.(solutionVehicleImpl),
+		vehicle,
 		planUnit.(*solutionPlanStopsUnitImpl),
 		quit,
 		stops,
@@ -82,7 +82,7 @@ func SolutionMoveStopsGeneratorTest(
 	shouldStop func() bool,
 ) {
 	SolutionMoveStopsGenerator(
-		vehicle.(solutionVehicleImpl),
+		vehicle,
 		planUnit.(*solutionPlanStopsUnitImpl),
 		yield,
 		stops,
@@ -94,7 +94,7 @@ func SolutionMoveStopsGeneratorTest(
 // SolutionMoveStopsGenerator generates all possible moves for a given vehicle and
 // plan unit. The function yield is called for each solutionMoveStopsImpl.
 func SolutionMoveStopsGenerator(
-	vehicle solutionVehicleImpl,
+	vehicle SolutionVehicle,
 	planUnit *solutionPlanStopsUnitImpl,
 	yield func(move SolutionMoveStops),
 	stops SolutionStops,
