@@ -44,7 +44,7 @@ func NewSolutionStopGenerator(
 		stopPositions:           slices.Clone(move.(*solutionMoveStopsImpl).stopPositions),
 		startAtFirst:            startAtFirst,
 		endAtLast:               endAtLast,
-		nextStop:                nextStop.(solutionStopImpl),
+		nextStop:                nextStop,
 		activeStopPositionIndex: 0,
 	}
 }
@@ -58,9 +58,9 @@ func newSolutionStopGenerator(
 	startAtFirst bool,
 	endAtLast bool,
 ) *solutionStopGeneratorImpl {
-	nextStop := move.vehicle().first()
+	nextStop := move.Vehicle().First()
 	if !startAtFirst {
-		nextStop = move.stopPositions[0].previous()
+		nextStop = move.stopPositions[0].Previous()
 	}
 	solutionStopGenerator := solutionGeneratorPool.Get().(*solutionStopGeneratorImpl)
 	solutionStopGenerator.stopPositions = solutionStopGenerator.stopPositions[:0]
@@ -74,8 +74,8 @@ func newSolutionStopGenerator(
 }
 
 type solutionStopGeneratorImpl struct {
-	nextStop                solutionStopImpl
-	stopPositions           []stopPositionImpl
+	nextStop                SolutionStop
+	stopPositions           []StopPosition
 	activeStopPositionIndex int
 	startAtFirst            bool
 	endAtLast               bool
@@ -85,7 +85,7 @@ type solutionStopGeneratorImpl struct {
 func (s *solutionStopGeneratorImpl) Next() SolutionStop {
 	next, ok := s.next()
 	if !ok {
-		return nil
+		return SolutionStop{}
 	}
 	return next
 }
@@ -94,41 +94,41 @@ func (s *solutionStopGeneratorImpl) release() {
 	solutionGeneratorPool.Put(s)
 }
 
-func (s *solutionStopGeneratorImpl) next() (solutionStopImpl, bool) {
+func (s *solutionStopGeneratorImpl) next() (SolutionStop, bool) {
 	if s.endReached {
-		return solutionStopImpl{}, false
+		return SolutionStop{}, false
 	}
 
 	returnStop := s.nextStop
 
 	if s.startAtFirst {
-		if s.nextStop == s.stopPositions[s.activeStopPositionIndex].previous() {
+		if s.nextStop == s.stopPositions[s.activeStopPositionIndex].Previous() {
 			s.startAtFirst = false
-			s.nextStop = s.stopPositions[s.activeStopPositionIndex].stop()
+			s.nextStop = s.stopPositions[s.activeStopPositionIndex].Stop()
 		} else {
-			s.nextStop = s.nextStop.next()
+			s.nextStop = s.nextStop.Next()
 		}
 		return returnStop, true
 	}
 
 	if s.activeStopPositionIndex < len(s.stopPositions) {
-		if s.nextStop == s.stopPositions[s.activeStopPositionIndex].stop() {
-			s.nextStop = s.stopPositions[s.activeStopPositionIndex].next()
+		if s.nextStop == s.stopPositions[s.activeStopPositionIndex].Stop() {
+			s.nextStop = s.stopPositions[s.activeStopPositionIndex].Next()
 			s.activeStopPositionIndex++
 			return returnStop, true
 		}
-		if s.nextStop == s.stopPositions[s.activeStopPositionIndex].previous() {
-			s.nextStop = s.stopPositions[s.activeStopPositionIndex].stop()
+		if s.nextStop == s.stopPositions[s.activeStopPositionIndex].Previous() {
+			s.nextStop = s.stopPositions[s.activeStopPositionIndex].Stop()
 			s.activeStopPositionIndex++
 			return returnStop, true
 		}
 		if !s.nextStop.IsPlanned() {
-			s.nextStop = s.stopPositions[s.activeStopPositionIndex-1].next()
+			s.nextStop = s.stopPositions[s.activeStopPositionIndex-1].Next()
 		} else {
 			if s.nextStop.IsLast() {
 				s.endReached = true
 			} else {
-				s.nextStop = s.nextStop.next()
+				s.nextStop = s.nextStop.Next()
 			}
 		}
 
@@ -136,7 +136,7 @@ func (s *solutionStopGeneratorImpl) next() (solutionStopImpl, bool) {
 	}
 
 	if !s.nextStop.IsPlanned() {
-		s.nextStop = s.stopPositions[s.activeStopPositionIndex-1].next()
+		s.nextStop = s.stopPositions[s.activeStopPositionIndex-1].Next()
 		return returnStop, true
 	}
 
@@ -145,7 +145,7 @@ func (s *solutionStopGeneratorImpl) next() (solutionStopImpl, bool) {
 			s.endReached = true
 			s.endAtLast = false
 		} else {
-			s.nextStop = s.nextStop.next()
+			s.nextStop = s.nextStop.Next()
 		}
 		return returnStop, true
 	}

@@ -21,7 +21,7 @@ import (
 //		) {
 //	 }
 func SolutionMoveStopsGeneratorChannel(
-	vehicle solutionVehicleImpl,
+	vehicle SolutionVehicle,
 	planUnit *solutionPlanStopsUnitImpl,
 	quit <-chan struct{},
 	stops SolutionStops,
@@ -64,7 +64,7 @@ func SolutionMoveStopsGeneratorChannelTest(
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 ) chan SolutionMoveStops {
 	return SolutionMoveStopsGeneratorChannel(
-		vehicle.(solutionVehicleImpl),
+		vehicle,
 		planUnit.(*solutionPlanStopsUnitImpl),
 		quit,
 		stops,
@@ -82,7 +82,7 @@ func SolutionMoveStopsGeneratorTest(
 	shouldStop func() bool,
 ) {
 	SolutionMoveStopsGenerator(
-		vehicle.(solutionVehicleImpl),
+		vehicle,
 		planUnit.(*solutionPlanStopsUnitImpl),
 		yield,
 		stops,
@@ -94,18 +94,18 @@ func SolutionMoveStopsGeneratorTest(
 // SolutionMoveStopsGenerator generates all possible moves for a given vehicle and
 // plan unit. The function yield is called for each solutionMoveStopsImpl.
 func SolutionMoveStopsGenerator(
-	vehicle solutionVehicleImpl,
+	vehicle SolutionVehicle,
 	planUnit *solutionPlanStopsUnitImpl,
 	yield func(move SolutionMoveStops),
 	stops SolutionStops,
 	preAllocatedMoveContainer *PreAllocatedMoveContainer,
 	shouldStop func() bool,
 ) {
-	source := common.Map(stops, func(stop SolutionStop) solutionStopImpl {
-		return stop.(solutionStopImpl)
+	source := common.Map(stops, func(stop SolutionStop) SolutionStop {
+		return stop
 	})
-	target := common.Map(vehicle.SolutionStops(), func(stop SolutionStop) solutionStopImpl {
-		return stop.(solutionStopImpl)
+	target := common.Map(vehicle.SolutionStops(), func(stop SolutionStop) SolutionStop {
+		return stop
 	})
 	m := preAllocatedMoveContainer.singleStopPosSolutionMoveStop
 	m.(*solutionMoveStopsImpl).reset()
@@ -117,7 +117,7 @@ func SolutionMoveStopsGenerator(
 	}
 
 	// TODO: we can reuse the stopPositions slice from m
-	positions := make([]stopPositionImpl, len(source))
+	positions := make([]StopPosition, len(source))
 	for idx := range source {
 		positions[idx].stopIndex = source[idx].index
 		positions[idx].solution = source[idx].solution
@@ -125,40 +125,66 @@ func SolutionMoveStopsGenerator(
 
 	locations := make([]int, 0, len(source))
 
-	generate(positions, locations, source, target, func() {
-		m.(*solutionMoveStopsImpl).reset()
-		m.(*solutionMoveStopsImpl).planUnit = planUnit
-		m.(*solutionMoveStopsImpl).stopPositions = positions
-		m.(*solutionMoveStopsImpl).allowed = false
-		m.(*solutionMoveStopsImpl).valueSeen = 1
-		yield(m)
-	}, shouldStop)
+	model := vehicle.solution.model.(*modelImpl)
+	if model.hasDisallowedSuccessors() || model.hasDirectSuccessors {
+		generate(positions, locations, source, target, func() {
+			m.(*solutionMoveStopsImpl).reset()
+			m.(*solutionMoveStopsImpl).planUnit = planUnit
+			m.(*solutionMoveStopsImpl).stopPositions = positions
+			m.(*solutionMoveStopsImpl).allowed = false
+			m.(*solutionMoveStopsImpl).valueSeen = 1
+			yield(m)
+		}, shouldStop)
+	} else {
+		combineAscending(locations, len(source), len(target)-1, func(locations []int) {
+			for idx, location := range locations {
+				positions[idx].previousStopIndex = target[location-1].index
+				positions[idx].nextStopIndex = target[location].index
+				if idx > 0 && locations[idx-1] == location {
+					positions[idx].previousStopIndex = source[idx-1].index
+				}
+				if idx < len(locations)-1 && locations[idx+1] == location {
+					positions[idx].nextStopIndex = source[idx+1].index
+				}
+			}
+			m.(*solutionMoveStopsImpl).reset()
+			m.(*solutionMoveStopsImpl).planUnit = planUnit
+			m.(*solutionMoveStopsImpl).stopPositions = positions
+			m.(*solutionMoveStopsImpl).allowed = false
+			m.(*solutionMoveStopsImpl).valueSeen = 1
+			yield(m)
+		}, shouldStop)
+	}
 }
 
-func isNotAllowed(from, to solutionStopImpl) bool {
-	fromModelStop := from.modelStop()
-	toModelStop := to.modelStop()
-	model := fromModelStop.Model()
-
-	return model.(*modelImpl).disallowedSuccessors[fromModelStop.Index()][toModelStop.Index()]
+func isNotAllowed(model *modelImpl, from, to SolutionStop) bool {
+	if !model.hasDisallowedSuccessors() {
+		return false
+	}
+	return model.disallowedSuccessors[from.ModelStopIndex()][to.ModelStopIndex()]
 }
 
-func mustBeNeighbours(from, to solutionStopImpl) bool {
-	if !from.modelStop().HasPlanStopsUnit() {
+func mustBeNeighbours(model *modelImpl, from, to SolutionStop) bool {
+	if !model.hasDirectSuccessors {
 		return false
 	}
 
-	return from.modelStop().
-		PlanStopsUnit().
-		DirectedAcyclicGraph().
-		HasDirectArc(from.ModelStop(), to.ModelStop())
+	fromModelStop := from.modelStop()
+	if !fromModelStop.HasPlanStopsUnit() {
+		return false
+	}
+
+	return fromModelStop.
+		planUnit.(*planMultipleStopsImpl).
+		dag.(*directedAcyclicGraphImpl).
+		hasDirectArc(fromModelStop.index, to.ModelStopIndex())
 }
 
 func generate(
-	stopPositions []stopPositionImpl,
+	stopPositions []StopPosition,
 	combination []int,
-	source []solutionStopImpl,
-	target []solutionStopImpl,
+	source []SolutionStop,
+	target []SolutionStop,
 	yield func(),
 	shouldStop func() bool,
 ) {
@@ -176,8 +202,10 @@ func generate(
 		start = combination[len(combination)-1] - 1
 	}
 
+	model := target[0].modelStop().model
+
 	for i := start; i < len(target)-1; i++ {
-		if i > 0 && mustBeNeighbours(target[i], target[i+1]) {
+		if i > 0 && mustBeNeighbours(model, target[i], target[i+1]) {
 			continue
 		}
 		combination = append(combination, i+1)
@@ -193,12 +221,12 @@ func generate(
 				stopPositions[positionIdx-1].nextStopIndex = stopPositions[positionIdx].stopIndex
 			} else {
 				stopPositions[positionIdx-1].nextStopIndex = target[combination[positionIdx-1]].index
-				if mustBeNeighbours(stopPositions[positionIdx-1].stop(), stopPositions[positionIdx].stop()) {
+				if mustBeNeighbours(model, stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx].Stop()) {
 					break
 				}
 			}
 
-			if isNotAllowed(stopPositions[positionIdx-1].stop(), stopPositions[positionIdx-1].next()) {
+			if isNotAllowed(model, stopPositions[positionIdx-1].Stop(), stopPositions[positionIdx-1].Next()) {
 				combination = combination[:positionIdx]
 				if stopPositions[positionIdx-1].nextStopIndex != stopPositions[positionIdx].previousStopIndex {
 					break
@@ -207,13 +235,48 @@ func generate(
 			}
 		}
 
-		if isNotAllowed(stopPositions[positionIdx].previous(), stopPositions[positionIdx].stop()) {
+		if isNotAllowed(model, stopPositions[positionIdx].Previous(), stopPositions[positionIdx].Stop()) {
 			combination = combination[:positionIdx]
 			continue
 		}
 
 		generate(stopPositions, combination, source, target, yield, shouldStop)
 
+		combination = combination[:len(combination)-1]
+	}
+}
+
+// combineAscending generates all combinations of n elements from m where
+// the elements are in ascending order.
+// 2,3 (2 elements can be at 3 locations) will generate:
+// [1 1] first at first location, second at first location
+// [1 2] first at first location, second at second location
+// [1 3] first at first location, second at third location
+// [2 2] first at second location, second at second location
+// [2 3] first at second location, second at third location
+// [3 3] first at third location, second at third location
+// 3, 2 (3 elements can be at 2 locations) will generate:
+// [1 1 1] first at first location, second at first location, third at first location
+// [1 1 2] first at first location, second at first location, third at second location
+// [1 2 2] first at first location, second at second location, third at second location
+// [2 2 2] first at second location, second at second location, third at second location
+// Being at the same location means element are next to each other.
+// The function yield is called for each combination of size n.
+func combineAscending(combination []int, n int, m int, yield func([]int), shouldStop func() bool) {
+	if shouldStop() {
+		return
+	}
+	if len(combination) == n {
+		yield(combination)
+		return
+	}
+	start := 0
+	if len(combination) > 0 {
+		start = combination[len(combination)-1] - 1
+	}
+	for i := start; i < m; i++ {
+		combination = append(combination, i+1)
+		combineAscending(combination, n, m, yield, shouldStop)
 		combination = combination[:len(combination)-1]
 	}
 }

@@ -104,7 +104,7 @@ func (l *maximumWaitStopConstraintImpl) EstimateIsViolated(
 }
 
 func (l *maximumWaitStopConstraintImpl) DoesStopHaveViolations(s SolutionStop) bool {
-	stop := s.(solutionStopImpl)
+	stop := s
 	return stop.StartValue()-stop.ArrivalValue() >
 		l.maxima.Value(nil, nil, stop.modelStop())
 }

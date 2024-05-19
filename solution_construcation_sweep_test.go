@@ -32,8 +32,8 @@ func TestSweepTwoDepots(t *testing.T) {
 	input := singleVehiclePlanSingleStopsModel()
 
 	location := Location{
-		Lat: common.NewInvalidLocation().Latitude(),
-		Lon: common.NewInvalidLocation().Longitude(),
+		Lat: 0,
+		Lon: 0,
 	}
 	input.Vehicles = append(input.Vehicles, vehicles("truck", location, 1)...)
 	model, err := createModel(input)

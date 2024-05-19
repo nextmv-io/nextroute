@@ -102,6 +102,7 @@ func NewSolution(
 	nrStops := 0
 	nrFixedPlanUnits := 0
 	nrPropositionPlanUnits := 0
+	nrVehicles := len(model.vehicles)
 
 	for _, planUnit := range model.PlanUnits() {
 		if planStopsUnit, ok := planUnit.(ModelPlanStopsUnit); ok {
@@ -127,13 +128,12 @@ func NewSolution(
 	solution := &solutionImpl{
 		model: m,
 
-		vehicleIndices:           make([]int, 0, len(model.vehicles)),
-		vehicles:                 make([]solutionVehicleImpl, 0, len(model.vehicles)),
-		solutionVehicles:         make([]SolutionVehicle, 0, len(model.vehicles)),
-		first:                    make([]int, 0, len(model.vehicles)),
-		last:                     make([]int, 0, len(model.vehicles)),
+		vehicleIndices:           make([]int, 0, nrVehicles),
+		vehicles:                 make([]SolutionVehicle, 0, nrVehicles),
+		solutionVehicles:         make([]SolutionVehicle, 0, nrVehicles),
+		first:                    make([]int, 0, nrVehicles),
+		last:                     make([]int, 0, nrVehicles),
 		stop:                     make([]int, 0, nrStops),
-		stopByIndexCache:         make([]SolutionStop, 0, nrStops),
 		inVehicle:                make([]int, 0, nrStops),
 		previous:                 make([]int, 0, nrStops),
 		next:                     make([]int, 0, nrStops),
@@ -191,7 +191,7 @@ func NewSolution(
 		solutionPlanUnit := &solutionPlanStopsUnitImpl{
 			modelPlanStopsUnit: planUnit,
 			solutionStops: make(
-				[]solutionStopImpl,
+				[]SolutionStop,
 				len(planUnit.Stops()),
 			),
 		}
@@ -309,8 +309,6 @@ func NewSolution(
 		}
 	}
 
-	resetStopInterfaceCache(solution)
-
 	if err := solution.addInitialSolution(m); err != nil {
 		return nil, err
 	}
@@ -384,7 +382,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 			common.Map(
 				initialModelStops,
 				func(modelStop ModelStop) SolutionPlanStopsUnit {
-					return s.solutionStop(modelStop).PlanStopsUnit()
+					return s.SolutionStop(modelStop).PlanStopsUnit()
 				}),
 			func(planUnit SolutionPlanStopsUnit) int {
 				return planUnit.ModelPlanStopsUnit().Index()
@@ -397,7 +395,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 	PlanUnitLoop:
 		for _, planUnit := range planUnits {
 			stopPositions := make(StopPositions, 0, len(planUnit.SolutionStops()))
-			previousStop := solutionVehicle.first()
+			previousStop := solutionVehicle.First()
 
 			solutionPlanUnit := s.unwrapRootPlanUnit(planUnit)
 			allPlanUnits[solutionPlanUnit] = true
@@ -427,14 +425,14 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 						)
 					}
 				}
-				solutionStop := s.solutionStop(modelStop)
+				solutionStop := s.SolutionStop(modelStop)
 				if solutionStop.IsPlanned() {
 					previousStop = solutionStop
 				}
 				if modelStop.PlanStopsUnit().Index() == planUnit.ModelPlanStopsUnit().Index() {
 					for nextIdx := modelStopIdx + 1; nextIdx < len(initialModelStops); nextIdx++ {
 						nextModelStop := initialModelStops[nextIdx]
-						nextSolutionStop := s.solutionStop(nextModelStop)
+						nextSolutionStop := s.SolutionStop(nextModelStop)
 						if nextSolutionStop.IsPlanned() ||
 							nextModelStop.PlanStopsUnit().Index() == planUnit.ModelPlanStopsUnit().Index() {
 							stopPositions = append(
@@ -457,7 +455,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 						newStopPosition(
 							previousStop,
 							solutionStop,
-							solutionVehicle.last(),
+							solutionVehicle.Last(),
 						),
 					)
 				}
@@ -512,7 +510,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 					)
 				}
 				for _, position := range move.(*solutionMoveStopsImpl).stopPositions {
-					position.stop().detach()
+					position.Stop().detach()
 				}
 				infeasiblePlanUnits[solutionPlanUnit] = true
 				continue
@@ -544,7 +542,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 			for _, solutionPlanUnit := range s.unwrapRootPlanUnit(s.stopToPlanUnit[index]).PlannedPlanStopsUnits() {
 				if solutionPlanUnit.IsPlanned() {
 					for _, solutionStop := range solutionPlanUnit.SolutionStops() {
-						solutionStop.(solutionStopImpl).detach()
+						solutionStop.detach()
 					}
 				}
 			}
@@ -596,18 +594,15 @@ type solutionImpl struct {
 	vehicleIndices       []int
 
 	// TODO: explore if vehicles should rather be interfaces, then we can avoid creating new vehicles on the fly
-	vehicles         []solutionVehicleImpl
-	solutionVehicles []SolutionVehicle
-	start            []float64
-	slack            []float64
-	arrival          []float64
-	next             []int
-	stopPosition     []int
-	first            []int
-	stop             []int
-	// solutionStopImpl holds solutionStopImpl indexed by stop index with
-	// a pointer to the current solution.
-	stopByIndexCache         []SolutionStop
+	vehicles                 []SolutionVehicle
+	solutionVehicles         []SolutionVehicle
+	start                    []float64
+	slack                    []float64
+	arrival                  []float64
+	next                     []int
+	stopPosition             []int
+	first                    []int
+	stop                     []int
 	cumulativeTravelDuration []float64
 	end                      []float64
 	previous                 []int
@@ -662,32 +657,24 @@ func (s *solutionImpl) SolutionStop(stop ModelStop) SolutionStop {
 	if stop != nil && stop.HasPlanStopsUnit() {
 		return s.SolutionPlanStopsUnit(stop.PlanStopsUnit()).SolutionStop(stop)
 	}
-	return nil
-}
-
-func (s *solutionImpl) solutionStop(stop ModelStop) solutionStopImpl {
-	if stop != nil && stop.HasPlanStopsUnit() {
-		return s.solutionPlanStopsUnit(stop.PlanStopsUnit()).solutionStop(stop)
-	}
-	// TODO: is this correct?
-	return solutionStopImpl{}
+	return SolutionStop{}
 }
 
 func (s *solutionImpl) SolutionVehicle(vehicle ModelVehicle) SolutionVehicle {
 	if solutionVehicle, ok := s.solutionVehicle(vehicle); ok {
 		return solutionVehicle
 	}
-	return nil
+	return SolutionVehicle{}
 }
 
-func (s *solutionImpl) solutionVehicle(vehicle ModelVehicle) (solutionVehicleImpl, bool) {
+func (s *solutionImpl) solutionVehicle(vehicle ModelVehicle) (SolutionVehicle, bool) {
 	if vehicle != nil {
-		return solutionVehicleImpl{
+		return SolutionVehicle{
 			index:    vehicle.Index(),
 			solution: s,
 		}, true
 	}
-	return solutionVehicleImpl{}, false
+	return SolutionVehicle{}, false
 }
 
 func (s *solutionImpl) Copy() Solution {
@@ -697,31 +684,50 @@ func (s *solutionImpl) Copy() Solution {
 	s.randomMutex.Lock()
 	random := rand.New(rand.NewSource(s.random.Int63()))
 	s.randomMutex.Unlock()
+
+	// in order to reduce the number of allocations, we allocate
+	// larger chunks of memory for the slices and then slice them
+	// to the correct size
+	nrStops := len(s.stop)
+	nrVehicles := len(s.vehicles)
+	ints := make([]int, 5*nrStops+3*nrVehicles)
+	first, ints := common.CopySliceFrom(ints, s.first)
+	vehicleIndices, ints := common.CopySliceFrom(ints, s.vehicleIndices)
+	last, ints := common.CopySliceFrom(ints, s.last)
+	inVehicle, ints := common.CopySliceFrom(ints, s.inVehicle)
+	previous, ints := common.CopySliceFrom(ints, s.previous)
+	next, ints := common.CopySliceFrom(ints, s.next)
+	stopPosition, ints := common.CopySliceFrom(ints, s.stopPosition)
+	stop, _ := common.CopySliceFrom(ints, s.stop)
+	floats := make([]float64, 5*nrStops)
+	start, floats := common.CopySliceFrom(floats, s.start)
+	end, floats := common.CopySliceFrom(floats, s.end)
+	arrival, floats := common.CopySliceFrom(floats, s.arrival)
+	slack, floats := common.CopySliceFrom(floats, s.slack)
+	cumulativeTravelDuration, _ := common.CopySliceFrom(floats, s.cumulativeTravelDuration)
 	solution := &solutionImpl{
-		arrival:                slices.Clone(s.arrival),
-		slack:                  slices.Clone(s.slack),
-		constraintStopData:     make(map[ModelConstraint][]Copier, len(s.constraintStopData)),
-		objectiveStopData:      make(map[ModelObjective][]Copier, len(s.objectiveStopData)),
-		constraintSolutionData: make(map[ModelConstraint]Copier, len(s.constraintSolutionData)),
-		objectiveSolutionData:  make(map[ModelObjective]Copier, len(s.objectiveSolutionData)),
-		cumulativeTravelDuration: slices.Clone(
-			s.cumulativeTravelDuration,
-		),
-		cumulativeValues: make([][]float64, len(s.cumulativeValues)),
-		stopToPlanUnit:   make([]*solutionPlanStopsUnitImpl, len(s.stopToPlanUnit)),
-		end:              slices.Clone(s.end),
-		first:            slices.Clone(s.first),
-		inVehicle:        slices.Clone(s.inVehicle),
-		last:             slices.Clone(s.last),
-		model:            model,
-		next:             slices.Clone(s.next),
-		previous:         slices.Clone(s.previous),
-		start:            slices.Clone(s.start),
-		stop:             slices.Clone(s.stop),
-		stopPosition:     slices.Clone(s.stopPosition),
-		values:           make([][]float64, len(s.values)),
-		vehicleIndices:   slices.Clone(s.vehicleIndices),
-		random:           random,
+		arrival:                  arrival,
+		slack:                    slack,
+		constraintStopData:       make(map[ModelConstraint][]Copier, len(s.constraintStopData)),
+		objectiveStopData:        make(map[ModelObjective][]Copier, len(s.objectiveStopData)),
+		constraintSolutionData:   make(map[ModelConstraint]Copier, len(s.constraintSolutionData)),
+		objectiveSolutionData:    make(map[ModelObjective]Copier, len(s.objectiveSolutionData)),
+		cumulativeTravelDuration: cumulativeTravelDuration,
+		cumulativeValues:         make([][]float64, len(s.cumulativeValues)),
+		stopToPlanUnit:           make([]*solutionPlanStopsUnitImpl, len(s.stopToPlanUnit)),
+		end:                      end,
+		first:                    first,
+		inVehicle:                inVehicle,
+		last:                     last,
+		model:                    model,
+		next:                     next,
+		previous:                 previous,
+		start:                    start,
+		stop:                     stop,
+		stopPosition:             stopPosition,
+		values:                   make([][]float64, len(s.values)),
+		vehicleIndices:           vehicleIndices,
+		random:                   random,
 		fixedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
 			random, s.fixedPlanUnits.Size(),
 		),
@@ -744,8 +750,6 @@ func (s *solutionImpl) Copy() Solution {
 		solution.vehicles[idx].solution = solution
 		solution.solutionVehicles[idx] = solution.vehicles[idx]
 	}
-
-	resetStopInterfaceCache(solution)
 
 	for _, expression := range model.expressions {
 		solution.cumulativeValues[expression.Index()] = slices.Clone(s.cumulativeValues[expression.Index()])
@@ -813,22 +817,6 @@ func (s *solutionImpl) Copy() Solution {
 	return solution
 }
 
-// resetStopInterfaceCache resets the stopByIndexCache.
-// The cache is holds a list of interface values for each stop index
-// to avoid allocations.
-func resetStopInterfaceCache(solution *solutionImpl) {
-	solution.stopByIndexCache = make(
-		[]SolutionStop,
-		len(solution.stop),
-	)
-	for idx := range solution.stop {
-		solution.stopByIndexCache[idx] = solutionStopImpl{
-			index:    idx,
-			solution: solution,
-		}
-	}
-}
-
 func (s *solutionImpl) SetRandom(random *rand.Rand) error {
 	if random == nil {
 		return fmt.Errorf("random is nil")
@@ -846,7 +834,7 @@ func (s *solutionImpl) newVehicle(
 	modelVehicle ModelVehicle,
 ) (SolutionVehicle, error) {
 	if modelVehicle == nil {
-		return nil, fmt.Errorf("modelVehicle is nil")
+		return SolutionVehicle{}, fmt.Errorf("modelVehicle is nil")
 	}
 
 	model := s.model.(*modelImpl)
@@ -869,13 +857,12 @@ func (s *solutionImpl) newVehicle(
 		modelVehicle.First().Index(),
 		modelVehicle.Last().Index(),
 	)
-	resetStopInterfaceCache(s)
 	s.vehicleIndices = append(s.vehicleIndices, modelVehicle.Index())
-	s.vehicles = append(s.vehicles, solutionVehicleImpl{
+	s.vehicles = append(s.vehicles, SolutionVehicle{
 		index:    modelVehicle.Index(),
 		solution: s,
 	})
-	s.solutionVehicles = append(s.solutionVehicles, solutionVehicleImpl{
+	s.solutionVehicles = append(s.solutionVehicles, SolutionVehicle{
 		index:    modelVehicle.Index(),
 		solution: s,
 	})
@@ -916,10 +903,10 @@ func (s *solutionImpl) newVehicle(
 
 	constraint, _, err := s.isFeasible(len(s.stop)-2, true)
 	if err != nil {
-		return nil, err
+		return SolutionVehicle{}, err
 	}
 	if constraint != nil {
-		return nil, fmt.Errorf("failed creating new vehicle: %v", constraint)
+		return SolutionVehicle{}, fmt.Errorf("failed creating new vehicle: %v", constraint)
 	}
 
 	return toSolutionVehicle(s, len(s.vehicles)-1), nil
@@ -1067,7 +1054,7 @@ func NewPreAllocatedMoveContainer(planUnit SolutionPlanUnit) *PreAllocatedMoveCo
 	switch planUnit.(type) {
 	case SolutionPlanStopsUnit:
 		m := newNotExecutableSolutionMoveStops(planUnit.(*solutionPlanStopsUnitImpl))
-		m.stopPositions = make([]stopPositionImpl, 1, 2)
+		m.stopPositions = make([]StopPosition, 1, 2)
 		allocations.singleStopPosSolutionMoveStop = m
 	case SolutionPlanUnitsUnit:
 	}
@@ -1096,7 +1083,7 @@ func (s *solutionImpl) BestMove(ctx context.Context, planUnit SolutionPlanUnit) 
 		return bestMove
 	}
 
-	solutionVehicle := solutionVehicleImpl{
+	solutionVehicle := SolutionVehicle{
 		index:    -1,
 		solution: s,
 	}
@@ -1189,7 +1176,10 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 	vehicle := s.model.Vehicle(s.vehicleIndices[s.inVehicle[index]]).(*modelVehicleImpl)
 	vehicleType := vehicle.VehicleType()
 
-	solutionStop := s.stopByIndexCache[index]
+	solutionStop := SolutionStop{
+		solution: s,
+		index:    index,
+	}
 
 	for _, constraint := range model.constraintsWithStopUpdater {
 		value, err := constraint.(ConstraintStopDataUpdater).
@@ -1240,7 +1230,11 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 
 		s.stopPosition[next] = s.stopPosition[index] + 1
 
-		solutionStop = s.stopByIndexCache[next]
+		solutionStop = SolutionStop{
+			solution: s,
+			index:    next,
+		}
+
 		for _, constraint := range model.constraintsWithStopUpdater {
 			value, err := constraint.(ConstraintStopDataUpdater).
 				UpdateConstraintStopData(
