@@ -75,7 +75,7 @@ func sequenceGeneratorSync(pu SolutionPlanUnit, yield func(SolutionStops)) {
 }
 
 func recSequenceGenerator(
-	stops []solutionStopImpl,
+	stops []SolutionStop,
 	sequence SolutionStops,
 	used []bool,
 	inDegree map[int]int,
