@@ -129,7 +129,7 @@ func NewSolution(
 		model: m,
 
 		vehicleIndices:           make([]int, 0, nrVehicles),
-		vehicles:                 make([]solutionVehicleImpl, 0, nrVehicles),
+		vehicles:                 make([]SolutionVehicle, 0, nrVehicles),
 		solutionVehicles:         make([]SolutionVehicle, 0, nrVehicles),
 		first:                    make([]int, 0, nrVehicles),
 		last:                     make([]int, 0, nrVehicles),
@@ -395,7 +395,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 	PlanUnitLoop:
 		for _, planUnit := range planUnits {
 			stopPositions := make(StopPositions, 0, len(planUnit.SolutionStops()))
-			previousStop := solutionVehicle.first()
+			previousStop := solutionVehicle.First()
 
 			solutionPlanUnit := s.unwrapRootPlanUnit(planUnit)
 			allPlanUnits[solutionPlanUnit] = true
@@ -455,7 +455,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 						newStopPosition(
 							previousStop,
 							solutionStop,
-							solutionVehicle.last(),
+							solutionVehicle.Last(),
 						),
 					)
 				}
@@ -510,7 +510,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 					)
 				}
 				for _, position := range move.(*solutionMoveStopsImpl).stopPositions {
-					position.stop().detach()
+					position.Stop().detach()
 				}
 				infeasiblePlanUnits[solutionPlanUnit] = true
 				continue
@@ -594,7 +594,7 @@ type solutionImpl struct {
 	vehicleIndices       []int
 
 	// TODO: explore if vehicles should rather be interfaces, then we can avoid creating new vehicles on the fly
-	vehicles                 []solutionVehicleImpl
+	vehicles                 []SolutionVehicle
 	solutionVehicles         []SolutionVehicle
 	start                    []float64
 	slack                    []float64
@@ -664,17 +664,17 @@ func (s *solutionImpl) SolutionVehicle(vehicle ModelVehicle) SolutionVehicle {
 	if solutionVehicle, ok := s.solutionVehicle(vehicle); ok {
 		return solutionVehicle
 	}
-	return nil
+	return SolutionVehicle{}
 }
 
-func (s *solutionImpl) solutionVehicle(vehicle ModelVehicle) (solutionVehicleImpl, bool) {
+func (s *solutionImpl) solutionVehicle(vehicle ModelVehicle) (SolutionVehicle, bool) {
 	if vehicle != nil {
-		return solutionVehicleImpl{
+		return SolutionVehicle{
 			index:    vehicle.Index(),
 			solution: s,
 		}, true
 	}
-	return solutionVehicleImpl{}, false
+	return SolutionVehicle{}, false
 }
 
 func (s *solutionImpl) Copy() Solution {
@@ -834,7 +834,7 @@ func (s *solutionImpl) newVehicle(
 	modelVehicle ModelVehicle,
 ) (SolutionVehicle, error) {
 	if modelVehicle == nil {
-		return nil, fmt.Errorf("modelVehicle is nil")
+		return SolutionVehicle{}, fmt.Errorf("modelVehicle is nil")
 	}
 
 	model := s.model.(*modelImpl)
@@ -858,11 +858,11 @@ func (s *solutionImpl) newVehicle(
 		modelVehicle.Last().Index(),
 	)
 	s.vehicleIndices = append(s.vehicleIndices, modelVehicle.Index())
-	s.vehicles = append(s.vehicles, solutionVehicleImpl{
+	s.vehicles = append(s.vehicles, SolutionVehicle{
 		index:    modelVehicle.Index(),
 		solution: s,
 	})
-	s.solutionVehicles = append(s.solutionVehicles, solutionVehicleImpl{
+	s.solutionVehicles = append(s.solutionVehicles, SolutionVehicle{
 		index:    modelVehicle.Index(),
 		solution: s,
 	})
@@ -903,10 +903,10 @@ func (s *solutionImpl) newVehicle(
 
 	constraint, _, err := s.isFeasible(len(s.stop)-2, true)
 	if err != nil {
-		return nil, err
+		return SolutionVehicle{}, err
 	}
 	if constraint != nil {
-		return nil, fmt.Errorf("failed creating new vehicle: %v", constraint)
+		return SolutionVehicle{}, fmt.Errorf("failed creating new vehicle: %v", constraint)
 	}
 
 	return toSolutionVehicle(s, len(s.vehicles)-1), nil
@@ -1083,7 +1083,7 @@ func (s *solutionImpl) BestMove(ctx context.Context, planUnit SolutionPlanUnit) 
 		return bestMove
 	}
 
-	solutionVehicle := solutionVehicleImpl{
+	solutionVehicle := SolutionVehicle{
 		index:    -1,
 		solution: s,
 	}

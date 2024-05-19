@@ -123,7 +123,7 @@ func (l *earlinessObjectiveImpl) EstimateDeltaValue(
 	// Init data
 	first := true
 	arrival, start, end := 0.0, 0.0, 0.0
-	previousStop := vehicle.first()
+	previousStop := vehicle.First()
 
 	// Get sequence starting with the first stop prior to the first stop to be
 	// inserted.

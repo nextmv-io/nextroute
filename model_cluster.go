@@ -226,13 +226,13 @@ func (l *clusterImpl) estimateDeltaScore(
 			return deltaScore, constNoPositionsHint
 		}
 
-		candidate := stopPosition.stop()
+		candidate := stopPosition.Stop()
 
 		var c *centroidData
 		if asConstraint {
-			c = vehicle.last().ConstraintData(l).(*centroidData)
+			c = vehicle.Last().ConstraintData(l).(*centroidData)
 		} else {
-			c = vehicle.last().ObjectiveData(l).(*centroidData)
+			c = vehicle.Last().ObjectiveData(l).(*centroidData)
 		}
 
 		centroid := c.location
@@ -249,7 +249,7 @@ func (l *clusterImpl) estimateDeltaScore(
 					continue
 				}
 				centroidOtherVehicle := otherVehicle.
-					last().
+					Last().
 					ConstraintData(l).(*centroidData).location
 
 				if haversineDistance(
@@ -285,12 +285,11 @@ func (l *clusterImpl) getSolutionStops(vehicle SolutionVehicle) []SolutionStop {
 }
 func (l *clusterImpl) Value(solutionStop Solution) float64 {
 	sum := 0.0
-	for _, v := range solutionStop.(*solutionImpl).vehiclesMutable() {
-		vehicle := v.(solutionVehicleImpl)
+	for _, vehicle := range solutionStop.(*solutionImpl).vehiclesMutable() {
 		if vehicle.IsEmpty() {
 			continue
 		}
-		sum += vehicle.last().ObjectiveData(l).(*centroidData).compactness
+		sum += vehicle.Last().ObjectiveData(l).(*centroidData).compactness
 	}
 	return sum
 }

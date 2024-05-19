@@ -190,8 +190,8 @@ func (l *latestImpl) Value(s Solution) float64 {
 	solution := s.(*solutionImpl)
 	value := 0.0
 	for _, vehicle := range solution.vehicles {
-		solutionStop := vehicle.first().Next()
-		lastSolutionStop := vehicle.last()
+		solutionStop := vehicle.First().Next()
+		lastSolutionStop := vehicle.Last()
 		for {
 			latenessFactor := l.latenessFactor.Value(
 				nil,
@@ -241,7 +241,7 @@ func (l *latestImpl) estimateDeltaScore(
 	first := true
 
 	arrival, start, end := 0.0, 0.0, 0.0
-	previousStop := vehicle.first().ModelStop()
+	previousStop := vehicle.First().ModelStop()
 	generator := newSolutionStopGenerator(*move, false, true)
 	defer generator.release()
 
