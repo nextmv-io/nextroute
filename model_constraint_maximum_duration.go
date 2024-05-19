@@ -54,13 +54,18 @@ func (l *maximumDurationConstraintImpl) EstimateIsViolated(
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
 	vehicle := moveImpl.vehicle()
+
+	if vehicle.IsEmpty() {
+		return false, constNoPositionsHint
+	}
+
 	vehicleType := vehicle.ModelVehicle().VehicleType()
 
 	dependentOnTime := vehicleType.TravelDurationExpression().IsDependentOnTime()
 
 	maximumValue := l.maximum.Value(vehicleType, nil, nil)
 
-	startValue := vehicle.first().StartValue()
+	startValue := vehicle.first().next().StartValue()
 	previous, _ := moveImpl.previous()
 	endValue := previous.EndValue()
 
@@ -97,8 +102,14 @@ func (l *maximumDurationConstraintImpl) EstimateIsViolated(
 }
 
 func (l *maximumDurationConstraintImpl) DoesVehicleHaveViolations(vehicle SolutionVehicle) bool {
-	return vehicle.DurationValue() >
-		l.maximum.Value(vehicle.ModelVehicle().VehicleType(), nil, nil)
+	if vehicle.IsEmpty() {
+		return false
+	}
+	// TODO: improve
+	endValue := vehicle.Last().EndValue() - vehicle.First().Next().StartValue()
+	max := l.maximum.Value(vehicle.ModelVehicle().VehicleType(), nil, nil)
+	return endValue > max
+
 }
 
 func (l *maximumDurationConstraintImpl) IsTemporal() bool {

@@ -8,20 +8,21 @@ package factory
 type Options struct {
 	Constraints struct {
 		Disable struct {
-			Attributes         bool     `json:"attributes" usage:"ignore the compatibility attributes constraint"`
-			Capacity           bool     `json:"capacity" usage:"ignore the capacity constraint for all resources"`
-			Capacities         []string `json:"capacities" usage:"ignore the capacity constraint for the given resource names"`
-			DistanceLimit      bool     `json:"distance_limit" usage:"ignore the distance limit constraint"`
-			Groups             bool     `json:"groups" usage:"ignore the groups constraint"`
-			MaximumDuration    bool     `json:"maximum_duration" usage:"ignore the maximum duration constraint"`
-			MaximumStops       bool     `json:"maximum_stops" usage:"ignore the maximum stops constraint"`
-			MaximumWaitStop    bool     `json:"maximum_wait_stop" usage:"ignore the maximum stop wait constraint"`
-			MaximumWaitVehicle bool     `json:"maximum_wait_vehicle" usage:"ignore the maximum vehicle wait constraint"`
-			MixingItems        bool     `json:"mixing_items" usage:"ignore the do not mix items constraint"`
-			Precedence         bool     `json:"precedence" usage:"ignore the precedence (pickups & deliveries) constraint"`
-			VehicleStartTime   bool     `json:"vehicle_start_time" usage:"ignore the vehicle start time constraint"`
-			VehicleEndTime     bool     `json:"vehicle_end_time" usage:"ignore the vehicle end time constraint"`
-			StartTimeWindows   bool     `json:"start_time_windows" usage:"ignore the start time windows constraint"`
+			Attributes            bool     `json:"attributes" usage:"ignore the compatibility attributes constraint"`
+			Capacity              bool     `json:"capacity" usage:"ignore the capacity constraint for all resources"`
+			Capacities            []string `json:"capacities" usage:"ignore the capacity constraint for the given resource names"`
+			DistanceLimit         bool     `json:"distance_limit" usage:"ignore the distance limit constraint"`
+			Groups                bool     `json:"groups" usage:"ignore the groups constraint"`
+			MaximumDuration       bool     `json:"maximum_duration" usage:"ignore the maximum duration constraint"`
+			MaximumTravelDuration bool     `json:"maximum_travel_duration" usage:"ignore the maximum travel duration constraint"`
+			MaximumStops          bool     `json:"maximum_stops" usage:"ignore the maximum stops constraint"`
+			MaximumWaitStop       bool     `json:"maximum_wait_stop" usage:"ignore the maximum stop wait constraint"`
+			MaximumWaitVehicle    bool     `json:"maximum_wait_vehicle" usage:"ignore the maximum vehicle wait constraint"`
+			MixingItems           bool     `json:"mixing_items" usage:"ignore the do not mix items constraint"`
+			Precedence            bool     `json:"precedence" usage:"ignore the precedence (pickups & deliveries) constraint"`
+			VehicleStartTime      bool     `json:"vehicle_start_time" usage:"ignore the vehicle start time constraint"`
+			VehicleEndTime        bool     `json:"vehicle_end_time" usage:"ignore the vehicle end time constraint"`
+			StartTimeWindows      bool     `json:"start_time_windows" usage:"ignore the start time windows constraint"`
 		} `json:"disable"`
 		Enable struct {
 			Cluster bool `json:"cluster" usage:"enable the cluster constraint"`
