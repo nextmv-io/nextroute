@@ -4,7 +4,7 @@ package nextroute
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"reflect"
 	"slices"
 	"sort"
@@ -206,7 +206,7 @@ func NewModel() (Model, error) {
 		objective:                      nil,
 		objectivesWithStopUpdater:      make(ModelObjectives, 0),
 		objectivesWithSolutionUpdater:  make(ModelObjectives, 0),
-		random:                         rand.New(rand.NewSource(0)),
+		random:                         rand.New(rand.NewPCG(0, 0)),
 		timeFormat:                     time.UnixDate,
 		stopVehicles:                   make(map[int]int),
 		// TODO: 24 is a magic number, it expresses that for up to 4 stops in a

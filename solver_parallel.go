@@ -36,7 +36,7 @@ func DefaultSolveOptionsFactory() SolveOptionsFactory {
 			Iterations: -1,
 			Duration:   30 * time.Second,
 		}
-		solveOptions.Iterations = (1 + solveInformation.Random().Intn(10)) * 200
+		solveOptions.Iterations = (1 + solveInformation.Random().IntN(10)) * 200
 		return solveOptions, nil
 	}
 }

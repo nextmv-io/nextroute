@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"math/rand"
+	"math/rand/v2"
 	"reflect"
 	"slices"
 	"strings"
@@ -116,7 +116,7 @@ func NewSolution(
 		}
 	}
 
-	random := rand.New(rand.NewSource(m.Random().Int63()))
+	random := newRandomRand(model.Random())
 
 	maxExpressionIndex := -1
 	for _, expression := range model.expressions {
@@ -682,7 +682,7 @@ func (s *solutionImpl) Copy() Solution {
 
 	model.OnCopySolution(s)
 	s.randomMutex.Lock()
-	random := rand.New(rand.NewSource(s.random.Int63()))
+	random := newRandomRand(model.Random())
 	s.randomMutex.Unlock()
 
 	// in order to reduce the number of allocations, we allocate
@@ -1363,4 +1363,9 @@ func (s *solutionImpl) isSolutionNotFeasible(
 		DoesSolutionHaveViolations(s)
 	s.model.OnSolutionConstraintChecked(constraint, !violated)
 	return violated
+}
+
+func newRandomRand(r *rand.Rand) *rand.Rand {
+	seed := uint64(r.Int64())
+	return rand.New(rand.NewPCG(seed, seed))
 }

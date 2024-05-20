@@ -3,7 +3,7 @@
 package nextroute
 
 import (
-	"math/rand"
+	"math/rand/v2"
 	"slices"
 
 	"github.com/nextmv-io/nextroute/common"

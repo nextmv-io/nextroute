@@ -127,7 +127,7 @@ func takeBestInPlace(best, that SolutionMove) SolutionMove {
 	if best.Value() > that.Value() {
 		return tryReplaceBy(best, that, that.ValueSeen())
 	}
-	if best.PlanUnit().Solution().Random().Intn(best.ValueSeen()+that.ValueSeen()) == 0 {
+	if best.PlanUnit().Solution().Random().IntN(best.ValueSeen()+that.ValueSeen()) == 0 {
 		switch b := best.(type) {
 		case *solutionMoveStopsImpl:
 			b.valueSeen++

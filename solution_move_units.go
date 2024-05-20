@@ -143,7 +143,7 @@ func (m solutionMoveUnitsImpl) TakeBest(that SolutionMove) SolutionMove {
 	if m.value < that.Value() {
 		return m
 	}
-	if m.solution.random.Intn(m.ValueSeen()+that.ValueSeen()) == 0 {
+	if m.solution.random.IntN(m.ValueSeen()+that.ValueSeen()) == 0 {
 		m.valueSeen++
 		return m
 	}

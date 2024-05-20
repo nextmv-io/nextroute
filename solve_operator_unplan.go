@@ -216,7 +216,7 @@ func (d *solveOperatorUnPlanImpl) unplanSomeStopsOfOneVehicle(
 		}
 	}
 
-	vehicle := vehicles[solution.Random().Intn(len(vehicles))]
+	vehicle := vehicles[solution.Random().IntN(len(vehicles))]
 	stops := vehicle.SolutionStops()
 	count := 0
 

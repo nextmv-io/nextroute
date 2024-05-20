@@ -4,7 +4,7 @@ package common_test
 
 import (
 	"math"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 
 	"github.com/nextmv-io/nextroute/common"
@@ -22,7 +22,7 @@ func TestAlias(t *testing.T) {
 	testAlias(t, []float64{1000, 1, 3, 10}, 10001310)
 }
 
-func testAlias(t *testing.T, weights []float64, seed int64) {
+func testAlias(t *testing.T, weights []float64, seed uint64) {
 	sum := 0.0
 	for i := 0; i < len(weights); i++ {
 		sum += weights[i]
@@ -32,7 +32,7 @@ func testAlias(t *testing.T, weights []float64, seed int64) {
 		t.Fatal(err)
 	}
 
-	random := rand.New(rand.NewSource(seed))
+	random := rand.New(rand.NewPCG(seed, seed))
 	counts := make([]int64, len(weights))
 
 	for i := 0; i < samples; i++ {

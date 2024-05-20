@@ -307,7 +307,7 @@ func (m *solutionMoveStopsImpl) TakeBest(that SolutionMove) SolutionMove {
 	if m.value < that.Value() {
 		return m
 	}
-	if m.planUnit.solution().random.Intn(m.ValueSeen()+that.ValueSeen()) == 0 {
+	if m.planUnit.solution().random.IntN(m.ValueSeen()+that.ValueSeen()) == 0 {
 		m.valueSeen++
 		return m
 	}
