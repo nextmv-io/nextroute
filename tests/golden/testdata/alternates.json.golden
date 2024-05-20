@@ -75,10 +75,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 925.145499687516,
+            "base": 1054.6462314259393,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 925.145499687516
+            "value": 1054.6462314259393
           },
           {
             "base": 4000000,
@@ -87,7 +87,7 @@
             "value": 4000000
           }
         ],
-        "value": 4000925.1454996876
+        "value": 4001054.646231426
       },
       "unplanned": [],
       "vehicles": [
@@ -133,21 +133,8 @@
               "travel_duration": 287
             },
             {
-              "cumulative_travel_distance": 9081,
-              "cumulative_travel_duration": 454,
-              "stop": {
-                "id": "Nijō Castle",
-                "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
-                }
-              },
-              "travel_distance": 3329,
-              "travel_duration": 166
-            },
-            {
-              "cumulative_travel_distance": 10857,
-              "cumulative_travel_duration": 542,
+              "cumulative_travel_distance": 9162,
+              "cumulative_travel_duration": 458,
               "stop": {
                 "id": "Kyoto Imperial Palace",
                 "location": {
@@ -155,38 +142,25 @@
                   "lon": 135.762057
                 }
               },
+              "travel_distance": 3410,
+              "travel_duration": 170
+            },
+            {
+              "cumulative_travel_distance": 10938,
+              "cumulative_travel_duration": 546,
+              "stop": {
+                "id": "Nijō Castle",
+                "location": {
+                  "lat": 35.014239,
+                  "lon": 135.748134
+                }
+              },
               "travel_distance": 1776,
               "travel_duration": 88
             },
             {
-              "cumulative_travel_distance": 13696,
-              "cumulative_travel_duration": 684,
-              "stop": {
-                "id": "Gionmachi",
-                "location": {
-                  "lat": 35.002457,
-                  "lon": 135.775682
-                }
-              },
-              "travel_distance": 2839,
-              "travel_duration": 141
-            },
-            {
-              "cumulative_travel_distance": 14897,
-              "cumulative_travel_duration": 745,
-              "stop": {
-                "id": "Kiyomizu-dera",
-                "location": {
-                  "lat": 34.994857,
-                  "lon": 135.78506
-                }
-              },
-              "travel_distance": 1201,
-              "travel_duration": 60
-            },
-            {
-              "cumulative_travel_distance": 18263,
-              "cumulative_travel_duration": 913,
+              "cumulative_travel_distance": 16285,
+              "cumulative_travel_duration": 814,
               "stop": {
                 "id": "Inari",
                 "location": {
@@ -194,13 +168,13 @@
                   "lon": 135.7666538
                 }
               },
-              "travel_distance": 3366,
-              "travel_duration": 168
+              "travel_distance": 5347,
+              "travel_duration": 267
             }
           ],
-          "route_duration": 913,
-          "route_travel_distance": 18263,
-          "route_travel_duration": 913
+          "route_duration": 814,
+          "route_travel_distance": 16285,
+          "route_travel_duration": 814
         },
         {
           "alternate_stops": [
@@ -242,11 +216,37 @@
               },
               "travel_distance": 236,
               "travel_duration": 11
+            },
+            {
+              "cumulative_travel_distance": 3603,
+              "cumulative_travel_duration": 180,
+              "stop": {
+                "id": "Kiyomizu-dera",
+                "location": {
+                  "lat": 34.994857,
+                  "lon": 135.78506
+                }
+              },
+              "travel_distance": 3367,
+              "travel_duration": 168
+            },
+            {
+              "cumulative_travel_distance": 4804,
+              "cumulative_travel_duration": 240,
+              "stop": {
+                "id": "Gionmachi",
+                "location": {
+                  "lat": 35.002457,
+                  "lon": 135.775682
+                }
+              },
+              "travel_distance": 1201,
+              "travel_duration": 60
             }
           ],
-          "route_duration": 11,
-          "route_travel_distance": 236,
-          "route_travel_duration": 11
+          "route_duration": 240,
+          "route_travel_distance": 4804,
+          "route_travel_duration": 240
         }
       ]
     }
@@ -255,16 +255,16 @@
     "result": {
       "custom": {
         "activated_vehicles": 2,
-        "max_duration": 913,
-        "max_stops_in_vehicle": 7,
-        "max_travel_duration": 913,
-        "min_duration": 11,
-        "min_stops_in_vehicle": 2,
-        "min_travel_duration": 11,
+        "max_duration": 814,
+        "max_stops_in_vehicle": 5,
+        "max_travel_duration": 814,
+        "min_duration": 240,
+        "min_stops_in_vehicle": 4,
+        "min_travel_duration": 240,
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 4000925.1454996876
+      "value": 4001054.646231426
     },
     "run": {
       "duration": 0.123,

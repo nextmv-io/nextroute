@@ -75,10 +75,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 1727.601181827492,
+            "base": 1844.672812003247,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 1727.601181827492
+            "value": 1844.672812003247
           },
           {
             "factor": 1,
@@ -86,7 +86,7 @@
             "value": 0
           }
         ],
-        "value": 1727.601181827492
+        "value": 1844.672812003247
       },
       "unplanned": [],
       "vehicles": [
@@ -157,35 +157,9 @@
               "travel_duration": 297
             },
             {
-              "cumulative_travel_distance": 13832,
-              "cumulative_travel_duration": 691,
-              "stop": {
-                "id": "Kyoto Imperial Palace",
-                "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762057
-                }
-              },
-              "travel_distance": 3410,
-              "travel_duration": 170
-            },
-            {
-              "cumulative_travel_distance": 15608,
-              "cumulative_travel_duration": 780,
+              "cumulative_travel_distance": 16174,
+              "cumulative_travel_duration": 808,
               "duration": 300,
-              "stop": {
-                "id": "Nijō Castle",
-                "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
-                }
-              },
-              "travel_distance": 1776,
-              "travel_duration": 88
-            },
-            {
-              "cumulative_travel_distance": 22548,
-              "cumulative_travel_duration": 1127,
               "stop": {
                 "id": "Arashiyama Bamboo Forest",
                 "location": {
@@ -193,14 +167,40 @@
                   "lon": 135.672009
                 }
               },
+              "travel_distance": 5752,
+              "travel_duration": 287
+            },
+            {
+              "cumulative_travel_distance": 23114,
+              "cumulative_travel_duration": 1155,
+              "stop": {
+                "id": "Nijō Castle",
+                "location": {
+                  "lat": 35.014239,
+                  "lon": 135.748134
+                }
+              },
               "travel_distance": 6940,
               "travel_duration": 347
+            },
+            {
+              "cumulative_travel_distance": 24890,
+              "cumulative_travel_duration": 1244,
+              "stop": {
+                "id": "Kyoto Imperial Palace",
+                "location": {
+                  "lat": 35.025431,
+                  "lon": 135.762057
+                }
+              },
+              "travel_distance": 1776,
+              "travel_duration": 88
             }
           ],
-          "route_duration": 1727,
+          "route_duration": 1844,
           "route_stops_duration": 600,
-          "route_travel_distance": 22548,
-          "route_travel_duration": 1127
+          "route_travel_distance": 24890,
+          "route_travel_duration": 1244
         }
       ]
     }
@@ -209,16 +209,16 @@
     "result": {
       "custom": {
         "activated_vehicles": 1,
-        "max_duration": 1727,
+        "max_duration": 1844,
         "max_stops_in_vehicle": 7,
-        "max_travel_duration": 1127,
-        "min_duration": 1727,
+        "max_travel_duration": 1244,
+        "min_duration": 1844,
         "min_stops_in_vehicle": 7,
-        "min_travel_duration": 1127,
+        "min_travel_duration": 1244,
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 1727.601181827492
+      "value": 1844.672812003247
     },
     "run": {
       "duration": 0.123,

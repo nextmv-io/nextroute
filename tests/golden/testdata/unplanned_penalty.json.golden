@@ -119,6 +119,24 @@
             {
               "cumulative_travel_duration": 0,
               "stop": {
+                "id": "Arashiyama Bamboo Forest",
+                "location": {
+                  "lat": 35.017209,
+                  "lon": 135.672009
+                }
+              },
+              "travel_duration": 0
+            }
+          ],
+          "route_duration": 0,
+          "route_travel_duration": 0
+        },
+        {
+          "id": "v2",
+          "route": [
+            {
+              "cumulative_travel_duration": 0,
+              "stop": {
                 "id": "Gionmachi",
                 "location": {
                   "lat": 35.002457,
@@ -157,24 +175,6 @@
           "route_duration": 312,
           "route_travel_distance": 6249,
           "route_travel_duration": 312
-        },
-        {
-          "id": "v2",
-          "route": [
-            {
-              "cumulative_travel_duration": 0,
-              "stop": {
-                "id": "Arashiyama Bamboo Forest",
-                "location": {
-                  "lat": 35.017209,
-                  "lon": 135.672009
-                }
-              },
-              "travel_duration": 0
-            }
-          ],
-          "route_duration": 0,
-          "route_travel_duration": 0
         }
       ]
     }

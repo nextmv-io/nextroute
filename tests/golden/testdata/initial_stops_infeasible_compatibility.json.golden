@@ -75,10 +75,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 684.9267442164864,
+            "base": 594.1017037634494,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 684.9267442164864
+            "value": 594.1017037634494
           },
           {
             "base": 1000000,
@@ -87,7 +87,7 @@
             "value": 1000000
           }
         ],
-        "value": 1000684.9267442165
+        "value": 1000594.1017037635
       },
       "unplanned": [
         {
@@ -123,63 +123,10 @@
                 }
               },
               "travel_duration": 0
-            },
-            {
-              "cumulative_travel_distance": 5752,
-              "cumulative_travel_duration": 287,
-              "stop": {
-                "id": "Kinkaku-ji",
-                "location": {
-                  "lat": 35.039705,
-                  "lon": 135.728898
-                }
-              },
-              "travel_distance": 5752,
-              "travel_duration": 287
-            },
-            {
-              "cumulative_travel_distance": 9081,
-              "cumulative_travel_duration": 454,
-              "stop": {
-                "id": "Nijō Castle",
-                "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
-                }
-              },
-              "travel_distance": 3329,
-              "travel_duration": 166
-            },
-            {
-              "cumulative_travel_distance": 10857,
-              "cumulative_travel_duration": 542,
-              "stop": {
-                "id": "Kyoto Imperial Palace",
-                "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762057
-                }
-              },
-              "travel_distance": 1776,
-              "travel_duration": 88
-            },
-            {
-              "cumulative_travel_distance": 13696,
-              "cumulative_travel_duration": 684,
-              "stop": {
-                "id": "Gionmachi",
-                "location": {
-                  "lat": 35.002457,
-                  "lon": 135.775682
-                }
-              },
-              "travel_distance": 2839,
-              "travel_duration": 141
             }
           ],
-          "route_duration": 684,
-          "route_travel_distance": 13696,
-          "route_travel_duration": 684
+          "route_duration": 0,
+          "route_travel_duration": 0
         },
         {
           "id": "v2",
@@ -205,10 +152,63 @@
                 }
               },
               "travel_duration": 0
+            },
+            {
+              "cumulative_travel_distance": 3935,
+              "cumulative_travel_duration": 196,
+              "stop": {
+                "id": "Gionmachi",
+                "location": {
+                  "lat": 35.002457,
+                  "lon": 135.775682
+                }
+              },
+              "travel_distance": 3935,
+              "travel_duration": 196
+            },
+            {
+              "cumulative_travel_distance": 6774,
+              "cumulative_travel_duration": 338,
+              "stop": {
+                "id": "Kyoto Imperial Palace",
+                "location": {
+                  "lat": 35.025431,
+                  "lon": 135.762057
+                }
+              },
+              "travel_distance": 2839,
+              "travel_duration": 141
+            },
+            {
+              "cumulative_travel_distance": 8550,
+              "cumulative_travel_duration": 427,
+              "stop": {
+                "id": "Nijō Castle",
+                "location": {
+                  "lat": 35.014239,
+                  "lon": 135.748134
+                }
+              },
+              "travel_distance": 1776,
+              "travel_duration": 88
+            },
+            {
+              "cumulative_travel_distance": 11879,
+              "cumulative_travel_duration": 594,
+              "stop": {
+                "id": "Kinkaku-ji",
+                "location": {
+                  "lat": 35.039705,
+                  "lon": 135.728898
+                }
+              },
+              "travel_distance": 3329,
+              "travel_duration": 166
             }
           ],
-          "route_duration": 0,
-          "route_travel_duration": 0
+          "route_duration": 594,
+          "route_travel_distance": 11879,
+          "route_travel_duration": 594
         }
       ]
     }
@@ -217,16 +217,16 @@
     "result": {
       "custom": {
         "activated_vehicles": 2,
-        "max_duration": 684,
+        "max_duration": 594,
         "max_stops_in_vehicle": 5,
-        "max_travel_duration": 684,
+        "max_travel_duration": 594,
         "min_duration": 0,
         "min_stops_in_vehicle": 1,
         "min_travel_duration": 0,
         "unplanned_stops": 1
       },
       "duration": 0.123,
-      "value": 1000684.9267442165
+      "value": 1000594.1017037635
     },
     "run": {
       "duration": 0.123,

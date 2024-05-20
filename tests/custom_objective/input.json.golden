@@ -75,10 +75,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty + 1 * balance_penalty",
         "objectives": [
           {
-            "base": 1084.2458387952015,
+            "base": 990.7616281716765,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 1084.2458387952015
+            "value": 990.7616281716765
           },
           {
             "factor": 1,
@@ -92,7 +92,7 @@
             "value": 1000
           }
         ],
-        "value": 2084.2458387952015
+        "value": 1990.7616281716764
       },
       "unplanned": [],
       "vehicles": [
@@ -122,48 +122,35 @@
               "travel_duration": 0
             },
             {
-              "cumulative_travel_distance": 8250,
-              "cumulative_travel_duration": 412,
+              "cumulative_travel_distance": 5752,
+              "cumulative_travel_duration": 287,
               "stop": {
-                "id": "Kyoto Imperial Palace",
+                "id": "Kinkaku-ji",
                 "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762057
+                  "lat": 35.039705,
+                  "lon": 135.728898
                 }
               },
-              "travel_distance": 8250,
-              "travel_duration": 412
+              "travel_distance": 5752,
+              "travel_duration": 287
             },
             {
-              "cumulative_travel_distance": 12243,
-              "cumulative_travel_duration": 612,
+              "cumulative_travel_distance": 9081,
+              "cumulative_travel_duration": 454,
               "stop": {
-                "id": "Kiyomizu-dera",
+                "id": "Nijō Castle",
                 "location": {
-                  "lat": 34.994857,
-                  "lon": 135.78506
+                  "lat": 35.014239,
+                  "lon": 135.748134
                 }
               },
-              "travel_distance": 3993,
-              "travel_duration": 199
-            },
-            {
-              "cumulative_travel_distance": 15523,
-              "cumulative_travel_duration": 776,
-              "stop": {
-                "id": "Fushimi Inari Taisha",
-                "location": {
-                  "lat": 34.967146,
-                  "lon": 135.772695
-                }
-              },
-              "travel_distance": 3280,
-              "travel_duration": 164
+              "travel_distance": 3329,
+              "travel_duration": 166
             }
           ],
-          "route_duration": 776,
-          "route_travel_distance": 15523,
-          "route_travel_duration": 776
+          "route_duration": 454,
+          "route_travel_distance": 9081,
+          "route_travel_duration": 454
         },
         {
           "id": "v2",
@@ -180,32 +167,21 @@
               "travel_duration": 0
             },
             {
-              "cumulative_travel_duration": 0,
+              "cumulative_travel_distance": 3410,
+              "cumulative_travel_duration": 170,
               "stop": {
-                "id": "Kinkaku-ji",
+                "id": "Kyoto Imperial Palace",
                 "location": {
-                  "lat": 35.039705,
-                  "lon": 135.728898
+                  "lat": 35.025431,
+                  "lon": 135.762057
                 }
               },
-              "travel_duration": 0
+              "travel_distance": 3410,
+              "travel_duration": 170
             },
             {
-              "cumulative_travel_distance": 3329,
-              "cumulative_travel_duration": 166,
-              "stop": {
-                "id": "Nijō Castle",
-                "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
-                }
-              },
-              "travel_distance": 3329,
-              "travel_duration": 166
-            },
-            {
-              "cumulative_travel_distance": 6159,
-              "cumulative_travel_duration": 308,
+              "cumulative_travel_distance": 6249,
+              "cumulative_travel_duration": 312,
               "stop": {
                 "id": "Gionmachi",
                 "location": {
@@ -213,13 +189,39 @@
                   "lon": 135.775682
                 }
               },
-              "travel_distance": 2830,
+              "travel_distance": 2839,
               "travel_duration": 141
+            },
+            {
+              "cumulative_travel_distance": 7450,
+              "cumulative_travel_duration": 372,
+              "stop": {
+                "id": "Kiyomizu-dera",
+                "location": {
+                  "lat": 34.994857,
+                  "lon": 135.78506
+                }
+              },
+              "travel_distance": 1201,
+              "travel_duration": 60
+            },
+            {
+              "cumulative_travel_distance": 10730,
+              "cumulative_travel_duration": 536,
+              "stop": {
+                "id": "Fushimi Inari Taisha",
+                "location": {
+                  "lat": 34.967146,
+                  "lon": 135.772695
+                }
+              },
+              "travel_distance": 3280,
+              "travel_duration": 164
             }
           ],
-          "route_duration": 308,
-          "route_travel_distance": 6159,
-          "route_travel_duration": 308
+          "route_duration": 536,
+          "route_travel_distance": 10730,
+          "route_travel_duration": 536
         }
       ]
     }
@@ -228,16 +230,16 @@
     "result": {
       "custom": {
         "activated_vehicles": 2,
-        "max_duration": 776,
+        "max_duration": 536,
         "max_stops_in_vehicle": 4,
-        "max_travel_duration": 776,
-        "min_duration": 308,
+        "max_travel_duration": 536,
+        "min_duration": 454,
         "min_stops_in_vehicle": 3,
-        "min_travel_duration": 308,
+        "min_travel_duration": 454,
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 2084.2458387952015
+      "value": 1990.7616281716764
     },
     "run": {
       "duration": 0.123,

@@ -100,7 +100,7 @@
               "end_time": "2023-01-01T12:10:00Z",
               "start_time": "2023-01-01T12:00:00Z",
               "stop": {
-                "id": "Gionmachi",
+                "id": "Kyoto Imperial Palace",
                 "location": {
                   "lat": 34.96714,
                   "lon": 135.77159
@@ -131,7 +131,7 @@
               "end_time": "2023-01-01T12:40:00Z",
               "start_time": "2023-01-01T12:30:00Z",
               "stop": {
-                "id": "Kyoto Imperial Palace",
+                "id": "Gionmachi",
                 "location": {
                   "lat": 34.96714,
                   "lon": 135.77159

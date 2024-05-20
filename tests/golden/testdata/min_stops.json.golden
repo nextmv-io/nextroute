@@ -75,10 +75,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty + 1 * min_stops",
         "objectives": [
           {
-            "base": 909.0466359667603,
+            "base": 767.0466501941119,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 909.0466359667603
+            "value": 767.0466501941119
           },
           {
             "factor": 1,
@@ -91,59 +91,15 @@
             "value": 0
           }
         ],
-        "value": 909.0466359667603
+        "value": 767.0466501941119
       },
       "unplanned": [],
       "vehicles": [
         {
           "id": "v1",
-          "route": [],
-          "route_duration": 0,
-          "route_travel_duration": 0
-        },
-        {
-          "id": "v2",
           "route": [
             {
               "cumulative_travel_duration": 0,
-              "stop": {
-                "id": "Fushimi Inari Taisha",
-                "location": {
-                  "lat": 34.967146,
-                  "lon": 135.772695
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "cumulative_travel_distance": 3280,
-              "cumulative_travel_duration": 164,
-              "stop": {
-                "id": "Kiyomizu-dera",
-                "location": {
-                  "lat": 34.994857,
-                  "lon": 135.78506
-                }
-              },
-              "travel_distance": 3280,
-              "travel_duration": 164
-            },
-            {
-              "cumulative_travel_distance": 4481,
-              "cumulative_travel_duration": 224,
-              "stop": {
-                "id": "Gionmachi",
-                "location": {
-                  "lat": 35.002457,
-                  "lon": 135.775682
-                }
-              },
-              "travel_distance": 1201,
-              "travel_duration": 60
-            },
-            {
-              "cumulative_travel_distance": 7320,
-              "cumulative_travel_duration": 366,
               "stop": {
                 "id": "Kyoto Imperial Palace",
                 "location": {
@@ -151,12 +107,11 @@
                   "lon": 135.762057
                 }
               },
-              "travel_distance": 2839,
-              "travel_duration": 141
+              "travel_duration": 0
             },
             {
-              "cumulative_travel_distance": 9096,
-              "cumulative_travel_duration": 454,
+              "cumulative_travel_distance": 1776,
+              "cumulative_travel_duration": 88,
               "stop": {
                 "id": "Nijō Castle",
                 "location": {
@@ -168,8 +123,8 @@
               "travel_duration": 88
             },
             {
-              "cumulative_travel_distance": 12425,
-              "cumulative_travel_duration": 621,
+              "cumulative_travel_distance": 5105,
+              "cumulative_travel_duration": 255,
               "stop": {
                 "id": "Kinkaku-ji",
                 "location": {
@@ -181,8 +136,8 @@
               "travel_duration": 166
             },
             {
-              "cumulative_travel_distance": 18177,
-              "cumulative_travel_duration": 909,
+              "cumulative_travel_distance": 10857,
+              "cumulative_travel_duration": 542,
               "stop": {
                 "id": "Arashiyama Bamboo Forest",
                 "location": {
@@ -194,9 +149,54 @@
               "travel_duration": 287
             }
           ],
-          "route_duration": 909,
-          "route_travel_distance": 18177,
-          "route_travel_duration": 909
+          "route_duration": 542,
+          "route_travel_distance": 10857,
+          "route_travel_duration": 542
+        },
+        {
+          "id": "v2",
+          "route": [
+            {
+              "cumulative_travel_duration": 0,
+              "stop": {
+                "id": "Gionmachi",
+                "location": {
+                  "lat": 35.002457,
+                  "lon": 135.775682
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "cumulative_travel_distance": 1201,
+              "cumulative_travel_duration": 60,
+              "stop": {
+                "id": "Kiyomizu-dera",
+                "location": {
+                  "lat": 34.994857,
+                  "lon": 135.78506
+                }
+              },
+              "travel_distance": 1201,
+              "travel_duration": 60
+            },
+            {
+              "cumulative_travel_distance": 4481,
+              "cumulative_travel_duration": 224,
+              "stop": {
+                "id": "Fushimi Inari Taisha",
+                "location": {
+                  "lat": 34.967146,
+                  "lon": 135.772695
+                }
+              },
+              "travel_distance": 3280,
+              "travel_duration": 164
+            }
+          ],
+          "route_duration": 224,
+          "route_travel_distance": 4481,
+          "route_travel_duration": 224
         }
       ]
     }
@@ -204,17 +204,17 @@
   "statistics": {
     "result": {
       "custom": {
-        "activated_vehicles": 1,
-        "max_duration": 909,
-        "max_stops_in_vehicle": 7,
-        "max_travel_duration": 909,
-        "min_duration": 909,
-        "min_stops_in_vehicle": 7,
-        "min_travel_duration": 909,
+        "activated_vehicles": 2,
+        "max_duration": 542,
+        "max_stops_in_vehicle": 4,
+        "max_travel_duration": 542,
+        "min_duration": 224,
+        "min_stops_in_vehicle": 3,
+        "min_travel_duration": 224,
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 909.0466359667603
+      "value": 767.0466501941119
     },
     "run": {
       "duration": 0.123,

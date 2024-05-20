@@ -151,10 +151,10 @@
             {
               "cumulative_travel_duration": 0,
               "stop": {
-                "id": "Kyoto Imperial Palace",
+                "id": "Nijō Castle",
                 "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762057
+                  "lat": 35.014239,
+                  "lon": 135.748134
                 }
               },
               "travel_duration": 0
@@ -163,10 +163,10 @@
               "cumulative_travel_distance": 1776,
               "cumulative_travel_duration": 88,
               "stop": {
-                "id": "Nijō Castle",
+                "id": "Kyoto Imperial Palace",
                 "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
+                  "lat": 35.025431,
+                  "lon": 135.762057
                 }
               },
               "travel_distance": 1776,

@@ -116,21 +116,21 @@
               "end_time": "2023-01-01T12:05:00Z",
               "start_time": "2023-01-01T12:00:00Z",
               "stop": {
-                "id": "Fushimi Inari Taisha",
+                "id": "Gionmachi",
                 "location": {
-                  "lat": 34.967146,
-                  "lon": 135.772695
+                  "lat": 35.002457,
+                  "lon": 135.775682
                 }
               },
               "travel_duration": 0
             },
             {
-              "arrival_time": "2023-01-01T12:15:56Z",
-              "cumulative_travel_distance": 3280,
-              "cumulative_travel_duration": 656,
+              "arrival_time": "2023-01-01T12:09:00Z",
+              "cumulative_travel_distance": 1201,
+              "cumulative_travel_duration": 240,
               "duration": 300,
-              "end_time": "2023-01-01T12:20:56Z",
-              "start_time": "2023-01-01T12:15:56Z",
+              "end_time": "2023-01-01T12:14:00Z",
+              "start_time": "2023-01-01T12:09:00Z",
               "stop": {
                 "id": "Kiyomizu-dera",
                 "location": {
@@ -138,8 +138,8 @@
                   "lon": 135.78506
                 }
               },
-              "travel_distance": 3280,
-              "travel_duration": 656
+              "travel_distance": 1201,
+              "travel_duration": 240
             },
             {
               "arrival_time": "2023-01-01T12:24:56Z",
@@ -149,14 +149,14 @@
               "end_time": "2023-01-01T12:29:56Z",
               "start_time": "2023-01-01T12:24:56Z",
               "stop": {
-                "id": "Gionmachi",
+                "id": "Fushimi Inari Taisha",
                 "location": {
-                  "lat": 35.002457,
-                  "lon": 135.775682
+                  "lat": 34.967146,
+                  "lon": 135.772695
                 }
               },
-              "travel_distance": 1201,
-              "travel_duration": 240
+              "travel_distance": 3280,
+              "travel_duration": 656
             }
           ],
           "route_duration": 1796,
