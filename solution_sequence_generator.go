@@ -51,14 +51,15 @@ func SequenceGeneratorChannel(
 			for _, arc := range dag.arcs {
 				inDegree[arc.Destination().Index()]++
 			}
-
+			random := solution.Random()
 			sequenceGenerator(
 				solutionStops,
 				make([]SolutionStop, 0, len(solutionStops)),
+				random.Perm(len(solutionStops)),
 				used,
 				inDegree,
 				dag,
-				solution.Random(),
+				random,
 				&maxSequences,
 				func(solutionStops SolutionStops) {
 					select {
@@ -77,6 +78,7 @@ func SequenceGeneratorChannel(
 
 func sequenceGenerator(
 	stops, sequence SolutionStops,
+	stopOrder []int,
 	used []bool,
 	inDegree map[int]int,
 	dag DirectedAcyclicGraph,
@@ -91,23 +93,23 @@ func sequenceGenerator(
 		}
 		return
 	}
-
-	stopOrder := random.Perm(len(stops))
+	localStopOrder := stopOrder
 
 	// we know the direct successor, so we move it to the front of the random
 	// sequence
-	if directSuccessor != -1 {
+	isDirectSuccessor := directSuccessor != -1
+	if isDirectSuccessor {
 		for _, stopIdx := range stopOrder {
 			if stops[stopIdx].Index() == directSuccessor {
-				stopOrder = []int{stopIdx}
+				localStopOrder = stopOrder[:1]
+				localStopOrder[0] = stopIdx
 				break
 			}
 		}
 	}
-	isDirectSuccessor := directSuccessor != -1
 	directSuccessor = -1
 
-	for _, idx := range stopOrder {
+	for _, idx := range localStopOrder {
 		stop := stops[idx]
 		if !used[idx] && inDegree[stop.ModelStop().Index()] == 0 {
 			used[idx] = true
@@ -119,16 +121,15 @@ func sequenceGenerator(
 					directSuccessor = stop.Solution().SolutionStop(arc.Destination()).Index()
 				}
 			} else {
-				outboundArcOrder := random.Perm(len(outboundArcs))
-				for _, arcsIdx := range outboundArcOrder {
-					arc := outboundArcs[arcsIdx]
+				shuffleInPlace(random, outboundArcs)
+				for _, arc := range outboundArcs {
 					inDegree[arc.Destination().Index()]--
 					if dag.HasDirectArc(arc.Origin(), arc.Destination()) {
 						directSuccessor = stop.Solution().SolutionStop(arc.Destination()).Index()
 					}
 				}
 			}
-			sequenceGenerator(stops, append(sequence, stop), used, inDegree, dag, random, maxSequences, yield, directSuccessor)
+			sequenceGenerator(stops, append(sequence, stop), stopOrder, used, inDegree, dag, random, maxSequences, yield, directSuccessor)
 			// reached the maximum number of sequences
 			if *maxSequences == 0 {
 				return
@@ -141,5 +142,12 @@ func sequenceGenerator(
 				break
 			}
 		}
+	}
+}
+
+func shuffleInPlace[T any](r *rand.Rand, slice []T) {
+	for i := len(slice) - 1; i > 0; i-- {
+		j := r.Intn(i + 1)
+		slice[i], slice[j] = slice[j], slice[i]
 	}
 }
