@@ -118,12 +118,7 @@ func NewSolution(
 
 	random := rand.New(rand.NewSource(m.Random().Int63()))
 
-	maxExpressionIndex := -1
-	for _, expression := range model.expressions {
-		if expression.Index() > maxExpressionIndex {
-			maxExpressionIndex = expression.Index()
-		}
-	}
+	nExpressions := len(model.expressions)
 
 	solution := &solutionImpl{
 		model: m,
@@ -143,8 +138,8 @@ func NewSolution(
 		slack:                    make([]float64, 0, nrStops),
 		start:                    make([]float64, 0, nrStops),
 		end:                      make([]float64, 0, nrStops),
-		values:                   make([][]float64, maxExpressionIndex+1),
-		cumulativeValues:         make([][]float64, maxExpressionIndex+1),
+		values:                   make(map[int][]float64, nExpressions),
+		cumulativeValues:         make(map[int][]float64, nExpressions),
 		stopToPlanUnit:           make([]*solutionPlanStopsUnitImpl, nrStops),
 		constraintStopData:       make(map[ModelConstraint][]Copier),
 		objectiveStopData:        make(map[ModelObjective][]Copier),
@@ -577,12 +572,12 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 type solutionImpl struct {
 	model                  Model
 	scores                 map[ModelObjective]float64
-	values                 [][]float64
+	values                 map[int][]float64
 	objectiveStopData      map[ModelObjective][]Copier
 	constraintStopData     map[ModelConstraint][]Copier
 	objectiveSolutionData  map[ModelObjective]Copier
 	constraintSolutionData map[ModelConstraint]Copier
-	cumulativeValues       [][]float64
+	cumulativeValues       map[int][]float64
 
 	// TODO: explore if stopToPlanUnit should rather contain interfaces
 	stopToPlanUnit       []*solutionPlanStopsUnitImpl
@@ -690,6 +685,7 @@ func (s *solutionImpl) Copy() Solution {
 	// to the correct size
 	nrStops := len(s.stop)
 	nrVehicles := len(s.vehicles)
+	nrExpressions := len(model.expressions)
 	ints := make([]int, 5*nrStops+3*nrVehicles)
 	first, ints := common.CopySliceFrom(ints, s.first)
 	vehicleIndices, ints := common.CopySliceFrom(ints, s.vehicleIndices)
@@ -699,12 +695,12 @@ func (s *solutionImpl) Copy() Solution {
 	next, ints := common.CopySliceFrom(ints, s.next)
 	stopPosition, ints := common.CopySliceFrom(ints, s.stopPosition)
 	stop, _ := common.CopySliceFrom(ints, s.stop)
-	floats := make([]float64, 5*nrStops)
+	floats := make([]float64, (5+2*nrExpressions)*nrStops)
 	start, floats := common.CopySliceFrom(floats, s.start)
 	end, floats := common.CopySliceFrom(floats, s.end)
 	arrival, floats := common.CopySliceFrom(floats, s.arrival)
 	slack, floats := common.CopySliceFrom(floats, s.slack)
-	cumulativeTravelDuration, _ := common.CopySliceFrom(floats, s.cumulativeTravelDuration)
+	cumulativeTravelDuration, floats := common.CopySliceFrom(floats, s.cumulativeTravelDuration)
 	solution := &solutionImpl{
 		arrival:                  arrival,
 		slack:                    slack,
@@ -713,7 +709,7 @@ func (s *solutionImpl) Copy() Solution {
 		constraintSolutionData:   make(map[ModelConstraint]Copier, len(s.constraintSolutionData)),
 		objectiveSolutionData:    make(map[ModelObjective]Copier, len(s.objectiveSolutionData)),
 		cumulativeTravelDuration: cumulativeTravelDuration,
-		cumulativeValues:         make([][]float64, len(s.cumulativeValues)),
+		cumulativeValues:         make(map[int][]float64, len(s.cumulativeValues)),
 		stopToPlanUnit:           make([]*solutionPlanStopsUnitImpl, len(s.stopToPlanUnit)),
 		end:                      end,
 		first:                    first,
@@ -725,7 +721,7 @@ func (s *solutionImpl) Copy() Solution {
 		start:                    start,
 		stop:                     stop,
 		stopPosition:             stopPosition,
-		values:                   make([][]float64, len(s.values)),
+		values:                   make(map[int][]float64, len(s.values)),
 		vehicleIndices:           vehicleIndices,
 		random:                   random,
 		fixedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
@@ -752,8 +748,9 @@ func (s *solutionImpl) Copy() Solution {
 	}
 
 	for _, expression := range model.expressions {
-		solution.cumulativeValues[expression.Index()] = slices.Clone(s.cumulativeValues[expression.Index()])
-		solution.values[expression.Index()] = slices.Clone(s.values[expression.Index()])
+		eIndex := expression.Index()
+		solution.cumulativeValues[eIndex], floats = common.CopySliceFrom(floats, s.cumulativeValues[eIndex])
+		solution.values[eIndex], floats = common.CopySliceFrom(floats, s.values[eIndex])
 	}
 
 	for _, constraint := range model.constraintsWithStopUpdater {

@@ -101,9 +101,7 @@ func (p *solutionPlanStopsUnitImpl) SolutionStops() SolutionStops {
 }
 
 func (p *solutionPlanStopsUnitImpl) solutionStopsImpl() []SolutionStop {
-	solutionStops := make([]SolutionStop, len(p.solutionStops))
-	copy(solutionStops, p.solutionStops)
-	return solutionStops
+	return p.solutionStops
 }
 
 func (p *solutionPlanStopsUnitImpl) IsPlanned() bool {
