@@ -28,13 +28,15 @@ func UnplanIsland(
 			stop = stop.Previous()
 		}
 		if distance.Value(common.Meters) > 0 {
-			closestStops, err := solutionStop.ModelStop().ClosestStops()
+			closestStops, err := solutionStop.modelStop().closestStops()
 			if err != nil {
 				return err
 			}
 			for _, closeModelStop := range closestStops {
-				if haversineDistance(solutionStop.ModelStop().Location(), closeModelStop.Location()).Value(common.Meters) <=
-					distance.Value(common.Meters) {
+				d := haversineDistance(
+					solutionStop.ModelStop().Location(),
+					closeModelStop.Location()).Value(common.Meters)
+				if d <= distance.Value(common.Meters) {
 					unplanUnits = append(unplanUnits, solutionStop.PlanStopsUnit())
 					break
 				}

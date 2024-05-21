@@ -40,7 +40,6 @@ func newNotExecutableSolutionMoveUnits(planUnit *solutionPlanUnitsUnitImpl) *sol
 		solution:  planUnit.Solution().(*solutionImpl),
 		planUnit:  planUnit,
 		valueSeen: 1,
-		allowed:   false,
 	}
 }
 
