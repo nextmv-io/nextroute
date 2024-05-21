@@ -126,8 +126,6 @@ func (l *maximumImpl) Lock(model Model) error {
 			delta += value
 			if value != 0 {
 				hasNoEffect = false
-				break
-
 			}
 		}
 		l.deltas[planUnit.Index()] = delta
