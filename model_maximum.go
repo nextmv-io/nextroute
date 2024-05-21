@@ -67,7 +67,7 @@ type maximumImpl struct {
 	resourceExpression                   ModelExpression
 	maximumByVehicleType                 []float64
 	penaltyOffset                        float64
-	effectLevel                          []bool
+	hasNoEffect                          []bool
 }
 
 func (l *maximumImpl) PenaltyOffset() float64 {
@@ -110,16 +110,7 @@ func (l *maximumImpl) Lock(model Model) error {
 
 	planUnits := model.PlanStopsUnits()
 
-	l.effectLevel = make([]bool, len(planUnits))
-
-	for _, planUnit := range planUnits {
-		for _, stop := range planUnit.Stops() {
-			value := l.Expression().Value(nil, nil, stop)
-			if value != 0 {
-				l.effectLevel[planUnit.Index()] = true
-			}
-		}
-	}
+	l.hasNoEffect = make([]bool, len(planUnits))
 
 	if !l.hasStopExpressionAndNoNegativeValues {
 		return nil
@@ -129,11 +120,18 @@ func (l *maximumImpl) Lock(model Model) error {
 
 	for _, planUnit := range planUnits {
 		delta := 0.0
+		hasNoEffect := true
 		for _, stop := range planUnit.Stops() {
 			value := l.Expression().Value(nil, nil, stop)
 			delta += value
+			if value != 0 {
+				hasNoEffect = false
+				break
+
+			}
 		}
 		l.deltas[planUnit.Index()] = delta
+		l.hasNoEffect[planUnit.Index()] = hasNoEffect
 	}
 
 	return nil
@@ -197,7 +195,7 @@ func (l *maximumImpl) EstimateIsViolated(
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
 
-	if !l.effectLevel[moveImpl.planUnit.modelPlanStopsUnit.Index()] {
+	if l.hasNoEffect[moveImpl.planUnit.modelPlanStopsUnit.Index()] {
 		return false, constNoPositionsHint
 	}
 
@@ -321,7 +319,7 @@ func (l *maximumImpl) EstimateDeltaValue(
 ) (deltaValue float64) {
 	moveImpl := move.(*solutionMoveStopsImpl)
 
-	if !l.effectLevel[moveImpl.planUnit.modelPlanStopsUnit.Index()] {
+	if l.hasNoEffect[moveImpl.planUnit.modelPlanStopsUnit.Index()] {
 		return 0.0
 	}
 
