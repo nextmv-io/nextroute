@@ -262,9 +262,7 @@ func (s *stopDurationExpressionImpl) Value(
 	_ ModelStop,
 	stop ModelStop,
 ) float64 {
-	index := stop.Index()
-
-	if value, ok := s.values[index]; ok {
+	if value, ok := s.values[stop.Index()]; ok {
 		return value
 	}
 	return s.defaultValue
@@ -347,9 +345,7 @@ func (v *vehicleTypeDurationExpressionImpl) Value(
 	_ ModelStop,
 	_ ModelStop,
 ) float64 {
-	index := vehicleType.Index()
-
-	if value, ok := v.values[index]; ok {
+	if value, ok := v.values[vehicleType.Index()]; ok {
 		return value
 	}
 	return v.defaultValue
