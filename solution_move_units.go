@@ -11,11 +11,11 @@ func newSolutionMoveUnits(
 	planUnit *solutionPlanUnitsUnitImpl,
 	moves SolutionMoves,
 ) solutionMoveUnitsImpl {
-	if len(moves) != len(planUnit.SolutionPlanUnits()) {
+	if len(moves) != len(planUnit.solutionPlanUnits) {
 		panic(
 			fmt.Sprintf("moves and SolutionPlanUnits must have the same length: %v != %v",
 				len(moves),
-				len(planUnit.SolutionPlanUnits()),
+				len(planUnit.solutionPlanUnits),
 			),
 		)
 	}
