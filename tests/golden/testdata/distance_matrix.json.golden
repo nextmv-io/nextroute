@@ -114,10 +114,10 @@
             {
               "cumulative_travel_duration": 0,
               "stop": {
-                "id": "Nijō Castle",
+                "id": "Fushimi Inari Taisha",
                 "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
+                  "lat": 34.967146,
+                  "lon": 135.772695
                 }
               },
               "travel_duration": 0
@@ -126,10 +126,10 @@
               "cumulative_travel_distance": 6700,
               "cumulative_travel_duration": 335,
               "stop": {
-                "id": "Fushimi Inari Taisha",
+                "id": "Nijō Castle",
                 "location": {
-                  "lat": 34.967146,
-                  "lon": 135.772695
+                  "lat": 35.014239,
+                  "lon": 135.748134
                 }
               },
               "travel_distance": 6700,

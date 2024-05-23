@@ -109,87 +109,9 @@
               "travel_duration": 0
             },
             {
-              "arrival_time": "2023-01-01T12:07:44Z",
-              "cumulative_travel_distance": 3280,
-              "cumulative_travel_duration": 164,
-              "duration": 300,
-              "end_time": "2023-01-01T12:12:44Z",
-              "start_time": "2023-01-01T12:07:44Z",
-              "stop": {
-                "id": "Kiyomizu-dera",
-                "location": {
-                  "lat": 34.994857,
-                  "lon": 135.78506
-                }
-              },
-              "travel_distance": 3280,
-              "travel_duration": 164
-            },
-            {
-              "arrival_time": "2023-01-01T12:16:03Z",
-              "cumulative_travel_distance": 7273,
-              "cumulative_travel_duration": 363,
-              "duration": 300,
-              "end_time": "2023-01-01T12:21:03Z",
-              "start_time": "2023-01-01T12:16:03Z",
-              "stop": {
-                "id": "Kyoto Imperial Palace",
-                "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762057
-                }
-              },
-              "travel_distance": 3993,
-              "travel_duration": 199
-            },
-            {
-              "arrival_time": "2023-01-01T12:23:54Z",
-              "cumulative_travel_distance": 10683,
-              "cumulative_travel_duration": 534,
-              "duration": 300,
-              "end_time": "2023-01-01T12:30:00Z",
-              "start_time": "2023-01-01T12:25:00Z",
-              "stop": {
-                "id": "Kinkaku-ji",
-                "location": {
-                  "lat": 35.039705,
-                  "lon": 135.728898
-                }
-              },
-              "travel_distance": 3410,
-              "travel_duration": 170,
-              "waiting_duration": 66
-            },
-            {
-              "arrival_time": "2023-01-01T12:34:47Z",
-              "cumulative_travel_distance": 16435,
-              "cumulative_travel_duration": 821,
-              "duration": 300,
-              "end_time": "2023-01-01T12:39:47Z",
-              "start_time": "2023-01-01T12:34:47Z",
-              "stop": {
-                "id": "Arashiyama Bamboo Forest",
-                "location": {
-                  "lat": 35.017209,
-                  "lon": 135.672009
-                }
-              },
-              "travel_distance": 5752,
-              "travel_duration": 287
-            }
-          ],
-          "route_duration": 2387,
-          "route_stops_duration": 1500,
-          "route_travel_distance": 16435,
-          "route_travel_duration": 821,
-          "route_waiting_duration": 66
-        },
-        {
-          "id": "v2",
-          "route": [
-            {
-              "arrival_time": "2023-01-01T12:00:00Z",
-              "cumulative_travel_duration": 0,
+              "arrival_time": "2023-01-01T12:09:44Z",
+              "cumulative_travel_distance": 5694,
+              "cumulative_travel_duration": 284,
               "duration": 300,
               "end_time": "2023-01-01T12:15:00Z",
               "start_time": "2023-01-01T12:10:00Z",
@@ -200,13 +122,14 @@
                   "lon": 135.748134
                 }
               },
-              "travel_duration": 0,
-              "waiting_duration": 600
+              "travel_distance": 5694,
+              "travel_duration": 284,
+              "waiting_duration": 16
             },
             {
               "arrival_time": "2023-01-01T12:17:21Z",
-              "cumulative_travel_distance": 2830,
-              "cumulative_travel_duration": 141,
+              "cumulative_travel_distance": 8524,
+              "cumulative_travel_duration": 426,
               "duration": 300,
               "end_time": "2023-01-01T12:25:00Z",
               "start_time": "2023-01-01T12:20:00Z",
@@ -223,10 +146,89 @@
             }
           ],
           "route_duration": 1500,
-          "route_stops_duration": 600,
-          "route_travel_distance": 2830,
-          "route_travel_duration": 141,
-          "route_waiting_duration": 759
+          "route_stops_duration": 900,
+          "route_travel_distance": 8524,
+          "route_travel_duration": 426,
+          "route_waiting_duration": 174
+        },
+        {
+          "id": "v2",
+          "route": [
+            {
+              "arrival_time": "2023-01-01T12:00:00Z",
+              "cumulative_travel_duration": 0,
+              "duration": 300,
+              "end_time": "2023-01-01T12:10:00Z",
+              "start_time": "2023-01-01T12:05:00Z",
+              "stop": {
+                "id": "Kiyomizu-dera",
+                "location": {
+                  "lat": 34.994857,
+                  "lon": 135.78506
+                }
+              },
+              "travel_duration": 0,
+              "waiting_duration": 300
+            },
+            {
+              "arrival_time": "2023-01-01T12:13:19Z",
+              "cumulative_travel_distance": 3993,
+              "cumulative_travel_duration": 199,
+              "duration": 300,
+              "end_time": "2023-01-01T12:20:00Z",
+              "start_time": "2023-01-01T12:15:00Z",
+              "stop": {
+                "id": "Kyoto Imperial Palace",
+                "location": {
+                  "lat": 35.025431,
+                  "lon": 135.762057
+                }
+              },
+              "travel_distance": 3993,
+              "travel_duration": 199,
+              "waiting_duration": 101
+            },
+            {
+              "arrival_time": "2023-01-01T12:22:50Z",
+              "cumulative_travel_distance": 7403,
+              "cumulative_travel_duration": 370,
+              "duration": 300,
+              "end_time": "2023-01-01T12:30:00Z",
+              "start_time": "2023-01-01T12:25:00Z",
+              "stop": {
+                "id": "Kinkaku-ji",
+                "location": {
+                  "lat": 35.039705,
+                  "lon": 135.728898
+                }
+              },
+              "travel_distance": 3410,
+              "travel_duration": 170,
+              "waiting_duration": 130
+            },
+            {
+              "arrival_time": "2023-01-01T12:34:47Z",
+              "cumulative_travel_distance": 13155,
+              "cumulative_travel_duration": 657,
+              "duration": 300,
+              "end_time": "2023-01-01T12:39:47Z",
+              "start_time": "2023-01-01T12:34:47Z",
+              "stop": {
+                "id": "Arashiyama Bamboo Forest",
+                "location": {
+                  "lat": 35.017209,
+                  "lon": 135.672009
+                }
+              },
+              "travel_distance": 5752,
+              "travel_duration": 287
+            }
+          ],
+          "route_duration": 2387,
+          "route_stops_duration": 1200,
+          "route_travel_distance": 13155,
+          "route_travel_duration": 657,
+          "route_waiting_duration": 530
         }
       ]
     }
@@ -236,11 +238,11 @@
       "custom": {
         "activated_vehicles": 2,
         "max_duration": 2387,
-        "max_stops_in_vehicle": 5,
-        "max_travel_duration": 821,
+        "max_stops_in_vehicle": 4,
+        "max_travel_duration": 657,
         "min_duration": 1500,
-        "min_stops_in_vehicle": 2,
-        "min_travel_duration": 141,
+        "min_stops_in_vehicle": 3,
+        "min_travel_duration": 426,
         "unplanned_stops": 0
       },
       "duration": 0.123,

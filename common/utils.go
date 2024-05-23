@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
-	"math/rand"
+	"math/rand/v2"
 	"slices"
 	"sync"
 	"time"
@@ -248,9 +248,9 @@ func RandomElement[T any](
 		// The rand use case here has no security concern.
 		// G404 (CWE-338): Use of weak random number generator (math/rand instead of crypto/rand).
 		/* #nosec */
-		source = rand.New(rand.NewSource(time.Now().UnixNano()))
+		source = newRandomSource()
 	}
-	return elements[source.Intn(len(elements))]
+	return elements[source.IntN(len(elements))]
 }
 
 // RandomElements returns a slice of n random elements from the
@@ -264,7 +264,7 @@ func RandomElements[T any](
 ) []T {
 	if source == nil {
 		/* #nosec */
-		source = rand.New(rand.NewSource(time.Now().UnixNano()))
+		source = newRandomSource()
 	}
 
 	if n <= 0 {
@@ -298,7 +298,7 @@ func RandomElementIndices[T any](
 ) []int {
 	if source == nil {
 		/* #nosec */
-		source = rand.New(rand.NewSource(time.Now().UnixNano()))
+		source = newRandomSource()
 	}
 
 	if n <= 0 {
@@ -331,11 +331,11 @@ func RandomElementIndices[T any](
 func RandomIndex(source *rand.Rand, size int, indicesUsed map[int]bool) int {
 	if source == nil {
 		/* #nosec */
-		source = rand.New(rand.NewSource(time.Now().UnixNano()))
+		source = newRandomSource()
 	}
 
 	for {
-		index := source.Intn(size)
+		index := source.IntN(size)
 		if used, ok := indicesUsed[index]; !ok || !used {
 			indicesUsed[index] = true
 			return index
@@ -349,10 +349,10 @@ func Shuffle[T any](source *rand.Rand, slice []T) []T {
 	s := DefensiveCopy(slice)
 	if source == nil {
 		/* #nosec */
-		source = rand.New(rand.NewSource(time.Now().UnixNano()))
+		source = newRandomSource()
 	}
 	for i := range slice {
-		j := source.Intn(i + 1)
+		j := source.IntN(i + 1)
 		s[i], s[j] = s[j], s[i]
 	}
 	return s
@@ -432,4 +432,9 @@ func Reverse[T any](slice []T) []T {
 		slice[i], slice[j] = slice[j], slice[i]
 	}
 	return slice
+}
+
+func newRandomSource() *rand.Rand {
+	seed := uint64(time.Now().UnixNano())
+	return rand.New(rand.NewPCG(seed, seed))
 }

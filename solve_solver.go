@@ -5,7 +5,7 @@ package nextroute
 import (
 	"context"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"slices"
 	"time"
 
@@ -244,7 +244,7 @@ func (s *solveImpl) Solve(
 	newWorkSolution := startSolutions[0].Copy()
 	s.bestSolution = startSolutions[0].Copy()
 	s.workSolution = newWorkSolution
-	s.random = rand.New(rand.NewSource(newWorkSolution.Random().Int63()))
+	s.random = newRandomRand(newWorkSolution.Random())
 
 	start := time.Now()
 

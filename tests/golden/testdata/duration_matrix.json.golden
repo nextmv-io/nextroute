@@ -96,17 +96,17 @@
             {
               "cumulative_travel_duration": 0,
               "stop": {
-                "id": "Nijō Castle",
+                "id": "Fushimi Inari Taisha",
                 "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
+                  "lat": 34.967146,
+                  "lon": 135.772695
                 }
               },
               "travel_duration": 0
             },
             {
-              "cumulative_travel_distance": 3994,
-              "cumulative_travel_duration": 660,
+              "cumulative_travel_distance": 3280,
+              "cumulative_travel_duration": 720,
               "stop": {
                 "id": "Kiyomizu-dera",
                 "location": {
@@ -114,21 +114,21 @@
                   "lon": 135.78506
                 }
               },
-              "travel_distance": 3994,
-              "travel_duration": 660
+              "travel_distance": 3280,
+              "travel_duration": 720
             },
             {
               "cumulative_travel_distance": 7274,
               "cumulative_travel_duration": 1380,
               "stop": {
-                "id": "Fushimi Inari Taisha",
+                "id": "Nijō Castle",
                 "location": {
-                  "lat": 34.967146,
-                  "lon": 135.772695
+                  "lat": 35.014239,
+                  "lon": 135.748134
                 }
               },
-              "travel_distance": 3280,
-              "travel_duration": 720
+              "travel_distance": 3994,
+              "travel_duration": 660
             }
           ],
           "route_duration": 1380,

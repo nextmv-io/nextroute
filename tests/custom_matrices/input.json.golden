@@ -75,10 +75,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 1242.8609280586243,
+            "base": 1603.9404928684235,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 1242.8609280586243
+            "value": 1603.9404928684235
           },
           {
             "factor": 1,
@@ -86,7 +86,7 @@
             "value": 0
           }
         ],
-        "value": 1242.8609280586243
+        "value": 1603.9404928684235
       },
       "unplanned": [],
       "vehicles": [
@@ -120,10 +120,91 @@
                 }
               },
               "travel_duration": 0
+            },
+            {
+              "arrival_time": "2023-01-01T06:11:34-06:00",
+              "cumulative_travel_distance": 6940,
+              "cumulative_travel_duration": 694,
+              "end_time": "2023-01-01T06:11:34-06:00",
+              "start_time": "2023-01-01T06:11:34-06:00",
+              "stop": {
+                "id": "Nijō Castle",
+                "location": {
+                  "lat": 35.014239,
+                  "lon": 135.748134
+                }
+              },
+              "travel_distance": 6940,
+              "travel_duration": 694
+            },
+            {
+              "arrival_time": "2023-01-01T06:14:31-06:00",
+              "cumulative_travel_distance": 8716,
+              "cumulative_travel_duration": 871,
+              "end_time": "2023-01-01T06:14:31-06:00",
+              "start_time": "2023-01-01T06:14:31-06:00",
+              "stop": {
+                "id": "Kyoto Imperial Palace",
+                "location": {
+                  "lat": 35.025431,
+                  "lon": 135.762057
+                }
+              },
+              "travel_distance": 1776,
+              "travel_duration": 177
+            },
+            {
+              "arrival_time": "2023-01-01T06:19:15-06:00",
+              "cumulative_travel_distance": 11555,
+              "cumulative_travel_duration": 1155,
+              "end_time": "2023-01-01T06:19:15-06:00",
+              "start_time": "2023-01-01T06:19:15-06:00",
+              "stop": {
+                "id": "Gionmachi",
+                "location": {
+                  "lat": 35.002457,
+                  "lon": 135.775682
+                }
+              },
+              "travel_distance": 2839,
+              "travel_duration": 283
+            },
+            {
+              "arrival_time": "2023-01-01T06:21:15-06:00",
+              "cumulative_travel_distance": 12756,
+              "cumulative_travel_duration": 1275,
+              "end_time": "2023-01-01T06:21:15-06:00",
+              "start_time": "2023-01-01T06:21:15-06:00",
+              "stop": {
+                "id": "Kiyomizu-dera",
+                "location": {
+                  "lat": 34.994857,
+                  "lon": 135.78506
+                }
+              },
+              "travel_distance": 1201,
+              "travel_duration": 120
+            },
+            {
+              "arrival_time": "2023-01-01T06:26:43-06:00",
+              "cumulative_travel_distance": 16036,
+              "cumulative_travel_duration": 1603,
+              "end_time": "2023-01-01T06:26:43-06:00",
+              "start_time": "2023-01-01T06:26:43-06:00",
+              "stop": {
+                "id": "Fushimi Inari Taisha",
+                "location": {
+                  "lat": 34.967146,
+                  "lon": 135.772695
+                }
+              },
+              "travel_distance": 3280,
+              "travel_duration": 328
             }
           ],
-          "route_duration": 0,
-          "route_travel_duration": 0
+          "route_duration": 1603,
+          "route_travel_distance": 16036,
+          "route_travel_duration": 1603
         },
         {
           "id": "v2",
@@ -155,91 +236,10 @@
                 }
               },
               "travel_duration": 0
-            },
-            {
-              "arrival_time": "2023-01-01T06:05:32-06:00",
-              "cumulative_travel_distance": 3329,
-              "cumulative_travel_duration": 332,
-              "end_time": "2023-01-01T06:05:32-06:00",
-              "start_time": "2023-01-01T06:05:32-06:00",
-              "stop": {
-                "id": "Nijō Castle",
-                "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
-                }
-              },
-              "travel_distance": 3329,
-              "travel_duration": 332
-            },
-            {
-              "arrival_time": "2023-01-01T06:08:30-06:00",
-              "cumulative_travel_distance": 5105,
-              "cumulative_travel_duration": 510,
-              "end_time": "2023-01-01T06:08:30-06:00",
-              "start_time": "2023-01-01T06:08:30-06:00",
-              "stop": {
-                "id": "Kyoto Imperial Palace",
-                "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762057
-                }
-              },
-              "travel_distance": 1776,
-              "travel_duration": 177
-            },
-            {
-              "arrival_time": "2023-01-01T06:13:14-06:00",
-              "cumulative_travel_distance": 7944,
-              "cumulative_travel_duration": 794,
-              "end_time": "2023-01-01T06:13:14-06:00",
-              "start_time": "2023-01-01T06:13:14-06:00",
-              "stop": {
-                "id": "Gionmachi",
-                "location": {
-                  "lat": 35.002457,
-                  "lon": 135.775682
-                }
-              },
-              "travel_distance": 2839,
-              "travel_duration": 283
-            },
-            {
-              "arrival_time": "2023-01-01T06:15:14-06:00",
-              "cumulative_travel_distance": 9145,
-              "cumulative_travel_duration": 914,
-              "end_time": "2023-01-01T06:15:14-06:00",
-              "start_time": "2023-01-01T06:15:14-06:00",
-              "stop": {
-                "id": "Kiyomizu-dera",
-                "location": {
-                  "lat": 34.994857,
-                  "lon": 135.78506
-                }
-              },
-              "travel_distance": 1201,
-              "travel_duration": 120
-            },
-            {
-              "arrival_time": "2023-01-01T06:20:42-06:00",
-              "cumulative_travel_distance": 12425,
-              "cumulative_travel_duration": 1242,
-              "end_time": "2023-01-01T06:20:42-06:00",
-              "start_time": "2023-01-01T06:20:42-06:00",
-              "stop": {
-                "id": "Fushimi Inari Taisha",
-                "location": {
-                  "lat": 34.967146,
-                  "lon": 135.772695
-                }
-              },
-              "travel_distance": 3280,
-              "travel_duration": 328
             }
           ],
-          "route_duration": 1242,
-          "route_travel_distance": 12425,
-          "route_travel_duration": 1242
+          "route_duration": 0,
+          "route_travel_duration": 0
         }
       ]
     }
@@ -248,16 +248,16 @@
     "result": {
       "custom": {
         "activated_vehicles": 2,
-        "max_duration": 1242,
+        "max_duration": 1603,
         "max_stops_in_vehicle": 6,
-        "max_travel_duration": 1242,
+        "max_travel_duration": 1603,
         "min_duration": 0,
         "min_stops_in_vehicle": 1,
         "min_travel_duration": 0,
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 1242.8609280586243
+      "value": 1603.9404928684235
     },
     "run": {
       "duration": 0.123,

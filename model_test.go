@@ -4,7 +4,7 @@ package nextroute_test
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"time"
 
@@ -64,7 +64,7 @@ func createModel(input Input) (nextroute.Model, error) {
 		return nil, err
 	}
 
-	model.SetRandom(rand.New(rand.NewSource(input.Seed)))
+	model.SetRandom(rand.New(rand.NewPCG(uint64(input.Seed), 0)))
 
 	serviceDuration := nextroute.NewStopDurationExpression("serviceDuration", 0.0)
 

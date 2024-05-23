@@ -112,10 +112,10 @@
             {
               "cumulative_travel_duration": 0,
               "stop": {
-                "id": "Nijō Castle",
+                "id": "Kyoto Imperial Palace",
                 "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
+                  "lat": 35.025431,
+                  "lon": 135.762057
                 }
               },
               "travel_duration": 0
@@ -124,10 +124,10 @@
               "cumulative_travel_distance": 1776,
               "cumulative_travel_duration": 88,
               "stop": {
-                "id": "Kyoto Imperial Palace",
+                "id": "Nijō Castle",
                 "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762057
+                  "lat": 35.014239,
+                  "lon": 135.748134
                 }
               },
               "travel_distance": 1776,
@@ -144,17 +144,17 @@
             {
               "cumulative_travel_duration": 0,
               "stop": {
-                "id": "Fushimi Inari Taisha",
+                "id": "Gionmachi",
                 "location": {
-                  "lat": 34.967146,
-                  "lon": 135.772695
+                  "lat": 35.002457,
+                  "lon": 135.775682
                 }
               },
               "travel_duration": 0
             },
             {
-              "cumulative_travel_distance": 3280,
-              "cumulative_travel_duration": 164,
+              "cumulative_travel_distance": 1201,
+              "cumulative_travel_duration": 60,
               "stop": {
                 "id": "Kiyomizu-dera",
                 "location": {
@@ -162,21 +162,21 @@
                   "lon": 135.78506
                 }
               },
-              "travel_distance": 3280,
-              "travel_duration": 164
+              "travel_distance": 1201,
+              "travel_duration": 60
             },
             {
               "cumulative_travel_distance": 4481,
               "cumulative_travel_duration": 224,
               "stop": {
-                "id": "Gionmachi",
+                "id": "Fushimi Inari Taisha",
                 "location": {
-                  "lat": 35.002457,
-                  "lon": 135.775682
+                  "lat": 34.967146,
+                  "lon": 135.772695
                 }
               },
-              "travel_distance": 1201,
-              "travel_duration": 60
+              "travel_distance": 3280,
+              "travel_duration": 164
             }
           ],
           "route_duration": 224,

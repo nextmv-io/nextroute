@@ -111,10 +111,40 @@
             {
               "arrival_time": "2023-01-01T12:00:00Z",
               "cumulative_travel_duration": 0,
-              "end_time": "2023-01-01T12:00:00Z",
-              "start_time": "2023-01-01T12:00:00Z",
+              "end_time": "2023-01-01T12:05:00Z",
+              "start_time": "2023-01-01T12:05:00Z",
               "stop": {
-                "id": "Arashiyama Bamboo Forest",
+                "id": "Gionmachi",
+                "location": {
+                  "lat": 34.96714,
+                  "lon": 135.77159
+                }
+              },
+              "travel_duration": 0,
+              "waiting_duration": 300
+            },
+            {
+              "arrival_time": "2023-01-01T12:05:00Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-01-01T12:10:00Z",
+              "start_time": "2023-01-01T12:10:00Z",
+              "stop": {
+                "id": "Nijō Castle",
+                "location": {
+                  "lat": 34.96714,
+                  "lon": 135.77159
+                }
+              },
+              "travel_duration": 0,
+              "waiting_duration": 300
+            },
+            {
+              "arrival_time": "2023-01-01T12:10:00Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-01-01T12:10:00Z",
+              "start_time": "2023-01-01T12:10:00Z",
+              "stop": {
+                "id": "Kiyomizu-dera",
                 "location": {
                   "lat": 34.96714,
                   "lon": 135.77159
@@ -123,7 +153,7 @@
               "travel_duration": 0
             },
             {
-              "arrival_time": "2023-01-01T12:00:00Z",
+              "arrival_time": "2023-01-01T12:10:00Z",
               "cumulative_travel_duration": 0,
               "end_time": "2023-01-01T12:20:00Z",
               "start_time": "2023-01-01T12:20:00Z",
@@ -135,7 +165,21 @@
                 }
               },
               "travel_duration": 0,
-              "waiting_duration": 1200
+              "waiting_duration": 600
+            },
+            {
+              "arrival_time": "2023-01-01T12:20:00Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-01-01T12:20:00Z",
+              "start_time": "2023-01-01T12:20:00Z",
+              "stop": {
+                "id": "Arashiyama Bamboo Forest",
+                "location": {
+                  "lat": 34.96714,
+                  "lon": 135.77159
+                }
+              },
+              "travel_duration": 0
             },
             {
               "arrival_time": "2023-01-01T12:20:00Z",
@@ -144,48 +188,6 @@
               "start_time": "2023-01-01T12:20:00Z",
               "stop": {
                 "id": "Kyoto Imperial Palace",
-                "location": {
-                  "lat": 34.96714,
-                  "lon": 135.77159
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "arrival_time": "2023-01-01T12:20:00Z",
-              "cumulative_travel_duration": 0,
-              "end_time": "2023-01-01T12:20:00Z",
-              "start_time": "2023-01-01T12:20:00Z",
-              "stop": {
-                "id": "Kiyomizu-dera",
-                "location": {
-                  "lat": 34.96714,
-                  "lon": 135.77159
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "arrival_time": "2023-01-01T12:20:00Z",
-              "cumulative_travel_duration": 0,
-              "end_time": "2023-01-01T12:20:00Z",
-              "start_time": "2023-01-01T12:20:00Z",
-              "stop": {
-                "id": "Nijō Castle",
-                "location": {
-                  "lat": 34.96714,
-                  "lon": 135.77159
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "arrival_time": "2023-01-01T12:20:00Z",
-              "cumulative_travel_duration": 0,
-              "end_time": "2023-01-01T12:20:00Z",
-              "start_time": "2023-01-01T12:20:00Z",
-              "stop": {
-                "id": "Gionmachi",
                 "location": {
                   "lat": 34.96714,
                   "lon": 135.77159

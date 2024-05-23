@@ -81,10 +81,10 @@
             "value": 4000
           },
           {
-            "base": 34394.3133084774,
+            "base": 34826.6783926487,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 34394.3133084774
+            "value": 34826.6783926487
           },
           {
             "base": 1400000,
@@ -98,34 +98,34 @@
             "value": 0
           },
           {
-            "base": 621271.1251366138,
+            "base": 662052.2353709936,
             "factor": 1,
             "name": "late_arrival_penalty",
-            "value": 621271.1251366138
+            "value": 662052.2353709936
           }
         ],
-        "value": 2059665.4384450912
+        "value": 2100878.9137636423
       },
       "unplanned": [
         {
-          "id": "s16",
+          "id": "s13",
           "location": {
-            "lat": 35.83458,
-            "lon": -78.63216
+            "lat": 35.88029,
+            "lon": -78.952142
           }
         },
         {
-          "id": "s22",
+          "id": "s20",
           "location": {
-            "lat": 35.962635,
-            "lon": -78.828547
+            "lat": 35.97414,
+            "lon": -78.995162
           }
         },
         {
-          "id": "s23",
+          "id": "s21",
           "location": {
-            "lat": 35.84616,
-            "lon": -78.60914
+            "lat": 35.7606,
+            "lon": -78.50509
           }
         },
         {
@@ -176,32 +176,13 @@
               "travel_duration": 0
             },
             {
-              "arrival_time": "2023-01-01T06:09:12-06:00",
-              "cumulative_travel_distance": 5524,
-              "cumulative_travel_duration": 552,
+              "arrival_time": "2023-01-01T06:08:12-06:00",
+              "cumulative_travel_distance": 4922,
+              "cumulative_travel_duration": 492,
               "duration": 300,
-              "end_time": "2023-01-01T06:14:12-06:00",
-              "late_arrival_duration": 7752,
-              "start_time": "2023-01-01T06:09:12-06:00",
-              "stop": {
-                "id": "s7",
-                "location": {
-                  "lat": 35.74261,
-                  "lon": -78.749391
-                }
-              },
-              "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 5524,
-              "travel_duration": 552
-            },
-            {
-              "arrival_time": "2023-01-01T06:28:29-06:00",
-              "cumulative_travel_distance": 14094,
-              "cumulative_travel_duration": 1409,
-              "duration": 300,
-              "end_time": "2023-01-01T06:33:29-06:00",
-              "late_arrival_duration": 8909,
-              "start_time": "2023-01-01T06:28:29-06:00",
+              "end_time": "2023-01-01T06:13:12-06:00",
+              "late_arrival_duration": 7692,
+              "start_time": "2023-01-01T06:08:12-06:00",
               "stop": {
                 "id": "s6",
                 "location": {
@@ -210,74 +191,17 @@
                 }
               },
               "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 8570,
-              "travel_duration": 857
+              "travel_distance": 4922,
+              "travel_duration": 492
             },
             {
-              "arrival_time": "2023-01-01T06:49:20-06:00",
-              "cumulative_travel_distance": 23604,
-              "cumulative_travel_duration": 2360,
+              "arrival_time": "2023-01-01T06:24:16-06:00",
+              "cumulative_travel_distance": 11560,
+              "cumulative_travel_duration": 1156,
               "duration": 300,
-              "end_time": "2023-01-01T06:54:20-06:00",
-              "late_arrival_duration": 10160,
-              "start_time": "2023-01-01T06:49:20-06:00",
-              "stop": {
-                "id": "s5",
-                "location": {
-                  "lat": 35.732995,
-                  "lon": -78.75084
-                }
-              },
-              "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 9510,
-              "travel_duration": 951
-            },
-            {
-              "arrival_time": "2023-01-01T07:05:29-06:00",
-              "cumulative_travel_distance": 30292,
-              "cumulative_travel_duration": 3029,
-              "duration": 300,
-              "end_time": "2023-01-01T07:10:29-06:00",
-              "late_arrival_duration": 11129,
-              "start_time": "2023-01-01T07:05:29-06:00",
-              "stop": {
-                "id": "s17",
-                "location": {
-                  "lat": 35.67337,
-                  "lon": -78.76063
-                }
-              },
-              "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 6688,
-              "travel_duration": 668
-            },
-            {
-              "arrival_time": "2023-01-01T07:34:43-06:00",
-              "cumulative_travel_distance": 44835,
-              "cumulative_travel_duration": 4483,
-              "duration": 300,
-              "end_time": "2023-01-01T07:39:43-06:00",
-              "late_arrival_duration": 12883,
-              "start_time": "2023-01-01T07:34:43-06:00",
-              "stop": {
-                "id": "s1",
-                "location": {
-                  "lat": 35.72389,
-                  "lon": -78.90919
-                }
-              },
-              "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 14543,
-              "travel_duration": 1454
-            },
-            {
-              "arrival_time": "2023-01-01T07:55:20-06:00",
-              "cumulative_travel_distance": 54198,
-              "cumulative_travel_duration": 5420,
-              "duration": 300,
-              "end_time": "2023-01-01T08:00:20-06:00",
-              "late_arrival_duration": 14120,
-              "start_time": "2023-01-01T07:55:20-06:00",
+              "end_time": "2023-01-01T06:29:16-06:00",
+              "late_arrival_duration": 8656,
+              "start_time": "2023-01-01T06:24:16-06:00",
               "stop": {
                 "id": "s2",
                 "location": {
@@ -286,36 +210,36 @@
                 }
               },
               "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "travel_distance": 6638,
+              "travel_duration": 663
+            },
+            {
+              "arrival_time": "2023-01-01T06:44:52-06:00",
+              "cumulative_travel_distance": 20923,
+              "cumulative_travel_duration": 2092,
+              "duration": 300,
+              "end_time": "2023-01-01T06:49:52-06:00",
+              "late_arrival_duration": 9892,
+              "start_time": "2023-01-01T06:44:52-06:00",
+              "stop": {
+                "id": "s1",
+                "location": {
+                  "lat": 35.72389,
+                  "lon": -78.90919
+                }
+              },
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
               "travel_distance": 9363,
               "travel_duration": 936
             },
             {
-              "arrival_time": "2023-01-01T08:19:08-06:00",
-              "cumulative_travel_distance": 65484,
-              "cumulative_travel_duration": 6548,
+              "arrival_time": "2023-01-01T07:28:42-06:00",
+              "cumulative_travel_distance": 44227,
+              "cumulative_travel_duration": 4422,
               "duration": 300,
-              "end_time": "2023-01-01T08:24:08-06:00",
-              "late_arrival_duration": 15548,
-              "start_time": "2023-01-01T08:19:08-06:00",
-              "stop": {
-                "id": "s15",
-                "location": {
-                  "lat": 35.83202,
-                  "lon": -78.89832
-                }
-              },
-              "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 11286,
-              "travel_duration": 1128
-            },
-            {
-              "arrival_time": "2023-01-01T08:43:25-06:00",
-              "cumulative_travel_distance": 77046,
-              "cumulative_travel_duration": 7705,
-              "duration": 300,
-              "end_time": "2023-01-01T08:48:25-06:00",
-              "late_arrival_duration": 17005,
-              "start_time": "2023-01-01T08:43:25-06:00",
+              "end_time": "2023-01-01T07:33:42-06:00",
+              "late_arrival_duration": 12522,
+              "start_time": "2023-01-01T07:28:42-06:00",
               "stop": {
                 "id": "s3",
                 "location": {
@@ -324,34 +248,110 @@
                 }
               },
               "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 11562,
-              "travel_duration": 1156
+              "travel_distance": 23304,
+              "travel_duration": 2330
             },
             {
-              "arrival_time": "2023-01-01T09:02:48-06:00",
-              "cumulative_travel_distance": 85682,
-              "cumulative_travel_duration": 8568,
+              "arrival_time": "2023-01-01T07:49:54-06:00",
+              "cumulative_travel_distance": 53940,
+              "cumulative_travel_duration": 5394,
               "duration": 300,
-              "end_time": "2023-01-01T09:07:48-06:00",
-              "late_arrival_duration": 18168,
-              "start_time": "2023-01-01T09:02:48-06:00",
+              "end_time": "2023-01-01T07:54:54-06:00",
+              "late_arrival_duration": 13794,
+              "start_time": "2023-01-01T07:49:54-06:00",
               "stop": {
-                "id": "s18",
+                "id": "s22",
                 "location": {
-                  "lat": 36.009015,
-                  "lon": -78.911485
+                  "lat": 35.962635,
+                  "lon": -78.828547
                 }
               },
               "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 8636,
-              "travel_duration": 863
+              "travel_distance": 9713,
+              "travel_duration": 971
             },
             {
-              "arrival_time": "2023-01-01T09:55:35-06:00",
-              "cumulative_travel_distance": 114350,
-              "cumulative_travel_duration": 11435,
-              "end_time": "2023-01-01T09:55:35-06:00",
-              "start_time": "2023-01-01T09:55:35-06:00",
+              "arrival_time": "2023-01-01T08:37:22-06:00",
+              "cumulative_travel_distance": 79424,
+              "cumulative_travel_duration": 7942,
+              "duration": 300,
+              "end_time": "2023-01-01T08:42:22-06:00",
+              "late_arrival_duration": 16642,
+              "start_time": "2023-01-01T08:37:22-06:00",
+              "stop": {
+                "id": "s7",
+                "location": {
+                  "lat": 35.74261,
+                  "lon": -78.749391
+                }
+              },
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "travel_distance": 25484,
+              "travel_duration": 2548
+            },
+            {
+              "arrival_time": "2023-01-01T08:44:10-06:00",
+              "cumulative_travel_distance": 80501,
+              "cumulative_travel_duration": 8050,
+              "duration": 300,
+              "end_time": "2023-01-01T08:49:10-06:00",
+              "late_arrival_duration": 17050,
+              "start_time": "2023-01-01T08:44:10-06:00",
+              "stop": {
+                "id": "s5",
+                "location": {
+                  "lat": 35.732995,
+                  "lon": -78.75084
+                }
+              },
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "travel_distance": 1077,
+              "travel_duration": 107
+            },
+            {
+              "arrival_time": "2023-01-01T09:15:06-06:00",
+              "cumulative_travel_distance": 96063,
+              "cumulative_travel_duration": 9606,
+              "duration": 300,
+              "end_time": "2023-01-01T09:20:06-06:00",
+              "late_arrival_duration": 18906,
+              "start_time": "2023-01-01T09:15:06-06:00",
+              "stop": {
+                "id": "s16",
+                "location": {
+                  "lat": 35.83458,
+                  "lon": -78.63216
+                }
+              },
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "travel_distance": 15562,
+              "travel_duration": 1556
+            },
+            {
+              "arrival_time": "2023-01-01T09:24:10-06:00",
+              "cumulative_travel_distance": 98505,
+              "cumulative_travel_duration": 9850,
+              "duration": 300,
+              "end_time": "2023-01-01T09:29:10-06:00",
+              "late_arrival_duration": 19450,
+              "start_time": "2023-01-01T09:24:10-06:00",
+              "stop": {
+                "id": "s23",
+                "location": {
+                  "lat": 35.84616,
+                  "lon": -78.60914
+                }
+              },
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "travel_distance": 2442,
+              "travel_duration": 244
+            },
+            {
+              "arrival_time": "2023-01-01T09:51:18-06:00",
+              "cumulative_travel_distance": 111779,
+              "cumulative_travel_duration": 11178,
+              "end_time": "2023-01-01T09:51:18-06:00",
+              "start_time": "2023-01-01T09:51:18-06:00",
               "stop": {
                 "id": "vehicle-0-end",
                 "location": {
@@ -359,14 +359,14 @@
                   "lon": -78.7401685145487
                 }
               },
-              "travel_distance": 28668,
-              "travel_duration": 2866
+              "travel_distance": 13274,
+              "travel_duration": 1327
             }
           ],
-          "route_duration": 14135,
+          "route_duration": 13878,
           "route_stops_duration": 2700,
-          "route_travel_distance": 114350,
-          "route_travel_duration": 11435
+          "route_travel_distance": 111779,
+          "route_travel_duration": 11178
         },
         {
           "id": "vehicle-1",
@@ -386,32 +386,13 @@
               "travel_duration": 0
             },
             {
-              "arrival_time": "2023-01-01T10:14:40-06:00",
-              "cumulative_travel_distance": 8801,
-              "cumulative_travel_duration": 880,
+              "arrival_time": "2023-01-01T10:18:45-06:00",
+              "cumulative_travel_distance": 11254,
+              "cumulative_travel_duration": 1125,
               "duration": 300,
-              "end_time": "2023-01-01T10:19:40-06:00",
-              "late_arrival_duration": 22480,
-              "start_time": "2023-01-01T10:14:40-06:00",
-              "stop": {
-                "id": "s11",
-                "location": {
-                  "lat": 35.77013,
-                  "lon": -78.83403
-                }
-              },
-              "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 8801,
-              "travel_duration": 880
-            },
-            {
-              "arrival_time": "2023-01-01T10:24:48-06:00",
-              "cumulative_travel_distance": 11889,
-              "cumulative_travel_duration": 1188,
-              "duration": 300,
-              "end_time": "2023-01-01T10:29:48-06:00",
-              "late_arrival_duration": 23088,
-              "start_time": "2023-01-01T10:24:48-06:00",
+              "end_time": "2023-01-01T10:23:45-06:00",
+              "late_arrival_duration": 22725,
+              "start_time": "2023-01-01T10:18:45-06:00",
               "stop": {
                 "id": "s12",
                 "location": {
@@ -420,74 +401,55 @@
                 }
               },
               "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 3088,
-              "travel_duration": 308
+              "travel_distance": 11254,
+              "travel_duration": 1125
             },
             {
-              "arrival_time": "2023-01-01T10:56:41-06:00",
-              "cumulative_travel_distance": 28011,
-              "cumulative_travel_duration": 2801,
+              "arrival_time": "2023-01-01T10:34:11-06:00",
+              "cumulative_travel_distance": 17515,
+              "cumulative_travel_duration": 1751,
               "duration": 300,
-              "end_time": "2023-01-01T11:01:41-06:00",
-              "late_arrival_duration": 25001,
-              "start_time": "2023-01-01T10:56:41-06:00",
+              "end_time": "2023-01-01T10:39:11-06:00",
+              "late_arrival_duration": 23651,
+              "start_time": "2023-01-01T10:34:11-06:00",
               "stop": {
-                "id": "s10",
+                "id": "s15",
                 "location": {
-                  "lat": 35.672955,
-                  "lon": -78.747955
+                  "lat": 35.83202,
+                  "lon": -78.89832
                 }
               },
               "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 16122,
-              "travel_duration": 1612
+              "travel_distance": 6261,
+              "travel_duration": 626
             },
             {
-              "arrival_time": "2023-01-01T11:17:11-06:00",
-              "cumulative_travel_distance": 37310,
-              "cumulative_travel_duration": 3731,
+              "arrival_time": "2023-01-01T10:54:11-06:00",
+              "cumulative_travel_distance": 26513,
+              "cumulative_travel_duration": 2651,
               "duration": 300,
-              "end_time": "2023-01-01T11:22:11-06:00",
-              "late_arrival_duration": 26231,
-              "start_time": "2023-01-01T11:17:11-06:00",
+              "end_time": "2023-01-01T10:59:11-06:00",
+              "late_arrival_duration": 24851,
+              "start_time": "2023-01-01T10:54:11-06:00",
               "stop": {
-                "id": "s9",
+                "id": "s11",
                 "location": {
-                  "lat": 35.64796,
-                  "lon": -78.64972
+                  "lat": 35.77013,
+                  "lon": -78.83403
                 }
               },
               "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 9299,
-              "travel_duration": 929
+              "travel_distance": 8998,
+              "travel_duration": 899
             },
             {
-              "arrival_time": "2023-01-01T11:52:20-06:00",
-              "cumulative_travel_distance": 55404,
-              "cumulative_travel_duration": 5540,
+              "arrival_time": "2023-01-01T11:57:18-06:00",
+              "cumulative_travel_distance": 61380,
+              "cumulative_travel_duration": 6138,
               "duration": 300,
-              "end_time": "2023-01-01T11:57:20-06:00",
-              "late_arrival_duration": 28340,
-              "start_time": "2023-01-01T11:52:20-06:00",
-              "stop": {
-                "id": "s21",
-                "location": {
-                  "lat": 35.7606,
-                  "lon": -78.50509
-                }
-              },
-              "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 18094,
-              "travel_duration": 1809
-            },
-            {
-              "arrival_time": "2023-01-01T12:34:43-06:00",
-              "cumulative_travel_distance": 77830,
-              "cumulative_travel_duration": 7783,
-              "duration": 300,
-              "end_time": "2023-01-01T12:39:43-06:00",
-              "late_arrival_duration": 30883,
-              "start_time": "2023-01-01T12:34:43-06:00",
+              "end_time": "2023-01-01T12:02:18-06:00",
+              "late_arrival_duration": 28638,
+              "start_time": "2023-01-01T11:57:18-06:00",
               "stop": {
                 "id": "s14",
                 "location": {
@@ -496,17 +458,17 @@
                 }
               },
               "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 22426,
-              "travel_duration": 2242
+              "travel_distance": 34867,
+              "travel_duration": 3486
             },
             {
-              "arrival_time": "2023-01-01T12:44:22-06:00",
-              "cumulative_travel_distance": 80624,
-              "cumulative_travel_duration": 8062,
+              "arrival_time": "2023-01-01T12:06:57-06:00",
+              "cumulative_travel_distance": 64174,
+              "cumulative_travel_duration": 6417,
               "duration": 300,
-              "end_time": "2023-01-01T12:49:22-06:00",
-              "late_arrival_duration": 31462,
-              "start_time": "2023-01-01T12:44:22-06:00",
+              "end_time": "2023-01-01T12:11:57-06:00",
+              "late_arrival_duration": 29217,
+              "start_time": "2023-01-01T12:06:57-06:00",
               "stop": {
                 "id": "s19",
                 "location": {
@@ -519,51 +481,32 @@
               "travel_duration": 279
             },
             {
-              "arrival_time": "2023-01-01T13:54:40-06:00",
-              "cumulative_travel_distance": 119804,
-              "cumulative_travel_duration": 11980,
+              "arrival_time": "2023-01-01T13:11:47-06:00",
+              "cumulative_travel_distance": 100074,
+              "cumulative_travel_duration": 10007,
               "duration": 300,
-              "end_time": "2023-01-01T13:59:40-06:00",
-              "late_arrival_duration": 35680,
-              "start_time": "2023-01-01T13:54:40-06:00",
+              "end_time": "2023-01-01T13:16:47-06:00",
+              "late_arrival_duration": 33107,
+              "start_time": "2023-01-01T13:11:47-06:00",
               "stop": {
-                "id": "s13",
+                "id": "s18",
                 "location": {
-                  "lat": 35.88029,
-                  "lon": -78.952142
+                  "lat": 36.009015,
+                  "lon": -78.911485
                 }
               },
               "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 39180,
-              "travel_duration": 3918
+              "travel_distance": 35900,
+              "travel_duration": 3590
             },
             {
-              "arrival_time": "2023-01-01T14:18:14-06:00",
-              "cumulative_travel_distance": 130935,
-              "cumulative_travel_duration": 13094,
+              "arrival_time": "2023-01-01T13:24:27-06:00",
+              "cumulative_travel_distance": 104675,
+              "cumulative_travel_duration": 10467,
               "duration": 300,
-              "end_time": "2023-01-01T14:23:14-06:00",
-              "late_arrival_duration": 37094,
-              "start_time": "2023-01-01T14:18:14-06:00",
-              "stop": {
-                "id": "s20",
-                "location": {
-                  "lat": 35.97414,
-                  "lon": -78.995162
-                }
-              },
-              "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 11131,
-              "travel_duration": 1113
-            },
-            {
-              "arrival_time": "2023-01-01T14:37:18-06:00",
-              "cumulative_travel_distance": 139380,
-              "cumulative_travel_duration": 13938,
-              "duration": 300,
-              "end_time": "2023-01-01T14:42:18-06:00",
-              "late_arrival_duration": 38238,
-              "start_time": "2023-01-01T14:37:18-06:00",
+              "end_time": "2023-01-01T13:29:27-06:00",
+              "late_arrival_duration": 33867,
+              "start_time": "2023-01-01T13:24:27-06:00",
               "stop": {
                 "id": "s8",
                 "location": {
@@ -572,15 +515,72 @@
                 }
               },
               "target_arrival_time": "2023-01-01T04:00:00-06:00",
-              "travel_distance": 8445,
-              "travel_duration": 844
+              "travel_distance": 4601,
+              "travel_duration": 460
             },
             {
-              "arrival_time": "2023-01-01T15:37:38-06:00",
-              "cumulative_travel_distance": 172581,
-              "cumulative_travel_duration": 17258,
-              "end_time": "2023-01-01T15:37:38-06:00",
-              "start_time": "2023-01-01T15:37:38-06:00",
+              "arrival_time": "2023-01-01T14:54:34-06:00",
+              "cumulative_travel_distance": 155743,
+              "cumulative_travel_duration": 15574,
+              "duration": 300,
+              "end_time": "2023-01-01T14:59:34-06:00",
+              "late_arrival_duration": 39274,
+              "start_time": "2023-01-01T14:54:34-06:00",
+              "stop": {
+                "id": "s9",
+                "location": {
+                  "lat": 35.64796,
+                  "lon": -78.64972
+                }
+              },
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "travel_distance": 51068,
+              "travel_duration": 5106
+            },
+            {
+              "arrival_time": "2023-01-01T15:15:04-06:00",
+              "cumulative_travel_distance": 165042,
+              "cumulative_travel_duration": 16504,
+              "duration": 300,
+              "end_time": "2023-01-01T15:20:04-06:00",
+              "late_arrival_duration": 40504,
+              "start_time": "2023-01-01T15:15:04-06:00",
+              "stop": {
+                "id": "s10",
+                "location": {
+                  "lat": 35.672955,
+                  "lon": -78.747955
+                }
+              },
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "travel_distance": 9299,
+              "travel_duration": 929
+            },
+            {
+              "arrival_time": "2023-01-01T15:21:59-06:00",
+              "cumulative_travel_distance": 166187,
+              "cumulative_travel_duration": 16619,
+              "duration": 300,
+              "end_time": "2023-01-01T15:26:59-06:00",
+              "late_arrival_duration": 40919,
+              "start_time": "2023-01-01T15:21:59-06:00",
+              "stop": {
+                "id": "s17",
+                "location": {
+                  "lat": 35.67337,
+                  "lon": -78.76063
+                }
+              },
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "travel_distance": 1145,
+              "travel_duration": 114
+            },
+            {
+              "arrival_time": "2023-01-01T15:49:08-06:00",
+              "cumulative_travel_distance": 179476,
+              "cumulative_travel_duration": 17948,
+              "end_time": "2023-01-01T15:49:08-06:00",
+              "start_time": "2023-01-01T15:49:08-06:00",
               "stop": {
                 "id": "vehicle-1-end",
                 "location": {
@@ -588,14 +588,14 @@
                   "lon": -78.7401685145487
                 }
               },
-              "travel_distance": 33201,
-              "travel_duration": 3320
+              "travel_distance": 13289,
+              "travel_duration": 1328
             }
           ],
-          "route_duration": 20258,
+          "route_duration": 20948,
           "route_stops_duration": 3000,
-          "route_travel_distance": 172581,
-          "route_travel_duration": 17258
+          "route_travel_distance": 179476,
+          "route_travel_duration": 17948
         }
       ]
     }
@@ -604,16 +604,16 @@
     "result": {
       "custom": {
         "activated_vehicles": 2,
-        "max_duration": 20258,
+        "max_duration": 20948,
         "max_stops_in_vehicle": 10,
-        "max_travel_duration": 17258,
-        "min_duration": 14135,
+        "max_travel_duration": 17948,
+        "min_duration": 13878,
         "min_stops_in_vehicle": 9,
-        "min_travel_duration": 11435,
+        "min_travel_duration": 11178,
         "unplanned_stops": 7
       },
       "duration": 0.123,
-      "value": 2059665.4384450912
+      "value": 2100878.9137636423
     },
     "run": {
       "duration": 0.123,

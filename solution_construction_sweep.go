@@ -81,7 +81,7 @@ func SweepSolutionConstruction(ctx context.Context, s Solution) (Solution, error
 		return 1
 	})
 
-	startIndex := solution.Random().Intn(len(unplannedPlanUnits))
+	startIndex := solution.Random().IntN(len(unplannedPlanUnits))
 
 LoopUnplannedPlanUnits:
 	for idx := startIndex; idx < startIndex+len(unplannedPlanUnits); idx++ {

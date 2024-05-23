@@ -235,16 +235,16 @@
               "cumulative_travel_duration": 2761,
               "duration": 90,
               "end_time": "2023-08-14T05:48:59Z",
-              "late_arrival_duration": 3197,
+              "late_arrival_duration": 4446,
               "start_time": "2023-08-14T05:47:29Z",
               "stop": {
-                "id": "6725C6378Q-DROP_OFF",
+                "id": "6725782PZY-DROP_OFF",
                 "location": {
                   "lat": 36.545800386888374,
                   "lon": 26.351867507809075
                 }
               },
-              "target_arrival_time": "2023-08-14T04:54:11.264097Z",
+              "target_arrival_time": "2023-08-14T04:33:22.347629Z",
               "travel_distance": 540,
               "travel_duration": 135
             },
@@ -254,16 +254,16 @@
               "cumulative_travel_duration": 2761,
               "duration": 90,
               "end_time": "2023-08-14T05:50:29Z",
-              "late_arrival_duration": 4536,
+              "late_arrival_duration": 3287,
               "start_time": "2023-08-14T05:48:59Z",
               "stop": {
-                "id": "6725782PZY-DROP_OFF",
+                "id": "6725C6378Q-DROP_OFF",
                 "location": {
                   "lat": 36.545800386888374,
                   "lon": 26.351867507809075
                 }
               },
-              "target_arrival_time": "2023-08-14T04:33:22.347629Z",
+              "target_arrival_time": "2023-08-14T04:54:11.264097Z",
               "travel_duration": 0
             }
           ],

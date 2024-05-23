@@ -4,7 +4,7 @@ package common
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 )
 
 // Alias is an interface that allows for sampling from a discrete
@@ -104,7 +104,7 @@ func NewAlias(weights []float64) (Alias, error) {
 }
 
 func (a *aliasImpl) Sample(random *rand.Rand) int {
-	ri := uint32(random.Int31())
+	ri := uint32(random.Int32())
 	w := ri % uint32(len(a.table))
 	if ri > a.table[w].probability {
 		return int(a.table[w].alias)
