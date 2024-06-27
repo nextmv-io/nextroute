@@ -75,10 +75,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 1841.9036093736736,
+            "base": 2205.7639215043205,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 1841.9036093736736
+            "value": 2205.7639215043205
           },
           {
             "factor": 1,
@@ -86,7 +86,7 @@
             "value": 0
           }
         ],
-        "value": 1841.9036093736736
+        "value": 2205.7639215043205
       },
       "unplanned": [],
       "vehicles": [
@@ -96,17 +96,145 @@
             {
               "cumulative_travel_duration": 0,
               "stop": {
+                "id": "Arashiyama Bamboo Forest Copy",
+                "location": {
+                  "lat": 35.017209,
+                  "lon": 135.672008
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "cumulative_travel_duration": 0,
+              "stop": {
+                "id": "Arashiyama Bamboo Forest",
+                "location": {
+                  "lat": 35.017209,
+                  "lon": 135.672009
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "cumulative_travel_distance": 9583,
+              "cumulative_travel_duration": 479,
+              "stop": {
+                "id": "Gionmachi Copy",
+                "location": {
+                  "lat": 35.002457,
+                  "lon": 135.775683
+                }
+              },
+              "travel_distance": 9583,
+              "travel_duration": 479
+            },
+            {
+              "cumulative_travel_distance": 15524,
+              "cumulative_travel_duration": 776,
+              "stop": {
+                "id": "Kinkaku-ji Copy",
+                "location": {
+                  "lat": 35.039705,
+                  "lon": 135.728899
+                }
+              },
+              "travel_distance": 5941,
+              "travel_duration": 297
+            },
+            {
+              "cumulative_travel_distance": 18934,
+              "cumulative_travel_duration": 946,
+              "stop": {
+                "id": "Kyoto Imperial Palace",
+                "location": {
+                  "lat": 35.025431,
+                  "lon": 135.762057
+                }
+              },
+              "travel_distance": 3410,
+              "travel_duration": 170
+            },
+            {
+              "cumulative_travel_distance": 20710,
+              "cumulative_travel_duration": 1035,
+              "stop": {
+                "id": "Nijō Castle",
+                "location": {
+                  "lat": 35.014239,
+                  "lon": 135.748134
+                }
+              },
+              "travel_distance": 1776,
+              "travel_duration": 88
+            },
+            {
+              "cumulative_travel_distance": 24039,
+              "cumulative_travel_duration": 1202,
+              "stop": {
+                "id": "Kinkaku-ji",
+                "location": {
+                  "lat": 35.039705,
+                  "lon": 135.728898
+                }
+              },
+              "travel_distance": 3329,
+              "travel_duration": 166
+            },
+            {
+              "cumulative_travel_distance": 27449,
+              "cumulative_travel_duration": 1372,
+              "stop": {
+                "id": "Kyoto Imperial Palace Copy",
+                "location": {
+                  "lat": 35.025431,
+                  "lon": 135.762058
+                }
+              },
+              "travel_distance": 3410,
+              "travel_duration": 170
+            },
+            {
+              "cumulative_travel_distance": 29225,
+              "cumulative_travel_duration": 1461,
+              "stop": {
+                "id": "Nijō Castle Copy",
+                "location": {
+                  "lat": 35.014239,
+                  "lon": 135.748135
+                }
+              },
+              "travel_distance": 1776,
+              "travel_duration": 88
+            },
+            {
+              "cumulative_travel_distance": 34805,
+              "cumulative_travel_duration": 1740,
+              "stop": {
+                "id": "Fushimi Inari Taisha Copy",
+                "location": {
+                  "lat": 34.967146,
+                  "lon": 135.72696
+                }
+              },
+              "travel_distance": 5580,
+              "travel_duration": 279
+            },
+            {
+              "cumulative_travel_distance": 38972,
+              "cumulative_travel_duration": 1948,
+              "stop": {
                 "id": "Fushimi Inari Taisha",
                 "location": {
                   "lat": 34.967146,
                   "lon": 135.772695
                 }
               },
-              "travel_duration": 0
+              "travel_distance": 4167,
+              "travel_duration": 208
             },
             {
-              "cumulative_travel_distance": 3935,
-              "cumulative_travel_duration": 196,
+              "cumulative_travel_distance": 42907,
+              "cumulative_travel_duration": 2145,
               "stop": {
                 "id": "Gionmachi",
                 "location": {
@@ -118,135 +246,8 @@
               "travel_duration": 196
             },
             {
-              "cumulative_travel_distance": 6765,
-              "cumulative_travel_duration": 338,
-              "stop": {
-                "id": "Nijō Castle Copy",
-                "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748135
-                }
-              },
-              "travel_distance": 2830,
-              "travel_duration": 141
-            },
-            {
-              "cumulative_travel_distance": 8541,
-              "cumulative_travel_duration": 427,
-              "stop": {
-                "id": "Kyoto Imperial Palace",
-                "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762057
-                }
-              },
-              "travel_distance": 1776,
-              "travel_duration": 88
-            },
-            {
-              "cumulative_travel_distance": 8541,
-              "cumulative_travel_duration": 427,
-              "stop": {
-                "id": "Kyoto Imperial Palace Copy",
-                "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762058
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "cumulative_travel_distance": 11951,
-              "cumulative_travel_duration": 597,
-              "stop": {
-                "id": "Kinkaku-ji",
-                "location": {
-                  "lat": 35.039705,
-                  "lon": 135.728898
-                }
-              },
-              "travel_distance": 3410,
-              "travel_duration": 170
-            },
-            {
-              "cumulative_travel_distance": 11951,
-              "cumulative_travel_duration": 597,
-              "stop": {
-                "id": "Kinkaku-ji Copy",
-                "location": {
-                  "lat": 35.039705,
-                  "lon": 135.728899
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "cumulative_travel_distance": 15280,
-              "cumulative_travel_duration": 764,
-              "stop": {
-                "id": "Nijō Castle",
-                "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
-                }
-              },
-              "travel_distance": 3329,
-              "travel_duration": 166
-            },
-            {
-              "cumulative_travel_distance": 22220,
-              "cumulative_travel_duration": 1111,
-              "stop": {
-                "id": "Arashiyama Bamboo Forest",
-                "location": {
-                  "lat": 35.017209,
-                  "lon": 135.672009
-                }
-              },
-              "travel_distance": 6940,
-              "travel_duration": 347
-            },
-            {
-              "cumulative_travel_distance": 22220,
-              "cumulative_travel_duration": 1111,
-              "stop": {
-                "id": "Arashiyama Bamboo Forest Copy",
-                "location": {
-                  "lat": 35.017209,
-                  "lon": 135.672008
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "cumulative_travel_distance": 29706,
-              "cumulative_travel_duration": 1485,
-              "stop": {
-                "id": "Fushimi Inari Taisha Copy",
-                "location": {
-                  "lat": 34.967146,
-                  "lon": 135.72696
-                }
-              },
-              "travel_distance": 7486,
-              "travel_duration": 374
-            },
-            {
-              "cumulative_travel_distance": 35632,
-              "cumulative_travel_duration": 1781,
-              "stop": {
-                "id": "Gionmachi Copy",
-                "location": {
-                  "lat": 35.002457,
-                  "lon": 135.775683
-                }
-              },
-              "travel_distance": 5926,
-              "travel_duration": 296
-            },
-            {
-              "cumulative_travel_distance": 36833,
-              "cumulative_travel_duration": 1841,
+              "cumulative_travel_distance": 44108,
+              "cumulative_travel_duration": 2205,
               "stop": {
                 "id": "Kiyomizu-dera",
                 "location": {
@@ -258,9 +259,9 @@
               "travel_duration": 60
             }
           ],
-          "route_duration": 1841,
-          "route_travel_distance": 36833,
-          "route_travel_duration": 1841
+          "route_duration": 2205,
+          "route_travel_distance": 44108,
+          "route_travel_duration": 2205
         }
       ]
     }
@@ -269,16 +270,16 @@
     "result": {
       "custom": {
         "activated_vehicles": 1,
-        "max_duration": 1841,
+        "max_duration": 2205,
         "max_stops_in_vehicle": 13,
-        "max_travel_duration": 1841,
-        "min_duration": 1841,
+        "max_travel_duration": 2205,
+        "min_duration": 2205,
         "min_stops_in_vehicle": 13,
-        "min_travel_duration": 1841,
+        "min_travel_duration": 2205,
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 1841.9036093736736
+      "value": 2205.7639215043205
     },
     "run": {
       "duration": 0.123,
