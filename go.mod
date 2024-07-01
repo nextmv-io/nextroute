@@ -10,7 +10,7 @@ require (
 require (
 	github.com/danielgtaylor/huma v1.14.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gorilla/schema v1.2.0 // indirect
+	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/itzg/go-flagsfiller v1.9.1 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
