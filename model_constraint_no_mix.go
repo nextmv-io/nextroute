@@ -4,6 +4,8 @@ package nextroute
 
 import (
 	"fmt"
+
+	"github.com/nextmv-io/nextroute/schema"
 )
 
 // NoMixConstraint limits the order in which stops are assigned to a vehicle
@@ -255,7 +257,7 @@ func (l *noMixConstraintImpl) UpdateConstraintStopData(
 			)
 		}
 		tour := previousNoMixData.tour
-		if previousNoMixData.content.Quantity == 0 {
+		if previousNoMixData.content.Quantity == 0 && previousNoMixData.content.Name != "" {
 			tour++
 		}
 		return &noMixSolutionStopData{
@@ -349,8 +351,17 @@ func (l *noMixConstraintImpl) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
+	// condition := moveImpl.stopPositions[0].stop().ModelStop().ID() == "CYFAIR-S-43-ARCHER AT WILLOWBROOK APTS - 7250 GREENS RD-218079" || moveImpl.stopPositions[0].stop().ModelStop().ID() == "CYFAIR-N-43-ARCHER AT WILLOWBROOK APTS - 7250 GREENS RD-218079"
+	condition := moveImpl.stopPositions[0].Stop().ModelStop().Data().(schema.Stop).MixingItems == nil
+	if condition {
+		fmt.Printf("checking violation for stop: %+v", moveImpl.stopPositions[0].Stop().ModelStop().ID())
+	}
+
 	_, hasRemoveMixItem := l.remove[moveImpl.stopPositions[0].Stop().ModelStop()]
 	if hasRemoveMixItem {
+		if condition {
+			fmt.Println("returning violation 1 for null stop")
+		}
 		return true, constNoPositionsHint
 	}
 
@@ -364,14 +375,23 @@ func (l *noMixConstraintImpl) EstimateIsViolated(
 	insertMixItem, hasInsertMixItem := l.insert[moveImpl.stopPositions[0].Stop().ModelStop()]
 	if hasInsertMixItem {
 		if contentName != insertMixItem.Name && previousNoMixData.content.Quantity != 0 {
+			if condition {
+				fmt.Println("returning violation 2 for null stop")
+			}
 			return true, constNoPositionsHint
 		}
 		deltaQuantity += insertMixItem.Quantity
 	}
 
+	if !hasRemoveMixItem && !hasInsertMixItem {
+		if condition {
+			fmt.Println("leaving constraint bc no mix data")
+		}
+		return false, constNoPositionsHint
+	}
 	tour := previousNoMixData.tour
 
-	if previousNoMixData.content.Quantity == 0 {
+	if previousNoMixData.content.Quantity == 0 && previousNoMixData.content.Name != "" {
 		contentName = insertMixItem.Name
 		tour++
 	}
@@ -380,13 +400,20 @@ func (l *noMixConstraintImpl) EstimateIsViolated(
 		previousStopImp = moveImpl.stopPositions[idx].Previous()
 		if previousStopImp.IsPlanned() {
 			previousNoMixData = previousStopImp.ConstraintData(l).(*noMixSolutionStopData)
-			if previousNoMixData.tour != tour || previousNoMixData.content.Name != contentName {
+			if previousNoMixData.tour != tour || (previousNoMixData.content.Name != contentName && previousNoMixData.content.Quantity != 0) {
+				fmt.Printf("In violation 3 for data: %+v", moveImpl.stopPositions[0].Stop().ModelStop().Data().(schema.Stop).MixingItems)
+				fmt.Printf("previous no mix data: %+v", previousNoMixData)
+				fmt.Printf("current no mix data: %+v", insertMixItem)
+				fmt.Printf("tour: %+v", tour)
 				return true, constNoPositionsHint
 			}
 		}
 		insertMixItem, hasInsertMixItem = l.insert[moveImpl.stopPositions[idx].Stop().ModelStop()]
 		if hasInsertMixItem {
 			if contentName != insertMixItem.Name {
+				if condition {
+					fmt.Println("returning violation 4 for null stop")
+				}
 				return true, constNoPositionsHint
 			}
 			deltaQuantity += insertMixItem.Quantity
@@ -395,6 +422,9 @@ func (l *noMixConstraintImpl) EstimateIsViolated(
 		removeMixItem, hasRemoveMixItem := l.remove[moveImpl.stopPositions[idx].Stop().ModelStop()]
 		if hasRemoveMixItem {
 			if contentName != removeMixItem.Name || contentQuantity+deltaQuantity < removeMixItem.Quantity {
+				if condition {
+					fmt.Println("returning violation 5 for null stop")
+				}
 				return true, constNoPositionsHint
 			}
 			deltaQuantity -= removeMixItem.Quantity
