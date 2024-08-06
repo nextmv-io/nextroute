@@ -75,10 +75,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 912.631200191493,
+            "base": 362.2360713145241,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 912.631200191493
+            "value": 362.2360713145241
           },
           {
             "factor": 1,
@@ -86,148 +86,167 @@
             "value": 0
           }
         ],
-        "value": 912.631200191493
+        "value": 362.2360713145241
       },
       "unplanned": [],
       "vehicles": [
         {
-          "id": "v1",
+          "id": "truck",
           "route": [
             {
               "cumulative_travel_duration": 0,
               "mix_items": {
-                "hazchem": {
-                  "name": "F-A-W-E",
+                "main": {
+                  "name": "B",
                   "quantity": 1
                 }
               },
               "stop": {
-                "id": "Fushimi Inari Taisha",
+                "id": "east",
                 "location": {
-                  "lat": 34.967146,
-                  "lon": 135.772695
+                  "lat": 51.9624,
+                  "lon": 7.6402
                 }
               },
               "travel_duration": 0
             },
             {
-              "cumulative_travel_distance": 3280,
-              "cumulative_travel_duration": 164,
+              "cumulative_travel_distance": 2000,
+              "cumulative_travel_duration": 100,
               "mix_items": {
-                "hazchem": {
-                  "name": "F-A-W-E",
+                "main": {
+                  "name": "B",
                   "quantity": 0
                 }
               },
               "stop": {
-                "id": "Kiyomizu-dera",
+                "id": "west",
                 "location": {
-                  "lat": 34.994857,
-                  "lon": 135.78506
+                  "lat": 51.9624,
+                  "lon": 7.611
                 }
               },
-              "travel_distance": 3280,
-              "travel_duration": 164
+              "travel_distance": 2000,
+              "travel_duration": 100
             },
             {
-              "cumulative_travel_distance": 4481,
-              "cumulative_travel_duration": 224,
+              "cumulative_travel_distance": 2770,
+              "cumulative_travel_duration": 138,
               "mix_items": {
-                "hazchem": {
-                  "name": "S-P-W-E",
-                  "quantity": 1
-                }
-              },
-              "stop": {
-                "id": "Gionmachi",
-                "location": {
-                  "lat": 35.002457,
-                  "lon": 135.775682
-                }
-              },
-              "travel_distance": 1201,
-              "travel_duration": 60
-            },
-            {
-              "cumulative_travel_distance": 7311,
-              "cumulative_travel_duration": 365,
-              "mix_items": {
-                "hazchem": {
-                  "name": "S-P-W-E",
-                  "quantity": 2
-                }
-              },
-              "stop": {
-                "id": "Nijō Castle",
-                "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
-                }
-              },
-              "travel_distance": 2830,
-              "travel_duration": 141
-            },
-            {
-              "cumulative_travel_distance": 9087,
-              "cumulative_travel_duration": 454,
-              "mix_items": {
-                "hazchem": {
-                  "name": "S-P-W-E",
-                  "quantity": 1
-                }
-              },
-              "stop": {
-                "id": "Kyoto Imperial Palace",
-                "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762057
-                }
-              },
-              "travel_distance": 1776,
-              "travel_duration": 88
-            },
-            {
-              "cumulative_travel_distance": 12497,
-              "cumulative_travel_duration": 625,
-              "mix_items": {
-                "hazchem": {
-                  "name": "S-P-W-E",
-                  "quantity": 0
-                }
-              },
-              "stop": {
-                "id": "Kinkaku-ji",
-                "location": {
-                  "lat": 35.039705,
-                  "lon": 135.728898
-                }
-              },
-              "travel_distance": 3410,
-              "travel_duration": 170
-            },
-            {
-              "cumulative_travel_distance": 18249,
-              "cumulative_travel_duration": 912,
-              "mix_items": {
-                "hazchem": {
+                "main": {
                   "name": "",
                   "quantity": 0
                 }
               },
               "stop": {
-                "id": "Arashiyama Bamboo Forest",
+                "id": "north_west",
                 "location": {
-                  "lat": 35.017209,
-                  "lon": 135.672009
+                  "lat": 51.9688,
+                  "lon": 7.6153
                 }
               },
-              "travel_distance": 5752,
-              "travel_duration": 287
+              "travel_distance": 770,
+              "travel_duration": 38
+            },
+            {
+              "cumulative_travel_distance": 3532,
+              "cumulative_travel_duration": 176,
+              "mix_items": {
+                "main": {
+                  "name": "A",
+                  "quantity": 1
+                }
+              },
+              "stop": {
+                "id": "north",
+                "location": {
+                  "lat": 51.9714,
+                  "lon": 7.6256
+                }
+              },
+              "travel_distance": 762,
+              "travel_duration": 38
+            },
+            {
+              "cumulative_travel_distance": 4294,
+              "cumulative_travel_duration": 214,
+              "mix_items": {
+                "main": {
+                  "name": "A",
+                  "quantity": 1
+                }
+              },
+              "stop": {
+                "id": "north_east",
+                "location": {
+                  "lat": 51.9688,
+                  "lon": 7.6359
+                }
+              },
+              "travel_distance": 762,
+              "travel_duration": 38
+            },
+            {
+              "cumulative_travel_distance": 5717,
+              "cumulative_travel_duration": 285,
+              "mix_items": {
+                "main": {
+                  "name": "A",
+                  "quantity": 1
+                }
+              },
+              "stop": {
+                "id": "south_east",
+                "location": {
+                  "lat": 51.956,
+                  "lon": 7.6359
+                }
+              },
+              "travel_distance": 1423,
+              "travel_duration": 71
+            },
+            {
+              "cumulative_travel_distance": 6479,
+              "cumulative_travel_duration": 324,
+              "mix_items": {
+                "main": {
+                  "name": "A",
+                  "quantity": 0
+                }
+              },
+              "stop": {
+                "id": "south",
+                "location": {
+                  "lat": 51.9534,
+                  "lon": 7.6256
+                }
+              },
+              "travel_distance": 762,
+              "travel_duration": 38
+            },
+            {
+              "cumulative_travel_distance": 7241,
+              "cumulative_travel_duration": 362,
+              "mix_items": {
+                "main": {
+                  "name": "",
+                  "quantity": 0
+                }
+              },
+              "stop": {
+                "id": "south_west",
+                "location": {
+                  "lat": 51.956,
+                  "lon": 7.6153
+                }
+              },
+              "travel_distance": 762,
+              "travel_duration": 38
             }
           ],
-          "route_duration": 912,
-          "route_travel_distance": 18249,
-          "route_travel_duration": 912
+          "route_duration": 362,
+          "route_travel_distance": 7241,
+          "route_travel_duration": 362
         }
       ]
     }
@@ -236,16 +255,16 @@
     "result": {
       "custom": {
         "activated_vehicles": 1,
-        "max_duration": 912,
-        "max_stops_in_vehicle": 7,
-        "max_travel_duration": 912,
-        "min_duration": 912,
-        "min_stops_in_vehicle": 7,
-        "min_travel_duration": 912,
+        "max_duration": 362,
+        "max_stops_in_vehicle": 8,
+        "max_travel_duration": 362,
+        "min_duration": 362,
+        "min_stops_in_vehicle": 8,
+        "min_travel_duration": 362,
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 912.631200191493
+      "value": 362.2360713145241
     },
     "run": {
       "duration": 0.123,

@@ -1,0 +1,96 @@
+{
+  "stops": [
+    {
+      "id": "north",
+      "location": {
+        "lon": 7.6256,
+        "lat": 51.9714
+      },
+      "precedes": "south",
+      "mixing_items": {
+        "main": {
+          "name": "A",
+          "quantity": 1
+        }
+      }
+    },
+    {
+      "id": "south",
+      "location": {
+        "lon": 7.6256,
+        "lat": 51.9534
+      },
+      "precedes": "south_west",
+      "mixing_items": {
+        "main": {
+          "name": "A",
+          "quantity": -1
+        }
+      }
+    },
+    {
+      "id": "east",
+      "location": {
+        "lon": 7.6402,
+        "lat": 51.9624
+      },
+      "precedes": "west",
+      "mixing_items": {
+        "main": {
+          "name": "B",
+          "quantity": 1
+        }
+      }
+    },
+    {
+      "id": "west",
+      "location": {
+        "lon": 7.611,
+        "lat": 51.9624
+      },
+      "precedes": "north_west",
+      "mixing_items": {
+        "main": {
+          "name": "B",
+          "quantity": -1
+        }
+      }
+    },
+    {
+      "id": "north_east",
+      "location": {
+        "lon": 7.6359,
+        "lat": 51.9688
+      },
+      "mixing_items": null
+    },
+    {
+      "id": "south_east",
+      "location": {
+        "lon": 7.6359,
+        "lat": 51.956
+      },
+      "mixing_items": null
+    },
+    {
+      "id": "south_west",
+      "location": {
+        "lon": 7.6153,
+        "lat": 51.956
+      }
+    },
+    {
+      "id": "north_west",
+      "location": {
+        "lon": 7.6153,
+        "lat": 51.9688
+      }
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "truck",
+      "speed": 20
+    }
+  ]
+}

@@ -369,6 +369,14 @@ func (l *noMixConstraintImpl) EstimateIsViolated(
 		deltaQuantity += insertMixItem.Quantity
 	}
 
+	if !hasRemoveMixItem && !hasInsertMixItem {
+		// If the stop is not associated with any mix item, then the constraint
+		// cannot be violated (as it is not mixing any new item between existing
+		// ones). Note that the content name of all stops of a move is the same,
+		// so it is enough to check the first stop.
+		return false, constNoPositionsHint
+	}
+
 	tour := previousNoMixData.tour
 
 	if previousNoMixData.content.Quantity == 0 {

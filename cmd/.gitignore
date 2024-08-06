@@ -1,2 +1,6 @@
 cmd
+main
 *.json
+*.sh
+*.yaml
+*.yml
