@@ -36,6 +36,14 @@ jobs:
               exit 1
             fi
           fi
+
+      - name: ensure version is not already released
+        run: |
+          if git ls-remote --tags origin | grep -q "refs/tags/$VERSION"; then
+            echo "Version $VERSION already exists"
+            exit 1
+          fi
+
       - name: configure git with the bot credentials
         run: |
           mkdir -p ~/.ssh
@@ -57,6 +65,18 @@ jobs:
           git checkout ${{ github.ref_name }}
 
           git rev-parse --short HEAD
+
+      - name: bump version in version file
+        run: |
+          echo $VERSION > VERSION
+        working-directory: ./nextroute
+
+      - name: commit version bump
+        run: |
+          git add VERSION
+          git commit -m "Bumping version to $VERSION"
+          git push origin ${{ github.ref_name }}
+        working-directory: ./nextroute
 
       - name: push release tag
         run: |
