@@ -3,14 +3,14 @@ module github.com/nextmv-io/nextroute
 go 1.21
 
 require (
-	github.com/nextmv-io/sdk v1.5.0
+	github.com/nextmv-io/sdk v1.8.0
 	gonum.org/v1/gonum v0.14.0
 )
 
 require (
 	github.com/danielgtaylor/huma v1.14.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gorilla/schema v1.2.0 // indirect
+	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/itzg/go-flagsfiller v1.9.1 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
