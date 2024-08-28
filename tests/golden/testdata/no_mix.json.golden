@@ -208,6 +208,12 @@
             {
               "cumulative_travel_distance": 18249,
               "cumulative_travel_duration": 912,
+              "mix_items": {
+                "hazchem": {
+                  "name": "",
+                  "quantity": 0
+                }
+              },
               "stop": {
                 "id": "Arashiyama Bamboo Forest",
                 "location": {

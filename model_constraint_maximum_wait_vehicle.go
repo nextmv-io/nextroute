@@ -139,7 +139,7 @@ func (l *maximumWaitVehicleConstraintImpl) EstimateIsViolated(
 }
 
 func (l *maximumWaitVehicleConstraintImpl) DoesStopHaveViolations(solution SolutionStop) bool {
-	stop := solution.(solutionStopImpl)
+	stop := solution
 	return stop.ConstraintData(l).(*maximumWaitVehicleConstraintData).accumulatedWait >
 		l.maxima.Value(stop.vehicle().ModelVehicle().VehicleType(), nil, nil)
 }

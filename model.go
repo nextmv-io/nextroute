@@ -259,6 +259,8 @@ type modelImpl struct {
 	sequenceSampleSize             int
 	mutex                          sync.RWMutex
 	isLocked                       bool
+	disallowedSuccessors           [][]bool
+	hasDirectSuccessors            bool
 }
 
 func (m *modelImpl) Vehicles() ModelVehicles {
@@ -615,6 +617,7 @@ func (m *modelImpl) lock() error {
 	if m.isLocked {
 		return nil
 	}
+
 	m.setConstraintEstimationOrder()
 	for _, constraint := range m.constraints {
 		if locker, ok := constraint.(Locker); ok {
@@ -732,6 +735,14 @@ func (m *modelImpl) lock() error {
 		}
 	}
 
+	// Loop all planunit combinations and check whether they must be neighbors.
+	for _, planUnit := range m.PlanStopsUnits() {
+		if len(planUnit.DirectedAcyclicGraph().(*directedAcyclicGraphImpl).outboundDirectArcs) > 0 {
+			m.hasDirectSuccessors = true
+			break
+		}
+	}
+
 	m.stopVehicles = make(map[int]int)
 	m.isLocked = true
 
@@ -796,4 +807,8 @@ func (m *modelImpl) MaxTime() time.Time {
 
 func (m *modelImpl) MaxDuration() time.Duration {
 	return m.MaxTime().Sub(m.epoch)
+}
+
+func (m *modelImpl) hasDisallowedSuccessors() bool {
+	return m.disallowedSuccessors != nil
 }

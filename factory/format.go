@@ -133,20 +133,20 @@ func toPlannedStopOutput(solutionStop nextroute.SolutionStop) schema.PlannedStop
 				int(math.Max(arrival.Sub(*inputStop.TargetArrivalTime).Seconds(), 0.0))
 		}
 
-		if inputStop.MixingItems != nil {
-			mixItems := make(map[string]nextroute.MixItem)
-			for _, constraint := range solutionStop.Vehicle().ModelVehicle().Model().Constraints() {
-				if noMixConstraint, ok := constraint.(nextroute.NoMixConstraint); ok {
-					mixItems[strings.TrimPrefix(noMixConstraint.ID(), "no_mix_")] = noMixConstraint.Value(solutionStop)
-				}
+		mixItems := make(map[string]nextroute.MixItem)
+		for _, constraint := range solutionStop.Vehicle().ModelVehicle().Model().Constraints() {
+			if noMixConstraint, ok := constraint.(nextroute.NoMixConstraint); ok {
+				mixItems[strings.TrimPrefix(noMixConstraint.ID(), "no_mix_")] = noMixConstraint.Value(solutionStop)
 			}
-			if len(mixItems) > 0 {
-				plannedStopOutput.MixItems = mixItems
-			}
+		}
+		if len(mixItems) > 0 {
+			plannedStopOutput.MixItems = mixItems
 		}
 	}
 
-	if data, ok := solutionStop.Vehicle().ModelVehicle().VehicleType().Data().(vehicleTypeData); ok {
+	hasTravelDistance := solutionStop.Previous().ModelStop().Location().IsValid() &&
+		solutionStop.ModelStop().Location().IsValid()
+	if data, ok := solutionStop.Vehicle().ModelVehicle().VehicleType().Data().(vehicleTypeData); ok && hasTravelDistance {
 		distance := data.DistanceExpression.Value(
 			solutionStop.Vehicle().ModelVehicle().VehicleType(),
 			solutionStop.Previous().ModelStop(),
@@ -286,9 +286,14 @@ func DefaultCustomResultStatistics(solution nextroute.Solution) schema.CustomRes
 		}
 	}
 
+	unplannedStops := common.MapSlice(
+		solution.UnPlannedPlanUnits().SolutionPlanUnits(),
+		toSolutionOutputStops,
+	)
+
 	return schema.CustomResultStatistics{
 		ActivatedVehicles: vehicleCount,
-		UnplannedStops:    solution.UnPlannedPlanUnits().Size(),
+		UnplannedStops:    len(unplannedStops),
 		MaxTravelDuration: maxTravelDuration,
 		MaxDuration:       maxDuration,
 		MinTravelDuration: minTravelDuration,

@@ -1,0 +1,278 @@
+{
+  "options": {
+    "check": {
+      "duration": 30000000000,
+      "verbosity": "off"
+    },
+    "format": {
+      "disable": {
+        "progression": true
+      }
+    },
+    "model": {
+      "constraints": {
+        "disable": {
+          "attributes": false,
+          "capacities": null,
+          "capacity": false,
+          "distance_limit": false,
+          "groups": false,
+          "maximum_duration": false,
+          "maximum_stops": false,
+          "maximum_wait_stop": false,
+          "maximum_wait_vehicle": false,
+          "mixing_items": false,
+          "precedence": false,
+          "start_time_windows": false,
+          "vehicle_end_time": false,
+          "vehicle_start_time": false
+        },
+        "enable": {
+          "cluster": false
+        }
+      },
+      "objectives": {
+        "capacities": "",
+        "cluster": 0,
+        "early_arrival_penalty": 1,
+        "late_arrival_penalty": 1,
+        "min_stops": 1,
+        "travel_duration": 0,
+        "unplanned_penalty": 1,
+        "vehicle_activation_penalty": 1,
+        "vehicles_duration": 1
+      },
+      "properties": {
+        "disable": {
+          "duration_groups": false,
+          "durations": false,
+          "initial_solution": false,
+          "stop_duration_multipliers": false
+        }
+      },
+      "validate": {
+        "disable": {
+          "resources": false,
+          "start_time": false
+        },
+        "enable": {
+          "matrix": false,
+          "matrix_asymmetry_tolerance": 20
+        }
+      }
+    },
+    "solve": {
+      "duration": 10000000000,
+      "iterations": 50,
+      "parallel_runs": 1,
+      "run_deterministically": true,
+      "start_solutions": 1
+    }
+  },
+  "solutions": [
+    {
+      "objective": {
+        "name": "1 * vehicles_duration + 1 * unplanned_penalty",
+        "objectives": [
+          {
+            "base": 362.2360713145241,
+            "factor": 1,
+            "name": "vehicles_duration",
+            "value": 362.2360713145241
+          },
+          {
+            "factor": 1,
+            "name": "unplanned_penalty",
+            "value": 0
+          }
+        ],
+        "value": 362.2360713145241
+      },
+      "unplanned": [],
+      "vehicles": [
+        {
+          "id": "truck",
+          "route": [
+            {
+              "cumulative_travel_duration": 0,
+              "mix_items": {
+                "main": {
+                  "name": "B",
+                  "quantity": 1
+                }
+              },
+              "stop": {
+                "id": "east",
+                "location": {
+                  "lat": 51.9624,
+                  "lon": 7.6402
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "cumulative_travel_distance": 2000,
+              "cumulative_travel_duration": 100,
+              "mix_items": {
+                "main": {
+                  "name": "B",
+                  "quantity": 0
+                }
+              },
+              "stop": {
+                "id": "west",
+                "location": {
+                  "lat": 51.9624,
+                  "lon": 7.611
+                }
+              },
+              "travel_distance": 2000,
+              "travel_duration": 100
+            },
+            {
+              "cumulative_travel_distance": 2770,
+              "cumulative_travel_duration": 138,
+              "mix_items": {
+                "main": {
+                  "name": "",
+                  "quantity": 0
+                }
+              },
+              "stop": {
+                "id": "north_west",
+                "location": {
+                  "lat": 51.9688,
+                  "lon": 7.6153
+                }
+              },
+              "travel_distance": 770,
+              "travel_duration": 38
+            },
+            {
+              "cumulative_travel_distance": 3532,
+              "cumulative_travel_duration": 176,
+              "mix_items": {
+                "main": {
+                  "name": "A",
+                  "quantity": 1
+                }
+              },
+              "stop": {
+                "id": "north",
+                "location": {
+                  "lat": 51.9714,
+                  "lon": 7.6256
+                }
+              },
+              "travel_distance": 762,
+              "travel_duration": 38
+            },
+            {
+              "cumulative_travel_distance": 4294,
+              "cumulative_travel_duration": 214,
+              "mix_items": {
+                "main": {
+                  "name": "A",
+                  "quantity": 1
+                }
+              },
+              "stop": {
+                "id": "north_east",
+                "location": {
+                  "lat": 51.9688,
+                  "lon": 7.6359
+                }
+              },
+              "travel_distance": 762,
+              "travel_duration": 38
+            },
+            {
+              "cumulative_travel_distance": 5717,
+              "cumulative_travel_duration": 285,
+              "mix_items": {
+                "main": {
+                  "name": "A",
+                  "quantity": 1
+                }
+              },
+              "stop": {
+                "id": "south_east",
+                "location": {
+                  "lat": 51.956,
+                  "lon": 7.6359
+                }
+              },
+              "travel_distance": 1423,
+              "travel_duration": 71
+            },
+            {
+              "cumulative_travel_distance": 6479,
+              "cumulative_travel_duration": 324,
+              "mix_items": {
+                "main": {
+                  "name": "A",
+                  "quantity": 0
+                }
+              },
+              "stop": {
+                "id": "south",
+                "location": {
+                  "lat": 51.9534,
+                  "lon": 7.6256
+                }
+              },
+              "travel_distance": 762,
+              "travel_duration": 38
+            },
+            {
+              "cumulative_travel_distance": 7241,
+              "cumulative_travel_duration": 362,
+              "mix_items": {
+                "main": {
+                  "name": "",
+                  "quantity": 0
+                }
+              },
+              "stop": {
+                "id": "south_west",
+                "location": {
+                  "lat": 51.956,
+                  "lon": 7.6153
+                }
+              },
+              "travel_distance": 762,
+              "travel_duration": 38
+            }
+          ],
+          "route_duration": 362,
+          "route_travel_distance": 7241,
+          "route_travel_duration": 362
+        }
+      ]
+    }
+  ],
+  "statistics": {
+    "result": {
+      "custom": {
+        "activated_vehicles": 1,
+        "max_duration": 362,
+        "max_stops_in_vehicle": 8,
+        "max_travel_duration": 362,
+        "min_duration": 362,
+        "min_stops_in_vehicle": 8,
+        "min_travel_duration": 362,
+        "unplanned_stops": 0
+      },
+      "duration": 0.123,
+      "value": 362.2360713145241
+    },
+    "run": {
+      "duration": 0.123,
+      "iterations": 50
+    },
+    "schema": "v1"
+  },
+  "version": {
+    "sdk": "VERSION"
+  }
+}

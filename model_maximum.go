@@ -67,6 +67,7 @@ type maximumImpl struct {
 	resourceExpression                   ModelExpression
 	maximumByVehicleType                 []float64
 	penaltyOffset                        float64
+	hasNoEffect                          []bool
 }
 
 func (l *maximumImpl) PenaltyOffset() float64 {
@@ -107,18 +108,28 @@ func (l *maximumImpl) Lock(model Model) error {
 		)
 	}
 
+	planUnits := model.PlanStopsUnits()
+
+	l.hasNoEffect = make([]bool, len(planUnits))
+
 	if !l.hasStopExpressionAndNoNegativeValues {
 		return nil
 	}
 
-	planUnits := model.PlanStopsUnits()
 	l.deltas = make([]float64, len(planUnits))
-	for _, planUnit := range model.PlanStopsUnits() {
+
+	for _, planUnit := range planUnits {
 		delta := 0.0
+		hasNoEffect := true
 		for _, stop := range planUnit.Stops() {
-			delta += l.Expression().Value(nil, nil, stop)
+			value := l.Expression().Value(nil, nil, stop)
+			delta += value
+			if value != 0 {
+				hasNoEffect = false
+			}
 		}
 		l.deltas[planUnit.Index()] = delta
+		l.hasNoEffect[planUnit.Index()] = hasNoEffect
 	}
 
 	return nil
@@ -161,7 +172,7 @@ func (l *maximumImpl) Maximum() VehicleTypeExpression {
 }
 
 func (l *maximumImpl) DoesStopHaveViolations(s SolutionStop) bool {
-	stop := s.(solutionStopImpl)
+	stop := s
 	// We check if the cumulative value is below zero or above the maximum.
 	// If there are stops with negative values, the cumulative value can be
 	// below zero. Un-planning can result in a cumulative value below zero
@@ -180,13 +191,17 @@ func (l *maximumImpl) DoesStopHaveViolations(s SolutionStop) bool {
 func (l *maximumImpl) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
+	moveImpl := move.(*solutionMoveStopsImpl)
+
+	if l.hasNoEffect[moveImpl.planUnit.modelPlanStopsUnit.Index()] {
+		return false, constNoPositionsHint
+	}
+
 	// All contributions to the level are negative, no need to check
 	// it will always be below the implied minimum level of zero.
 	if l.hasNegativeValues && !l.hasPositiveValues {
 		return true, constSkipVehiclePositionsHint
 	}
-
-	moveImpl := move.(*solutionMoveStopsImpl)
 
 	vehicle := moveImpl.vehicle()
 	vehicleType := vehicle.ModelVehicle().VehicleType()
@@ -208,7 +223,7 @@ func (l *maximumImpl) EstimateIsViolated(
 	// level at the end of the vehicle. We can only do this if the expression
 	// is a stop expression.
 	if l.hasStopExpressionAndNoNegativeValues {
-		cumulativeValue := vehicle.last().CumulativeValue(expression)
+		cumulativeValue := vehicle.Last().CumulativeValue(expression)
 
 		if cumulativeValue+l.deltas[moveImpl.planUnit.modelPlanStopsUnit.Index()] > maximum {
 			return true, constSkipVehiclePositionsHint
@@ -241,14 +256,14 @@ func (l *maximumImpl) EstimateIsViolated(
 
 	if !l.hasNegativeValues {
 		violated := level-previousStop.CumulativeValue(l.Expression())+
-			vehicle.last().CumulativeValue(l.Expression()) > maximum
+			vehicle.Last().CumulativeValue(l.Expression()) > maximum
 		return violated, constNoPositionsHint
 	}
 
 	stop, _ := moveImpl.next()
 
-	if stop.CumulativeValue(expression) < level {
-		stop = stop.next()
+	if stop.CumulativeValue(expression) != level {
+		stop = stop.Next()
 
 		for !stop.IsLast() {
 			level += stop.Value(expression)
@@ -258,7 +273,7 @@ func (l *maximumImpl) EstimateIsViolated(
 				return true, constNoPositionsHint
 			}
 
-			stop = stop.next()
+			stop = stop.Next()
 		}
 	}
 
@@ -302,9 +317,13 @@ func (l *maximumImpl) EstimateDeltaValue(
 ) (deltaValue float64) {
 	moveImpl := move.(*solutionMoveStopsImpl)
 
+	if l.hasNoEffect[moveImpl.planUnit.modelPlanStopsUnit.Index()] {
+		return 0.0
+	}
+
 	vehicle := moveImpl.vehicle()
 
-	hasViolation := vehicle.last().ObjectiveData(l).(*maximumObjectiveDate).hasViolation
+	hasViolation := vehicle.Last().ObjectiveData(l).(*maximumObjectiveDate).hasViolation
 
 	vehicleType := vehicle.ModelVehicle().VehicleType()
 	maximum := l.maximumByVehicleType[vehicleType.Index()]
@@ -325,7 +344,7 @@ func (l *maximumImpl) EstimateDeltaValue(
 	// level at the end of the vehicle. We can only do this if the expression
 	// is a stop expression.
 	if l.hasStopExpressionAndNoNegativeValues {
-		cumulativeValue := vehicle.last().CumulativeValue(l.resourceExpression)
+		cumulativeValue := vehicle.Last().CumulativeValue(l.resourceExpression)
 
 		returnValue := 0.0
 		excess := cumulativeValue + l.deltas[moveImpl.planUnit.modelPlanStopsUnit.Index()] - maximum
@@ -394,7 +413,7 @@ func (l *maximumImpl) Value(
 		maximum := l.maximumByVehicleType[vehicleType.Index()]
 
 		if l.hasStopExpressionAndNoNegativeValues {
-			cumulativeValue := vehicle.last().CumulativeValue(l.resourceExpression)
+			cumulativeValue := vehicle.Last().CumulativeValue(l.resourceExpression)
 			excess := cumulativeValue - maximum
 			if excess > 0 {
 				score += excess

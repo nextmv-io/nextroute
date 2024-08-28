@@ -59,6 +59,8 @@ func (h *haversineExpression) Value(
 	from ModelStop,
 	to ModelStop,
 ) float64 {
-	return haversineDistance(from.Location(), to.Location()).
-		Value(vehicle.Model().DistanceUnit())
+	return haversineDistance(
+		from.Location(),
+		to.Location(),
+	).Value(vehicle.Model().DistanceUnit())
 }

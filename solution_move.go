@@ -23,9 +23,10 @@ type SolutionMove interface {
 	// any hard constraints.
 	IsExecutable() bool
 
-	// IsImprovement returns true if the move is executable and the move
-	// has a value less than zero, false if the move is not executable or
-	// the move has a value of zero or greater than zero.
+	// IsImprovement returns true if the move is estimated to be executable and
+	// the move has a an estimated delta objective value less than zero, false
+	// if the move is not executable or the move has a value of zero or greater
+	// than zero.
 	IsImprovement() bool
 
 	// PlanUnit returns the [SolutionPlanUnit] that is affected by the move.

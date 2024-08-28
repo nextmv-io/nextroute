@@ -50,6 +50,7 @@ func cleanUp() {
 	keep := []string{
 		"testdata",
 		"main_test.go",
+		"benchmark_test.go",
 	}
 	golden.Reset(keep)
 }

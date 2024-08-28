@@ -77,7 +77,6 @@
         "plan_units": [
           {
             "best_move_failed": false,
-            "best_move_increases_objective": false,
             "best_move_objective": {
               "terms": [
                 {
@@ -96,18 +95,30 @@
               "value": -1998927.0938755402,
               "vehicle": "v1"
             },
-            "has_best_move": true,
+            "has_plannable_best_move": true,
+            "planning_makes_objective_worse": false,
             "stops": [
               "Fushimi Inari Taisha"
             ],
             "vehicles_have_moves": 1,
             "vehicles_with_moves": [
-              "v1"
+              {
+                "delta_objective": -999463.5469377702,
+                "delta_objective_estimate": -999463.5469377701,
+                "positions": [
+                  {
+                    "next": "v1-end",
+                    "previous": "v1-start",
+                    "stop": "Fushimi Inari Taisha"
+                  }
+                ],
+                "vehicle_id": "v1",
+                "was_plannable": true
+              }
             ]
           },
           {
             "best_move_failed": false,
-            "best_move_increases_objective": false,
             "best_move_objective": {
               "terms": [
                 {
@@ -126,18 +137,30 @@
               "value": -1998940.772192232,
               "vehicle": "v1"
             },
-            "has_best_move": true,
+            "has_plannable_best_move": true,
+            "planning_makes_objective_worse": false,
             "stops": [
               "Kiyomizu-dera"
             ],
             "vehicles_have_moves": 1,
             "vehicles_with_moves": [
-              "v1"
+              {
+                "delta_objective": -999470.3860961162,
+                "delta_objective_estimate": -999470.386096116,
+                "positions": [
+                  {
+                    "next": "v1-end",
+                    "previous": "v1-start",
+                    "stop": "Kiyomizu-dera"
+                  }
+                ],
+                "vehicle_id": "v1",
+                "was_plannable": true
+              }
             ]
           },
           {
             "best_move_failed": false,
-            "best_move_increases_objective": false,
             "best_move_objective": {
               "terms": [
                 {
@@ -156,18 +179,30 @@
               "value": -1999305.958360977,
               "vehicle": "v1"
             },
-            "has_best_move": true,
+            "has_plannable_best_move": true,
+            "planning_makes_objective_worse": false,
             "stops": [
               "Nijō Castle"
             ],
             "vehicles_have_moves": 1,
             "vehicles_with_moves": [
-              "v1"
+              {
+                "delta_objective": -999652.9791804887,
+                "delta_objective_estimate": -999652.9791804885,
+                "positions": [
+                  {
+                    "next": "v1-end",
+                    "previous": "v1-start",
+                    "stop": "Nijō Castle"
+                  }
+                ],
+                "vehicle_id": "v1",
+                "was_plannable": true
+              }
             ]
           },
           {
             "best_move_failed": false,
-            "best_move_increases_objective": false,
             "best_move_objective": {
               "terms": [
                 {
@@ -186,18 +221,30 @@
               "value": -1999174.925711939,
               "vehicle": "v1"
             },
-            "has_best_move": true,
+            "has_plannable_best_move": true,
+            "planning_makes_objective_worse": false,
             "stops": [
               "Kyoto Imperial Palace"
             ],
             "vehicles_have_moves": 1,
             "vehicles_with_moves": [
-              "v1"
+              {
+                "delta_objective": -999587.4628559696,
+                "delta_objective_estimate": -999587.4628559696,
+                "positions": [
+                  {
+                    "next": "v1-end",
+                    "previous": "v1-start",
+                    "stop": "Kyoto Imperial Palace"
+                  }
+                ],
+                "vehicle_id": "v1",
+                "was_plannable": true
+              }
             ]
           },
           {
             "best_move_failed": false,
-            "best_move_increases_objective": false,
             "best_move_objective": {
               "terms": [
                 {
@@ -216,18 +263,30 @@
               "value": -1999041.6594053446,
               "vehicle": "v1"
             },
-            "has_best_move": true,
+            "has_plannable_best_move": true,
+            "planning_makes_objective_worse": false,
             "stops": [
               "Gionmachi"
             ],
             "vehicles_have_moves": 1,
             "vehicles_with_moves": [
-              "v1"
+              {
+                "delta_objective": -999520.8297026725,
+                "delta_objective_estimate": -999520.8297026723,
+                "positions": [
+                  {
+                    "next": "v1-end",
+                    "previous": "v1-start",
+                    "stop": "Gionmachi"
+                  }
+                ],
+                "vehicle_id": "v1",
+                "was_plannable": true
+              }
             ]
           },
           {
             "best_move_failed": false,
-            "best_move_increases_objective": false,
             "best_move_objective": {
               "terms": [
                 {
@@ -246,18 +305,30 @@
               "value": -1999424.7676562932,
               "vehicle": "v1"
             },
-            "has_best_move": true,
+            "has_plannable_best_move": true,
+            "planning_makes_objective_worse": false,
             "stops": [
               "Kinkaku-ji"
             ],
             "vehicles_have_moves": 1,
             "vehicles_with_moves": [
-              "v1"
+              {
+                "delta_objective": -999712.3838281464,
+                "delta_objective_estimate": -999712.3838281466,
+                "positions": [
+                  {
+                    "next": "v1-end",
+                    "previous": "v1-start",
+                    "stop": "Kinkaku-ji"
+                  }
+                ],
+                "vehicle_id": "v1",
+                "was_plannable": true
+              }
             ]
           },
           {
             "best_move_failed": false,
-            "best_move_increases_objective": false,
             "best_move_objective": {
               "terms": [
                 {
@@ -276,13 +347,26 @@
               "value": -2000000,
               "vehicle": "v1"
             },
-            "has_best_move": true,
+            "has_plannable_best_move": true,
+            "planning_makes_objective_worse": false,
             "stops": [
               "Arashiyama Bamboo Forest"
             ],
             "vehicles_have_moves": 1,
             "vehicles_with_moves": [
-              "v1"
+              {
+                "delta_objective": -1000000,
+                "delta_objective_estimate": -1000000,
+                "positions": [
+                  {
+                    "next": "v1-end",
+                    "previous": "v1-start",
+                    "stop": "Arashiyama Bamboo Forest"
+                  }
+                ],
+                "vehicle_id": "v1",
+                "was_plannable": true
+              }
             ]
           }
         ],
@@ -313,9 +397,9 @@
         },
         "summary": {
           "moves_failed": 0,
+          "number_of_plan_units_making_objective_worse": 0,
           "plan_units_best_move_failed": 0,
           "plan_units_best_move_found": 7,
-          "plan_units_best_move_increases_objective": 0,
           "plan_units_checked": 7,
           "plan_units_have_no_move": 0,
           "plan_units_to_be_checked": 7

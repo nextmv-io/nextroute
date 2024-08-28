@@ -87,3 +87,45 @@ func (e *BaseEvent2[S, T]) Trigger(payload1 S, payload2 T) {
 
 // Handler2 is a function that handles an event with two payloads.
 type Handler2[S any, T any] func(payload1 S, payload2 T)
+
+// BaseEvent3 is a base event type that can be used to implement events
+// with three payloads.
+type BaseEvent3[S any, T any, U any] struct {
+	handlers []Handler3[S, T, U]
+}
+
+// Register adds an event handler for this event.
+func (e *BaseEvent3[S, T, U]) Register(handler Handler3[S, T, U]) {
+	e.handlers = append(e.handlers, handler)
+}
+
+// Trigger sends out an event with the payload.
+func (e *BaseEvent3[S, T, U]) Trigger(payload1 S, payload2 T, payload3 U) {
+	for _, handler := range e.handlers {
+		handler(payload1, payload2, payload3)
+	}
+}
+
+// Handler3 is a function that handles an event with three payloads.
+type Handler3[S any, T any, U any] func(payload1 S, payload2 T, payload3 U)
+
+// BaseEvent4 is a base event type that can be used to implement events
+// with four payloads.
+type BaseEvent4[S any, T any, U any, V any] struct {
+	handlers []Handler4[S, T, U, V]
+}
+
+// Register adds an event handler for this event.
+func (e *BaseEvent4[S, T, U, V]) Register(handler Handler4[S, T, U, V]) {
+	e.handlers = append(e.handlers, handler)
+}
+
+// Trigger sends out an event with the payload.
+func (e *BaseEvent4[S, T, U, V]) Trigger(payload1 S, payload2 T, payload3 U, payload4 V) {
+	for _, handler := range e.handlers {
+		handler(payload1, payload2, payload3, payload4)
+	}
+}
+
+// Handler4 is a function that handles an event with four payloads.
+type Handler4[S any, T any, U any, V any] func(payload1 S, payload2 T, payload3 U, payload4 V)

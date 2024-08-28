@@ -34,7 +34,7 @@ type SolutionPlanStopsUnits []SolutionPlanStopsUnit
 
 type solutionPlanStopsUnitImpl struct {
 	modelPlanStopsUnit ModelPlanStopsUnit
-	solutionStops      []solutionStopImpl
+	solutionStops      []SolutionStop
 }
 
 func (p *solutionPlanStopsUnitImpl) String() string {
@@ -48,7 +48,7 @@ func (p *solutionPlanStopsUnitImpl) SolutionStop(stop ModelStop) SolutionStop {
 	return p.solutionStop(stop)
 }
 
-func (p *solutionPlanStopsUnitImpl) solutionStop(stop ModelStop) solutionStopImpl {
+func (p *solutionPlanStopsUnitImpl) solutionStop(stop ModelStop) SolutionStop {
 	for _, solutionStop := range p.solutionStops {
 		if solutionStop.ModelStop().Index() == stop.Index() {
 			return solutionStop
@@ -96,16 +96,12 @@ func (p *solutionPlanStopsUnitImpl) Stops() ModelStops {
 
 func (p *solutionPlanStopsUnitImpl) SolutionStops() SolutionStops {
 	solutionStops := make(SolutionStops, len(p.solutionStops))
-	for i, solutionStop := range p.solutionStops {
-		solutionStops[i] = solutionStop
-	}
+	copy(solutionStops, p.solutionStops)
 	return solutionStops
 }
 
-func (p *solutionPlanStopsUnitImpl) solutionStopsImpl() []solutionStopImpl {
-	solutionStops := make([]solutionStopImpl, len(p.solutionStops))
-	copy(solutionStops, p.solutionStops)
-	return solutionStops
+func (p *solutionPlanStopsUnitImpl) solutionStopsImpl() []SolutionStop {
+	return p.solutionStops
 }
 
 func (p *solutionPlanStopsUnitImpl) IsPlanned() bool {
@@ -170,11 +166,11 @@ func (p *solutionPlanStopsUnitImpl) UnPlan() (bool, error) {
 
 func (p *solutionPlanStopsUnitImpl) StopPositions() StopPositions {
 	if p.IsPlanned() {
-		return common.Map(p.solutionStops, func(solutionStop solutionStopImpl) StopPosition {
+		return common.Map(p.solutionStops, func(solutionStop SolutionStop) StopPosition {
 			return newStopPosition(
-				solutionStop.previous(),
+				solutionStop.Previous(),
 				solutionStop,
-				solutionStop.next(),
+				solutionStop.Next(),
 			)
 		})
 	}
@@ -184,7 +180,7 @@ func (p *solutionPlanStopsUnitImpl) StopPositions() StopPositions {
 var unplanSolutionMove = sync.Pool{
 	New: func() any {
 		return &solutionMoveStopsImpl{
-			stopPositions: make([]stopPositionImpl, 0, 64),
+			stopPositions: make([]StopPosition, 0, 64),
 		}
 	},
 }
@@ -206,9 +202,9 @@ func (p *solutionPlanStopsUnitImpl) unplan() (bool, error) {
 	move.allowed = true
 	for _, solutionStop := range p.solutionStops {
 		move.stopPositions = append(move.stopPositions, newStopPosition(
-			solutionStop.previous(),
+			solutionStop.Previous(),
 			solutionStop,
-			solutionStop.next(),
+			solutionStop.Next(),
 		))
 	}
 
@@ -232,6 +228,7 @@ func (p *solutionPlanStopsUnitImpl) unplan() (bool, error) {
 					"failed undoing failed unplan",
 				)
 		}
+		return false, nil
 	}
 	return true, nil
 }

@@ -44,8 +44,10 @@ type ParallelSolver interface {
 	// Solve starts the solving process using the given options. It returns the
 	// solutions as a channel.
 	Solve(context.Context, ParallelSolveOptions, ...Solution) (SolutionChannel, error)
-	// SolveEvents returns the solve-events used by the solver.
+	// SolveEvents returns the solve-events used by the individual solver instances.
 	SolveEvents() SolveEvents
+	// ParallelSolveEvents returns the solve-events used by the parallel solver.
+	ParallelSolveEvents() ParallelSolveEvents
 }
 
 // SolveOptionsFactory is a factory type for creating new solve options.
@@ -92,11 +94,9 @@ func NewSkeletonParallelSolver(model Model) (ParallelSolver, error) {
 		return nil, fmt.Errorf("model cannot be nil")
 	}
 	parallelSolver := &parallelSolverImpl{
-		parallelSolverObservedImpl: parallelSolverObservedImpl{
-			observers: make([]ParallelSolverObserver, 0),
-		},
-		solveEvents: NewSolveEvents(),
-		model:       model,
+		solveEvents:         NewSolveEvents(),
+		parallelSolveEvents: NewParallelSolveEvents(),
+		model:               model,
 	}
 
 	return parallelSolver, nil
@@ -129,69 +129,21 @@ func (s metaSolveInformationImpl) Random() *rand.Rand {
 	return s.random
 }
 
-// ParallelSolverObserver is the interface for observing the parallel solver.
-type ParallelSolverObserver interface {
-	// OnStart is called when the parallel solver is started.
-	OnStart(
-		solver ParallelSolver,
-		options ParallelSolveOptions,
-		parallelRuns int,
-	)
-	// OnNewRun is called when a new run is started.
-	OnNewRun(
-		solver ParallelSolver,
-	)
-	// OnNewSolution is called when a new solution is found.
-	OnNewSolution(
-		solver ParallelSolver,
-		solution Solution,
-	)
-}
-
-type parallelSolverObservedImpl struct {
-	observers []ParallelSolverObserver
-}
-
-func (o *parallelSolverObservedImpl) AddMetaSearchObserver(
-	observer ParallelSolverObserver,
-) {
-	o.observers = append(o.observers, observer)
-}
-
-func (o *parallelSolverObservedImpl) OnStart(
-	solver ParallelSolver,
-	options ParallelSolveOptions,
-	parallelRuns int,
-) {
-	for _, observer := range o.observers {
-		observer.OnStart(solver, options, parallelRuns)
-	}
-}
-
-func (o *parallelSolverObservedImpl) OnNewRun(
-	solver ParallelSolver,
-) {
-	for _, observer := range o.observers {
-		observer.OnNewRun(solver)
-	}
-}
-
-func (o *parallelSolverObservedImpl) OnNewSolution(
-	solver ParallelSolver,
-	solution Solution,
-) {
-	for _, observer := range o.observers {
-		observer.OnNewSolution(solver, solution)
-	}
-}
-
 type parallelSolverImpl struct {
-	parallelSolverObservedImpl
 	model               Model
 	progression         []ProgressionEntry
 	solveEvents         SolveEvents
+	parallelSolveEvents ParallelSolveEvents
 	solveOptionsFactory SolveOptionsFactory
 	solverFactory       SolverFactory
+}
+
+func (s *parallelSolverImpl) ParallelSolveEvents() ParallelSolveEvents {
+	return s.parallelSolveEvents
+}
+
+func (s *parallelSolverImpl) SolveEvents() SolveEvents {
+	return s.solveEvents
 }
 
 func (s *parallelSolverImpl) Model() Model {
@@ -278,7 +230,11 @@ func (s *parallelSolverImpl) Solve(
 		}
 	}
 
-	start := ctx.Value(run.Start).(time.Time)
+	start := time.Now()
+
+	if ctx.Value(run.Start) != nil {
+		start = ctx.Value(run.Start).(time.Time)
+	}
 
 	ctx, cancel := context.WithDeadline(
 		ctx,
@@ -294,7 +250,11 @@ func (s *parallelSolverImpl) Solve(
 		parallelRuns = runtime.NumCPU()
 	}
 
-	s.OnStart(s, options, parallelRuns)
+	s.ParallelSolveEvents().Start.Trigger(
+		s,
+		options,
+		parallelRuns,
+	)
 
 	bestSolution := solutions[0]
 
@@ -408,6 +368,14 @@ func (s *parallelSolverImpl) Solve(
 						if updatedIterations < 0 {
 							opt.Iterations = int(updatedIterations + int64(opt.Iterations))
 						}
+
+						s.ParallelSolveEvents().StartSolver.Trigger(
+							metaSolveInformation,
+							solver,
+							opt,
+							solution,
+						)
+
 						solutionChannel, err := solver.Solve(
 							ctx,
 							opt,
@@ -417,6 +385,13 @@ func (s *parallelSolverImpl) Solve(
 							panic(err)
 						}
 						for sol := range solutionChannel {
+							if sol.Solution != nil {
+								s.ParallelSolveEvents().NewSolution.Trigger(
+									metaSolveInformation,
+									sol.Solution,
+								)
+							}
+
 							syncResultChannel <- solutionContainer{
 								Solution:   sol,
 								Error:      sol.Error,
@@ -434,11 +409,14 @@ func (s *parallelSolverImpl) Solve(
 
 	go func() {
 		defer func() {
+			iterations := int(totalIterations.Load())
 			if dataMap, ok := ctx.Value(run.Data).(*sync.Map); ok {
-				converted := int(totalIterations.Load())
+				converted := iterations
 				dataMap.Store(Iterations, converted)
 			}
 			close(resultChannel)
+
+			s.ParallelSolveEvents().End.Trigger(s, iterations, bestSolution)
 		}()
 		for solverResult := range syncResultChannel {
 			if solverResult.Error != nil {
@@ -466,10 +444,6 @@ func (s *parallelSolverImpl) Solve(
 	}()
 
 	return resultChannel, nil
-}
-
-func (s *parallelSolverImpl) SolveEvents() SolveEvents {
-	return s.solveEvents
 }
 
 func (s *parallelSolverImpl) RegisterEvents(

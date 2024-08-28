@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/nextmv-io/nextroute/common"
-	"github.com/nextmv-io/sdk/run"
 )
 
 // IntParameterOptions are the options for an integer parameter.
@@ -247,7 +246,12 @@ func (s *solveImpl) Solve(
 	s.workSolution = newWorkSolution
 	s.random = rand.New(rand.NewSource(newWorkSolution.Random().Int63()))
 
-	start := ctx.Value(run.Start).(time.Time)
+	start := time.Now()
+
+	ctx, cancel := context.WithDeadline(
+		ctx,
+		start.Add(solveOptions.Duration),
+	)
 
 	solveInformation := &solveInformationImpl{
 		iteration:      0,
@@ -268,20 +272,20 @@ func (s *solveImpl) Solve(
 		Error:    nil,
 	}
 	go func() {
-		defer close(solutions)
+		defer func() {
+			close(solutions)
+			cancel()
+		}()
 
 	Loop:
 		for iteration := 0; iteration < solveOptions.Iterations; iteration++ {
 			solveInformation.iteration = iteration
 			solveInformation.deltaScore = 0.0
-			solveInformation.solveOperators = make(
-				SolveOperators,
-				0,
-				len(s.solveOperators),
-			)
-
+			// we do not clear the elements of solveOperators as they are
+			// stable across iterations. We do not risk a memory leak here.
+			solveInformation.solveOperators = solveInformation.solveOperators[:0]
 			s.solveEvents.Iterating.Trigger(solveInformation)
-			for _, solveOperator := range s.SolveOperators() {
+			for _, solveOperator := range s.solveOperators {
 				select {
 				case <-ctx.Done():
 					s.solveEvents.ContextDone.Trigger(solveInformation)

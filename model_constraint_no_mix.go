@@ -225,7 +225,7 @@ func (l *noMixConstraintImpl) Value(solutionStop SolutionStop) MixItem {
 func (l *noMixConstraintImpl) UpdateConstraintStopData(
 	solutionStop SolutionStop,
 ) (Copier, error) {
-	solutionStopImp := solutionStop.(solutionStopImpl)
+	solutionStopImp := solutionStop
 
 	if solutionStopImp.IsFirst() {
 		return &noMixSolutionStopData{
@@ -238,7 +238,7 @@ func (l *noMixConstraintImpl) UpdateConstraintStopData(
 		}, nil
 	}
 
-	previousNoMixData := solutionStopImp.previous().ConstraintData(l).(*noMixSolutionStopData)
+	previousNoMixData := solutionStopImp.Previous().ConstraintData(l).(*noMixSolutionStopData)
 
 	insertMixIngredient, hasInsertMixIngredient := l.insert[solutionStop.ModelStop()]
 	if hasInsertMixIngredient {
@@ -349,24 +349,32 @@ func (l *noMixConstraintImpl) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
-	_, hasRemoveMixItem := l.remove[moveImpl.stopPositions[0].stop().ModelStop()]
+	_, hasRemoveMixItem := l.remove[moveImpl.stopPositions[0].Stop().ModelStop()]
 	if hasRemoveMixItem {
 		return true, constNoPositionsHint
 	}
 
-	previousStopImp := moveImpl.stopPositions[0].previous()
+	previousStopImp := moveImpl.stopPositions[0].Previous()
 	previousNoMixData := previousStopImp.ConstraintData(l).(*noMixSolutionStopData)
 	contentName := previousNoMixData.content.Name
 	contentQuantity := previousNoMixData.content.Quantity
 
 	deltaQuantity := 0
 
-	insertMixItem, hasInsertMixItem := l.insert[moveImpl.stopPositions[0].stop().ModelStop()]
+	insertMixItem, hasInsertMixItem := l.insert[moveImpl.stopPositions[0].Stop().ModelStop()]
 	if hasInsertMixItem {
 		if contentName != insertMixItem.Name && previousNoMixData.content.Quantity != 0 {
 			return true, constNoPositionsHint
 		}
 		deltaQuantity += insertMixItem.Quantity
+	}
+
+	if !hasRemoveMixItem && !hasInsertMixItem {
+		// If the stop is not associated with any mix item, then the constraint
+		// cannot be violated (as it is not mixing any new item between existing
+		// ones). Note that the content name of all stops of a move is the same,
+		// so it is enough to check the first stop.
+		return false, constNoPositionsHint
 	}
 
 	tour := previousNoMixData.tour
@@ -377,14 +385,14 @@ func (l *noMixConstraintImpl) EstimateIsViolated(
 	}
 
 	for idx := 1; idx < len(moveImpl.stopPositions); idx++ {
-		previousStopImp = moveImpl.stopPositions[idx].previous()
+		previousStopImp = moveImpl.stopPositions[idx].Previous()
 		if previousStopImp.IsPlanned() {
 			previousNoMixData = previousStopImp.ConstraintData(l).(*noMixSolutionStopData)
 			if previousNoMixData.tour != tour || previousNoMixData.content.Name != contentName {
 				return true, constNoPositionsHint
 			}
 		}
-		insertMixItem, hasInsertMixItem = l.insert[moveImpl.stopPositions[idx].stop().ModelStop()]
+		insertMixItem, hasInsertMixItem = l.insert[moveImpl.stopPositions[idx].Stop().ModelStop()]
 		if hasInsertMixItem {
 			if contentName != insertMixItem.Name {
 				return true, constNoPositionsHint
@@ -392,7 +400,7 @@ func (l *noMixConstraintImpl) EstimateIsViolated(
 			deltaQuantity += insertMixItem.Quantity
 			continue
 		}
-		removeMixItem, hasRemoveMixItem := l.remove[moveImpl.stopPositions[idx].stop().ModelStop()]
+		removeMixItem, hasRemoveMixItem := l.remove[moveImpl.stopPositions[idx].Stop().ModelStop()]
 		if hasRemoveMixItem {
 			if contentName != removeMixItem.Name || contentQuantity+deltaQuantity < removeMixItem.Quantity {
 				return true, constNoPositionsHint

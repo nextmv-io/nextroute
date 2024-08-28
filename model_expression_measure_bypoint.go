@@ -52,8 +52,7 @@ func (m *measureByPointExpression) SetName(n string) {
 }
 
 func (m *measureByPointExpression) Value(_ ModelVehicleType, from, to ModelStop) float64 {
-	locFrom := from.Location()
-	locTo := to.Location()
+	locFrom, locTo := from.Location(), to.Location()
 	value := m.measure.Cost(
 		measure.Point{locFrom.Longitude(), locFrom.Latitude()},
 		measure.Point{locTo.Longitude(), locTo.Latitude()},
