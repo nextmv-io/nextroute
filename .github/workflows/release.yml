@@ -96,3 +96,8 @@ jobs:
           --generate-notes \
           --title $VERSION $PRERELEASE_FLAG
         working-directory: ./nextroute
+
+      - name: notify slack
+        run: |
+          export DATA="{\"text\":\"Release notification - nextroute $VERSION (see <https://github.com/nextmv-io/nextroute/releases/latest|release notes>)\"}"
+          curl -X POST -H 'Content-type: application/json' --data "$DATA" ${{ secrets.SLACK_WEBHOOK_URL }}
