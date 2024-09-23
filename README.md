@@ -1,16 +1,23 @@
-# nextroute
+# Nextroute
 
-Welcome to Nextmv's **nextroute**, a feature-rich Vehicle Routing Problem (VRP)
+Welcome to Nextmv's **Nextroute**, a feature-rich Vehicle Routing Problem (VRP)
 solver written in pure Go. Designed with a focus on maintainability,
-feature-richness, and extensibility, nextroute is built to handle real-world
+feature-richness, and extensibility, Nextroute is built to handle real-world
 applications across [all platforms that Go (cross)compiles
 to](https://go.dev/doc/install/source#environment).
 
 Our goal is not to compete on specific VRP type benchmarks, but to provide a
 robust and versatile tool that can adapt to a variety of routing use-cases.
 Whether you're optimizing the routes for a small fleet of delivery vans in a
-city or managing complex logistics for a global supply chain, nextroute is
+city or managing complex logistics for a global supply chain, Nextroute is
 equipped to help you find efficient solutions.
+
+You can work with Nextroute in a variety of ways:
+
+* Go package: Import the `nextroute` package in your Go project and use the
+  solver directly.
+* Python package: Use the `nextroute` Python package as an interface to the Go
+  solver.
 
 ## Features
 
@@ -53,9 +60,27 @@ equipped to help you find efficient solutions.
 
 ## License
 
-Please note that nextroute is provided as _source-available_ software (not
+Please note that Nextroute is provided as _source-available_ software (not
 _open-source_). For further information, please refer to the [LICENSE](./LICENSE.md)
 file.
+
+## Installation
+
+* Go
+
+    Install the Go package with the following command:
+
+    ```bash
+    go get github.com/nextmv-io/nextroute
+    ```
+
+* Python
+
+    Install the Python package with the following command:
+
+    ```bash
+    pip install nextroute
+    ```
 
 ## Usage
 
@@ -73,7 +98,7 @@ If you have [Nextmv CLI](https://www.nextmv.io/docs/platform/installation#nextmv
 installed, you can create a new project with the following command:
 
 ```bash
-nextmv community clone -a nextroute
+nextmv community clone -a go-nextroute
 ```
 
 For further information on how to get started, features, deployment, etc.,
@@ -106,5 +131,5 @@ benchstat develop.txt new.txt
 We try our best to version our software thoughtfully and only break APIs and
 behaviors when we have a good reason to.
 
-- Minor (`v1.^.0`) tags: new features, might be breaking.
-- Patch (`v1.0.^`) tags: bug fixes.
+* Minor (`v1.^.0`) tags: new features, might be breaking.
+* Patch (`v1.0.^`) tags: bug fixes.
