@@ -1,5 +1,4 @@
-name: release-python
-run-name: Release ${{ inputs.VERSION }} (pre-release - ${{ inputs.IS_PRE_RELEASE }}) by @${{ github.actor }} from ${{ github.ref_name }}
+name: release
 
 on:
   workflow_dispatch:
@@ -10,11 +9,11 @@ on:
       IS_PRE_RELEASE:
         description: "It IS a pre-release"
         required: true
-        default: false
+        default: true
         type: boolean
 
 jobs:
-  bump: # This job is used to bump the version and create a release
+  bump:
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ inputs.VERSION }}
@@ -23,6 +22,13 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: ensure version is not already released
+        run: |
+          if git ls-remote --tags origin | grep -q "refs/tags/$VERSION"; then
+            echo "Version $VERSION already exists"
+            exit 1
+          fi
+
       - name: set up Python
         uses: actions/setup-python@v5
         with:
@@ -49,24 +55,29 @@ jobs:
           git config --global user.signingkey ~/.ssh/signing.key
 
           git clone git@github.com:nextmv-io/nextroute.git
-          cd nextroute
-          git switch ${{ github.ref_name }}
 
-      - name: upgrade version with hatch
+          cd nextroute
+          git checkout ${{ github.ref_name }}
+
+          git rev-parse --short HEAD
+
+      - name: bump version in version file for Go
+        run: |
+          echo $VERSION > VERSION
+        working-directory: ./nextroute
+
+      - name: upgrade version with hatch for Python
         run: hatch version ${{ env.VERSION }}
         working-directory: ./nextroute
 
-      - name: intervene version (add python)
+      - name: commit version bump
         run: |
-          export VERSION="${VERSION}-python"
-          echo "Final version (for Python release): $VERSION"
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
-
-      - name: commit new version
-        run: |
+          git add VERSION
           git add nextroute/__about__.py
+
           git commit -S -m "Bump version to $VERSION"
           git push
+
           git tag $VERSION
           git push origin $VERSION
         working-directory: ./nextroute
@@ -84,7 +95,7 @@ jobs:
           --title $VERSION $PRERELEASE_FLAG
         working-directory: ./nextroute
 
-      - name: ensure passing build
+      - name: ensure passing build for Python
         run: python -m build
         working-directory: ./nextroute
 
@@ -143,5 +154,5 @@ jobs:
     steps:
       - name: notify slack
         run: |
-          export DATA="{\"text\":\"Release notification - nextroute (Python) ${{ inputs.VERSION }} (see <https://github.com/nextmv-io/nextroute/releases/${{ inputs.VERSION }}|release notes> / <https://pypi.org/project/nextroute|PyPI>)\"}"
+          export DATA="{\"text\":\"Release notification - nextroute ${{ inputs.VERSION }} (see <https://github.com/nextmv-io/nextroute/releases/${{ inputs.VERSION }}|release notes> / <https://pypi.org/project/nextroute|PyPI>)\"}"
           curl -X POST -H 'Content-type: application/json' --data "$DATA" ${{ secrets.SLACK_URL_MISSION_CONTROL }}
