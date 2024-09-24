@@ -1,4 +1,8 @@
-"""Defines the stop class."""
+# © 2019-present nextmv.io inc
+
+"""
+Defines the stop class.
+"""
 
 from datetime import datetime
 from typing import Any, List, Optional

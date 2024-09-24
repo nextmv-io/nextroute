@@ -1,4 +1,8 @@
-"""Schema (class) definitions for the entities in Nextroute."""
+# © 2019-present nextmv.io inc
+
+"""
+Schema (class) definitions for the entities in Nextroute.
+"""
 
 from .input import Defaults as Defaults
 from .input import DurationGroup as DurationGroup

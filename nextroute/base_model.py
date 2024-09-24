@@ -1,4 +1,8 @@
-"""JSON class for data wrangling JSON objects."""
+# © 2019-present nextmv.io inc
+
+"""
+JSON class for data wrangling JSON objects.
+"""
 
 from typing import Any, Dict
 

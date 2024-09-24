@@ -1,4 +1,8 @@
-"""This module contains definitions for the schema in the Nextroute check."""
+# © 2019-present nextmv.io inc
+
+"""
+This module contains definitions for the schema in the Nextroute check.
+"""
 
 from typing import Dict, List, Optional
 

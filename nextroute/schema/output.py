@@ -1,4 +1,8 @@
-"""Defines the output class."""
+# © 2019-present nextmv.io inc
+
+"""
+Defines the output class.
+"""
 
 from datetime import datetime
 from typing import Any, Dict, List, Optional

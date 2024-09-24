@@ -1,4 +1,8 @@
-"""Schema for statistics."""
+# © 2019-present nextmv.io inc
+
+"""
+Schema for statistics.
+"""
 
 from typing import Any, Dict, List, Optional, Union
 

@@ -1,4 +1,8 @@
-"""Defines the input class."""
+# © 2019-present nextmv.io inc
+
+"""
+Defines the input class.
+"""
 
 from typing import Any, List, Optional
 

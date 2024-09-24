@@ -1,4 +1,8 @@
-"""Defines the location class."""
+# © 2019-present nextmv.io inc
+
+"""
+Defines the location class.
+"""
 
 from nextroute.base_model import BaseModel
 

@@ -1,4 +1,8 @@
-"""Defines the vehicle class."""
+# © 2019-present nextmv.io inc
+
+"""
+Defines the vehicle class.
+"""
 
 from datetime import datetime
 from typing import Any, List, Optional

@@ -1,3 +1,5 @@
+# © 2019-present nextmv.io inc
+
 """
 Check provides a plugin that allows you to check models and solutions.
 

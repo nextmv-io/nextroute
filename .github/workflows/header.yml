@@ -3,6 +3,10 @@ on: [push]
 jobs:
   check-header:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["go", "python"]
     steps:
       - name: git clone
         uses: actions/checkout@v4
@@ -12,6 +16,6 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: check header in .go files
+      - name: check header in ${{ matrix.language }} files
         run: |
-          python .nextmv/check_header.py
+          HEADER_CHECK_LANGUAGE=${{ matrix.language }} python .nextmv/check_header.py
