@@ -1,0 +1,63 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling >= 1.13.0"]
+
+[project]
+authors = [
+    { email = "tech@nextmv.io", name = "Nextmv" }
+]
+classifiers = [
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "pydantic>=2.5.2",
+]
+description = "Nextroute is an engine for solving Vehicle Routing Problems (VRPs)."
+dynamic = [
+    "version",
+]
+keywords = [
+    "decision engineering",
+    "decision science",
+    "decisions",
+    "nextmv",
+    "optimization",
+    "operations research",
+    "solver",
+    "vehicle routing problem",
+]
+license = { file = "LICENSE" }
+maintainers = [
+    { email = "tech@nextmv.io", name = "Nextmv" }
+]
+name = "nextroute"
+readme = "README.md"
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://www.nextmv.io"
+Documentation = "https://www.nextmv.io/docs/vehicle-routing"
+Repository = "https://github.com/nextmv-io/nextroute"
+
+[tool.ruff]
+target-version = "py38"
+lint.select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+    "UP",  # pyupgrade
+]
+line-length = 120
+
+[tool.hatch.version]
+path = "nextroute/__about__.py"

@@ -1,0 +1,851 @@
+{
+  "version": {
+    "sdk": "v1.0.4"
+  },
+  "options": {
+    "model": {
+      "constraints": {
+        "disable": {
+          "attributes": false,
+          "capacity": false,
+          "distance_limit": false,
+          "groups": false,
+          "maximum_duration": false,
+          "maximum_stops": false,
+          "maximum_wait_stop": false,
+          "maximum_wait_vehicle": false,
+          "mixing_items": false,
+          "precedence": false,
+          "vehicle_start_time": false,
+          "vehicle_end_time": false,
+          "start_time_windows": false
+        },
+        "enable": {
+          "cluster": false
+        }
+      },
+      "objectives": {
+        "min_stops": 1,
+        "early_arrival_penalty": 1,
+        "late_arrival_penalty": 1,
+        "vehicle_activation_penalty": 1,
+        "travel_duration": 0,
+        "vehicles_duration": 1,
+        "unplanned_penalty": 1,
+        "cluster": 0
+      },
+      "properties": {
+        "disable": {
+          "durations": false,
+          "stop_duration_multipliers": false,
+          "duration_groups": false,
+          "initial_solution": false
+        }
+      },
+      "validate": {
+        "disable": {
+          "start_time": false,
+          "resources": false
+        },
+        "enable": {
+          "matrix": false,
+          "matrix_asymmetry_tolerance": 20
+        }
+      }
+    },
+    "solve": {
+      "iterations": -1,
+      "duration": 30000000000,
+      "parallel_runs": -1,
+      "start_solutions": -1,
+      "run_deterministically": false
+    },
+    "format": {
+      "disable": {
+        "progression": false
+      }
+    },
+    "check": {
+      "duration": 30000000000,
+      "verbosity": "off"
+    }
+  },
+  "solutions": [
+    {
+      "unplanned": [
+        {
+          "id": "s21",
+          "location": {
+            "lon": -78.50509,
+            "lat": 35.7606
+          }
+        },
+        {
+          "id": "s24",
+          "location": {
+            "lon": -78.65521,
+            "lat": 35.740605
+          }
+        },
+        {
+          "id": "s25",
+          "location": {
+            "lon": -78.92051,
+            "lat": 35.887575
+          }
+        },
+        {
+          "id": "s26",
+          "location": {
+            "lon": -78.84058,
+            "lat": 35.823865
+          }
+        },
+        {
+          "id": "s4",
+          "location": {
+            "lon": -78.505745,
+            "lat": 35.77772
+          }
+        },
+        {
+          "id": "s9",
+          "location": {
+            "lon": -78.64972,
+            "lat": 35.64796
+          }
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "vehicle-0",
+          "route": [
+            {
+              "stop": {
+                "id": "vehicle-0-start",
+                "location": {
+                  "lon": -78.7401685145487,
+                  "lat": 35.791729813680874
+                }
+              },
+              "travel_duration": 0,
+              "cumulative_travel_duration": 0,
+              "arrival_time": "2023-01-01T06:00:00-06:00",
+              "start_time": "2023-01-01T06:00:00-06:00",
+              "end_time": "2023-01-01T06:00:00-06:00"
+            },
+            {
+              "stop": {
+                "id": "s7",
+                "location": {
+                  "lon": -78.749391,
+                  "lat": 35.74261
+                }
+              },
+              "travel_duration": 552,
+              "cumulative_travel_duration": 552,
+              "travel_distance": 5524,
+              "cumulative_travel_distance": 5524,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T06:09:12-06:00",
+              "start_time": "2023-01-01T06:09:12-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T06:14:12-06:00",
+              "late_arrival_duration": 7752
+            },
+            {
+              "stop": {
+                "id": "s5",
+                "location": {
+                  "lon": -78.75084,
+                  "lat": 35.732995
+                }
+              },
+              "travel_duration": 107,
+              "cumulative_travel_duration": 660,
+              "travel_distance": 1077,
+              "cumulative_travel_distance": 6601,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T06:16:00-06:00",
+              "start_time": "2023-01-01T06:16:00-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T06:21:00-06:00",
+              "late_arrival_duration": 8160
+            },
+            {
+              "stop": {
+                "id": "s2",
+                "location": {
+                  "lon": -78.813862,
+                  "lat": 35.75712
+                }
+              },
+              "travel_duration": 628,
+              "cumulative_travel_duration": 1289,
+              "travel_distance": 6288,
+              "cumulative_travel_distance": 12889,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T06:31:29-06:00",
+              "start_time": "2023-01-01T06:31:29-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T06:36:29-06:00",
+              "late_arrival_duration": 9089
+            },
+            {
+              "stop": {
+                "id": "s1",
+                "location": {
+                  "lon": -78.90919,
+                  "lat": 35.72389
+                }
+              },
+              "travel_duration": 936,
+              "cumulative_travel_duration": 2225,
+              "travel_distance": 9363,
+              "cumulative_travel_distance": 22252,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T06:52:05-06:00",
+              "start_time": "2023-01-01T06:52:05-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T06:57:05-06:00",
+              "late_arrival_duration": 10325
+            },
+            {
+              "stop": {
+                "id": "s15",
+                "location": {
+                  "lon": -78.89832,
+                  "lat": 35.83202
+                }
+              },
+              "travel_duration": 1206,
+              "cumulative_travel_duration": 3431,
+              "travel_distance": 12063,
+              "cumulative_travel_distance": 34315,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T07:17:11-06:00",
+              "start_time": "2023-01-01T07:17:11-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T07:22:11-06:00",
+              "late_arrival_duration": 11831
+            },
+            {
+              "stop": {
+                "id": "s3",
+                "location": {
+                  "lon": -78.92996,
+                  "lat": 35.932795
+                }
+              },
+              "travel_duration": 1156,
+              "cumulative_travel_duration": 4588,
+              "travel_distance": 11562,
+              "cumulative_travel_distance": 45877,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T07:41:28-06:00",
+              "start_time": "2023-01-01T07:41:28-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T07:46:28-06:00",
+              "late_arrival_duration": 13288
+            },
+            {
+              "stop": {
+                "id": "s22",
+                "location": {
+                  "lon": -78.828547,
+                  "lat": 35.962635
+                }
+              },
+              "travel_duration": 971,
+              "cumulative_travel_duration": 5559,
+              "travel_distance": 9713,
+              "cumulative_travel_distance": 55590,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T08:02:39-06:00",
+              "start_time": "2023-01-01T08:02:39-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T08:07:39-06:00",
+              "late_arrival_duration": 14559
+            },
+            {
+              "stop": {
+                "id": "s6",
+                "location": {
+                  "lon": -78.788025,
+                  "lat": 35.813025
+                }
+              },
+              "travel_duration": 1703,
+              "cumulative_travel_duration": 7262,
+              "travel_distance": 17031,
+              "cumulative_travel_distance": 72621,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T08:36:02-06:00",
+              "start_time": "2023-01-01T08:36:02-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T08:41:02-06:00",
+              "late_arrival_duration": 16562
+            },
+            {
+              "stop": {
+                "id": "s16",
+                "location": {
+                  "lon": -78.63216,
+                  "lat": 35.83458
+                }
+              },
+              "travel_duration": 1425,
+              "cumulative_travel_duration": 8688,
+              "travel_distance": 14255,
+              "cumulative_travel_distance": 86876,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T09:04:48-06:00",
+              "start_time": "2023-01-01T09:04:48-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T09:09:48-06:00",
+              "late_arrival_duration": 18288
+            },
+            {
+              "stop": {
+                "id": "s23",
+                "location": {
+                  "lon": -78.60914,
+                  "lat": 35.84616
+                }
+              },
+              "travel_duration": 244,
+              "cumulative_travel_duration": 8932,
+              "travel_distance": 2442,
+              "cumulative_travel_distance": 89318,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T09:13:52-06:00",
+              "start_time": "2023-01-01T09:13:52-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T09:18:52-06:00",
+              "late_arrival_duration": 18832
+            },
+            {
+              "stop": {
+                "id": "vehicle-0-end",
+                "location": {
+                  "lon": -78.7401685145487,
+                  "lat": 35.791729813680874
+                }
+              },
+              "travel_duration": 1327,
+              "cumulative_travel_duration": 10259,
+              "travel_distance": 13274,
+              "cumulative_travel_distance": 102592,
+              "arrival_time": "2023-01-01T09:40:59-06:00",
+              "start_time": "2023-01-01T09:40:59-06:00",
+              "end_time": "2023-01-01T09:40:59-06:00"
+            }
+          ],
+          "route_travel_duration": 10259,
+          "route_travel_distance": 102592,
+          "route_stops_duration": 3000,
+          "route_duration": 13259
+        },
+        {
+          "id": "vehicle-1",
+          "route": [
+            {
+              "stop": {
+                "id": "vehicle-1-start",
+                "location": {
+                  "lon": -78.7401685145487,
+                  "lat": 35.791729813680874
+                }
+              },
+              "travel_duration": 0,
+              "cumulative_travel_duration": 0,
+              "arrival_time": "2023-01-01T10:00:00-06:00",
+              "start_time": "2023-01-01T10:00:00-06:00",
+              "end_time": "2023-01-01T10:00:00-06:00"
+            },
+            {
+              "stop": {
+                "id": "s17",
+                "location": {
+                  "lon": -78.76063,
+                  "lat": 35.67337
+                }
+              },
+              "travel_duration": 1328,
+              "cumulative_travel_duration": 1328,
+              "travel_distance": 13289,
+              "cumulative_travel_distance": 13289,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T10:22:08-06:00",
+              "start_time": "2023-01-01T10:22:08-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T10:27:08-06:00",
+              "late_arrival_duration": 22928
+            },
+            {
+              "stop": {
+                "id": "s10",
+                "location": {
+                  "lon": -78.747955,
+                  "lat": 35.672955
+                }
+              },
+              "travel_duration": 114,
+              "cumulative_travel_duration": 1443,
+              "travel_distance": 1145,
+              "cumulative_travel_distance": 14434,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T10:29:03-06:00",
+              "start_time": "2023-01-01T10:29:03-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T10:34:03-06:00",
+              "late_arrival_duration": 23343
+            },
+            {
+              "stop": {
+                "id": "s11",
+                "location": {
+                  "lon": -78.83403,
+                  "lat": 35.77013
+                }
+              },
+              "travel_duration": 1330,
+              "cumulative_travel_duration": 2774,
+              "travel_distance": 13309,
+              "cumulative_travel_distance": 27743,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T10:56:14-06:00",
+              "start_time": "2023-01-01T10:56:14-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T11:01:14-06:00",
+              "late_arrival_duration": 24974
+            },
+            {
+              "stop": {
+                "id": "s12",
+                "location": {
+                  "lon": -78.864465,
+                  "lat": 35.782855
+                }
+              },
+              "travel_duration": 308,
+              "cumulative_travel_duration": 3083,
+              "travel_distance": 3088,
+              "cumulative_travel_distance": 30831,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T11:06:23-06:00",
+              "start_time": "2023-01-01T11:06:23-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T11:11:23-06:00",
+              "late_arrival_duration": 25583
+            },
+            {
+              "stop": {
+                "id": "s13",
+                "location": {
+                  "lon": -78.952142,
+                  "lat": 35.88029
+                }
+              },
+              "travel_duration": 1341,
+              "cumulative_travel_duration": 4424,
+              "travel_distance": 13411,
+              "cumulative_travel_distance": 44242,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T11:33:44-06:00",
+              "start_time": "2023-01-01T11:33:44-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T11:38:44-06:00",
+              "late_arrival_duration": 27224
+            },
+            {
+              "stop": {
+                "id": "s20",
+                "location": {
+                  "lon": -78.995162,
+                  "lat": 35.97414
+                }
+              },
+              "travel_duration": 1113,
+              "cumulative_travel_duration": 5537,
+              "travel_distance": 11131,
+              "cumulative_travel_distance": 55373,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T11:57:17-06:00",
+              "start_time": "2023-01-01T11:57:17-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T12:02:17-06:00",
+              "late_arrival_duration": 28637
+            },
+            {
+              "stop": {
+                "id": "s8",
+                "location": {
+                  "lon": -78.94658,
+                  "lat": 36.039135
+                }
+              },
+              "travel_duration": 844,
+              "cumulative_travel_duration": 6382,
+              "travel_distance": 8445,
+              "cumulative_travel_distance": 63818,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T12:16:22-06:00",
+              "start_time": "2023-01-01T12:16:22-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T12:21:22-06:00",
+              "late_arrival_duration": 29782
+            },
+            {
+              "stop": {
+                "id": "s18",
+                "location": {
+                  "lon": -78.911485,
+                  "lat": 36.009015
+                }
+              },
+              "travel_duration": 460,
+              "cumulative_travel_duration": 6842,
+              "travel_distance": 4601,
+              "cumulative_travel_distance": 68419,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T12:29:02-06:00",
+              "start_time": "2023-01-01T12:29:02-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T12:34:02-06:00",
+              "late_arrival_duration": 30542
+            },
+            {
+              "stop": {
+                "id": "s14",
+                "location": {
+                  "lon": -78.52748,
+                  "lat": 35.961465
+                }
+              },
+              "travel_duration": 3495,
+              "cumulative_travel_duration": 10337,
+              "travel_distance": 34953,
+              "cumulative_travel_distance": 103372,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T13:32:17-06:00",
+              "start_time": "2023-01-01T13:32:17-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T13:37:17-06:00",
+              "late_arrival_duration": 34337
+            },
+            {
+              "stop": {
+                "id": "s19",
+                "location": {
+                  "lon": -78.522705,
+                  "lat": 35.93663
+                }
+              },
+              "travel_duration": 279,
+              "cumulative_travel_duration": 10617,
+              "travel_distance": 2794,
+              "cumulative_travel_distance": 106166,
+              "target_arrival_time": "2023-01-01T04:00:00-06:00",
+              "arrival_time": "2023-01-01T13:41:57-06:00",
+              "start_time": "2023-01-01T13:41:57-06:00",
+              "duration": 300,
+              "end_time": "2023-01-01T13:46:57-06:00",
+              "late_arrival_duration": 34917
+            },
+            {
+              "stop": {
+                "id": "vehicle-1-end",
+                "location": {
+                  "lon": -78.7401685145487,
+                  "lat": 35.791729813680874
+                }
+              },
+              "travel_duration": 2536,
+              "cumulative_travel_duration": 13154,
+              "travel_distance": 25369,
+              "cumulative_travel_distance": 131535,
+              "arrival_time": "2023-01-01T14:29:14-06:00",
+              "start_time": "2023-01-01T14:29:14-06:00",
+              "end_time": "2023-01-01T14:29:14-06:00"
+            }
+          ],
+          "route_travel_duration": 13154,
+          "route_travel_distance": 131535,
+          "route_stops_duration": 3000,
+          "route_duration": 16154
+        }
+      ],
+      "objective": {
+        "name": "1 * vehicle_activation_penalty + 1 * vehicles_duration + 1 * unplanned_penalty + 1 * early_arrival_penalty + 1 * late_arrival_penalty",
+        "objectives": [
+          {
+            "name": "vehicle_activation_penalty",
+            "factor": 1,
+            "base": 4000,
+            "value": 4000
+          },
+          {
+            "name": "vehicles_duration",
+            "factor": 1,
+            "base": 29413.842347860336,
+            "value": 29413.842347860336
+          },
+          {
+            "name": "unplanned_penalty",
+            "factor": 1,
+            "base": 1200000,
+            "value": 1200000
+          },
+          {
+            "name": "early_arrival_penalty",
+            "factor": 1,
+            "value": 0
+          },
+          {
+            "name": "late_arrival_penalty",
+            "factor": 1,
+            "base": 616441.7213555574,
+            "value": 616441.7213555574
+          }
+        ],
+        "value": 1849855.5637034178
+      }
+    }
+  ],
+  "statistics": {
+    "schema": "v1",
+    "run": {
+      "duration": 30.000849301,
+      "iterations": 465176
+    },
+    "result": {
+      "duration": 29.927211845,
+      "value": 1849855.5637034178,
+      "custom": {
+        "activated_vehicles": 2,
+        "unplanned_stops": 4,
+        "max_travel_duration": 13154,
+        "max_duration": 16154,
+        "min_travel_duration": 10259,
+        "min_duration": 13259,
+        "max_stops_in_vehicle": 10,
+        "min_stops_in_vehicle": 10
+      }
+    },
+    "series_data": {
+      "value": {
+        "name": "1 * vehicle_activation_penalty + 1 * vehicles_duration + 1 * unplanned_penalty + 1 * early_arrival_penalty + 1 * late_arrival_penalty",
+        "data_points": [
+          {
+            "x": 0.020842667,
+            "y": 2234344.7645682096
+          },
+          {
+            "x": 0.032997817,
+            "y": 2093402.032223463
+          },
+          {
+            "x": 0.033048328,
+            "y": 1947534.4139026403
+          },
+          {
+            "x": 0.039701579,
+            "y": 1890176.909870863
+          },
+          {
+            "x": 0.078813374,
+            "y": 1886204.0638763905
+          },
+          {
+            "x": 0.079158687,
+            "y": 1885495.5472869873
+          },
+          {
+            "x": 0.079277793,
+            "y": 1883426.0389726162
+          },
+          {
+            "x": 0.093256976,
+            "y": 1881908.785944581
+          },
+          {
+            "x": 0.113405891,
+            "y": 1875424.7203474045
+          },
+          {
+            "x": 0.307581538,
+            "y": 1873276.893983841
+          },
+          {
+            "x": 0.348684455,
+            "y": 1868549.87184906
+          },
+          {
+            "x": 0.598760729,
+            "y": 1867817.255899191
+          },
+          {
+            "x": 0.605771215,
+            "y": 1866863.8481647968
+          },
+          {
+            "x": 0.618908364,
+            "y": 1864543.5895097256
+          },
+          {
+            "x": 0.618960483,
+            "y": 1863885.0290094614
+          },
+          {
+            "x": 0.859121106,
+            "y": 1863562.3404604197
+          },
+          {
+            "x": 1.161325635,
+            "y": 1862488.1202926636
+          },
+          {
+            "x": 1.500369885,
+            "y": 1861753.3104981184
+          },
+          {
+            "x": 1.642751038,
+            "y": 1859471.9136766195
+          },
+          {
+            "x": 2.171013945,
+            "y": 1858156.1083689928
+          },
+          {
+            "x": 2.171313761,
+            "y": 1856647.7867827415
+          },
+          {
+            "x": 3.208299811,
+            "y": 1856477.4777450562
+          },
+          {
+            "x": 3.227739753,
+            "y": 1856098.1994230747
+          },
+          {
+            "x": 3.302338785,
+            "y": 1853902.9517987967
+          },
+          {
+            "x": 29.927211845,
+            "y": 1849855.5637034178
+          }
+        ]
+      },
+      "custom": [
+        {
+          "name": "iterations",
+          "data_points": [
+            {
+              "x": 0.020842667,
+              "y": 0
+            },
+            {
+              "x": 0.032997817,
+              "y": 105
+            },
+            {
+              "x": 0.033048328,
+              "y": 105
+            },
+            {
+              "x": 0.039701579,
+              "y": 191
+            },
+            {
+              "x": 0.078813374,
+              "y": 448
+            },
+            {
+              "x": 0.079158687,
+              "y": 704
+            },
+            {
+              "x": 0.079277793,
+              "y": 705
+            },
+            {
+              "x": 0.093256976,
+              "y": 868
+            },
+            {
+              "x": 0.113405891,
+              "y": 1073
+            },
+            {
+              "x": 0.307581538,
+              "y": 3747
+            },
+            {
+              "x": 0.348684455,
+              "y": 4243
+            },
+            {
+              "x": 0.598760729,
+              "y": 7450
+            },
+            {
+              "x": 0.605771215,
+              "y": 7478
+            },
+            {
+              "x": 0.618908364,
+              "y": 7760
+            },
+            {
+              "x": 0.618960483,
+              "y": 7760
+            },
+            {
+              "x": 0.859121106,
+              "y": 11302
+            },
+            {
+              "x": 1.161325635,
+              "y": 16152
+            },
+            {
+              "x": 1.500369885,
+              "y": 21264
+            },
+            {
+              "x": 1.642751038,
+              "y": 23336
+            },
+            {
+              "x": 2.171013945,
+              "y": 32376
+            },
+            {
+              "x": 2.171313761,
+              "y": 32376
+            },
+            {
+              "x": 3.208299811,
+              "y": 49195
+            },
+            {
+              "x": 3.227739753,
+              "y": 49465
+            },
+            {
+              "x": 3.302338785,
+              "y": 50605
+            },
+            {
+              "x": 29.927211845,
+              "y": 463955
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
