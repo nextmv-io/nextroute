@@ -1,0 +1,147 @@
+name: release-python
+run-name: Release ${{ inputs.VERSION }} (pre-release - ${{ inputs.IS_PRE_RELEASE }}) by @${{ github.actor }} from ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      VERSION:
+        description: "The version to release"
+        required: true
+      IS_PRE_RELEASE:
+        description: "It IS a pre-release"
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  bump: # This job is used to bump the version and create a release
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.VERSION }}
+      GH_TOKEN: ${{ github.token }}
+      SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+    permissions:
+      contents: write
+    steps:
+      - name: set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install build hatch
+
+      - name: configure git with the bot credentials
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.NEXTMVBOT_SSH_KEY }}"
+
+          echo "${{ secrets.NEXTMVBOT_SIGNING_KEY }}" > ~/.ssh/signing.key
+          chmod 600 ~/.ssh/signing.key
+
+          git config --global user.name "nextmv-bot"
+          git config --global user.email "tech+gh-nextmv-bot@nextmv.io"
+          git config --global gpg.format ssh
+          git config --global user.signingkey ~/.ssh/signing.key
+
+          git clone git@github.com:nextmv-io/nextroute.git
+          cd nextroute
+          git switch ${{ github.ref_name }}
+
+      - name: upgrade version with hatch
+        run: hatch version ${{ env.VERSION }}
+        working-directory: ./nextroute
+
+      - name: intervene version (add python)
+        run: |
+          export VERSION="${VERSION}-python"
+          echo "Final version (for Python release): $VERSION"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
+      - name: commit new version
+        run: |
+          git add nextroute/__about__.py
+          git commit -S -m "Bump version to $VERSION"
+          git push
+          git tag $VERSION
+          git push origin $VERSION
+        working-directory: ./nextroute
+
+      - name: create release
+        run: |
+          PRERELEASE_FLAG=""
+          if [ ${{ inputs.IS_PRE_RELEASE }} = true ]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+
+          gh release create $VERSION \
+          --verify-tag \
+          --generate-notes \
+          --title $VERSION $PRERELEASE_FLAG
+        working-directory: ./nextroute
+
+      - name: ensure passing build
+        run: python -m build
+        working-directory: ./nextroute
+
+  release: # This job is used to publish the release to PyPI/TestPyPI
+    runs-on: ubuntu-latest
+    needs: bump
+    strategy:
+      matrix:
+        include:
+          - target-env: pypi
+            target-url: https://pypi.org/p/nextroute
+          - target-env: testpypi
+            target-url: https://test.pypi.org/p/nextroute
+    environment:
+      name: ${{ matrix.target-env }}
+      url: ${{ matrix.target-url }}
+    permissions:
+      contents: read
+      id-token: write # This is required for trusted publishing to PyPI
+    steps:
+      - name: git clone ${{ github.ref_name }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install build hatch
+
+      - name: build binary wheel and source tarball
+        run: python -m build
+
+      - name: Publish package distributions to PyPI
+        if: ${{ matrix.target-env == 'pypi' }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ./dist
+
+      - name: Publish package distributions to TestPyPI
+        if: ${{ matrix.target-env == 'testpypi' }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: ./dist
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: release
+    if: ${{ needs.release.result == 'success' && inputs.IS_PRE_RELEASE == false }}
+    steps:
+      - name: notify slack
+        run: |
+          export DATA="{\"text\":\"Release notification - nextroute (Python) ${{ inputs.VERSION }} (see <https://github.com/nextmv-io/nextroute/releases/${{ inputs.VERSION }}|release notes> / <https://pypi.org/project/nextroute|PyPI>)\"}"
+          curl -X POST -H 'Content-type: application/json' --data "$DATA" ${{ secrets.SLACK_URL_MISSION_CONTROL }}
