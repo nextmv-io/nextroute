@@ -11,7 +11,7 @@ go_files = glob.glob("**/*.go", recursive=True)
 missing = []
 checked = 0
 for file in go_files:
-    with open(file, "r") as f:
+    with open(file) as f:
         first_line = f.readline().strip()
         if first_line != HEADER:
             missing.append(file)
