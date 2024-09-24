@@ -23,6 +23,21 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: ensure proper tagging
+        run: |
+          echo "If it's a pre-release, the version should contain a hyphen"
+          if [ ${{ inputs.IS_PRE_RELEASE }} = true ]; then
+            if [[ $VERSION != *-* ]]; then
+              echo "Pre-release versions should contain a hyphen"
+              exit 1
+            fi
+          else
+            if [[ $VERSION == *-* ]]; then
+              echo "Release versions should not contain a hyphen"
+              exit 1
+            fi
+          fi
+
       - name: ensure version is not already released
         run: |
           if git ls-remote --tags origin | grep -q "refs/tags/$VERSION"; then
