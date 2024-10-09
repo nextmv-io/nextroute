@@ -3,6 +3,7 @@
 package factory
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
@@ -269,16 +270,76 @@ func validateConstraints(input schema.Input, modelOptions Options) error {
 	}
 
 	if input.DurationMatrix != nil && modelOptions.Validate.Enable.Matrix {
-		durationMatrix := *input.DurationMatrix
-		if err := validateMatrix(
-			input,
-			durationMatrix,
-			modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
-			"duration"); err != nil {
-			return err
+		switch matrix := input.DurationMatrix.(type) {
+		case [][]float64:
+			if err := validateMatrix(
+				input,
+				matrix,
+				modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
+				"duration"); err != nil {
+				return err
+			}
+		case map[string]any:
+			var durationMatrices schema.DurationMatrices
+			jsonData, err := json.Marshal(matrix)
+			if err != nil {
+				return err
+			}
+			err = json.Unmarshal(jsonData, &durationMatrices)
+			if err != nil {
+				return err
+			}
+			if err := validateMatrix(
+				input,
+				durationMatrices.DefaultMatrix,
+				modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
+				"time_dependent_duration"); err != nil {
+				return err
+			}
+			for i, tf := range durationMatrices.TimeFrames {
+				if tf.Matrix == nil && tf.ScalingFactor == nil {
+					return nmerror.NewInputDataError(fmt.Errorf(
+						"duration for time frame %d is missing both matrix and scaling factor", i))
+				}
+				if tf.Matrix != nil {
+					if err := validateMatrix(
+						input,
+						tf.Matrix,
+						modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
+						fmt.Sprintf("time_dependent_duration for time frame %d", i),
+					); err != nil {
+						return err
+					}
+
+					if tf.ScalingFactor != nil {
+						if *tf.ScalingFactor <= 0 {
+							return nmerror.NewInputDataError(fmt.Errorf(
+								"time_dependent_duration for time frame %d has invalid scaling factor %v", i, *tf.ScalingFactor))
+						}
+					}
+				}
+			}
+		case any:
+			var durationMatrix [][]float64
+			jsonData, err := json.Marshal(matrix)
+			if err != nil {
+				return err
+			}
+			err = json.Unmarshal(jsonData, &durationMatrix)
+			if err != nil {
+				return err
+			}
+			if err := validateMatrix(
+				input,
+				durationMatrix,
+				modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
+				"duration"); err != nil {
+				return err
+			}
+		default:
+			return nmerror.NewInputDataError(fmt.Errorf("invalid duration matrix type %T", matrix))
 		}
 	}
-
 	return nil
 }
 

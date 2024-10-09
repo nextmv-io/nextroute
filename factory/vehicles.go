@@ -3,6 +3,8 @@
 package factory
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/nextmv-io/nextroute"
@@ -22,7 +24,40 @@ func addVehicles(
 		return nil, err
 	}
 
-	travelDuration := travelDurationExpression(input)
+	var travelDuration nextroute.DurationExpression
+	switch matrix := input.DurationMatrix.(type) {
+	case [][]float64:
+		travelDuration = travelDurationExpression(matrix)
+	case map[string]any:
+		var durationMatrices schema.DurationMatrices
+		jsonData, err := json.Marshal(matrix)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(jsonData, &durationMatrices)
+		if err != nil {
+			return nil, err
+		}
+		travelDuration, err = dependentTravelDurationExpression(durationMatrices, model)
+		if err != nil {
+			return nil, err
+		}
+	case []any:
+		var durationMatrix [][]float64
+		jsonData, err := json.Marshal(matrix)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(jsonData, &durationMatrix)
+		if err != nil {
+			return nil, err
+		}
+		travelDuration = travelDurationExpression(durationMatrix)
+	case nil:
+	default:
+		return nil, fmt.Errorf("invalid duration matrix type: %T", matrix)
+	}
+
 	durationGroupsExpression := NewDurationGroupsExpression(model.NumberOfStops(), len(input.Vehicles))
 	distanceExpression := distanceExpression(input.DistanceMatrix)
 
@@ -105,12 +140,26 @@ func newVehicleType(
 		))
 	}
 
-	vehicleType, err := model.NewVehicleType(
-		nextroute.NewTimeIndependentDurationExpression(durationExpression),
-		durationGroupsExpression,
-	)
-	if err != nil {
-		return nil, err
+	var vehicleType nextroute.ModelVehicleType
+	switch expression := durationExpression.(type) {
+	case nextroute.TimeDependentDurationExpression:
+		vt, err := model.NewVehicleType(
+			expression,
+			durationGroupsExpression,
+		)
+		if err != nil {
+			return nil, err
+		}
+		vehicleType = vt
+	default:
+		vt, err := model.NewVehicleType(
+			nextroute.NewTimeIndependentDurationExpression(durationExpression),
+			durationGroupsExpression,
+		)
+		if err != nil {
+			return nil, err
+		}
+		vehicleType = vt
 	}
 
 	vehicleType.SetID(vehicle.ID)
@@ -184,17 +233,57 @@ func newVehicle(
 // travelDurationExpressions returns the expressions that define how vehicles
 // travel from one stop to another and the time it takes them to process a stop
 // (service it).
-func travelDurationExpression(input schema.Input) nextroute.DurationExpression {
+func travelDurationExpression(matrix [][]float64) nextroute.DurationExpression {
 	var travelDuration nextroute.DurationExpression
-	if input.DurationMatrix != nil {
+	if matrix != nil {
 		travelDuration = nextroute.NewDurationExpression(
 			"travelDuration",
-			nextroute.NewMeasureByIndexExpression(measure.Matrix(*input.DurationMatrix)),
+			nextroute.NewMeasureByIndexExpression(measure.Matrix(matrix)),
 			common.Second,
 		)
 	}
 
 	return travelDuration
+}
+
+func dependentTravelDurationExpression(
+	durationMatrices schema.DurationMatrices,
+	model nextroute.Model,
+) (nextroute.DurationExpression, error) {
+	if durationMatrices.DefaultMatrix != nil {
+		defaultExpression := nextroute.NewDurationExpression(
+			"default_duration_expression",
+			nextroute.NewMeasureByIndexExpression(measure.Matrix(durationMatrices.DefaultMatrix)),
+			common.Second,
+		)
+
+		timeExpression, err := nextroute.NewTimeDependentDurationExpression(model, defaultExpression)
+		if err != nil {
+			return nil, err
+		}
+
+		for i, tf := range durationMatrices.TimeFrames {
+			if tf.ScalingFactor != nil {
+				scaledExpression := nextroute.NewScaledDurationExpression(defaultExpression, *tf.ScalingFactor)
+				if err := timeExpression.SetExpression(tf.StartTime, tf.EndTime, scaledExpression); err != nil {
+					return nil, err
+				}
+			} else {
+				trafficExpression := nextroute.NewDurationExpression(
+					fmt.Sprintf("traffic_duration_expression_%d", i),
+					nextroute.NewMeasureByIndexExpression(measure.Matrix(tf.Matrix)),
+					common.Second,
+				)
+				if err := timeExpression.SetExpression(tf.StartTime, tf.EndTime, trafficExpression); err != nil {
+					return nil, err
+				}
+			}
+		}
+
+		return timeExpression, nil
+	}
+
+	return nil, errors.New("no duration matrix provided")
 }
 
 // distanceExpression creates a distance expression for later use.
