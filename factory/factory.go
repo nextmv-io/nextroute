@@ -150,6 +150,10 @@ func appendObjectiveModifiers(
 		modifiers = append(modifiers, addCapacityObjective)
 	}
 
+	if options.Objectives.StopBalance > 0.0 {
+		modifiers = append(modifiers, addStopBalanceObjective)
+	}
+
 	return modifiers
 }
 

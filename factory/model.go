@@ -37,6 +37,7 @@ type Options struct {
 		VehiclesDuration         float64 `json:"vehicles_duration" usage:"factor to weigh the vehicles duration objective" default:"1.0"`
 		UnplannedPenalty         float64 `json:"unplanned_penalty" usage:"factor to weigh the unplanned objective" default:"1.0"`
 		Cluster                  float64 `json:"cluster" usage:"factor to weigh the cluster objective" default:"0.0"`
+		StopBalance              float64 `json:"stop_balance" usage:"factor to weigh the stop balance objective" default:"0.0"`
 	} `json:"objectives"`
 	Properties struct {
 		Disable struct {
