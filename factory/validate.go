@@ -269,15 +269,17 @@ func validateConstraints(input schema.Input, modelOptions Options) error {
 		}
 	}
 
-	if input.DurationMatrix != nil && modelOptions.Validate.Enable.Matrix {
+	if input.DurationMatrix != nil {
 		switch matrix := input.DurationMatrix.(type) {
 		case [][]float64:
-			if err := validateMatrix(
-				input,
-				matrix,
-				modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
-				"duration"); err != nil {
-				return err
+			if modelOptions.Validate.Enable.Matrix {
+				if err := validateMatrix(
+					input,
+					matrix,
+					modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
+					"duration"); err != nil {
+					return err
+				}
 			}
 		case map[string]any:
 			var durationMatrices schema.DurationMatrices
@@ -289,19 +291,27 @@ func validateConstraints(input schema.Input, modelOptions Options) error {
 			if err != nil {
 				return err
 			}
-			if err := validateMatrix(
-				input,
-				durationMatrices.DefaultMatrix,
-				modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
-				"time_dependent_duration"); err != nil {
-				return err
+			if modelOptions.Validate.Enable.Matrix {
+				if err := validateMatrix(
+					input,
+					durationMatrices.DefaultMatrix,
+					modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
+					"time_dependent_duration"); err != nil {
+					return err
+				}
 			}
 			for i, tf := range durationMatrices.TimeFrames {
 				if tf.Matrix == nil && tf.ScalingFactor == nil {
 					return nmerror.NewInputDataError(fmt.Errorf(
 						"duration for time frame %d is missing both matrix and scaling factor", i))
 				}
-				if tf.Matrix != nil {
+
+				if tf.Matrix != nil && tf.ScalingFactor != nil {
+					return nmerror.NewInputDataError(fmt.Errorf(
+						"duration for time frame %d has both matrix and scaling factor, only one is allowed", i))
+				}
+
+				if tf.Matrix != nil && modelOptions.Validate.Enable.Matrix {
 					if err := validateMatrix(
 						input,
 						tf.Matrix,
@@ -310,14 +320,28 @@ func validateConstraints(input schema.Input, modelOptions Options) error {
 					); err != nil {
 						return err
 					}
+				}
 
-					if tf.ScalingFactor != nil {
-						if *tf.ScalingFactor <= 0 {
-							return nmerror.NewInputDataError(fmt.Errorf(
-								"time_dependent_duration for time frame %d has invalid scaling factor %v", i, *tf.ScalingFactor))
-						}
+				if tf.ScalingFactor != nil {
+					if *tf.ScalingFactor <= 0 {
+						return nmerror.NewInputDataError(fmt.Errorf(
+							"time_dependent_duration for time frame %d has invalid scaling factor %v", i, *tf.ScalingFactor))
 					}
 				}
+
+				if tf.StartTime.IsZero() {
+					return nmerror.NewInputDataError(fmt.Errorf(
+						"time_dependent_duration for time frame %d has no start time", i))
+				}
+				if tf.EndTime.IsZero() {
+					return nmerror.NewInputDataError(fmt.Errorf(
+						"time_dependent_duration for time frame %d has no end time", i))
+				}
+				if tf.StartTime.After(tf.EndTime) || tf.StartTime.Equal(tf.EndTime) {
+					return nmerror.NewInputDataError(fmt.Errorf(
+						"time_dependent_duration for time frame %d has invalid start and end time, start time is after or equal to end time", i))
+				}
+
 			}
 		case any:
 			var durationMatrix [][]float64
