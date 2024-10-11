@@ -28,6 +28,11 @@ func addVehicles(
 	switch matrix := input.DurationMatrix.(type) {
 	case [][]float64:
 		travelDuration = travelDurationExpression(matrix)
+	case schema.DurationMatrices:
+		travelDuration, err = dependentTravelDurationExpression(matrix, model)
+		if err != nil {
+			return nil, err
+		}
 	case map[string]any:
 		var durationMatrices schema.DurationMatrices
 		jsonData, err := json.Marshal(matrix)
