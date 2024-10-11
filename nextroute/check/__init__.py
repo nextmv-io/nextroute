@@ -19,6 +19,7 @@ solution. If the check is invoked on a solution, it is executed on the
 unplanned plan units of the solution.
 """
 
+from .options import Options as Options
 from .schema import Objective as Objective
 from .schema import ObjectiveTerm as ObjectiveTerm
 from .schema import Output as Output
