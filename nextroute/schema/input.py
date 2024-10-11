@@ -4,8 +4,8 @@
 Defines the input class.
 """
 
-from typing import Any, List, Optional
-
+from typing import Any, List, Optional, Union
+from datetime import datetime
 from nextroute.base_model import BaseModel
 from nextroute.schema.stop import AlternateStop, Stop, StopDefaults
 from nextroute.schema.vehicle import Vehicle, VehicleDefaults
@@ -29,6 +29,24 @@ class DurationGroup(BaseModel):
     group: List[str]
     """Stop IDs contained in the group."""
 
+class TimeFrame(BaseModel):
+    """Represents a time-dependent duration matrix or scaling factor."""
+    start_time: datetime
+    """Start time of the time frame."""
+    end_time: datetime
+    """End time of the time frame."""
+    matrix: Optional[List[List[float]]] = None
+    """Duration matrix for the time frame."""
+    scaling_factor: Optional[float] = None
+    """Scaling factor for the time frame."""
+
+class DurationMatrices(BaseModel):
+    """Represents time-dependent duration matrices."""
+    default_matrix: List[List[float]]
+    """Default duration matrix."""
+    time_frames: Optional[List[TimeFrame]] = None
+    """Time-dependent duration matrices."""
+
 
 class Input(BaseModel):
     """Input schema for Nextroute."""
@@ -48,8 +66,8 @@ class Input(BaseModel):
     """Matrix of travel distances in meters between stops."""
     duratrion_groups: Optional[List[DurationGroup]] = None
     """Duration in seconds added when approaching the group."""
-    duration_matrix: Optional[List[List[float]]] = None
-    """Matrix of travel durations in seconds between stops."""
+    duration_matrix: Optional[Union[List[List[float]], DurationMatrices]] = None
+    """Matrix of travel durations in seconds between stops as a single matrix or duration matrices."""
     options: Optional[Any] = None
     """Arbitrary options."""
     stop_groups: Optional[List[List[str]]] = None
