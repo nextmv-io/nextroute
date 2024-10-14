@@ -9,9 +9,9 @@ from typing import Any, Dict, List
 
 from pydantic import Field
 
-import nextroute.check as nextrouteCheck
-from nextroute import factory
 from nextroute.base_model import BaseModel
+from nextroute.check.options import Options as CheckOptions
+from nextroute.factory.options import Options as FactoryOptions
 
 _DURATIONS_ARGS = [
     "-check.duration",
@@ -60,11 +60,11 @@ class FormatOptions(BaseModel):
 class Options(BaseModel):
     """Options for using Nextroute."""
 
-    check: nextrouteCheck.Options = Field(default_factory=nextrouteCheck.Options)
+    check: CheckOptions = Field(default_factory=CheckOptions)
     """Options for enabling the check engine."""
     format: FormatOptions = Field(default_factory=FormatOptions)
     """Options for the output format."""
-    model: factory.Options = Field(default_factory=factory.Options)
+    model: FactoryOptions = Field(default_factory=FactoryOptions)
     """Options for the ready-to-go model."""
     solve: ParallelSolveOptions = Field(default_factory=ParallelSolveOptions)
     """Options for the parallel solver."""
@@ -82,16 +82,39 @@ class Options(BaseModel):
         opt_dict = self.to_dict()
         flattened = _flatten(opt_dict)
 
+        default_options = Options()
+        default_options_dict = default_options.to_dict()
+        default_flattened = _flatten(default_options_dict)
+
         args = []
         for key, value in flattened.items():
+            # We only care about custom options, so we skip the default ones.
+            default_value = default_flattened.get(key)
+            if value == default_value:
+                continue
+
             key = key.replace("_", "")
-            args.append(key)
 
             str_value = json.dumps(value)
             if key in _DURATIONS_ARGS:
                 str_value = str_value + "s"  # Transforms into seconds.
 
-            args.append(str_value)
+            if str_value.startswith('"') and str_value.endswith('"'):
+                str_value = str_value[1:-1]
+
+            # Nextroute’s Go implementation does not support boolean flags with
+            # values. If the value is a boolean, then we only append the key if
+            # the value is True.
+            should_append_value = True
+            if isinstance(value, bool):
+                if not value:
+                    continue
+
+                should_append_value = False
+
+            args.append(key)
+            if should_append_value:
+                args.append(str_value)
 
         return args
 
