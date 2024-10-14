@@ -1,6 +1,8 @@
 import unittest
 
 import nextroute
+import nextroute.check
+import nextroute.factory
 from nextroute import options
 
 
@@ -96,90 +98,44 @@ class TestOptions(unittest.TestCase):
         )
 
     def test_options_to_args(self):
+        # Default options should not produce any arguments.
         opt = nextroute.Options()
         args = opt.to_args()
+        self.assertListEqual(args, [])
+
+        # Only options that are not default should produce arguments.
+        opt2 = nextroute.Options(
+            check=nextroute.check.Options(
+                duration=4,
+                verbosity=nextroute.check.Verbosity.MEDIUM,
+            ),
+            solve=nextroute.ParallelSolveOptions(
+                duration=4,
+                iterations=-1,  # Default value should be skipped.
+            ),
+            model=nextroute.factory.Options(
+                constraints=nextroute.factory.Constraints(
+                    disable=nextroute.factory.DisableConstraints(
+                        attributes=True,
+                    ),
+                ),
+                validate=nextroute.factory.Validate(
+                    enable=nextroute.factory.EnableValidate(
+                        matrix=False,  # This option should be skipped because it is bool False.
+                    ),
+                ),
+            ),
+        )
+        args2 = opt2.to_args()
         self.assertListEqual(
-            args,
+            args2,
             [
                 "-check.duration",
-                "30.0s",
+                "4.0s",
                 "-check.verbosity",
-                '"off"',
-                "-format.disable.progression",
-                "false",
-                "-model.constraints.disable.attributes",
-                "false",
-                "-model.constraints.disable.capacity",
-                "false",
-                "-model.constraints.disable.capacities",
-                "[]",
-                "-model.constraints.disable.distancelimit",
-                "false",
-                "-model.constraints.disable.groups",
-                "false",
-                "-model.constraints.disable.maximumduration",
-                "false",
-                "-model.constraints.disable.maximumstops",
-                "false",
-                "-model.constraints.disable.maximumwaitstop",
-                "false",
-                "-model.constraints.disable.maximumwaitvehicle",
-                "false",
-                "-model.constraints.disable.mixingitems",
-                "false",
-                "-model.constraints.disable.precedence",
-                "false",
-                "-model.constraints.disable.vehiclestarttime",
-                "false",
-                "-model.constraints.disable.vehicleendtime",
-                "false",
-                "-model.constraints.disable.starttimewindows",
-                "false",
-                "-model.constraints.enable.cluster",
-                "false",
-                "-model.objectives.capacities",
-                '""',
-                "-model.objectives.minstops",
-                "1.0",
-                "-model.objectives.earlyarrivalpenalty",
-                "1.0",
-                "-model.objectives.latearrivalpenalty",
-                "1.0",
-                "-model.objectives.vehicleactivationpenalty",
-                "1.0",
-                "-model.objectives.travelduration",
-                "0.0",
-                "-model.objectives.vehiclesduration",
-                "1.0",
-                "-model.objectives.unplannedpenalty",
-                "1.0",
-                "-model.objectives.cluster",
-                "0.0",
-                "-model.properties.disable.durations",
-                "false",
-                "-model.properties.disable.stopdurationmultipliers",
-                "false",
-                "-model.properties.disable.durationgroups",
-                "false",
-                "-model.properties.disable.initialsolution",
-                "false",
-                "-model.validate.disable.starttime",
-                "false",
-                "-model.validate.disable.resources",
-                "false",
-                "-model.validate.enable.matrix",
-                "false",
-                "-model.validate.enable.matrixasymmetrytolerance",
-                "20",
-                "-solve.iterations",
-                "-1",
+                "medium",
+                "-model.constraints.disable.attributes",  # Bool flags do not have values.
                 "-solve.duration",
-                "5.0s",
-                "-solve.parallelruns",
-                "-1",
-                "-solve.startsolutions",
-                "-1",
-                "-solve.rundeterministically",
-                "false",
+                "4.0s",
             ],
         )
