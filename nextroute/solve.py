@@ -15,12 +15,13 @@ from nextroute.schema.output import Output
 
 SUPPORTED_OS = ["linux", "windows", "darwin"]
 """The operating systems supported by the Nextroute engine."""
-SUPPORTED_ARCHITECTURES = ["x86_64", "arm64"]
+SUPPORTED_ARCHITECTURES = ["x86_64", "arm64", "aarch64"]
 """The architectures supported by the Nextroute engine."""
 
 _ARCHITECTURE_TRANSLATION = {
     "x86_64": "amd64",
     "arm64": "arm64",
+    "aarch64": "arm64",
 }
 
 
