@@ -35,9 +35,14 @@ func addVehicles(
 			return nil, err
 		}
 	case []schema.DurationMatrices:
-		travelDuration, err = dependentTravelDurationExpression(matrix[0], model)
-		if err != nil {
-			return nil, err
+		for _, durationMatrix := range matrix {
+			m, err := dependentTravelDurationExpression(durationMatrix, model)
+			if err != nil {
+				return nil, err
+			}
+			for _, vehicleID := range durationMatrix.VehicleIDs {
+				travelDurationMap[vehicleID] = &m
+			}
 		}
 	case map[string]any:
 		var durationMatrices schema.DurationMatrices
