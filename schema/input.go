@@ -38,6 +38,9 @@ type Input struct {
 
 // DurationMatrices represents time-dependent duration matrices
 type DurationMatrices struct {
+	// VehicleIDs is a list of vehicle IDs for which the duration matrix is defined.
+	// Must be empty for a single matrix.
+	VehicleIDs []string `json:"vehicle_ids,omitempty"`
 	// DefaultMatrix is the default duration matrix used for undefined time frames
 	DefaultMatrix [][]float64 `json:"default_matrix"`
 

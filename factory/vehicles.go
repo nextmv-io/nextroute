@@ -25,11 +25,17 @@ func addVehicles(
 	}
 
 	var travelDuration nextroute.DurationExpression
+	travelDurationMap := make(map[string]*nextroute.DurationExpression)
 	switch matrix := input.DurationMatrix.(type) {
 	case [][]float64:
 		travelDuration = travelDurationExpression(matrix)
 	case schema.DurationMatrices:
 		travelDuration, err = dependentTravelDurationExpression(matrix, model)
+		if err != nil {
+			return nil, err
+		}
+	case []schema.DurationMatrices:
+		travelDuration, err = dependentTravelDurationExpression(matrix[0], model)
 		if err != nil {
 			return nil, err
 		}
@@ -48,16 +54,30 @@ func addVehicles(
 			return nil, err
 		}
 	case []any:
-		var durationMatrix [][]float64
-		jsonData, err := json.Marshal(matrix)
-		if err != nil {
-			return nil, err
+		// First, try to assert it as [][]float64
+		if floatMatrix, ok := common.TryAssertFloat64Matrix(matrix); ok {
+			travelDuration = travelDurationExpression(floatMatrix)
+		} else {
+			// If it's not [][]float64, try to assert it as []schema.DurationMatrices
+			var durationMatrices []schema.DurationMatrices
+			jsonData, err := json.Marshal(matrix)
+			if err != nil {
+				return nil, err
+			}
+			err = json.Unmarshal(jsonData, &durationMatrices)
+			if err != nil {
+				return nil, err
+			}
+			for _, durationMatrix := range durationMatrices {
+				m, err := dependentTravelDurationExpression(durationMatrix, model)
+				if err != nil {
+					return nil, err
+				}
+				for _, vehicleID := range durationMatrix.VehicleIDs {
+					travelDurationMap[vehicleID] = &m
+				}
+			}
 		}
-		err = json.Unmarshal(jsonData, &durationMatrix)
-		if err != nil {
-			return nil, err
-		}
-		travelDuration = travelDurationExpression(durationMatrix)
 	case nil:
 	default:
 		return nil, fmt.Errorf("invalid duration matrix type: %T", matrix)
@@ -75,11 +95,15 @@ func addVehicles(
 	}
 
 	for idx, inputVehicle := range input.Vehicles {
+		td := travelDuration
+		if travelDurationMap[inputVehicle.ID] != nil {
+			td = *travelDurationMap[inputVehicle.ID]
+		}
 		vehicleType, err := newVehicleType(
 			inputVehicle,
 			model,
 			distanceExpression,
-			travelDuration,
+			td,
 			durationGroupsExpression,
 		)
 		if err != nil {
