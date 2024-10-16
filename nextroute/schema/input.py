@@ -4,8 +4,9 @@
 Defines the input class.
 """
 
-from typing import Any, List, Optional, Union
 from datetime import datetime
+from typing import Any, List, Optional, Union
+
 from nextroute.base_model import BaseModel
 from nextroute.schema.stop import AlternateStop, Stop, StopDefaults
 from nextroute.schema.vehicle import Vehicle, VehicleDefaults
