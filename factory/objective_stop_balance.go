@@ -9,7 +9,7 @@ import (
 
 // addStopBalanceObjective adds the stop balance objective to the model.
 func addStopBalanceObjective(
-	input schema.Input,
+	_ schema.Input,
 	model nextroute.Model,
 	options Options,
 ) (nextroute.Model, error) {
