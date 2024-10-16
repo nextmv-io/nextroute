@@ -14,16 +14,16 @@ func (t *balanceObjectiveImpl) EstimateDeltaValue(
 	move Move,
 ) float64 {
 	solution := move.Solution()
-	oldMax, newMax := t.MaxStops(solution, move)
+	oldMax, newMax := t.maxStops(solution, move)
 	return float64(newMax - oldMax)
 }
 
 func (t *balanceObjectiveImpl) Value(solution Solution) float64 {
-	maxBefore, _ := t.MaxStops(solution, nil)
+	maxBefore, _ := t.maxStops(solution, nil)
 	return float64(maxBefore)
 }
 
-func (t *balanceObjectiveImpl) MaxStops(solution Solution, move SolutionMoveStops) (int, int) {
+func (t *balanceObjectiveImpl) maxStops(solution Solution, move SolutionMoveStops) (int, int) {
 	max := 0
 	maxBefore := 0
 	moveExists := move != nil
