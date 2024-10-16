@@ -284,40 +284,39 @@ func dependentTravelDurationExpression(
 	durationMatrices schema.DurationMatrices,
 	model nextroute.Model,
 ) (nextroute.DurationExpression, error) {
-	if durationMatrices.DefaultMatrix != nil {
-		defaultExpression := nextroute.NewDurationExpression(
-			"default_duration_expression",
-			nextroute.NewMeasureByIndexExpression(measure.Matrix(durationMatrices.DefaultMatrix)),
-			common.Second,
-		)
+	if durationMatrices.DefaultMatrix == nil {
+		return nil, errors.New("no duration matrix provided")
+	}
+	defaultExpression := nextroute.NewDurationExpression(
+		"default_duration_expression",
+		nextroute.NewMeasureByIndexExpression(measure.Matrix(durationMatrices.DefaultMatrix)),
+		common.Second,
+	)
 
-		timeExpression, err := nextroute.NewTimeDependentDurationExpression(model, defaultExpression)
-		if err != nil {
-			return nil, err
-		}
-
-		for i, tf := range durationMatrices.TimeFrames {
-			if tf.ScalingFactor != nil {
-				scaledExpression := nextroute.NewScaledDurationExpression(defaultExpression, *tf.ScalingFactor)
-				if err := timeExpression.SetExpression(tf.StartTime, tf.EndTime, scaledExpression); err != nil {
-					return nil, err
-				}
-			} else {
-				trafficExpression := nextroute.NewDurationExpression(
-					fmt.Sprintf("traffic_duration_expression_%d", i),
-					nextroute.NewMeasureByIndexExpression(measure.Matrix(tf.Matrix)),
-					common.Second,
-				)
-				if err := timeExpression.SetExpression(tf.StartTime, tf.EndTime, trafficExpression); err != nil {
-					return nil, err
-				}
-			}
-		}
-
-		return timeExpression, nil
+	timeExpression, err := nextroute.NewTimeDependentDurationExpression(model, defaultExpression)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, errors.New("no duration matrix provided")
+	for i, tf := range durationMatrices.TimeFrames {
+		if tf.ScalingFactor != nil {
+			scaledExpression := nextroute.NewScaledDurationExpression(defaultExpression, *tf.ScalingFactor)
+			if err := timeExpression.SetExpression(tf.StartTime, tf.EndTime, scaledExpression); err != nil {
+				return nil, err
+			}
+		} else {
+			trafficExpression := nextroute.NewDurationExpression(
+				fmt.Sprintf("traffic_duration_expression_%d", i),
+				nextroute.NewMeasureByIndexExpression(measure.Matrix(tf.Matrix)),
+				common.Second,
+			)
+			if err := timeExpression.SetExpression(tf.StartTime, tf.EndTime, trafficExpression); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return timeExpression, nil
 }
 
 // distanceExpression creates a distance expression for later use.

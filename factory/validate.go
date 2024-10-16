@@ -269,63 +269,67 @@ func validateConstraints(input schema.Input, modelOptions Options) error {
 		}
 	}
 
-	if input.DurationMatrix != nil {
-		switch matrix := input.DurationMatrix.(type) {
-		case [][]float64:
-			if modelOptions.Validate.Enable.Matrix {
-				if err := validateMatrix(
-					input,
-					matrix,
-					modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
-					"duration"); err != nil {
-					return err
-				}
-			}
-		case schema.DurationMatrices:
-			return validateDurationMatrices(input, matrix, modelOptions, true)
-		case []schema.DurationMatrices:
-			return validateDurationMatricesAndIDs(input, matrix, modelOptions)
-		case map[string]any:
-			var durationMatrices schema.DurationMatrices
-			jsonData, err := json.Marshal(matrix)
-			if err != nil {
+	if input.DurationMatrix == nil {
+		return nil
+	}
+	switch matrix := input.DurationMatrix.(type) {
+	case [][]float64:
+		if modelOptions.Validate.Enable.Matrix {
+			if err := validateMatrix(
+				input,
+				matrix,
+				modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
+				"duration"); err != nil {
 				return err
 			}
-			err = json.Unmarshal(jsonData, &durationMatrices)
-			if err != nil {
-				return err
-			}
-			return validateDurationMatrices(input, durationMatrices, modelOptions, true)
-		case []any:
-			// First, try to assert it as [][]float64
-			if floatMatrix, ok := common.TryAssertFloat64Matrix(matrix); ok {
-				if modelOptions.Validate.Enable.Matrix {
-					if err := validateMatrix(
-						input,
-						floatMatrix,
-						modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
-						"duration"); err != nil {
-						return err
-					}
-				}
-			} else {
-				// If it's not [][]float64, try to assert it as []schema.DurationMatrices
-				var durationMatrices []schema.DurationMatrices
-				jsonData, err := json.Marshal(matrix)
-				if err != nil {
-					return err
-				}
-				err = json.Unmarshal(jsonData, &durationMatrices)
-				if err != nil {
-					return err
-				}
-				return validateDurationMatricesAndIDs(input, durationMatrices, modelOptions)
-			}
-		default:
-			return nmerror.NewInputDataError(fmt.Errorf("invalid duration matrix type %T", matrix))
 		}
+	case schema.DurationMatrices:
+		return validateDurationMatrix(input, matrix, modelOptions, true)
+	case []schema.DurationMatrices:
+		return validateDurationMatricesAndIDs(input, matrix, modelOptions)
+	case map[string]any:
+		var durationMatrices schema.DurationMatrices
+		jsonData, err := json.Marshal(matrix)
+		if err != nil {
+			return err
+		}
+		err = json.Unmarshal(jsonData, &durationMatrices)
+		if err != nil {
+			return err
+		}
+		return validateDurationMatrix(input, durationMatrices, modelOptions, true)
+	case []any:
+		// In this case we have a single matrix that can be a float64 matrix or a
+		// multi duration matrix.
+		return validateFloatOrMultiDurationMatrix(input, matrix, modelOptions)
+	default:
+		return nmerror.NewInputDataError(fmt.Errorf("invalid duration matrix type %T", matrix))
 	}
 	return nil
+}
+
+func validateFloatOrMultiDurationMatrix(input schema.Input, matrix []any, modelOptions Options) error {
+	if floatMatrix, ok := common.TryAssertFloat64Matrix(matrix); ok {
+		if modelOptions.Validate.Enable.Matrix {
+			return validateMatrix(
+				input,
+				floatMatrix,
+				modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
+				"duration")
+		}
+		return nil
+	}
+
+	var durationMatrices []schema.DurationMatrices
+	jsonData, err := json.Marshal(matrix)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(jsonData, &durationMatrices)
+	if err != nil {
+		return err
+	}
+	return validateDurationMatricesAndIDs(input, durationMatrices, modelOptions)
 }
 
 func validateDurationMatricesAndIDs(
@@ -349,7 +353,7 @@ func validateDurationMatricesAndIDs(
 			}
 			vIDs[vID] = true
 		}
-		if err := validateDurationMatrices(input, durationMatrix, modelOptions, false); err != nil {
+		if err := validateDurationMatrix(input, durationMatrix, modelOptions, false); err != nil {
 			return err
 		}
 	}
@@ -599,7 +603,7 @@ func validateAlternateStop(idx int, stop schema.AlternateStop) error {
 	return nil
 }
 
-func validateDurationMatrices(
+func validateDurationMatrix(
 	input schema.Input,
 	durationMatrices schema.DurationMatrices,
 	modelOptions Options,
@@ -659,9 +663,9 @@ func validateDurationMatrices(
 		}
 		if tf.StartTime.After(tf.EndTime) || tf.StartTime.Equal(tf.EndTime) {
 			return nmerror.NewInputDataError(fmt.Errorf(
-				"time_dependent_duration for time frame %d has invalid start and end time, start time is after or equal to end time", i))
+				"time_dependent_duration for time frame %d has invalid start and end time, "+
+					"start time is after or equal to end time", i))
 		}
-
 	}
 	return nil
 }

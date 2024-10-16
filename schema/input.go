@@ -36,7 +36,7 @@ type Input struct {
 	AlternateStops *[]AlternateStop `json:"alternate_stops,omitempty"`
 }
 
-// DurationMatrices represents time-dependent duration matrices
+// DurationMatrices represents time-dependent duration matrices.
 type DurationMatrices struct {
 	// VehicleIDs is a list of vehicle IDs for which the duration matrix is defined.
 	// Must be empty for a single matrix.
@@ -48,7 +48,7 @@ type DurationMatrices struct {
 	TimeFrames []TimeFrame `json:"time_frames,omitempty"`
 }
 
-// TimeFrame represents a time-dependent duration matrix or scaling factor
+// TimeFrame represents a time-dependent duration matrix or scaling factor.
 type TimeFrame struct {
 	// StartTime is the start time of the time frame
 	StartTime time.Time `json:"start_time"`
