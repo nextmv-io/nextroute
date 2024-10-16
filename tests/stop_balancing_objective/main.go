@@ -35,7 +35,7 @@ func solver(
 	input schema.Input,
 	options options,
 ) (runSchema.Output, error) {
-	options.Model.Objectives.StopBalance = 1000.0
+	// options.Model.Objectives.StopBalance = 1000.0
 	model, err := factory.NewModel(input, options.Model)
 	if err != nil {
 		return runSchema.Output{}, err

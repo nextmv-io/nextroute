@@ -30,6 +30,7 @@ func TestGolden(t *testing.T) {
 				"-solve.iterations", "10000",
 				"-solve.rundeterministically",
 				"-solve.startsolutions", "1",
+				"-model.objectives.stopbalance", "1000.0",
 			},
 			TransientFields: []golden.TransientField{
 				{Key: "$.version.sdk", Replacement: golden.StableVersion},
