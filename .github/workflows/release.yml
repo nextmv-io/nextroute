@@ -13,6 +13,10 @@ on:
         default: true
         type: boolean
 
+env:
+  GO_VERSION: 1.22.0
+  PYTHON_VERSION: 3.12
+
 jobs:
   bump:
     runs-on: ubuntu-latest
@@ -48,7 +52,7 @@ jobs:
       - name: set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: install dependencies
         run: |
@@ -127,7 +131,7 @@ jobs:
       - name: set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: install dependencies
         run: |
@@ -161,6 +165,7 @@ jobs:
   build-wheels:
     needs: configure-build-wheels
     strategy:
+      fail-fast: false
       matrix: ${{fromJson(needs.configure-build-wheels.outputs.matrix)}}
     runs-on: ${{ matrix.image }}
     steps:
@@ -172,12 +177,17 @@ jobs:
       - name: set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: set up go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
 
       - name: set up QEMU
         if: matrix.platform == 'linux'
@@ -238,7 +248,7 @@ jobs:
       - name: set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: install dependencies
         run: |
