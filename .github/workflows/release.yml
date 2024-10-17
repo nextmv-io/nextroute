@@ -155,7 +155,7 @@ jobs:
       - name: export matrix
         id: export
         run: |
-          MATRIX=$(yq -o json '.build-wheels | {"include": .}' workflow-configuration.yml | jq .)
+          MATRIX=$(yq -o json '.build-wheels | {"include": .}' workflow-configuration.yml | jq -c .)
           echo "matrix=${MATRIX}" >> "$GITHUB_OUTPUT"
 
   build-wheels:
@@ -186,7 +186,11 @@ jobs:
           platforms: all
 
       - name: build Nextroute Go binary
-        run: GOOS=${{ matrix.GOOS }} GOARCH=${{ matrix.GOARCH }} go build -o nextroute/bin/nextroute-${{ matrix.GOOS }}-${{ matrix.GOARCH }} cmd/main.go
+        run: |
+          GOOS=${{ matrix.GOOS }} \
+          GOARCH=${{ matrix.GOARCH }} \
+          go build -o nextroute/bin/nextroute-${{ matrix.GOOS }}-${{ matrix.GOARCH }} \
+          cmd/main.go
 
       - name: build wheels
         if: matrix.platform != 'macos-arm'
