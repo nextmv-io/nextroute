@@ -5,10 +5,10 @@ on:
   workflow_dispatch:
     inputs:
       VERSION:
-        description: "The version to release"
+        description: 'The version to release'
         required: true
       IS_PRE_RELEASE:
-        description: "It IS a pre-release"
+        description: 'It IS a pre-release'
         required: true
         default: true
         type: boolean
@@ -48,7 +48,7 @@ jobs:
       - name: set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
       - name: install dependencies
         run: |
@@ -115,9 +115,103 @@ jobs:
         run: python -m build
         working-directory: ./nextroute
 
-  release: # This job is used to publish the release to PyPI/TestPyPI
-    runs-on: ubuntu-latest
+  build-sdist:
     needs: bump
+    runs-on: ubuntu-latest
+    steps:
+      - name: git clone ${{ github.ref_name }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: build source tarball
+        run: python -m build --sdist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          path: dist/*.tar.gz
+
+  configure-build-wheels:
+    needs: bump
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.export.outputs.matrix }}
+    steps:
+      - name: git clone ${{ github.ref_name }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: export matrix
+        id: export
+        run: |
+          MATRIX=$(yq -o json '.build-wheels | {"include": .}' workflow-configuration.yml | jq .)
+          echo "matrix=${MATRIX}" >> "$GITHUB_OUTPUT"
+
+  build-wheels:
+    needs: configure-build-wheels
+    strategy:
+      matrix: ${{fromJson(needs.configure-build-wheels.outputs.matrix)}}
+    runs-on: ${{ matrix.image }}
+    steps:
+      - name: git clone ${{ github.ref_name }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: set up QEMU
+        if: matrix.platform == 'linux'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
+      - name: build Nextroute Go binary
+        run: GOOS=${{ matrix.GOOS }} GOARCH=${{ matrix.GOARCH }} go build -o nextroute/bin/nextroute-${{ matrix.GOOS }}-${{ matrix.GOARCH }} cmd/main.go
+
+      - name: build wheels
+        if: matrix.platform != 'macos-arm'
+        uses: pypa/cibuildwheel@v2.19.2
+        env:
+          MACOSX_DEPLOYMENT_TARGET: 13.0
+          CC: gcc-13
+          CXX: g++-13
+
+      - name: build wheels
+        if: matrix.platform == 'macos-arm'
+        uses: pypa/cibuildwheel@v2.19.2
+        env:
+          MACOSX_DEPLOYMENT_TARGET: 14.0
+          CC: gcc-13
+          CXX: g++-13
+
+      - name: upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          path: wheelhouse/*.whl
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-sdist, build-wheels]
     strategy:
       matrix:
         include:
@@ -140,15 +234,18 @@ jobs:
       - name: set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
       - name: install dependencies
         run: |
           pip install --upgrade pip
-          pip install build hatch
+          pip install -r requirements.txt
 
-      - name: build binary wheel and source tarball
-        run: python -m build
+      - name: download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact
+          path: dist
 
       - name: Publish package distributions to PyPI
         if: ${{ matrix.target-env == 'pypi' }}

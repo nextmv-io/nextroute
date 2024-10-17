@@ -2,3 +2,5 @@ build>=1.0.3
 pydantic>=2.5.2
 ruff>=0.1.7
 twine>=4.0.2
+cibuildwheel>=2.21.3
+hatch>=1.13.0

@@ -35,7 +35,8 @@ def solve(
     and options can be provided as dictionaries or as objects, although the
     recommended way is to use the classes, as they provide validation.
 
-    Example:
+    Examples
+    --------
 
     * Using default options to load an input from a file.
         ```python
