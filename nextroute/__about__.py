@@ -1,3 +1,3 @@
 # © 2019-present nextmv.io inc
 
-__version__ = "v1.8.0.dev20"
+__version__ = "v1.8.0.dev21"
