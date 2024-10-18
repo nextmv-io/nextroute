@@ -42,7 +42,7 @@ except ImportError:
 # platform. We also set CGO_ENABLED=0 to ensure that the binary is statically
 # linked.
 goos = platform.system().lower()
-goarch = platform.machine()
+goarch = platform.machine().lower()
 
 if goos not in ["linux", "windows", "darwin"]:
     raise Exception(f"unsupported operating system: {goos}")

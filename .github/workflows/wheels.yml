@@ -27,6 +27,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
+          name: wheels-artifacts-sdist
           path: dist/*.tar.gz
 
   build_wheels:
@@ -86,6 +87,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
+          name: wheels-artifacts-${{ matrix.platform }}
           path: wheelhouse/*.whl
 
   upload:
@@ -98,7 +100,8 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: artifact
+          name: wheels-artifacts-*
+          merge-multiple: true
           path: dist
 
       # TODO: Add a step to upload to PyPI
