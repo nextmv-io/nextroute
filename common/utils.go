@@ -433,3 +433,25 @@ func Reverse[T any](slice []T) []T {
 	}
 	return slice
 }
+
+// TryAssertFloat64Matrix tries to assert that the given matrix is a
+// [][]float64. Returns true if successful and the matrix otherwise false.
+func TryAssertFloat64Matrix(matrix []any) ([][]float64, bool) {
+	if len(matrix) == 0 {
+		return nil, false
+	}
+
+	result := make([][]float64, len(matrix))
+	for i, row := range matrix {
+		if _, ok := row.([]any); !ok {
+			return nil, false
+		}
+		for _, r := range row.([]any) {
+			if _, ok := r.(float64); !ok {
+				return nil, false
+			}
+			result[i] = append(result[i], r.(float64))
+		}
+	}
+	return result, true
+}

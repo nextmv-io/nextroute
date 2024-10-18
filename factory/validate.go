@@ -3,6 +3,7 @@
 package factory
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
@@ -268,17 +269,112 @@ func validateConstraints(input schema.Input, modelOptions Options) error {
 		}
 	}
 
-	if input.DurationMatrix != nil && modelOptions.Validate.Enable.Matrix {
-		durationMatrix := *input.DurationMatrix
-		if err := validateMatrix(
-			input,
-			durationMatrix,
-			modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
-			"duration"); err != nil {
+	if input.DurationMatrix == nil {
+		return nil
+	}
+	switch matrix := input.DurationMatrix.(type) {
+	case [][]float64:
+		if modelOptions.Validate.Enable.Matrix {
+			if err := validateMatrix(
+				input,
+				matrix,
+				modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
+				"duration"); err != nil {
+				return err
+			}
+		}
+	case schema.DurationMatrices:
+		return validateDurationMatrix(input, matrix, modelOptions, true)
+	case []schema.DurationMatrices:
+		return validateDurationMatricesAndIDs(input, matrix, modelOptions)
+	case map[string]any:
+		var durationMatrices schema.DurationMatrices
+		jsonData, err := json.Marshal(matrix)
+		if err != nil {
+			return err
+		}
+		err = json.Unmarshal(jsonData, &durationMatrices)
+		if err != nil {
+			return err
+		}
+		return validateDurationMatrix(input, durationMatrices, modelOptions, true)
+	case []any:
+		// In this case we have a single matrix that can be a float64 matrix or a
+		// multi duration matrix.
+		return validateFloatOrMultiDurationMatrix(input, matrix, modelOptions)
+	default:
+		return nmerror.NewInputDataError(fmt.Errorf("invalid duration matrix type %T", matrix))
+	}
+	return nil
+}
+
+func validateFloatOrMultiDurationMatrix(input schema.Input, matrix []any, modelOptions Options) error {
+	if floatMatrix, ok := common.TryAssertFloat64Matrix(matrix); ok {
+		if modelOptions.Validate.Enable.Matrix {
+			return validateMatrix(
+				input,
+				floatMatrix,
+				modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
+				"duration")
+		}
+		return nil
+	}
+
+	var durationMatrices []schema.DurationMatrices
+	jsonData, err := json.Marshal(matrix)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(jsonData, &durationMatrices)
+	if err != nil {
+		return err
+	}
+	return validateDurationMatricesAndIDs(input, durationMatrices, modelOptions)
+}
+
+func validateDurationMatricesAndIDs(
+	input schema.Input,
+	durationMatrices []schema.DurationMatrices,
+	modelOptions Options,
+) error {
+	vIDs := make(map[string]bool)
+	for _, durationMatrix := range durationMatrices {
+		if durationMatrix.VehicleIDs == nil || len(durationMatrix.VehicleIDs) == 0 {
+			return nmerror.NewInputDataError(fmt.Errorf(
+				"vehicle ids are not set for duration matrix",
+			))
+		}
+		for _, vID := range durationMatrix.VehicleIDs {
+			if _, ok := vIDs[vID]; ok {
+				return nmerror.NewInputDataError(fmt.Errorf(
+					"duplicate vehicle id in duration matrices: %s",
+					durationMatrix.VehicleIDs,
+				))
+			}
+			vIDs[vID] = true
+		}
+		if err := validateDurationMatrix(input, durationMatrix, modelOptions, false); err != nil {
 			return err
 		}
 	}
 
+	// Make sure all vehicles in the input have a duration matrix defined.
+	for _, vehicle := range input.Vehicles {
+		if _, ok := vIDs[vehicle.ID]; !ok {
+			return nmerror.NewInputDataError(fmt.Errorf(
+				"vehicle id %s is not defined in duration matrices",
+				vehicle.ID,
+			))
+		}
+	}
+
+	// Make sure there is no definition in the input that does not exist as a vehicle.
+	if len(vIDs) != len(input.Vehicles) {
+		return nmerror.NewInputDataError(fmt.Errorf(
+			"vehicle ids in duration matrices do not match vehicle ids in input: %v",
+			vIDs,
+		))
+	}
 	return nil
 }
 
@@ -504,6 +600,73 @@ func validateAlternateStop(idx int, stop schema.AlternateStop) error {
 		))
 	}
 
+	return nil
+}
+
+func validateDurationMatrix(
+	input schema.Input,
+	durationMatrices schema.DurationMatrices,
+	modelOptions Options,
+	isSingleMatrix bool,
+) error {
+	if modelOptions.Validate.Enable.Matrix {
+		if err := validateMatrix(
+			input,
+			durationMatrices.DefaultMatrix,
+			modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
+			"time_dependent_duration"); err != nil {
+			return err
+		}
+	}
+	if isSingleMatrix {
+		if len(durationMatrices.VehicleIDs) != 0 {
+			return nmerror.NewInputDataError(fmt.Errorf(
+				"single matrix has vehicle ids set, it must be empty"))
+		}
+	}
+	for i, tf := range durationMatrices.TimeFrames {
+		if tf.Matrix == nil && tf.ScalingFactor == nil {
+			return nmerror.NewInputDataError(fmt.Errorf(
+				"duration for time frame %d is missing both matrix and scaling factor", i))
+		}
+
+		if tf.Matrix != nil && tf.ScalingFactor != nil {
+			return nmerror.NewInputDataError(fmt.Errorf(
+				"duration for time frame %d has both matrix and scaling factor, only one is allowed", i))
+		}
+
+		if tf.Matrix != nil && modelOptions.Validate.Enable.Matrix {
+			if err := validateMatrix(
+				input,
+				tf.Matrix,
+				modelOptions.Validate.Enable.MatrixAsymmetryTolerance,
+				fmt.Sprintf("time_dependent_duration for time frame %d", i),
+			); err != nil {
+				return err
+			}
+		}
+
+		if tf.ScalingFactor != nil {
+			if *tf.ScalingFactor <= 0 {
+				return nmerror.NewInputDataError(fmt.Errorf(
+					"time_dependent_duration for time frame %d has invalid scaling factor %v", i, *tf.ScalingFactor))
+			}
+		}
+
+		if tf.StartTime.IsZero() {
+			return nmerror.NewInputDataError(fmt.Errorf(
+				"time_dependent_duration for time frame %d has no start time", i))
+		}
+		if tf.EndTime.IsZero() {
+			return nmerror.NewInputDataError(fmt.Errorf(
+				"time_dependent_duration for time frame %d has no end time", i))
+		}
+		if tf.StartTime.After(tf.EndTime) || tf.StartTime.Equal(tf.EndTime) {
+			return nmerror.NewInputDataError(fmt.Errorf(
+				"time_dependent_duration for time frame %d has invalid start and end time, "+
+					"start time is after or equal to end time", i))
+		}
+	}
 	return nil
 }
 

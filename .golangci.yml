@@ -320,3 +320,14 @@ issues:
     - path: solution_sequence_generator\.go
       linters:
         - nestif
+    - path: factory/vehicles\.go
+      linters:
+        - gocyclo
+    # 'vehicle_ids' want 'vehicle_i_ds' <- no, we don't want this
+    - path: schema/input\.go
+      linters:
+        - tagliatelle
+    # We do not need the context check here
+    - path: check/format\.go
+      linters:
+        - contextcheck
