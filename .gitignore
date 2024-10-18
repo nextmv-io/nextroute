@@ -164,3 +164,6 @@ cython_debug/
 
 # VSCode
 .vscode/
+
+# Nextroute binaries for Python
+nextroute/bin/*

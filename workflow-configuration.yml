@@ -1,28 +1,22 @@
 # This file is used to configure the workflow for the GitHub Actions.
 
-# Wheels that need to be built for the different platforms.
-# The image is the name of the runner to use.
-# The platform is the platform to build the wheel for.
-# The GOOS is the operating system to build the wheel for.
-# The GOARCH is the architecture to build the wheel for.
-build-wheels:
-  - image: ubuntu-latest
-    platform: linux
+# Binaries that need to be built for the different platforms. The image is the
+# name of the runner to use. The platform is the platform to build the wheel
+# for. The GOOS is the operating system to build the wheel for. The GOARCH is
+# the architecture to build the wheel for.
+build:
+  - name: linux-amd64
     GOOS: linux
     GOARCH: amd64
-  - image: ubuntu-latest
-    platform: linux
+  - name: linux-arm64
     GOOS: linux
     GOARCH: arm64
-  - image: macos-13
-    platform: macos-intel
+  - name: darwin-amd64
     GOOS: darwin
     GOARCH: amd64
-  - image: macos-14
-    platform: macos-arm
+  - name: darwin-arm64
     GOOS: darwin
     GOARCH: arm64
-  - image: windows-latest
-    platform: windows
+  - name: windows-amd64
     GOOS: windows
     GOARCH: amd64

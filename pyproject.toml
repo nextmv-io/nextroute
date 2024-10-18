@@ -61,14 +61,3 @@ line-length = 120
 
 [tool.hatch.version]
 path = "nextroute/__about__.py"
-
-[tool.cibuildwheel]
-test-command = 'python -c "import nextroute"'
-build = "cp3{8,9,10,11,12}-*"
-skip = "*musllinux*"
-archs = "native"
-manylinux-x86_64-image = "quay.io/pypa/manylinux_2_28_x86_64"
-manylinux-aarch64-image = "quay.io/pypa/manylinux_2_28_aarch64"
-
-[tool.cibuildwheel.linux]
-archs = ["x86_64", "aarch64"]
