@@ -1,6 +1,7 @@
 name: release
 
 on:
+  push:
   workflow_dispatch:
     inputs:
       VERSION:
