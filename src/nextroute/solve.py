@@ -125,6 +125,9 @@ def solve(
         )
 
     binary_name = f"nextroute-{os_name}-{_ARCHITECTURE_TRANSLATION[architecture]}"
+    if os_name == "windows":
+        binary_name += ".exe"
+
     executable = os.path.join(os.path.dirname(__file__), "bin", binary_name)
     if not os.path.exists(executable):
         raise Exception(f"missing Nextroute binary: {executable}")
