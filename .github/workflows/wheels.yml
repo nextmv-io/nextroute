@@ -1,4 +1,4 @@
-name: release
+name: wheels
 
 on:
   push:
@@ -10,6 +10,7 @@ on:
 
 env:
   PYTHON_VERSION: 3.12
+  GO_VERSION: 1.22.0
 
 jobs:
   build_sdist:
@@ -24,7 +25,7 @@ jobs:
       - name: Check metadata
         run: pipx run twine check dist/*
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           path: dist/*.tar.gz
 
@@ -55,6 +56,11 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: set up go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
       - name: Set up QEMU
         if: matrix.platform == 'linux'
         uses: docker/setup-qemu-action@v3
@@ -78,7 +84,7 @@ jobs:
         shell: bash
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: wheelhouse/*.whl
 
@@ -90,7 +96,7 @@ jobs:
     steps:
       - uses: actions/setup-python@v5
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: artifact
           path: dist
