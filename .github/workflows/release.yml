@@ -171,7 +171,20 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: artifact
-          path: nextroute/bin
+          path: nextroute/nextroute/bin
+
+      - name: Print Folder Tree
+        uses: jaywcjlove/github-action-folder-tree@main
+        with:
+          path: ./
+
+      - name: move Go binaries to the appropriate location
+        run: mv nextroute/nextroute/bin nextroute/bin
+
+      - name: Print Folder Tree
+        uses: jaywcjlove/github-action-folder-tree@main
+        with:
+          path: ./
 
       - name: build binary wheel and source tarball
         run: python -m build
