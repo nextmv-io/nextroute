@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from nextroute.base_model import BaseModel
-from nextroute.check import Output as checkOutput
+from nextroute.check.schema import Output as CheckOutput
 from nextroute.schema.location import Location
 from nextroute.schema.statistics import Statistics
 
@@ -122,7 +122,7 @@ class Solution(BaseModel):
     """List of vehicles in the solution."""
     objective: Optional[ObjectiveOutput] = None
     """Information of the objective (value function)."""
-    check: Optional[checkOutput] = None
+    check: Optional[CheckOutput] = None
     """Check of the solution, if enabled."""
 
 

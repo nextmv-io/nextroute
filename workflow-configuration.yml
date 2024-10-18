@@ -1,0 +1,22 @@
+# This file is used to configure the workflow for the GitHub Actions.
+
+# Binaries that need to be built for the different platforms. The image is the
+# name of the runner to use. The platform is the platform to build the wheel
+# for. The GOOS is the operating system to build the wheel for. The GOARCH is
+# the architecture to build the wheel for.
+build:
+  - name: linux-amd64
+    GOOS: linux
+    GOARCH: amd64
+  - name: linux-arm64
+    GOOS: linux
+    GOARCH: arm64
+  - name: darwin-amd64
+    GOOS: darwin
+    GOARCH: amd64
+  - name: darwin-arm64
+    GOOS: darwin
+    GOARCH: arm64
+  - name: windows-amd64
+    GOOS: windows
+    GOARCH: amd64

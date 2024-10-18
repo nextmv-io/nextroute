@@ -13,8 +13,12 @@ on:
         default: true
         type: boolean
 
+env:
+  GO_VERSION: 1.22.0
+  PYTHON_VERSION: 3.12
+
 jobs:
-  bump:
+  build:
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ inputs.VERSION }}
@@ -48,12 +52,12 @@ jobs:
       - name: set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install build hatch
+      - name: set up go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
 
       - name: configure git with the bot credentials
         run: |
@@ -77,6 +81,12 @@ jobs:
 
           git rev-parse --short HEAD
 
+      - name: install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: ./nextroute
+
       - name: bump version in version file for Go
         run: |
           echo $VERSION > VERSION
@@ -85,6 +95,16 @@ jobs:
       - name: upgrade version with hatch for Python
         run: hatch version ${{ env.VERSION }}
         working-directory: ./nextroute
+
+      - name: compile Nextroute Go binaries
+        run: |
+          bash .nextmv/compile_binaries.sh
+        working-directory: ./nextroute
+
+      - name: upload Go binaries
+        uses: actions/upload-artifact@v4
+        with:
+          path: ./nextroute/nextroute/bin/
 
       - name: commit version bump
         run: |
@@ -115,9 +135,9 @@ jobs:
         run: python -m build
         working-directory: ./nextroute
 
-  release: # This job is used to publish the release to PyPI/TestPyPI
+  release:
     runs-on: ubuntu-latest
-    needs: bump
+    needs: build
     strategy:
       matrix:
         include:
@@ -140,12 +160,31 @@ jobs:
       - name: set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: install dependencies
         run: |
           pip install --upgrade pip
-          pip install build hatch
+          pip install -r requirements.txt
+
+      - name: download Go binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact
+          path: nextroute/nextroute/bin
+
+      - name: Print Folder Tree
+        uses: jaywcjlove/github-action-folder-tree@main
+        with:
+          path: ./
+
+      - name: move Go binaries to the appropriate location
+        run: mv nextroute/nextroute/bin nextroute/bin
+
+      - name: Print Folder Tree
+        uses: jaywcjlove/github-action-folder-tree@main
+        with:
+          path: ./
 
       - name: build binary wheel and source tarball
         run: python -m build

@@ -84,7 +84,14 @@ file.
 
 ## Usage
 
-A first run can be done with the following command:
+For further information on how to get started, features, deployment, etc.,
+please refer to the [official
+documentation](https://www.nextmv.io/docs/vehicle-routing).
+
+### Go
+
+A first run can be done with the following command. Stand at the root of the
+repository and run:
 
 ```bash
 go run cmd/main.go -runner.input.path cmd/input.json -solve.duration 5s
@@ -93,7 +100,7 @@ go run cmd/main.go -runner.input.path cmd/input.json -solve.duration 5s
 This will run the solver for 5 seconds and output the result to the console.
 
 In order to start a _new project_, please refer to the sample app in the
-[community-apps repository](https://github.com/nextmv-io/community-apps/tree/develop/nextroute).
+[community-apps repository](https://github.com/nextmv-io/community-apps/tree/develop/go-nextroute).
 If you have [Nextmv CLI](https://www.nextmv.io/docs/platform/installation#nextmv-cli)
 installed, you can create a new project with the following command:
 
@@ -101,8 +108,40 @@ installed, you can create a new project with the following command:
 nextmv community clone -a go-nextroute
 ```
 
-For further information on how to get started, features, deployment, etc.,
-please refer to the [official documentation](https://www.nextmv.io/docs/vehicle-routing).
+### Python
+
+A first run can be done by executing the following script. Stand at the root of
+the repository and execute it:
+
+```python
+import json
+
+import nextroute
+
+with open("cmd/input.json") as f:
+    data = json.load(f)
+
+input = nextroute.schema.Input.from_dict(data)
+options = nextroute.Options(
+    solve=nextroute.ParallelSolveOptions(
+        duration=5,
+    ),
+)
+
+output = nextroute.solve(input, options)
+print(json.dumps(output.to_dict(), indent=2))
+```
+
+This will run the solver for 5 seconds and output the result to the console.
+
+In order to start a _new project_, please refer to the sample app in the
+[community-apps repository](https://github.com/nextmv-io/community-apps/tree/develop/python-nextroute).
+If you have [Nextmv CLI](https://www.nextmv.io/docs/platform/installation#nextmv-cli)
+installed, you can create a new project with the following command:
+
+```bash
+nextmv community clone -a python-nextroute
+```
 
 ## Local benchmarking
 

@@ -9,6 +9,11 @@ to it.
 """
 
 from .__about__ import __version__
+from .options import DisableFormatOptions as DisableFormatOptions
+from .options import FormatOptions as FormatOptions
+from .options import Options as Options
+from .options import ParallelSolveOptions as ParallelSolveOptions
+from .solve import solve as solve
 
 VERSION = __version__
 """The version of the Nextroute Python package."""
