@@ -167,6 +167,9 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: build binary wheel and source tarball
+        run: python -m build
+
       - name: download artifacts
         uses: actions/download-artifact@v4
         with:
