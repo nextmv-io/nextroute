@@ -171,6 +171,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: nextroute/bin
+          merge-multiple: true
 
       - name: Publish package distributions to PyPI
         if: ${{ matrix.target-env == 'pypi' }}
