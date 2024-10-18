@@ -78,6 +78,8 @@ jobs:
         if: matrix.platform == 'macos-arm64'
         uses: pypa/cibuildwheel@v2.21.3
         env:
+          # TODO: re-enable wheel repair
+          CIBW_REPAIR_WHEEL_COMMAND: ""
           MACOSX_DEPLOYMENT_TARGET: 14.0
 
       - name: Verify clean directory
