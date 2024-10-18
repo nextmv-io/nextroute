@@ -1,4 +1,5 @@
 import os
+import platform
 import subprocess
 
 from setuptools import Distribution, setup
@@ -40,8 +41,8 @@ except ImportError:
 # Compile Nextroute binary. We cross-compile (if necessary) for the current
 # platform. We also set CGO_ENABLED=0 to ensure that the binary is statically
 # linked.
-goos = os.uname().sysname.lower()
-goarch = os.uname().machine.lower()
+goos = platform.system().lower()
+goarch = platform.machine()
 
 if goos not in ["linux", "windows", "darwin"]:
     raise Exception(f"unsupported operating system: {goos}")
