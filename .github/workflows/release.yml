@@ -98,9 +98,7 @@ jobs:
 
       - name: compile Nextroute Go binaries
         run: |
-          ls -lah
-          ls -lah .nextmv
-          bash ./nextmv/compile_binaries.sh
+          bash .nextmv/compile_binaries.sh
         working-directory: ./nextroute
 
       - name: upload Go binaries
