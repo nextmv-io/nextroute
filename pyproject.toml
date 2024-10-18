@@ -1,6 +1,8 @@
 [build-system]
-build-backend = "hatchling.build"
-requires = ["hatchling >= 1.13.0"]
+# build-backend = "hatchling.build"
+# requires = ["hatchling >= 1.13.0"]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools", "wheel", "cibuildwheel"]
 
 [project]
 authors = [
@@ -62,8 +64,24 @@ line-length = 120
 [tool.hatch.version]
 path = "nextroute/__about__.py"
 
+# [tool.hatch.build.targets.wheel.shared-data]
+# nextroute = "nextroute/bin/nextroute.exe"
+
+# [tool.hatch.build.targets.wheel.hooks.custom]
+
+[tool.setuptools.packages.find]
+where = ["src/"]
+exclude = ["tests"]
+
+# [tool.setuptools]
+# packages = ["nextroute"]
+# include-package-data = true
+
+[tool.setuptools.package-data]
+nextroute = ["bin/*.exe"]
+
 [tool.cibuildwheel]
-test-command = 'python -c "import nextroute"'
+test-command = 'python -c "exec(\"import nextroute\nprint(nextroute.nextroute_version())\")"'
 build = "cp3{8,9,10,11,12}-*"
 skip = "*musllinux*"
 archs = "native"
@@ -72,3 +90,7 @@ manylinux-aarch64-image = "quay.io/pypa/manylinux_2_28_aarch64"
 
 [tool.cibuildwheel.linux]
 archs = ["x86_64", "aarch64"]
+before-all = """
+dnf update -y
+dnf -y install go
+"""
