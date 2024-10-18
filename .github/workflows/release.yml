@@ -5,10 +5,10 @@ on:
   workflow_dispatch:
     inputs:
       VERSION:
-        description: 'The version to release'
+        description: "The version to release"
         required: true
       IS_PRE_RELEASE:
-        description: 'It IS a pre-release'
+        description: "It IS a pre-release"
         required: true
         default: true
         type: boolean
