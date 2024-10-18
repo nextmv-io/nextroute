@@ -104,7 +104,7 @@ jobs:
       - name: upload Go binaries
         uses: actions/upload-artifact@v4
         with:
-          path: ./nextroute/nextroute/bin/*
+          path: ./nextroute/nextroute/bin/
 
       - name: commit version bump
         run: |
@@ -173,8 +173,17 @@ jobs:
       - name: download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: nextroute/bin
-          merge-multiple: true
+          name: artifact
+          path: nextroute/nextroute/bin
+
+      - name: debug artifacts
+        run: |
+          echo "=== nextroute/nextroute/bin ==="
+          ls -lah nextroute/nextroute/bin
+          echo "=== nextroute ==="
+          ls -lah nextroute/
+          echo "=== nextroute/bin ==="
+          ls -lah nextroute/bin
 
       - name: Publish package distributions to PyPI
         if: ${{ matrix.target-env == 'pypi' }}
