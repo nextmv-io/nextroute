@@ -170,20 +170,11 @@ jobs:
       - name: build binary wheel and source tarball
         run: python -m build
 
-      - name: download artifacts
+      - name: download Go binaries
         uses: actions/download-artifact@v4
         with:
           name: artifact
           path: nextroute/nextroute/bin
-
-      - name: debug artifacts
-        run: |
-          echo "=== nextroute/nextroute/bin ==="
-          ls -lah nextroute/nextroute/bin
-          echo "=== nextroute ==="
-          ls -lah nextroute/
-          echo "=== nextroute/bin ==="
-          ls -lah nextroute/bin
 
       - name: Publish package distributions to PyPI
         if: ${{ matrix.target-env == 'pypi' }}
