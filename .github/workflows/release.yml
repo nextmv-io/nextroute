@@ -167,14 +167,14 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: build binary wheel and source tarball
-        run: python -m build
-
       - name: download Go binaries
         uses: actions/download-artifact@v4
         with:
           name: artifact
           path: nextroute/nextroute/bin
+
+      - name: build binary wheel and source tarball
+        run: python -m build
 
       - name: Publish package distributions to PyPI
         if: ${{ matrix.target-env == 'pypi' }}
