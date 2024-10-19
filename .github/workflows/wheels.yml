@@ -105,7 +105,6 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: wheels-artifacts-*
           merge-multiple: true
           path: dist
 
