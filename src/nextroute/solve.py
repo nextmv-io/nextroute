@@ -6,6 +6,7 @@ Methods for solving a Vehicle Routing Problem with Nextroute.
 
 import json
 import os
+import platform
 import subprocess
 from typing import Any, Dict, Union
 
@@ -108,11 +109,11 @@ def solve(
     if isinstance(options, dict):
         options = Options.from_dict(options)
 
-    os_name = os.uname().sysname.lower()
+    os_name = platform.system().lower()
     if os_name not in SUPPORTED_OS:
         raise Exception(f'unsupported operating system: "{os_name}", supported os are: {", ".join(SUPPORTED_OS)}')
 
-    architecture = os.uname().machine.lower()
+    architecture = platform.machine().lower()
     if architecture not in SUPPORTED_ARCHITECTURES:
         raise Exception(
             f'unsupported architecture: "{architecture}", supported arch are: {", ".join(SUPPORTED_ARCHITECTURES)}'
