@@ -9,7 +9,7 @@ GO_HEADER = f"// {HEADER}"
 GO_IGNORE = []
 
 PYTHON_HEADER = f"# {HEADER}"
-PYTHON_IGNORE = ["venv/*", "tests/*"]
+PYTHON_IGNORE = ["venv/*", "src/tests/*"]
 
 
 def main() -> None:
