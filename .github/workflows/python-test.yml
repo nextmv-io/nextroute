@@ -30,13 +30,24 @@ jobs:
         run: python -m unittest
         working-directory: src
 
+      # There appears to be a bug around
+      # `nextmv-io/sdk@v1.8.0/golden/file.go:75` specifically in Windows. When
+      # attempting to remove a temp file, the following error is encountered:
+      # `panic: remove C:\Users\RUNNER~1\AppData\Local\Temp\output1368198263:
+      # The process cannot access the file because it is being used by another
+      # process.` We need to figure out why it only happens in Windows. Until
+      # then, we will not run the golden file tests in Windows.
+      # Source:https://github.com/nextmv-io/nextroute/actions/runs/11414952328/job/31764458969?pr=65
       - name: set up Go
+        if: ${{ matrix.platform != 'windows-latest' }}
         uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
 
       - name: compile Go binary
+        if: ${{ matrix.platform != 'windows-latest' }}
         run: go build -o src/nextroute/bin/nextroute.exe cmd/main.go
 
       - name: golden file tests from Python package
+        if: ${{ matrix.platform != 'windows-latest' }}
         run: go test $(go list ./... | grep github.com/nextmv-io/nextroute/src)

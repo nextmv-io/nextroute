@@ -44,7 +44,7 @@ func TestPythonSolveGolden(t *testing.T) {
 	// Nextmv Python SDK to load options and read/write JSON files.
 	golden.FileTests(
 		t,
-		path.Join("..", "..", "..", "tests", "golden", "testdata", "alternates.json"),
+		path.Join("..", "..", "..", "tests", "golden", "testdata"),
 		golden.Config{
 			Args: []string{
 				"-solve_duration", "10",
