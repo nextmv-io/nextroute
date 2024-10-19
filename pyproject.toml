@@ -62,20 +62,11 @@ lint.select = [
 line-length = 120
 
 [tool.hatch.version]
-path = "nextroute/__about__.py"
-
-# [tool.hatch.build.targets.wheel.shared-data]
-# nextroute = "nextroute/bin/nextroute.exe"
-
-# [tool.hatch.build.targets.wheel.hooks.custom]
+path = "src/nextroute/__about__.py"
 
 [tool.setuptools.packages.find]
 where = ["src/"]
 exclude = ["tests"]
-
-# [tool.setuptools]
-# packages = ["nextroute"]
-# include-package-data = true
 
 [tool.setuptools.package-data]
 nextroute = ["bin/*.exe"]
