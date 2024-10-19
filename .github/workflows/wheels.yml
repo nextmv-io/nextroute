@@ -78,7 +78,10 @@ jobs:
         if: matrix.platform == 'macos-arm64'
         uses: pypa/cibuildwheel@v2.21.3
         env:
-          # TODO: re-enable wheel repair
+          # TODO: default wheel repair does not recognize the arm64 wheel.
+          # This seems like a bug in delocate-wheel, which is the tool used by cibuildwheel,
+          # since the binary works fine when installed. However, we skip a more thorough
+          # investigation for now and just disable the repair step.
           CIBW_REPAIR_WHEEL_COMMAND: ""
           MACOSX_DEPLOYMENT_TARGET: 14.0
 
