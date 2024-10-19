@@ -39,4 +39,4 @@ jobs:
         run: go build -o src/nextroute/bin/nextroute.exe cmd/main.go
 
       - name: golden file tests from Python package
-        run: go test $(go list ./... | grep github.com/nextmv-io/nextroute/src) -parallel 1
+        run: go test $(go list ./... | grep github.com/nextmv-io/nextroute/src)

@@ -3,6 +3,7 @@
 package main
 
 import (
+	"io"
 	"os"
 	"path"
 	"testing"
@@ -17,16 +18,42 @@ var pythonFileDestination = path.Join("..", "..", pythonFile)
 func TestMain(m *testing.M) {
 	// Move the python file to the `src` so that the import path in that file
 	// is resolved.
-	input, err := os.ReadFile(pythonFile)
-	if err != nil {
-		panic(err)
-	}
-	err = os.WriteFile(pythonFileDestination, input, 0644)
+	// input, err := os.ReadFile(pythonFile)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// err = os.WriteFile(pythonFileDestination, input, 0644)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	source, err := os.Open(pythonFile)
 	if err != nil {
 		panic(err)
 	}
 
+	destination, err := os.Create(pythonFileDestination)
+	if err != nil {
+		panic(err)
+	}
+
+	if _, err = io.Copy(destination, source); err != nil {
+		panic(err)
+	}
+
+	if err = destination.Sync(); err != nil {
+		panic(err)
+	}
+
 	code := m.Run()
+
+	if err = source.Close(); err != nil {
+		panic(err)
+	}
+
+	if err = destination.Close(); err != nil {
+		panic(err)
+	}
 
 	// Clean up the python file.
 	err = os.Remove(pythonFileDestination)
