@@ -14,6 +14,7 @@ from .options import FormatOptions as FormatOptions
 from .options import Options as Options
 from .options import ParallelSolveOptions as ParallelSolveOptions
 from .solve import solve as solve
+from .version import nextroute_version as nextroute_version
 
 VERSION = __version__
 """The version of the Nextroute Python package."""

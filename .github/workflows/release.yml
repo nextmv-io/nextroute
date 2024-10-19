@@ -18,7 +18,7 @@ env:
   PYTHON_VERSION: 3.12
 
 jobs:
-  build:
+  bump-version:
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ inputs.VERSION }}
@@ -96,20 +96,10 @@ jobs:
         run: hatch version ${{ env.VERSION }}
         working-directory: ./nextroute
 
-      - name: compile Nextroute Go binaries
-        run: |
-          bash .nextmv/compile_binaries.sh
-        working-directory: ./nextroute
-
-      - name: upload Go binaries
-        uses: actions/upload-artifact@v4
-        with:
-          path: ./nextroute/nextroute/bin/
-
       - name: commit version bump
         run: |
           git add VERSION
-          git add nextroute/__about__.py
+          git add src/nextroute/__about__.py
 
           git commit -S -m "Bump version to $VERSION"
           git push
@@ -131,13 +121,93 @@ jobs:
           --title $VERSION $PRERELEASE_FLAG
         working-directory: ./nextroute
 
-      - name: ensure passing build for Python
-        run: python -m build
-        working-directory: ./nextroute
+  build-sdist:
+    name: wheels-sdist
+    needs: bump-version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build sdist
+        run: pipx run build --sdist
+
+      - name: Check metadata
+        run: pipx run twine check dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-artifacts-sdist
+          path: dist/*.tar.gz
+
+  build-wheels:
+    name: wheels-${{ matrix.platform }}
+    needs: bump-version
+    runs-on: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: ubuntu-latest
+            platform: linux
+          - image: macos-13
+            platform: macos-amd64
+          - image: macos-14
+            platform: macos-arm64
+          - image: windows-latest
+            platform: windows
+
+    steps:
+      - name: git clone ${{ github.ref_name }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: set up go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Set up QEMU
+        if: matrix.platform == 'linux'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
+      - name: Build wheels
+        if: matrix.platform != 'macos-arm64'
+        uses: pypa/cibuildwheel@v2.21.3
+        env:
+          MACOSX_DEPLOYMENT_TARGET: 13.0
+
+      - name: Build wheels
+        if: matrix.platform == 'macos-arm64'
+        uses: pypa/cibuildwheel@v2.21.3
+        env:
+          # TODO: default wheel repair does not recognize the arm64 wheel.
+          # This seems like a bug in delocate-wheel, which is the tool used by cibuildwheel,
+          # since the binary works fine when installed. However, we skip a more thorough
+          # investigation for now and just disable the repair step.
+          CIBW_REPAIR_WHEEL_COMMAND: ""
+          MACOSX_DEPLOYMENT_TARGET: 14.0
+
+      - name: Verify clean directory
+        run: git diff --exit-code
+        shell: bash
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-artifacts-${{ matrix.platform }}
+          path: wheelhouse/*.whl
 
   release:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build-wheels, build-sdist]
     strategy:
       matrix:
         include:
@@ -152,42 +222,15 @@ jobs:
       contents: read
       id-token: write # This is required for trusted publishing to PyPI
     steps:
-      - name: git clone ${{ github.ref_name }}
-        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
-          ref: ${{ github.ref_name }}
+          merge-multiple: true
+          path: dist
 
-      - name: set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: download Go binaries
-        uses: actions/download-artifact@v4
-        with:
-          name: artifact
-          path: nextroute/nextroute/bin
-
-      - name: Print Folder Tree
+      - name: Print directory tree for reference
         uses: jaywcjlove/github-action-folder-tree@main
         with:
           path: ./
-
-      - name: move Go binaries to the appropriate location
-        run: mv nextroute/nextroute/bin nextroute/bin
-
-      - name: Print Folder Tree
-        uses: jaywcjlove/github-action-folder-tree@main
-        with:
-          path: ./
-
-      - name: build binary wheel and source tarball
-        run: python -m build
 
       - name: Publish package distributions to PyPI
         if: ${{ matrix.target-env == 'pypi' }}

@@ -18,12 +18,6 @@ SUPPORTED_OS = ["linux", "windows", "darwin"]
 SUPPORTED_ARCHITECTURES = ["x86_64", "arm64", "aarch64"]
 """The architectures supported by the Nextroute engine."""
 
-_ARCHITECTURE_TRANSLATION = {
-    "x86_64": "amd64",
-    "arm64": "arm64",
-    "aarch64": "arm64",
-}
-
 
 def solve(
     input: Union[Input, Dict[str, Any]],
@@ -124,11 +118,7 @@ def solve(
             f'unsupported architecture: "{architecture}", supported arch are: {", ".join(SUPPORTED_ARCHITECTURES)}'
         )
 
-    binary_name = f"nextroute-{os_name}-{_ARCHITECTURE_TRANSLATION[architecture]}"
-    if os_name == "windows":
-        binary_name += ".exe"
-
-    executable = os.path.join(os.path.dirname(__file__), "bin", binary_name)
+    executable = os.path.join(os.path.dirname(__file__), "bin", "nextroute.exe")
     if not os.path.exists(executable):
         raise Exception(f"missing Nextroute binary: {executable}")
 
