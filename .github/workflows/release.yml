@@ -99,7 +99,7 @@ jobs:
       - name: commit version bump
         run: |
           git add VERSION
-          git add nextroute/__about__.py
+          git add src/nextroute/__about__.py
 
           git commit -S -m "Bump version to $VERSION"
           git push
