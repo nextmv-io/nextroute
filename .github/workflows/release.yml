@@ -231,6 +231,11 @@ jobs:
           merge-multiple: true
           path: dist
 
+      - name: Print directory tree for reference
+        uses: jaywcjlove/github-action-folder-tree@main
+        with:
+          path: ./
+
       - name: Publish package distributions to PyPI
         if: ${{ matrix.target-env == 'pypi' }}
         uses: pypa/gh-action-pypi-publish@release/v1
