@@ -26,14 +26,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: python unit tests
+      - name: Python unit tests
         run: python -m unittest
         working-directory: src
 
-      - name: set up go
+      - name: set up Go
         uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
+
+      - name: compile Go binary
+        run: go build -o src/nextroute/bin/nextroute.exe cmd/main.go
 
       - name: golden file tests from Python package
         run: go test $(go list ./... | grep github.com/nextmv-io/nextroute/src)
