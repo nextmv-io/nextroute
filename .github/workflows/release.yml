@@ -121,10 +121,6 @@ jobs:
           --title $VERSION $PRERELEASE_FLAG
         working-directory: ./nextroute
 
-      - name: ensure passing build for Python
-        run: python -m build
-        working-directory: ./nextroute
-
   build-sdist:
     name: wheels-sdist
     needs: bump-version
