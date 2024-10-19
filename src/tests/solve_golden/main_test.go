@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestGolden(t *testing.T) {
+func TestPythonSolveGolden(t *testing.T) {
 	// These golden file tests are based on the original Go golden file tests.
 	// It uses the `./tests/golden` directory (relative to the root of the
 	// project) as a data source. It executes a Python script that uses the
