@@ -30,11 +30,6 @@ jobs:
         run: python -m unittest
         working-directory: src
 
-      - name: Going crazy fam
-        run: |
-          cp src/tests/solve_golden/main.py src
-          cat cmd/input.json | python src/main.py -solve_duration 1 | jq .
-
       # There appears to be a bug around
       # `nextmv-io/sdk@v1.8.0/golden/file.go:75` specifically in Windows. When
       # attempting to remove a temp file, the following error is encountered:
@@ -44,14 +39,17 @@ jobs:
       # then, we will not run the golden file tests in Windows.
       # Source:https://github.com/nextmv-io/nextroute/actions/runs/11414952328/job/31764458969?pr=65
       - name: set up Go
-        if: ${{ matrix.platform != 'windows-latest' }}
         uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
 
       - name: compile Go binary
-        if: ${{ matrix.platform != 'windows-latest' }}
         run: go build -o src/nextroute/bin/nextroute.exe cmd/main.go
+
+      - name: Going crazy fam
+        run: |
+          cp src/tests/solve_golden/main.py src
+          cat cmd/input.json | python src/main.py -solve_duration 1 | jq .
 
       - name: golden file tests from Python package
         if: ${{ matrix.platform != 'windows-latest' }}
