@@ -37,7 +37,12 @@ func TestGolden(t *testing.T) {
 			TransientFields: []golden.TransientField{
 				{Key: "$.version.sdk", Replacement: golden.StableVersion},
 				{Key: "$.statistics.result.duration", Replacement: golden.StableFloat},
+				{Key: "$.statistics.result.value", Replacement: golden.StableFloat},
 				{Key: "$.statistics.run.duration", Replacement: golden.StableFloat},
+				{Key: "$.statistics.result.custom.max_travel_duration", Replacement: golden.StableFloat},
+				{Key: "$.statistics.result.custom.min_travel_duration", Replacement: golden.StableFloat},
+				{Key: "$.statistics.result.custom.max_duration", Replacement: golden.StableFloat},
+				{Key: "$.statistics.result.custom.min_duration", Replacement: golden.StableFloat},
 			},
 			Thresholds: golden.Tresholds{
 				Float: 0.01,
