@@ -4,6 +4,7 @@ package main
 
 import (
 	"os"
+	"os/exec"
 	"path"
 	"testing"
 
@@ -26,6 +27,19 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
+	// Compile the Go binary that is needed for this test.
+	cmd := exec.Command(
+		"go", "build",
+		"-o", path.Join("..", "..", "nextroute", "bin", "nextroute.exe"),
+		path.Join("..", "..", "..", "cmd", "main.go"),
+	)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		panic(err)
+	}
+
+	// Run the tests.
 	code := m.Run()
 
 	// Clean up the python file.
