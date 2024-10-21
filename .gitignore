@@ -164,3 +164,8 @@ cython_debug/
 
 # VSCode
 .vscode/
+
+# Ignore the nextmv binary we build for the Python wheels
+nextroute.exe
+src/nextroute/bin/
+wheelhouse/
