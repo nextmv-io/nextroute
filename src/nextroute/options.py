@@ -155,7 +155,7 @@ class Options(BaseModel):
             if value == default_value:
                 continue
 
-            key = f"-{key.replace("_", ".").lower()}"
+            key = f"-{key.replace('_', '.').lower()}"
 
             str_value = json.dumps(value)
             if key in _DURATIONS_ARGS:
