@@ -127,6 +127,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
 
       - name: Build sdist
         run: pipx run build --sdist
