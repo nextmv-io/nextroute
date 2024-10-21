@@ -122,12 +122,7 @@ with open("cmd/input.json") as f:
     data = json.load(f)
 
 input = nextroute.schema.Input.from_dict(data)
-options = nextroute.Options(
-    solve=nextroute.ParallelSolveOptions(
-        duration=5,
-    ),
-)
-
+options = nextroute.Options(SOLVE_DURATION=5)
 output = nextroute.solve(input, options)
 print(json.dumps(output.to_dict(), indent=2))
 ```
