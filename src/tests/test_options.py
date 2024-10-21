@@ -1,9 +1,6 @@
 import unittest
 
 import nextroute
-import nextroute.check
-import nextroute.factory
-from nextroute import options
 
 
 class TestOptions(unittest.TestCase):
@@ -13,87 +10,46 @@ class TestOptions(unittest.TestCase):
         self.assertDictEqual(
             options_dict,
             {
-                "check": {"duration": 30.0, "verbosity": "off"},
-                "format": {"disable": {"progression": False}},
-                "model": {
-                    "constraints": {
-                        "disable": {
-                            "attributes": False,
-                            "capacity": False,
-                            "capacities": [],
-                            "distance_limit": False,
-                            "groups": False,
-                            "maximum_duration": False,
-                            "maximum_stops": False,
-                            "maximum_wait_stop": False,
-                            "maximum_wait_vehicle": False,
-                            "mixing_items": False,
-                            "precedence": False,
-                            "vehicle_start_time": False,
-                            "vehicle_end_time": False,
-                            "start_time_windows": False,
-                        },
-                        "enable": {"cluster": False},
-                    },
-                    "objectives": {
-                        "capacities": "",
-                        "min_stops": 1.0,
-                        "early_arrival_penalty": 1.0,
-                        "late_arrival_penalty": 1.0,
-                        "vehicle_activation_penalty": 1.0,
-                        "travel_duration": 0.0,
-                        "vehicles_duration": 1.0,
-                        "unplanned_penalty": 1.0,
-                        "cluster": 0.0,
-                    },
-                    "properties": {
-                        "disable": {
-                            "durations": False,
-                            "stop_duration_multipliers": False,
-                            "duration_groups": False,
-                            "initial_solution": False,
-                        }
-                    },
-                    "validate": {
-                        "disable": {"start_time": False, "resources": False},
-                        "enable": {"matrix": False, "matrix_asymmetry_tolerance": 20},
-                    },
-                },
-                "solve": {
-                    "iterations": -1,
-                    "duration": 5.0,
-                    "parallel_runs": -1,
-                    "start_solutions": -1,
-                    "run_deterministically": False,
-                },
-            },
-        )
-
-    def test_flatten(self):
-        nested = {
-            "foo": {
-                "bar": False,
-                "baz": 1,
-                "roh": "doh",
-            },
-            "bar": {
-                "baz": {
-                    "bah": "roh",
-                }
-            },
-            "baz": False,
-            "bah": 1,
-        }
-        flat = options._flatten(nested)
-        self.assertDictEqual(
-            flat,
-            {
-                "-foo.bar": False,
-                "-foo.baz": 1,
-                "-foo.roh": "doh",
-                "-bar.baz.bah": "roh",
-                "-baz": False,
-                "-bah": 1,
+                "CHECK_DURATION": 30.0,
+                "CHECK_VERBOSITY": "off",
+                "FORMAT_DISABLE_PROGRESSION": False,
+                "MODEL_CONSTRAINTS_DISABLE_ATTRIBUTES": False,
+                "MODEL_CONSTRAINTS_DISABLE_CAPACITIES": [],
+                "MODEL_CONSTRAINTS_DISABLE_CAPACITY": False,
+                "MODEL_CONSTRAINTS_DISABLE_DISTANCELIMIT": False,
+                "MODEL_CONSTRAINTS_DISABLE_GROUPS": False,
+                "MODEL_CONSTRAINTS_DISABLE_MAXIMUMDURATION": False,
+                "MODEL_CONSTRAINTS_DISABLE_MAXIMUMSTOPS": False,
+                "MODEL_CONSTRAINTS_DISABLE_MAXIMUMWAITSTOP": False,
+                "MODEL_CONSTRAINTS_DISABLE_MAXIMUMWAITVEHICLE": False,
+                "MODEL_CONSTRAINTS_DISABLE_MIXINGITEMS": False,
+                "MODEL_CONSTRAINTS_DISABLE_PRECEDENCE": False,
+                "MODEL_CONSTRAINTS_DISABLE_STARTTIMEWINDOWS": False,
+                "MODEL_CONSTRAINTS_DISABLE_VEHICLEENDTIME": False,
+                "MODEL_CONSTRAINTS_DISABLE_VEHICLESTARTTIME": False,
+                "MODEL_CONSTRAINTS_ENABLE_CLUSTER": False,
+                "MODEL_OBJECTIVES_CAPACITIES": "",
+                "MODEL_OBJECTIVES_CLUSTER": 0.0,
+                "MODEL_OBJECTIVES_EARLYARRIVALPENALTY": 1.0,
+                "MODEL_OBJECTIVES_LATEARRIVALPENALTY": 1.0,
+                "MODEL_OBJECTIVES_MINSTOPS": 1.0,
+                "MODEL_OBJECTIVES_TRAVELDURATION": 0.0,
+                "MODEL_OBJECTIVES_UNPLANNEDPENALTY": 1.0,
+                "MODEL_OBJECTIVES_VEHICLEACTIVATIONPENALTY": 1.0,
+                "MODEL_OBJECTIVES_VEHICLESDURATION": 1.0,
+                "MODEL_PROPERTIES_DISABLE_DURATIONGROUPS": False,
+                "MODEL_PROPERTIES_DISABLE_DURATIONS": False,
+                "MODEL_PROPERTIES_DISABLE_INITIALSOLUTION": False,
+                "MODEL_PROPERTIES_DISABLE_STOPDURATIONMULTIPLIERS": False,
+                "MODEL_VALIDATE_DISABLE_RESOURCES": False,
+                "MODEL_VALIDATE_DISABLE_STARTTIME": False,
+                "MODEL_VALIDATE_ENABLE_MATRIX": False,
+                "MODEL_VALIDATE_ENABLE_MATRIXASYMMETRYTOLERANCE": 20,
+                "SOLVE_DURATION": 5.0,
+                "SOLVE_ITERATIONS": -1,
+                "SOLVE_PARALLELRUNS": -1,
+                "SOLVE_RUNDETERMINISTICALLY": False,
+                "SOLVE_STARTSOLUTIONS": -1,
             },
         )
 
@@ -105,26 +61,12 @@ class TestOptions(unittest.TestCase):
 
         # Only options that are not default should produce arguments.
         opt2 = nextroute.Options(
-            check=nextroute.check.Options(
-                duration=4,
-                verbosity=nextroute.check.Verbosity.MEDIUM,
-            ),
-            solve=nextroute.ParallelSolveOptions(
-                duration=4,
-                iterations=-1,  # Default value should be skipped.
-            ),
-            model=nextroute.factory.Options(
-                constraints=nextroute.factory.Constraints(
-                    disable=nextroute.factory.DisableConstraints(
-                        attributes=True,
-                    ),
-                ),
-                validate=nextroute.factory.Validate(
-                    enable=nextroute.factory.EnableValidate(
-                        matrix=False,  # This option should be skipped because it is bool False.
-                    ),
-                ),
-            ),
+            CHECK_DURATION=4,
+            CHECK_VERBOSITY=nextroute.Verbosity.MEDIUM,
+            SOLVE_DURATION=4,
+            SOLVE_ITERATIONS=-1,  # Default value should be skipped.
+            MODEL_CONSTRAINTS_DISABLE_ATTRIBUTES=True,
+            MODEL_VALIDATE_ENABLE_MATRIX=False,  # This option should be skipped because it is bool False.
         )
         args2 = opt2.to_args()
         self.assertListEqual(
