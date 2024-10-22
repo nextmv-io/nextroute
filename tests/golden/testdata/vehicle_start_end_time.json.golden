@@ -295,16 +295,16 @@
     "result": {
       "custom": {
         "activated_vehicles": 4,
-        "max_duration": 4520,
+        "max_duration": 0.123,
         "max_stops_in_vehicle": 4,
-        "max_travel_duration": 2120,
-        "min_duration": 600,
+        "max_travel_duration": 0.123,
+        "min_duration": 0.123,
         "min_stops_in_vehicle": 1,
-        "min_travel_duration": 0,
+        "min_travel_duration": 0.123,
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 6321.044562101364
+      "value": 0.123
     },
     "run": {
       "duration": 0.123,
