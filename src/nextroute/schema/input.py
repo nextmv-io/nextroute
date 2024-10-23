@@ -69,7 +69,7 @@ class Input(BaseModel):
     """Matrix of travel distances in meters between stops."""
     duratrion_groups: Optional[List[DurationGroup]] = None
     """Duration in seconds added when approaching the group."""
-    duration_matrix: Optional[Union[List[List[float]], TimeDependentMatrix]] = None
+    duration_matrix: Optional[Union[List[List[float]], TimeDependentMatrix, List[TimeDependentMatrix]]] = None
     """Matrix of travel durations in seconds between stops as a single matrix or duration matrices."""
     options: Optional[Any] = None
     """Arbitrary options."""
