@@ -11,12 +11,12 @@
       {
         "start_time": "2023-01-01T12:03:00Z",
         "end_time": "2023-01-01T12:10:00Z",
-        "scaling_factor": 1.4
+        "scaling_factor": 2.0
       },
       {
         "start_time": "2023-01-01T12:12:00Z",
         "end_time": "2023-01-01T12:20:00Z",
-        "scaling_factor": 2.0
+        "scaling_factor": 4.0
       }
     ]
   },

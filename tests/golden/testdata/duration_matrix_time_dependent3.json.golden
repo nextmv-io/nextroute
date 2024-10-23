@@ -75,10 +75,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 360,
+            "base": 1140,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 360
+            "value": 1140
           },
           {
             "factor": 1,
@@ -86,7 +86,7 @@
             "value": 0
           }
         ],
-        "value": 360
+        "value": 1140
       },
       "unplanned": [],
       "vehicles": [
@@ -108,11 +108,11 @@
               "travel_duration": 0
             },
             {
-              "arrival_time": "2023-01-01T12:06:00Z",
+              "arrival_time": "2023-01-01T12:19:00Z",
               "cumulative_travel_distance": 3280,
-              "cumulative_travel_duration": 360,
-              "end_time": "2023-01-01T12:06:00Z",
-              "start_time": "2023-01-01T12:06:00Z",
+              "cumulative_travel_duration": 1140,
+              "end_time": "2023-01-01T12:19:00Z",
+              "start_time": "2023-01-01T12:19:00Z",
               "stop": {
                 "id": "Fushimi Inari Taisha",
                 "location": {
@@ -121,12 +121,12 @@
                 }
               },
               "travel_distance": 3280,
-              "travel_duration": 360
+              "travel_duration": 1140
             }
           ],
-          "route_duration": 360,
+          "route_duration": 1140,
           "route_travel_distance": 3280,
-          "route_travel_duration": 360
+          "route_travel_duration": 1140
         },
         {
           "id": "v2",
