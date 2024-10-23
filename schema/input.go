@@ -20,7 +20,10 @@ type Input struct {
 	// StopGroups group of stops that must be part of the same route.
 	StopGroups *[][]string `json:"stop_groups,omitempty"`
 	// DurationMatrix matrix of durations in seconds between stops.
-	DurationMatrix *[][]float64 `json:"duration_matrix,omitempty"`
+	// It can be a single matrix of type [][]float64 or of type DurationMatrix.
+	// The latter allows to pass time dependent matrices by either scaling a
+	// default matrix or by passing a matrix per time frame.
+	DurationMatrix any `json:"duration_matrix,omitempty"`
 	// DistanceMatrix matrix of distances in meters between stops.
 	DistanceMatrix *[][]float64 `json:"distance_matrix,omitempty"`
 	// DurationGroups duration in seconds added when approaching the group.
@@ -31,6 +34,33 @@ type Input struct {
 	Stops []Stop `json:"stops,omitempty"`
 	// AlternateStops a set of alternate stops for vehicles.
 	AlternateStops *[]AlternateStop `json:"alternate_stops,omitempty"`
+}
+
+// TimeDependentMatrix represents time-dependent duration matrices.
+type TimeDependentMatrix struct {
+	// VehicleIDs is a list of vehicle IDs for which the duration matrix is defined.
+	// Must be empty for a single matrix.
+	VehicleIDs []string `json:"vehicle_ids,omitempty"`
+	// DefaultMatrix is the default duration matrix used for undefined time frames
+	DefaultMatrix [][]float64 `json:"default_matrix"`
+
+	// MatrixTimeFrames contains time-dependent matrices or scaling factors
+	MatrixTimeFrames []MatrixTimeFrame `json:"matrix_time_frames,omitempty"`
+}
+
+// MatrixTimeFrame represents a time-dependent duration matrix or scaling factor.
+type MatrixTimeFrame struct {
+	// StartTime is the start time of the time frame
+	StartTime time.Time `json:"start_time"`
+
+	// EndTime is the end time of the time frame
+	EndTime time.Time `json:"end_time"`
+
+	// Matrix is the full duration matrix for this time frame
+	Matrix [][]float64 `json:"matrix,omitempty"`
+
+	// ScalingFactor is applied to the default matrix during this time frame
+	ScalingFactor *float64 `json:"scaling_factor,omitempty"`
 }
 
 // Defaults contains default values for vehicles and stops.
