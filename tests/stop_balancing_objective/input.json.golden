@@ -76,10 +76,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty + 1000 * stop_balance",
         "objectives": [
           {
-            "base": 15055.87046845047,
+            "base": 14812.966247110293,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 15055.87046845047
+            "value": 14812.966247110293
           },
           {
             "factor": 1,
@@ -93,7 +93,7 @@
             "value": 13000
           }
         ],
-        "value": 28055.87046845047
+        "value": 27812.966247110293
       },
       "unplanned": [],
       "vehicles": [
@@ -216,170 +216,8 @@
               "travel_duration": 1016
             },
             {
-              "cumulative_travel_distance": 69288,
-              "cumulative_travel_duration": 6929,
-              "stop": {
-                "id": "s16",
-                "location": {
-                  "lat": 35.83458,
-                  "lon": -78.63216
-                }
-              },
-              "travel_distance": 14255,
-              "travel_duration": 1425
-            },
-            {
-              "cumulative_travel_distance": 71730,
-              "cumulative_travel_duration": 7173,
-              "stop": {
-                "id": "s23",
-                "location": {
-                  "lat": 35.84616,
-                  "lon": -78.60914
-                }
-              },
-              "travel_distance": 2442,
-              "travel_duration": 244
-            },
-            {
-              "cumulative_travel_distance": 84451,
-              "cumulative_travel_duration": 8445,
-              "stop": {
-                "id": "s19",
-                "location": {
-                  "lat": 35.93663,
-                  "lon": -78.522705
-                }
-              },
-              "travel_distance": 12721,
-              "travel_duration": 1272
-            },
-            {
-              "cumulative_travel_distance": 87245,
-              "cumulative_travel_duration": 8725,
-              "stop": {
-                "id": "s14",
-                "location": {
-                  "lat": 35.961465,
-                  "lon": -78.52748
-                }
-              },
-              "travel_distance": 2794,
-              "travel_duration": 279
-            }
-          ],
-          "route_duration": 8725,
-          "route_travel_distance": 87245,
-          "route_travel_duration": 8725
-        },
-        {
-          "id": "vehicle-1",
-          "route": [
-            {
-              "cumulative_travel_duration": 0,
-              "stop": {
-                "id": "s4",
-                "location": {
-                  "lat": 35.77772,
-                  "lon": -78.505745
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "cumulative_travel_distance": 1904,
-              "cumulative_travel_duration": 190,
-              "stop": {
-                "id": "s21",
-                "location": {
-                  "lat": 35.7606,
-                  "lon": -78.50509
-                }
-              },
-              "travel_distance": 1904,
-              "travel_duration": 190
-            },
-            {
-              "cumulative_travel_distance": 15632,
-              "cumulative_travel_duration": 1563,
-              "stop": {
-                "id": "s24",
-                "location": {
-                  "lat": 35.740605,
-                  "lon": -78.65521
-                }
-              },
-              "travel_distance": 13728,
-              "travel_duration": 1372
-            },
-            {
-              "cumulative_travel_distance": 25945,
-              "cumulative_travel_duration": 2594,
-              "stop": {
-                "id": "s9",
-                "location": {
-                  "lat": 35.64796,
-                  "lon": -78.64972
-                }
-              },
-              "travel_distance": 10313,
-              "travel_duration": 1031
-            },
-            {
-              "cumulative_travel_distance": 35244,
-              "cumulative_travel_duration": 3524,
-              "stop": {
-                "id": "s10",
-                "location": {
-                  "lat": 35.672955,
-                  "lon": -78.747955
-                }
-              },
-              "travel_distance": 9299,
-              "travel_duration": 929
-            },
-            {
-              "cumulative_travel_distance": 36389,
-              "cumulative_travel_duration": 3639,
-              "stop": {
-                "id": "s17",
-                "location": {
-                  "lat": 35.67337,
-                  "lon": -78.76063
-                }
-              },
-              "travel_distance": 1145,
-              "travel_duration": 114
-            },
-            {
-              "cumulative_travel_distance": 43077,
-              "cumulative_travel_duration": 4308,
-              "stop": {
-                "id": "s5",
-                "location": {
-                  "lat": 35.732995,
-                  "lon": -78.75084
-                }
-              },
-              "travel_distance": 6688,
-              "travel_duration": 668
-            },
-            {
-              "cumulative_travel_distance": 44154,
-              "cumulative_travel_duration": 4415,
-              "stop": {
-                "id": "s7",
-                "location": {
-                  "lat": 35.74261,
-                  "lon": -78.749391
-                }
-              },
-              "travel_distance": 1077,
-              "travel_duration": 107
-            },
-            {
-              "cumulative_travel_distance": 50191,
-              "cumulative_travel_duration": 5019,
+              "cumulative_travel_distance": 61671,
+              "cumulative_travel_duration": 6167,
               "stop": {
                 "id": "s2",
                 "location": {
@@ -387,12 +225,12 @@
                   "lon": -78.813862
                 }
               },
-              "travel_distance": 6037,
-              "travel_duration": 603
+              "travel_distance": 6638,
+              "travel_duration": 663
             },
             {
-              "cumulative_travel_distance": 52515,
-              "cumulative_travel_duration": 5252,
+              "cumulative_travel_distance": 63995,
+              "cumulative_travel_duration": 6400,
               "stop": {
                 "id": "s11",
                 "location": {
@@ -404,8 +242,8 @@
               "travel_duration": 232
             },
             {
-              "cumulative_travel_distance": 55603,
-              "cumulative_travel_duration": 5560,
+              "cumulative_travel_distance": 67083,
+              "cumulative_travel_duration": 6708,
               "stop": {
                 "id": "s12",
                 "location": {
@@ -417,8 +255,8 @@
               "travel_duration": 308
             },
             {
-              "cumulative_travel_distance": 63302,
-              "cumulative_travel_duration": 6330,
+              "cumulative_travel_distance": 74782,
+              "cumulative_travel_duration": 7478,
               "stop": {
                 "id": "s1",
                 "location": {
@@ -430,9 +268,171 @@
               "travel_duration": 769
             }
           ],
-          "route_duration": 6330,
-          "route_travel_distance": 63302,
-          "route_travel_duration": 6330
+          "route_duration": 7478,
+          "route_travel_distance": 74782,
+          "route_travel_duration": 7478
+        },
+        {
+          "id": "vehicle-1",
+          "route": [
+            {
+              "cumulative_travel_duration": 0,
+              "stop": {
+                "id": "s9",
+                "location": {
+                  "lat": 35.64796,
+                  "lon": -78.64972
+                }
+              },
+              "travel_duration": 0
+            },
+            {
+              "cumulative_travel_distance": 9299,
+              "cumulative_travel_duration": 929,
+              "stop": {
+                "id": "s10",
+                "location": {
+                  "lat": 35.672955,
+                  "lon": -78.747955
+                }
+              },
+              "travel_distance": 9299,
+              "travel_duration": 929
+            },
+            {
+              "cumulative_travel_distance": 10444,
+              "cumulative_travel_duration": 1044,
+              "stop": {
+                "id": "s17",
+                "location": {
+                  "lat": 35.67337,
+                  "lon": -78.76063
+                }
+              },
+              "travel_distance": 1145,
+              "travel_duration": 114
+            },
+            {
+              "cumulative_travel_distance": 17132,
+              "cumulative_travel_duration": 1713,
+              "stop": {
+                "id": "s5",
+                "location": {
+                  "lat": 35.732995,
+                  "lon": -78.75084
+                }
+              },
+              "travel_distance": 6688,
+              "travel_duration": 668
+            },
+            {
+              "cumulative_travel_distance": 18209,
+              "cumulative_travel_duration": 1821,
+              "stop": {
+                "id": "s7",
+                "location": {
+                  "lat": 35.74261,
+                  "lon": -78.749391
+                }
+              },
+              "travel_distance": 1077,
+              "travel_duration": 107
+            },
+            {
+              "cumulative_travel_distance": 26711,
+              "cumulative_travel_duration": 2671,
+              "stop": {
+                "id": "s24",
+                "location": {
+                  "lat": 35.740605,
+                  "lon": -78.65521
+                }
+              },
+              "travel_distance": 8502,
+              "travel_duration": 850
+            },
+            {
+              "cumulative_travel_distance": 40439,
+              "cumulative_travel_duration": 4044,
+              "stop": {
+                "id": "s21",
+                "location": {
+                  "lat": 35.7606,
+                  "lon": -78.50509
+                }
+              },
+              "travel_distance": 13728,
+              "travel_duration": 1372
+            },
+            {
+              "cumulative_travel_distance": 42343,
+              "cumulative_travel_duration": 4234,
+              "stop": {
+                "id": "s4",
+                "location": {
+                  "lat": 35.77772,
+                  "lon": -78.505745
+                }
+              },
+              "travel_distance": 1904,
+              "travel_duration": 190
+            },
+            {
+              "cumulative_travel_distance": 55378,
+              "cumulative_travel_duration": 5538,
+              "stop": {
+                "id": "s16",
+                "location": {
+                  "lat": 35.83458,
+                  "lon": -78.63216
+                }
+              },
+              "travel_distance": 13035,
+              "travel_duration": 1303
+            },
+            {
+              "cumulative_travel_distance": 57820,
+              "cumulative_travel_duration": 5782,
+              "stop": {
+                "id": "s23",
+                "location": {
+                  "lat": 35.84616,
+                  "lon": -78.60914
+                }
+              },
+              "travel_distance": 2442,
+              "travel_duration": 244
+            },
+            {
+              "cumulative_travel_distance": 70541,
+              "cumulative_travel_duration": 7054,
+              "stop": {
+                "id": "s19",
+                "location": {
+                  "lat": 35.93663,
+                  "lon": -78.522705
+                }
+              },
+              "travel_distance": 12721,
+              "travel_duration": 1272
+            },
+            {
+              "cumulative_travel_distance": 73335,
+              "cumulative_travel_duration": 7334,
+              "stop": {
+                "id": "s14",
+                "location": {
+                  "lat": 35.961465,
+                  "lon": -78.52748
+                }
+              },
+              "travel_distance": 2794,
+              "travel_duration": 279
+            }
+          ],
+          "route_duration": 7334,
+          "route_travel_distance": 73335,
+          "route_travel_duration": 7334
         }
       ]
     }
@@ -441,16 +441,16 @@
     "result": {
       "custom": {
         "activated_vehicles": 2,
-        "max_duration": 8725,
+        "max_duration": 7478,
         "max_stops_in_vehicle": 13,
-        "max_travel_duration": 8725,
-        "min_duration": 6330,
+        "max_travel_duration": 7478,
+        "min_duration": 7334,
         "min_stops_in_vehicle": 12,
-        "min_travel_duration": 6330,
+        "min_travel_duration": 7334,
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 28055.87046845047
+      "value": 27812.966247110293
     },
     "run": {
       "duration": 0.123,
