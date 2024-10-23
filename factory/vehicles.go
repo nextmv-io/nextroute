@@ -29,12 +29,12 @@ func addVehicles(
 	switch matrix := input.DurationMatrix.(type) {
 	case [][]float64:
 		travelDuration = travelDurationExpression(matrix)
-	case schema.DurationMatrices:
+	case schema.TimeDependentMatrix:
 		travelDuration, err = dependentTravelDurationExpression(matrix, model)
 		if err != nil {
 			return nil, err
 		}
-	case []schema.DurationMatrices:
+	case []schema.TimeDependentMatrix:
 		for _, durationMatrix := range matrix {
 			m, err := dependentTravelDurationExpression(durationMatrix, model)
 			if err != nil {
@@ -45,7 +45,7 @@ func addVehicles(
 			}
 		}
 	case map[string]any:
-		var durationMatrices schema.DurationMatrices
+		var durationMatrices schema.TimeDependentMatrix
 		jsonData, err := json.Marshal(matrix)
 		if err != nil {
 			return nil, err
@@ -64,7 +64,7 @@ func addVehicles(
 			travelDuration = travelDurationExpression(floatMatrix)
 		} else {
 			// If it's not [][]float64, try to assert it as []schema.DurationMatrices
-			var durationMatrices []schema.DurationMatrices
+			var durationMatrices []schema.TimeDependentMatrix
 			jsonData, err := json.Marshal(matrix)
 			if err != nil {
 				return nil, err
@@ -281,7 +281,7 @@ func travelDurationExpression(matrix [][]float64) nextroute.DurationExpression {
 }
 
 func dependentTravelDurationExpression(
-	durationMatrices schema.DurationMatrices,
+	durationMatrices schema.TimeDependentMatrix,
 	model nextroute.Model,
 ) (nextroute.DurationExpression, error) {
 	if durationMatrices.DefaultMatrix == nil {
@@ -298,7 +298,7 @@ func dependentTravelDurationExpression(
 		return nil, err
 	}
 
-	for i, tf := range durationMatrices.TimeFrames {
+	for i, tf := range durationMatrices.MatrixTimeFrames {
 		if tf.ScalingFactor != nil {
 			scaledExpression := nextroute.NewScaledDurationExpression(defaultExpression, *tf.ScalingFactor)
 			if err := timeExpression.SetExpression(tf.StartTime, tf.EndTime, scaledExpression); err != nil {

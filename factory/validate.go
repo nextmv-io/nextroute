@@ -283,21 +283,21 @@ func validateConstraints(input schema.Input, modelOptions Options) error {
 				return err
 			}
 		}
-	case schema.DurationMatrices:
-		return validateDurationMatrix(input, matrix, modelOptions, true)
-	case []schema.DurationMatrices:
-		return validateDurationMatricesAndIDs(input, matrix, modelOptions)
+	case schema.TimeDependentMatrix:
+		return validateTimeDependentMatrix(input, matrix, modelOptions, true)
+	case []schema.TimeDependentMatrix:
+		return validateTimeDependentMatricesAndIDs(input, matrix, modelOptions)
 	case map[string]any:
-		var durationMatrices schema.DurationMatrices
+		var timeDependentMatrix schema.TimeDependentMatrix
 		jsonData, err := json.Marshal(matrix)
 		if err != nil {
 			return err
 		}
-		err = json.Unmarshal(jsonData, &durationMatrices)
+		err = json.Unmarshal(jsonData, &timeDependentMatrix)
 		if err != nil {
 			return err
 		}
-		return validateDurationMatrix(input, durationMatrices, modelOptions, true)
+		return validateTimeDependentMatrix(input, timeDependentMatrix, modelOptions, true)
 	case []any:
 		// In this case we have a single matrix that can be a float64 matrix or a
 		// multi duration matrix.
@@ -320,25 +320,25 @@ func validateFloatOrMultiDurationMatrix(input schema.Input, matrix []any, modelO
 		return nil
 	}
 
-	var durationMatrices []schema.DurationMatrices
+	var timeDependentMatrix []schema.TimeDependentMatrix
 	jsonData, err := json.Marshal(matrix)
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal(jsonData, &durationMatrices)
+	err = json.Unmarshal(jsonData, &timeDependentMatrix)
 	if err != nil {
 		return err
 	}
-	return validateDurationMatricesAndIDs(input, durationMatrices, modelOptions)
+	return validateTimeDependentMatricesAndIDs(input, timeDependentMatrix, modelOptions)
 }
 
-func validateDurationMatricesAndIDs(
+func validateTimeDependentMatricesAndIDs(
 	input schema.Input,
-	durationMatrices []schema.DurationMatrices,
+	timeDependentMatrices []schema.TimeDependentMatrix,
 	modelOptions Options,
 ) error {
 	vIDs := make(map[string]bool)
-	for _, durationMatrix := range durationMatrices {
+	for _, durationMatrix := range timeDependentMatrices {
 		if durationMatrix.VehicleIDs == nil || len(durationMatrix.VehicleIDs) == 0 {
 			return nmerror.NewInputDataError(fmt.Errorf(
 				"vehicle ids are not set for duration matrix",
@@ -353,7 +353,7 @@ func validateDurationMatricesAndIDs(
 			}
 			vIDs[vID] = true
 		}
-		if err := validateDurationMatrix(input, durationMatrix, modelOptions, false); err != nil {
+		if err := validateTimeDependentMatrix(input, durationMatrix, modelOptions, false); err != nil {
 			return err
 		}
 	}
@@ -603,9 +603,9 @@ func validateAlternateStop(idx int, stop schema.AlternateStop) error {
 	return nil
 }
 
-func validateDurationMatrix(
+func validateTimeDependentMatrix(
 	input schema.Input,
-	durationMatrices schema.DurationMatrices,
+	durationMatrices schema.TimeDependentMatrix,
 	modelOptions Options,
 	isSingleMatrix bool,
 ) error {
@@ -624,7 +624,7 @@ func validateDurationMatrix(
 				"single matrix has vehicle ids set, it must be empty"))
 		}
 	}
-	for i, tf := range durationMatrices.TimeFrames {
+	for i, tf := range durationMatrices.MatrixTimeFrames {
 		if tf.Matrix == nil && tf.ScalingFactor == nil {
 			return nmerror.NewInputDataError(fmt.Errorf(
 				"duration for time frame %d is missing both matrix and scaling factor", i))

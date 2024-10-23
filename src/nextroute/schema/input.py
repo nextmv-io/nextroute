@@ -30,7 +30,7 @@ class DurationGroup(BaseModel):
     group: List[str]
     """Stop IDs contained in the group."""
 
-class TimeFrame(BaseModel):
+class MatrixTimeFrame(BaseModel):
     """Represents a time-dependent duration matrix or scaling factor."""
     start_time: datetime
     """Start time of the time frame."""
@@ -41,11 +41,11 @@ class TimeFrame(BaseModel):
     scaling_factor: Optional[float] = None
     """Scaling factor for the time frame."""
 
-class DurationMatrices(BaseModel):
+class TimeDependentMatrix(BaseModel):
     """Represents time-dependent duration matrices."""
     default_matrix: List[List[float]]
     """Default duration matrix."""
-    time_frames: Optional[List[TimeFrame]] = None
+    matrix_time_frames: Optional[List[MatrixTimeFrame]] = None
     """Time-dependent duration matrices."""
 
 
@@ -67,7 +67,7 @@ class Input(BaseModel):
     """Matrix of travel distances in meters between stops."""
     duratrion_groups: Optional[List[DurationGroup]] = None
     """Duration in seconds added when approaching the group."""
-    duration_matrix: Optional[Union[List[List[float]], DurationMatrices]] = None
+    duration_matrix: Optional[Union[List[List[float]], TimeDependentMatrix]] = None
     """Matrix of travel durations in seconds between stops as a single matrix or duration matrices."""
     options: Optional[Any] = None
     """Arbitrary options."""
