@@ -86,7 +86,7 @@ file.
 
 For further information on how to get started, features, deployment, etc.,
 please refer to the [official
-documentation](https://www.nextmv.io/docs/vehicle-routing).
+documentation](https://www.nextmv.io/docs/vehicle-routing/get-started).
 
 ### Go
 
