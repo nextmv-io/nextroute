@@ -43,6 +43,8 @@ class MatrixTimeFrame(BaseModel):
 
 class TimeDependentMatrix(BaseModel):
     """Represents time-dependent duration matrices."""
+    vehicle_ids: Optional[List[str]] = None
+    """Vehicle IDs for which the duration matrix is defined."""
     default_matrix: List[List[float]]
     """Default duration matrix."""
     matrix_time_frames: Optional[List[MatrixTimeFrame]] = None
