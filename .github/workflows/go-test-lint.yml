@@ -29,5 +29,5 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
-      - name: go test
-        run: go test ./...
+      - name: go test (exclude golden file tests from Python package)
+        run: go test $(go list ./... | grep -v github.com/nextmv-io/nextroute/src)
