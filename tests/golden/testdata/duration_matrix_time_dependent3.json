@@ -9,7 +9,7 @@
         [0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0]
       ],
-      "time_frames": [
+      "matrix_time_frames": [
         {
           "start_time": "2023-01-01T12:03:00Z",
           "end_time": "2023-01-01T12:10:00Z",
@@ -31,7 +31,7 @@
         [0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0]
       ],
-      "time_frames": [
+      "matrix_time_frames": [
         {
           "start_time": "2023-01-01T12:03:00Z",
           "end_time": "2023-01-01T12:10:00Z",
