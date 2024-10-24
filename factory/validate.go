@@ -3,12 +3,12 @@
 package factory
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/nextmv-io/nextroute/common"
 	nmerror "github.com/nextmv-io/nextroute/common/errors"
@@ -288,12 +288,7 @@ func validateConstraints(input schema.Input, modelOptions Options) error {
 	case []schema.TimeDependentMatrix:
 		return validateTimeDependentMatricesAndIDs(input, matrix, modelOptions)
 	case map[string]any:
-		var timeDependentMatrix schema.TimeDependentMatrix
-		jsonData, err := json.Marshal(matrix)
-		if err != nil {
-			return err
-		}
-		err = json.Unmarshal(jsonData, &timeDependentMatrix)
+		timeDependentMatrix, err := convertToTimeDependentMatrix(matrix)
 		if err != nil {
 			return err
 		}
@@ -320,16 +315,30 @@ func validateFloatOrMultiDurationMatrix(input schema.Input, matrix []any, modelO
 		return nil
 	}
 
-	var timeDependentMatrix []schema.TimeDependentMatrix
-	jsonData, err := json.Marshal(matrix)
+	timeDependentMatrices, err := convertToTimeDependentMatrices(matrix)
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal(jsonData, &timeDependentMatrix)
-	if err != nil {
-		return err
+	return validateTimeDependentMatricesAndIDs(input, timeDependentMatrices, modelOptions)
+}
+
+// Converts a single or multiple time-dependent matrices from a slice of interfaces to []schema.TimeDependentMatrix.
+func convertToTimeDependentMatrices(data []any) ([]schema.TimeDependentMatrix, error) {
+	var result []schema.TimeDependentMatrix
+
+	for _, item := range data {
+		if matrixMap, ok := item.(map[string]any); ok {
+			matrix, err := convertToTimeDependentMatrix(matrixMap)
+			if err != nil {
+				return nil, err
+			}
+			result = append(result, matrix)
+		} else {
+			return nil, fmt.Errorf("invalid time-dependent matrix format")
+		}
 	}
-	return validateTimeDependentMatricesAndIDs(input, timeDependentMatrix, modelOptions)
+
+	return result, nil
 }
 
 func validateTimeDependentMatricesAndIDs(
@@ -1099,4 +1108,71 @@ func validateResources(input schema.Input, modelOptions Options) error {
 	}
 
 	return nil
+}
+
+// Converts a time-dependent matrix from a JSON map to a schema.TimeDependentMatrix.
+func convertToTimeDependentMatrix(data map[string]any) (schema.TimeDependentMatrix, error) {
+	var result schema.TimeDependentMatrix
+
+	if dMatrix, ok := data["default_matrix"].([]any); ok {
+		if fMatrix, ok := common.TryAssertFloat64Matrix(dMatrix); ok {
+			result.DefaultMatrix = fMatrix
+		} else {
+			return result, fmt.Errorf("invalid or missing default_matrix")
+		}
+	} else {
+		return result, fmt.Errorf("invalid or missing default_matrix")
+	}
+
+	if vIDs, ok := data["vehicle_ids"].([]any); ok {
+		if vehicleIDs, ok := common.TryAssertStringSlice(vIDs); ok {
+			result.VehicleIDs = vehicleIDs
+		}
+	}
+
+	if timeFrames, ok := data["matrix_time_frames"].([]any); ok {
+		result.MatrixTimeFrames = make([]schema.MatrixTimeFrame, len(timeFrames))
+		for i, tf := range timeFrames {
+			timeFrame, ok := tf.(map[string]any)
+			if !ok {
+				return result, fmt.Errorf("invalid time frame at index %d", i)
+			}
+
+			var mtf schema.MatrixTimeFrame
+
+			if mMatrix, ok := timeFrame["matrix"].([]any); ok {
+				if fMatrix, ok := common.TryAssertFloat64Matrix(mMatrix); ok {
+					mtf.Matrix = fMatrix
+				}
+			}
+
+			if scalingFactor, ok := timeFrame["scaling_factor"].(float64); ok {
+				mtf.ScalingFactor = &scalingFactor
+			}
+
+			if startTime, ok := timeFrame["start_time"].(string); ok {
+				t, err := time.Parse(time.RFC3339, startTime)
+				if err != nil {
+					return result, fmt.Errorf("invalid start_time at index %d: %v", i, err)
+				}
+				mtf.StartTime = t
+			} else {
+				return result, fmt.Errorf("missing or invalid start_time at index %d", i)
+			}
+
+			if endTime, ok := timeFrame["end_time"].(string); ok {
+				t, err := time.Parse(time.RFC3339, endTime)
+				if err != nil {
+					return result, fmt.Errorf("invalid end_time at index %d: %v", i, err)
+				}
+				mtf.EndTime = t
+			} else {
+				return result, fmt.Errorf("missing or invalid end_time at index %d", i)
+			}
+
+			result.MatrixTimeFrames[i] = mtf
+		}
+	}
+
+	return result, nil
 }
