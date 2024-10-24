@@ -348,7 +348,7 @@ func validateTimeDependentMatricesAndIDs(
 ) error {
 	vIDs := make(map[string]bool)
 	for _, durationMatrix := range timeDependentMatrices {
-		if durationMatrix.VehicleIDs == nil || len(durationMatrix.VehicleIDs) == 0 {
+		if len(durationMatrix.VehicleIDs) == 0 {
 			return nmerror.NewInputDataError(fmt.Errorf(
 				"vehicle ids are not set for duration matrix",
 			))

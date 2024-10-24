@@ -456,7 +456,7 @@ func TryAssertFloat64Matrix(matrix []any) ([][]float64, bool) {
 	return result, true
 }
 
-// TryAssertStringSlice attempts to convert a slice of any to a slice of strings
+// TryAssertStringSlice attempts to convert a slice of any to a slice of strings.
 func TryAssertStringSlice(slice []any) ([]string, bool) {
 	result := make([]string, len(slice))
 	for i, v := range slice {

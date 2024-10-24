@@ -331,3 +331,6 @@ issues:
     - path: check/format\.go
       linters:
         - contextcheck
+    - path: factory/validate\.go
+      linters:
+        - nestif
