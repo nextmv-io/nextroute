@@ -322,11 +322,11 @@ func validateFloatOrMultiDurationMatrix(input schema.Input, matrix []any, modelO
 	return validateTimeDependentMatricesAndIDs(input, timeDependentMatrices, modelOptions)
 }
 
-// Converts a single or multiple time-dependent matrices from a slice of interfaces to []schema.TimeDependentMatrix.
+// Converts a time-dependent matrices from a slice of interfaces to []schema.TimeDependentMatrix.
 func convertToTimeDependentMatrices(data []any) ([]schema.TimeDependentMatrix, error) {
 	var result []schema.TimeDependentMatrix
 
-	for _, item := range data {
+	for i, item := range data {
 		if matrixMap, ok := item.(map[string]any); ok {
 			matrix, err := convertToTimeDependentMatrix(matrixMap)
 			if err != nil {
@@ -334,7 +334,7 @@ func convertToTimeDependentMatrices(data []any) ([]schema.TimeDependentMatrix, e
 			}
 			result = append(result, matrix)
 		} else {
-			return nil, fmt.Errorf("invalid time-dependent matrix format")
+			return nil, fmt.Errorf("invalid time-dependent matrix format at index %v", i)
 		}
 	}
 
