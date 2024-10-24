@@ -76,10 +76,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 767.0466501941119,
+            "base": 1140,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 767.0466501941119
+            "value": 1140
           },
           {
             "factor": 1,
@@ -87,7 +87,7 @@
             "value": 0
           }
         ],
-        "value": 767.0466501941119
+        "value": 1140
       },
       "unplanned": [],
       "vehicles": [
@@ -95,99 +95,10 @@
           "id": "v1",
           "route": [
             {
+              "arrival_time": "2023-01-01T12:00:00Z",
               "cumulative_travel_duration": 0,
-              "stop": {
-                "id": "v1-start",
-                "location": {
-                  "lat": 35.017209,
-                  "lon": 135.672009
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "cumulative_travel_duration": 0,
-              "stop": {
-                "id": "Arashiyama Bamboo Forest",
-                "location": {
-                  "lat": 35.017209,
-                  "lon": 135.672009
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "cumulative_travel_distance": 5752,
-              "cumulative_travel_duration": 287,
-              "stop": {
-                "id": "Kinkaku-ji",
-                "location": {
-                  "lat": 35.039705,
-                  "lon": 135.728898
-                }
-              },
-              "travel_distance": 5752,
-              "travel_duration": 287
-            },
-            {
-              "cumulative_travel_distance": 9081,
-              "cumulative_travel_duration": 454,
-              "stop": {
-                "id": "Nijō Castle",
-                "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
-                }
-              },
-              "travel_distance": 3329,
-              "travel_duration": 166
-            },
-            {
-              "cumulative_travel_distance": 10857,
-              "cumulative_travel_duration": 542,
-              "stop": {
-                "id": "Kyoto Imperial Palace",
-                "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762057
-                }
-              },
-              "travel_distance": 1776,
-              "travel_duration": 88
-            }
-          ],
-          "route_duration": 542,
-          "route_travel_distance": 10857,
-          "route_travel_duration": 542
-        },
-        {
-          "id": "v2",
-          "route": [
-            {
-              "cumulative_travel_duration": 0,
-              "stop": {
-                "id": "v2-start",
-                "location": {
-                  "lat": 34.967146,
-                  "lon": 135.772695
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "cumulative_travel_duration": 0,
-              "stop": {
-                "id": "Fushimi Inari Taisha",
-                "location": {
-                  "lat": 34.967146,
-                  "lon": 135.772695
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "cumulative_travel_distance": 3280,
-              "cumulative_travel_duration": 164,
+              "end_time": "2023-01-01T12:00:00Z",
+              "start_time": "2023-01-01T12:00:00Z",
               "stop": {
                 "id": "Kiyomizu-dera",
                 "location": {
@@ -195,26 +106,49 @@
                   "lon": 135.78506
                 }
               },
-              "travel_distance": 3280,
-              "travel_duration": 164
+              "travel_duration": 0
             },
             {
-              "cumulative_travel_distance": 4481,
-              "cumulative_travel_duration": 224,
+              "arrival_time": "2023-01-01T12:19:00Z",
+              "cumulative_travel_distance": 3280,
+              "cumulative_travel_duration": 1140,
+              "end_time": "2023-01-01T12:19:00Z",
+              "start_time": "2023-01-01T12:19:00Z",
               "stop": {
-                "id": "Gionmachi",
+                "id": "Fushimi Inari Taisha",
                 "location": {
-                  "lat": 35.002457,
-                  "lon": 135.775682
+                  "lat": 34.967146,
+                  "lon": 135.772695
                 }
               },
-              "travel_distance": 1201,
-              "travel_duration": 60
+              "travel_distance": 3280,
+              "travel_duration": 1140
             }
           ],
-          "route_duration": 224,
-          "route_travel_distance": 4481,
-          "route_travel_duration": 224
+          "route_duration": 1140,
+          "route_travel_distance": 3280,
+          "route_travel_duration": 1140
+        },
+        {
+          "id": "v2",
+          "route": [
+            {
+              "arrival_time": "2023-01-01T12:00:00Z",
+              "cumulative_travel_duration": 0,
+              "end_time": "2023-01-01T12:00:00Z",
+              "start_time": "2023-01-01T12:00:00Z",
+              "stop": {
+                "id": "Nijō Castle",
+                "location": {
+                  "lat": 35.014239,
+                  "lon": 135.748134
+                }
+              },
+              "travel_duration": 0
+            }
+          ],
+          "route_duration": 0,
+          "route_travel_duration": 0
         }
       ]
     }
@@ -224,10 +158,10 @@
       "custom": {
         "activated_vehicles": 2,
         "max_duration": 0.123,
-        "max_stops_in_vehicle": 4,
+        "max_stops_in_vehicle": 2,
         "max_travel_duration": 0.123,
         "min_duration": 0.123,
-        "min_stops_in_vehicle": 3,
+        "min_stops_in_vehicle": 1,
         "min_travel_duration": 0.123,
         "unplanned_stops": 0
       },
