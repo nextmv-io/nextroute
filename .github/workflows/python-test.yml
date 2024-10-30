@@ -2,7 +2,7 @@ name: python test
 on: [push]
 
 env:
-  GO_VERSION: 1.22.0
+  GO_VERSION: 1.23
 
 jobs:
   python-test:
