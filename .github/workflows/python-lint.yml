@@ -22,4 +22,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: lint with ruff
-        run: ruff check --output-format=github .
+        run: ruff check --output-format=github -v .
