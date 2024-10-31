@@ -3,7 +3,6 @@
 package factory
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -45,16 +44,11 @@ func addVehicles(
 			}
 		}
 	case map[string]any:
-		var durationMatrices schema.TimeDependentMatrix
-		jsonData, err := json.Marshal(matrix)
+		timeDependentMatrix, err := convertToTimeDependentMatrix(matrix)
 		if err != nil {
 			return nil, err
 		}
-		err = json.Unmarshal(jsonData, &durationMatrices)
-		if err != nil {
-			return nil, err
-		}
-		travelDuration, err = dependentTravelDurationExpression(durationMatrices, model)
+		travelDuration, err = dependentTravelDurationExpression(timeDependentMatrix, model)
 		if err != nil {
 			return nil, err
 		}
@@ -64,16 +58,11 @@ func addVehicles(
 			travelDuration = travelDurationExpression(floatMatrix)
 		} else {
 			// If it's not [][]float64, try to assert it as []schema.DurationMatrices
-			var durationMatrices []schema.TimeDependentMatrix
-			jsonData, err := json.Marshal(matrix)
+			timeDependentMatrices, err := convertToTimeDependentMatrices(matrix)
 			if err != nil {
 				return nil, err
 			}
-			err = json.Unmarshal(jsonData, &durationMatrices)
-			if err != nil {
-				return nil, err
-			}
-			for _, durationMatrix := range durationMatrices {
+			for _, durationMatrix := range timeDependentMatrices {
 				m, err := dependentTravelDurationExpression(durationMatrix, model)
 				if err != nil {
 					return nil, err

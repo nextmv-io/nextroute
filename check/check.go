@@ -11,6 +11,7 @@ import (
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/nextroute/check/schema"
 	"github.com/nextmv-io/nextroute/common"
+	"github.com/nextmv-io/sdk/run/statistics"
 )
 
 // ModelCheck is the check of a model returning a [Output].
@@ -222,7 +223,7 @@ SolutionPlanUnitLoop:
 					*m.output.PlanUnits[solutionPlanUnitIdx].VehiclesHaveMoves++
 				}
 
-				value := bestMove.Value()
+				value := statistics.Float64(bestMove.Value())
 				vehicleDetails := &schema.VehiclesWithMovesDetail{
 					VehicleID:              solutionVehicle.ModelVehicle().ID(),
 					DeltaObjectiveEstimate: &value,
@@ -268,7 +269,7 @@ SolutionPlanUnitLoop:
 					if planned {
 						moveIsImprovement = true
 						vehicleDetails.WasPlannable = true
-						deltaObjective := m.solution.Score() - actualScoreBeforeMove
+						deltaObjective := statistics.Float64(m.solution.Score() - actualScoreBeforeMove)
 						vehicleDetails.DeltaObjective = &deltaObjective
 
 						m.output.PlanUnits[solutionPlanUnitIdx].HasPlannableBestMove = true
