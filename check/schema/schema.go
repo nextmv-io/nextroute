@@ -3,6 +3,8 @@
 // Package schema contains the core schemas for nextroute.
 package schema
 
+import "github.com/nextmv-io/sdk/run/statistics"
+
 // Output is the output of the  check.
 type Output struct {
 	// Error is the error raised during the check.
@@ -119,10 +121,10 @@ type VehiclesWithMovesDetail struct {
 	VehicleID string `json:"vehicle_id"`
 	// DeltaObjectiveEstimate is the estimate of the delta of the objective of
 	// that will be incurred by the move.
-	DeltaObjectiveEstimate *float64 `json:"delta_objective_estimate,omitempty"`
+	DeltaObjectiveEstimate *statistics.Float64 `json:"delta_objective_estimate,omitempty"`
 	// DeltaObjective is the actual delta of the objective of that will be
 	// incurred by the move.
-	DeltaObjective *float64 `json:"delta_objective,omitempty"`
+	DeltaObjective *statistics.Float64 `json:"delta_objective,omitempty"`
 	// FailedConstraints are the constraints that are violated for the move.
 	FailedConstraints []string `json:"failed_constraints,omitempty"`
 	// WasPlannable is true if the move was plannable, false otherwise.
