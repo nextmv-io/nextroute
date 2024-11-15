@@ -30,7 +30,8 @@
       "travel_duration": 0,
       "vehicles_duration": 1,
       "unplanned_penalty": 1,
-      "cluster": 0
+      "cluster": 0,
+      "stop_balance": 0
     },
     "properties": {
       "disable": {

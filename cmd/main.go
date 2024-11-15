@@ -5,7 +5,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
+	"strings"
 
 	"github.com/nextmv-io/nextroute"
 	"github.com/nextmv-io/nextroute/check"
@@ -16,6 +19,12 @@ import (
 )
 
 func main() {
+	// If the only argument is 'version', print the version and exit.
+	if len(os.Args) == 2 && strings.TrimLeft(os.Args[1], "-") == "version" {
+		fmt.Println(nextroute.Version())
+		return
+	}
+	// Continue with runner based execution.
 	runner := run.CLI(solver)
 	err := runner.Run(context.Background())
 	if err != nil {

@@ -1,16 +1,23 @@
-# nextroute
+# Nextroute
 
-Welcome to Nextmv's **nextroute**, a feature-rich Vehicle Routing Problem (VRP)
+Welcome to Nextmv's **Nextroute**, a feature-rich Vehicle Routing Problem (VRP)
 solver written in pure Go. Designed with a focus on maintainability,
-feature-richness, and extensibility, nextroute is built to handle real-world
+feature-richness, and extensibility, Nextroute is built to handle real-world
 applications across [all platforms that Go (cross)compiles
 to](https://go.dev/doc/install/source#environment).
 
 Our goal is not to compete on specific VRP type benchmarks, but to provide a
 robust and versatile tool that can adapt to a variety of routing use-cases.
 Whether you're optimizing the routes for a small fleet of delivery vans in a
-city or managing complex logistics for a global supply chain, nextroute is
+city or managing complex logistics for a global supply chain, Nextroute is
 equipped to help you find efficient solutions.
+
+You can work with Nextroute in a variety of ways:
+
+* Go package: Import the `nextroute` package in your Go project and use the
+  solver directly.
+* Python package: Use the `nextroute` Python package as an interface to the Go
+  solver.
 
 ## Features
 
@@ -53,13 +60,38 @@ equipped to help you find efficient solutions.
 
 ## License
 
-Please note that nextroute is provided as _source-available_ software (not
+Please note that Nextroute is provided as _source-available_ software (not
 _open-source_). For further information, please refer to the [LICENSE](./LICENSE.md)
 file.
 
+## Installation
+
+* Go
+
+    Install the Go package with the following command:
+
+    ```bash
+    go get github.com/nextmv-io/nextroute
+    ```
+
+* Python
+
+    Install the Python package with the following command:
+
+    ```bash
+    pip install nextroute
+    ```
+
 ## Usage
 
-A first run can be done with the following command:
+For further information on how to get started, features, deployment, etc.,
+please refer to the [official
+documentation](https://www.nextmv.io/docs/vehicle-routing/get-started).
+
+### Go
+
+A first run can be done with the following command. Stand at the root of the
+repository and run:
 
 ```bash
 go run cmd/main.go -runner.input.path cmd/input.json -solve.duration 5s
@@ -68,16 +100,43 @@ go run cmd/main.go -runner.input.path cmd/input.json -solve.duration 5s
 This will run the solver for 5 seconds and output the result to the console.
 
 In order to start a _new project_, please refer to the sample app in the
-[community-apps repository](https://github.com/nextmv-io/community-apps/tree/develop/nextroute).
+[community-apps repository](https://github.com/nextmv-io/community-apps/tree/develop/go-nextroute).
 If you have [Nextmv CLI](https://www.nextmv.io/docs/platform/installation#nextmv-cli)
 installed, you can create a new project with the following command:
 
 ```bash
-nextmv community clone -a nextroute
+nextmv community clone -a go-nextroute
 ```
 
-For further information on how to get started, features, deployment, etc.,
-please refer to the [official documentation](https://www.nextmv.io/docs/vehicle-routing).
+### Python
+
+A first run can be done by executing the following script. Stand at the root of
+the repository and execute it:
+
+```python
+import json
+
+import nextroute
+
+with open("cmd/input.json") as f:
+    data = json.load(f)
+
+input = nextroute.schema.Input.from_dict(data)
+options = nextroute.Options(SOLVE_DURATION=5)
+output = nextroute.solve(input, options)
+print(json.dumps(output.to_dict(), indent=2))
+```
+
+This will run the solver for 5 seconds and output the result to the console.
+
+In order to start a _new project_, please refer to the sample app in the
+[community-apps repository](https://github.com/nextmv-io/community-apps/tree/develop/python-nextroute).
+If you have [Nextmv CLI](https://www.nextmv.io/docs/platform/installation#nextmv-cli)
+installed, you can create a new project with the following command:
+
+```bash
+nextmv community clone -a python-nextroute
+```
 
 ## Local benchmarking
 
@@ -106,5 +165,5 @@ benchstat develop.txt new.txt
 We try our best to version our software thoughtfully and only break APIs and
 behaviors when we have a good reason to.
 
-- Minor (`v1.^.0`) tags: new features, might be breaking.
-- Patch (`v1.0.^`) tags: bug fixes.
+* Minor (`v1.^.0`) tags: new features, might be breaking.
+* Patch (`v1.0.^`) tags: bug fixes.

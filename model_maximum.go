@@ -67,6 +67,7 @@ type maximumImpl struct {
 	resourceExpression                   ModelExpression
 	maximumByVehicleType                 []float64
 	penaltyOffset                        float64
+	hasNoEffect                          []bool
 }
 
 func (l *maximumImpl) PenaltyOffset() float64 {
@@ -107,18 +108,28 @@ func (l *maximumImpl) Lock(model Model) error {
 		)
 	}
 
+	planUnits := model.PlanStopsUnits()
+
+	l.hasNoEffect = make([]bool, len(planUnits))
+
 	if !l.hasStopExpressionAndNoNegativeValues {
 		return nil
 	}
 
-	planUnits := model.PlanStopsUnits()
 	l.deltas = make([]float64, len(planUnits))
-	for _, planUnit := range model.PlanStopsUnits() {
+
+	for _, planUnit := range planUnits {
 		delta := 0.0
+		hasNoEffect := true
 		for _, stop := range planUnit.Stops() {
-			delta += l.Expression().Value(nil, nil, stop)
+			value := l.Expression().Value(nil, nil, stop)
+			delta += value
+			if value != 0 {
+				hasNoEffect = false
+			}
 		}
 		l.deltas[planUnit.Index()] = delta
+		l.hasNoEffect[planUnit.Index()] = hasNoEffect
 	}
 
 	return nil
@@ -180,13 +191,17 @@ func (l *maximumImpl) DoesStopHaveViolations(s SolutionStop) bool {
 func (l *maximumImpl) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
+	moveImpl := move.(*solutionMoveStopsImpl)
+
+	if l.hasNoEffect[moveImpl.planUnit.modelPlanStopsUnit.Index()] {
+		return false, constNoPositionsHint
+	}
+
 	// All contributions to the level are negative, no need to check
 	// it will always be below the implied minimum level of zero.
 	if l.hasNegativeValues && !l.hasPositiveValues {
 		return true, constSkipVehiclePositionsHint
 	}
-
-	moveImpl := move.(*solutionMoveStopsImpl)
 
 	vehicle := moveImpl.vehicle()
 	vehicleType := vehicle.ModelVehicle().VehicleType()
@@ -301,6 +316,10 @@ func (l *maximumImpl) EstimateDeltaValue(
 	move SolutionMoveStops,
 ) (deltaValue float64) {
 	moveImpl := move.(*solutionMoveStopsImpl)
+
+	if l.hasNoEffect[moveImpl.planUnit.modelPlanStopsUnit.Index()] {
+		return 0.0
+	}
 
 	vehicle := moveImpl.vehicle()
 
