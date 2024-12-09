@@ -1250,7 +1250,7 @@ func validateTimeHorizon(input schema.Input, modelOptions Options) error {
 	if int(maxTime.Sub(minTime).Seconds()) > modelOptions.Properties.MaximumTimeHorizon {
 		return nmerror.NewInputDataError(fmt.Errorf(
 			"the time horizon of the input data is %v, which is larger than the configured maximum allowed time horizon of %v"+
-				" - please adjust the maximum time horizon if intentional",
+				" - please adjust the maximum time horizon via options if intentional",
 			maxTime.Sub(minTime),
 			time.Duration(modelOptions.Properties.MaximumTimeHorizon)*time.Second,
 		))
