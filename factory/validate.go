@@ -1189,8 +1189,8 @@ func validateTimeHorizon(input schema.Input, modelOptions Options) error {
 	}
 
 	// Keep track of minimum and maximum time in the input data
-	minTime := time.Time{}                             // zero time
-	maxTime := time.Unix(1<<63-62135596801, 999999999) // max time
+	minTime := time.Unix(1<<63-62135596801, 999999999) // zero time
+	maxTime := time.Time{}                             // max time
 
 	// Define some helper functions
 	updateMinMaxTime := func(t time.Time) {
@@ -1207,12 +1207,7 @@ func validateTimeHorizon(input schema.Input, modelOptions Options) error {
 				if t.IsZero() {
 					continue
 				}
-				if t.Before(minTime) {
-					minTime = t
-				}
-				if t.After(maxTime) {
-					maxTime = t
-				}
+				updateMinMaxTime(t)
 			}
 		}
 	}
