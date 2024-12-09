@@ -80,7 +80,10 @@ func validate(input schema.Input, modelOptions Options) error {
 	if err := validateResources(input, modelOptions); err != nil {
 		return err
 	}
-	return validateConstraints(input, modelOptions)
+	if err := validateConstraints(input, modelOptions); err != nil {
+		return err
+	}
+	return validateTimeHorizon(input, modelOptions)
 }
 
 func identify(input schema.Input, i int) string {
@@ -1175,4 +1178,87 @@ func convertToTimeDependentMatrix(data map[string]any) (schema.TimeDependentMatr
 	}
 
 	return result, nil
+}
+
+// validateTimeHorizon validates that the overall time horizon of the input data
+// is within the maximum allowed range.
+func validateTimeHorizon(input schema.Input, modelOptions Options) error {
+	if modelOptions.Properties.MaximumTimeHorizon <= 0 {
+		// Ignore time horizon validation on user request
+		return nil
+	}
+
+	// Keep track of minimum and maximum time in the input data
+	minTime := time.Time{}                             // zero time
+	maxTime := time.Unix(1<<63-62135596801, 999999999) // max time
+
+	// Define some helper functions
+	updateMinMaxTime := func(t time.Time) {
+		if t.Before(minTime) {
+			minTime = t
+		}
+		if t.After(maxTime) {
+			maxTime = t
+		}
+	}
+	updateMinMaxWindows := func(timeWindows [][2]time.Time) {
+		for _, tw := range timeWindows {
+			for _, t := range tw {
+				if t.IsZero() {
+					continue
+				}
+				if t.Before(minTime) {
+					minTime = t
+				}
+				if t.After(maxTime) {
+					maxTime = t
+				}
+			}
+		}
+	}
+
+	for _, vehicle := range input.Vehicles {
+		if vehicle.StartTime != nil {
+			updateMinMaxTime(*vehicle.StartTime)
+		}
+		if vehicle.EndTime != nil {
+			updateMinMaxTime(*vehicle.EndTime)
+		}
+	}
+
+	for _, stop := range input.Stops {
+		if stop.StartTimeWindow != nil {
+			timeWindows, err := convertTimeWindow(stop.StartTimeWindow, stop.ID)
+			if err != nil {
+				return err
+			}
+
+			updateMinMaxWindows(timeWindows)
+		}
+	}
+
+	if input.AlternateStops != nil {
+		for _, stop := range *input.AlternateStops {
+			if stop.StartTimeWindow == nil {
+				continue
+			}
+
+			timeWindows, err := convertTimeWindow(stop.StartTimeWindow, stop.ID)
+			if err != nil {
+				return err
+			}
+
+			updateMinMaxWindows(timeWindows)
+		}
+	}
+
+	if int(maxTime.Sub(minTime).Seconds()) > modelOptions.Properties.MaximumTimeHorizon {
+		return nmerror.NewInputDataError(fmt.Errorf(
+			"the time horizon of the input data is %v, which is larger than the maximum allowed time horizon of %v",
+			maxTime.Sub(minTime),
+			time.Duration(modelOptions.Properties.MaximumTimeHorizon)*time.Second,
+		))
+	}
+
+	return nil
 }
