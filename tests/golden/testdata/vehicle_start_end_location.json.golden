@@ -49,7 +49,8 @@
           "durations": false,
           "initial_solution": false,
           "stop_duration_multipliers": false
-        }
+        },
+        "maximum_time_horizon": 2592000
       },
       "validate": {
         "disable": {
@@ -76,10 +77,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 375.4720230604402,
+            "base": 375.47202306044016,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 375.4720230604402
+            "value": 375.47202306044016
           },
           {
             "factor": 1,
@@ -87,7 +88,7 @@
             "value": 0
           }
         ],
-        "value": 375.4720230604402
+        "value": 375.47202306044016
       },
       "unplanned": [],
       "vehicles": [
