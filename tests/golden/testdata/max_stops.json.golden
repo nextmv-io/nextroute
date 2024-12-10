@@ -50,7 +50,7 @@
           "initial_solution": false,
           "stop_duration_multipliers": false
         },
-        "maximum_time_horizon": 604800
+        "maximum_time_horizon": 2592000
       },
       "validate": {
         "disable": {
