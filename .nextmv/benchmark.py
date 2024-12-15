@@ -1,3 +1,12 @@
+# Description:
+# This script does the following:
+# - Make sure the working directory is clean.
+# - Pushes a new version of the app (if it does not already exist; uses git sha as version).
+# - Updates the candidate instance to use the new version.
+# - Runs an acceptance test between the candidate and baseline instances.
+# - Waits for the test to complete.
+# - Posts the result to Slack (if requested).
+
 import os
 from datetime import datetime, timezone
 
@@ -21,6 +30,11 @@ METRICS = [
         statistic=cloud.StatisticType.mean,
     )
 ]
+
+
+def check_clean_working_directory():
+    if os.system("git diff --quiet") != 0 or os.system("git diff --cached --quiet") != 0:
+        raise Exception("Working directory is not clean")
 
 
 def run_acceptance_test() -> cloud.AcceptanceTest:
