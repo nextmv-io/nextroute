@@ -65,7 +65,7 @@ def get_tag(app: cloud.Application) -> str:
             .replace(":", "")
             .replace("-", "")
         )
-        return f"{version_id}-{ts}"
+        version_id = f"{version_id}-{ts}"
     # Otherwise, we just use the git sha
     return version_id
 
