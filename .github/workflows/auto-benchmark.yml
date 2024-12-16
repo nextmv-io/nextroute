@@ -30,4 +30,6 @@ jobs:
       - name: run acceptance test
         run: |
           export BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
+          export BENCHMARK_API_KEY_PROD=${{ secrets.BENCHMARK_API_KEY_PROD }}
+          export SLACK_URL_DEV_SCIENCE=${{ secrets.SLACK_URL_DEV_SCIENCE }}
           python .nextmv/benchmark.py
