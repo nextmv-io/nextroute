@@ -40,7 +40,7 @@
         "duration_groups": false,
         "initial_solution": false
       },
-      "maximum_time_horizon": 2592000
+      "maximum_time_horizon": 15552000
     },
     "validate": {
       "disable": {

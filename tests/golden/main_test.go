@@ -34,6 +34,7 @@ func TestGolden(t *testing.T) {
 				// for deterministic tests
 				"-solve.startsolutions", "1",
 			},
+			GoldenExtension: ".go.golden",
 			TransientFields: []golden.TransientField{
 				{Key: "$.version.sdk", Replacement: golden.StableVersion},
 				{Key: "$.statistics.result.duration", Replacement: golden.StableFloat},

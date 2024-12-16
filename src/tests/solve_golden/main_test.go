@@ -73,8 +73,8 @@ func TestPythonSolveGolden(t *testing.T) {
 				{Key: "$.statistics.result.duration", Replacement: golden.StableFloat},
 				{Key: "$.statistics.run.duration", Replacement: golden.StableFloat},
 				{Key: "$.statistics.result.value", Replacement: golden.StableFloat},
-				{Key: "$.options.nextmv.output", Replacement: "output.json"},
-				{Key: "$.options.nextmv.input", Replacement: "input.json"},
+				{Key: "$.options.output", Replacement: "output.json"},
+				{Key: "$.options.input", Replacement: "input.json"},
 				{Key: "$.statistics.result.custom.max_travel_duration", Replacement: golden.StableFloat},
 				{Key: "$.statistics.result.custom.min_travel_duration", Replacement: golden.StableFloat},
 				{Key: "$.statistics.result.custom.max_duration", Replacement: golden.StableFloat},
@@ -83,6 +83,7 @@ func TestPythonSolveGolden(t *testing.T) {
 			Thresholds: golden.Tresholds{
 				Float: 0.01,
 			},
+			GoldenExtension: ".python.golden",
 			ExecutionConfig: &golden.ExecutionConfig{
 				Command:    "python3",
 				Args:       []string{pythonFileDestination},
