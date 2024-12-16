@@ -88,13 +88,12 @@ def push_new_version(app: cloud.Application, tag: str) -> None:
 
 def run_acceptance_test(
     app: cloud.Application,
+    id: str,
     tag: str,
 ) -> cloud.AcceptanceTest:
     """
     Run an acceptance test between the candidate and baseline instances.
     """
-    id = f"auto-{tag}"
-    print(f"Running acceptance test with ID: {id}")
     print("Waiting for the test to complete...")
     result = app.new_acceptance_test_with_result(
         candidate_instance_id="candidate",
@@ -109,10 +108,6 @@ def run_acceptance_test(
             max_tries=1000,  # basically forever - we'll stop by duration
         ),
     )
-    passed = "unknown"
-    if result and result.results:
-        passed = "passed" if result.results.passed else "failed"
-    print(f"Acceptance test completed with status: {passed}")
     return result
 
 
@@ -123,6 +118,7 @@ def main():
     # Change to the directory of the app (sibling directory of this script)
     os.chdir(os.path.join(os.path.dirname(__file__), "..", "cmd"))
 
+    print("Making sure the working directory is clean...")
     ensure_clean_working_directory()
 
     client = cloud.Client(api_key=os.getenv("NEXTMV_API_KEY"))
@@ -130,9 +126,17 @@ def main():
 
     tag = get_tag(app)
 
+    print(f"Pushing new version with tag: {tag}")
     push_new_version(app, tag)
 
-    run_acceptance_test(app, tag)
+    id = f"auto-{tag}"
+    print(f"Running acceptance test with ID: {id}")
+    print("Waiting for it to complete...")
+    result = run_acceptance_test(app, tag)
+    passed = "unknown"
+    if result and result.results:
+        passed = "passed" if result.results.passed else "failed"
+    print(f"Acceptance test completed with status: {passed}")
 
 
 if __name__ == "__main__":
