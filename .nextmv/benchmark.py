@@ -64,9 +64,9 @@ def get_tag(app: cloud.Application) -> str:
             .replace(":", "")
             .replace("-", "")
         )
-        return f"{git_sha}-{ts}"
+        return f"auto-{git_sha}-{ts}"
     # Otherwise, we just use the git sha
-    return git_sha
+    return f"auto-{git_sha}"
 
 
 def push_new_version(app: cloud.Application, tag: str) -> None:
@@ -74,15 +74,14 @@ def push_new_version(app: cloud.Application, tag: str) -> None:
     Push a new version of the app and update the candidate instance to use it.
     """
     app.push(app_dir=".")
-    version_id = f"auto-{tag}"
     app.new_version(
-        id=version_id,
+        id=tag,
         name=f"Auto version {tag}",
         description=f"Automatically generated version {tag}",
     )
     app.update_instance(
         id="candidate",
-        version_id=version_id,
+        version_id=tag,
     )
 
 
