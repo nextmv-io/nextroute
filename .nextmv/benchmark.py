@@ -96,7 +96,6 @@ def run_acceptance_test(
     """
     Run an acceptance test between the candidate and baseline instances.
     """
-    print("Waiting for the test to complete...")
     result = app.new_acceptance_test_with_result(
         candidate_instance_id="candidate",
         baseline_instance_id="baseline",
