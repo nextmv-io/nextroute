@@ -1,128 +1,98 @@
 {
   "options": {
-    "check": {
-      "duration": 30000000000,
-      "verbosity": "off"
-    },
-    "format": {
-      "disable": {
-        "progression": true
-      }
-    },
-    "model": {
-      "constraints": {
-        "disable": {
-          "attributes": false,
-          "capacities": null,
-          "capacity": false,
-          "distance_limit": false,
-          "groups": false,
-          "maximum_duration": false,
-          "maximum_stops": false,
-          "maximum_wait_stop": false,
-          "maximum_wait_vehicle": false,
-          "mixing_items": false,
-          "precedence": false,
-          "start_time_windows": false,
-          "vehicle_end_time": false,
-          "vehicle_start_time": false
-        },
-        "enable": {
-          "cluster": false
-        }
-      },
-      "objectives": {
-        "capacities": "",
-        "cluster": 0,
-        "early_arrival_penalty": 1,
-        "late_arrival_penalty": 1,
-        "min_stops": 1,
-        "stop_balance": 0,
-        "travel_duration": 0,
-        "unplanned_penalty": 1,
-        "vehicle_activation_penalty": 1,
-        "vehicles_duration": 1
-      },
-      "properties": {
-        "disable": {
-          "duration_groups": false,
-          "durations": false,
-          "initial_solution": false,
-          "stop_duration_multipliers": false
-        },
-        "maximum_time_horizon": 2592000
-      },
-      "validate": {
-        "disable": {
-          "resources": false,
-          "start_time": false
-        },
-        "enable": {
-          "matrix": false,
-          "matrix_asymmetry_tolerance": 20
-        }
-      }
-    },
-    "solve": {
-      "duration": 10000000000,
-      "iterations": 50,
-      "parallel_runs": 1,
-      "run_deterministically": true,
-      "start_solutions": 1
-    }
+    "check_duration": 30,
+    "check_verbosity": "off",
+    "format_disable_progression": true,
+    "input": "../../../tests/golden/testdata/initial_stops_infeasible_remove_all.json",
+    "model_constraints_disable_attributes": false,
+    "model_constraints_disable_capacities": [],
+    "model_constraints_disable_capacity": false,
+    "model_constraints_disable_distancelimit": false,
+    "model_constraints_disable_groups": false,
+    "model_constraints_disable_maximumduration": false,
+    "model_constraints_disable_maximumstops": false,
+    "model_constraints_disable_maximumwaitstop": false,
+    "model_constraints_disable_maximumwaitvehicle": false,
+    "model_constraints_disable_mixingitems": false,
+    "model_constraints_disable_precedence": false,
+    "model_constraints_disable_starttimewindows": false,
+    "model_constraints_disable_vehicleendtime": false,
+    "model_constraints_disable_vehiclestarttime": false,
+    "model_constraints_enable_cluster": false,
+    "model_objectives_capacities": "",
+    "model_objectives_cluster": 0,
+    "model_objectives_earlyarrivalpenalty": 1,
+    "model_objectives_latearrivalpenalty": 1,
+    "model_objectives_minstops": 1,
+    "model_objectives_travelduration": 0,
+    "model_objectives_unplannedpenalty": 1,
+    "model_objectives_vehicleactivationpenalty": 1,
+    "model_objectives_vehiclesduration": 1,
+    "model_properties_disable_durationgroups": false,
+    "model_properties_disable_durations": false,
+    "model_properties_disable_initialsolution": false,
+    "model_properties_disable_stopdurationmultipliers": false,
+    "model_validate_disable_resources": false,
+    "model_validate_disable_starttime": false,
+    "model_validate_enable_matrix": false,
+    "model_validate_enable_matrixasymmetrytolerance": 20,
+    "output": "/tmp/output2809169781",
+    "solve_duration": 10,
+    "solve_iterations": 50,
+    "solve_parallelruns": 1,
+    "solve_rundeterministically": true,
+    "solve_startsolutions": 1
   },
-  "solutions": [
-    {
-      "objective": {
-        "name": "1 * vehicles_duration + 1 * unplanned_penalty",
-        "objectives": [
-          {
-            "factor": 1,
-            "name": "vehicles_duration",
-            "value": 0
-          },
-          {
-            "base": 60000,
-            "factor": 1,
-            "name": "unplanned_penalty",
-            "value": 60000
-          }
-        ],
-        "value": 60000
-      },
-      "unplanned": [
+  "solution": {
+    "objective": {
+      "name": "1 * vehicles_duration + 1 * unplanned_penalty",
+      "objectives": [
         {
-          "id": "stop1",
-          "location": {
-            "lat": 51.9636,
-            "lon": 7.6293
-          }
+          "factor": 1,
+          "name": "vehicles_duration",
+          "value": 0
         },
         {
-          "id": "stop2",
-          "location": {
-            "lat": 51.9635,
-            "lon": 7.6439
-          }
-        },
-        {
-          "id": "stop3",
-          "location": {
-            "lat": 51.9635,
-            "lon": 7.6585
-          }
+          "base": 60000,
+          "factor": 1,
+          "name": "unplanned_penalty",
+          "value": 60000
         }
       ],
-      "vehicles": [
-        {
-          "id": "v1",
-          "route": [],
-          "route_duration": 0,
-          "route_travel_duration": 0
+      "value": 60000
+    },
+    "unplanned": [
+      {
+        "id": "stop1",
+        "location": {
+          "lat": 51.9636,
+          "lon": 7.6293
         }
-      ]
-    }
-  ],
+      },
+      {
+        "id": "stop2",
+        "location": {
+          "lat": 51.9635,
+          "lon": 7.6439
+        }
+      },
+      {
+        "id": "stop3",
+        "location": {
+          "lat": 51.9635,
+          "lon": 7.6585
+        }
+      }
+    ],
+    "vehicles": [
+      {
+        "id": "v1",
+        "route": [],
+        "route_duration": 0,
+        "route_travel_duration": 0
+      }
+    ]
+  },
   "statistics": {
     "result": {
       "custom": {
@@ -143,8 +113,5 @@
       "iterations": 50
     },
     "schema": "v1"
-  },
-  "version": {
-    "sdk": "VERSION"
   }
 }
