@@ -52,7 +52,7 @@ def get_tag(app: cloud.Application) -> str:
     # If the version already exists, we append a timestamp to the tag
     exists = False
     try:
-        app.version(git_sha)
+        app.version(version_id)
         exists = True
     except Exception:
         pass
