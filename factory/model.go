@@ -46,7 +46,7 @@ type Options struct {
 			DurationGroups          bool `json:"duration_groups" usage:"ignore the durations groups of stops"`
 			InitialSolution         bool `json:"initial_solution" usage:"ignore the initial solution"`
 		} `json:"disable"`
-		MaximumTimeHorizon int `json:"maximum_time_horizon" usage:"maximum time horizon for the model in seconds" default:"2592000"`
+		MaximumTimeHorizon int `json:"maximum_time_horizon" usage:"maximum time horizon for the model in seconds" default:"15552000"`
 	} `json:"properties"`
 	Validate struct {
 		Disable struct {
