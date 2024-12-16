@@ -48,6 +48,7 @@ def get_tag(app: cloud.Application) -> str:
     """
     # If we don't have a tag, we generate one based on the git sha and a timestamp
     git_sha = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()[0:8]
+    version_id = f"auto-{git_sha}"
     # If the version already exists, we append a timestamp to the tag
     exists = False
     try:
@@ -64,9 +65,9 @@ def get_tag(app: cloud.Application) -> str:
             .replace(":", "")
             .replace("-", "")
         )
-        return f"auto-{git_sha}-{ts}"
+        return f"{version_id}-{ts}"
     # Otherwise, we just use the git sha
-    return f"auto-{git_sha}"
+    return version_id
 
 
 def push_new_version(app: cloud.Application, tag: str) -> None:
