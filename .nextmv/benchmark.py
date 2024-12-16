@@ -80,9 +80,11 @@ def push_new_version(app: cloud.Application, tag: str) -> None:
         name=f"Auto version {tag}",
         description=f"Automatically generated version {tag}",
     )
+    instance = app.instance("candidate")
     app.update_instance(
         id="candidate",
         version_id=tag,
+        name=instance.name,  # Name is required, but we don't want to change it
     )
 
 
