@@ -1,0 +1,2 @@
+nextmv>=0.14.1
+requests>=2.32.3

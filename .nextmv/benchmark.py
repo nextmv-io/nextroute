@@ -11,10 +11,13 @@ import os
 import subprocess
 from datetime import datetime, timezone
 
+import requests
 from nextmv import cloud
 
 APP_ID = "nextroute-bench"
-API_KEY = os.environ["NEXTMV_API_KEY"]
+API_KEY = os.environ["BENCHMARK_API_KEY_PROD"]
+SLACK_WEBHOOK = os.getenv("SLACK_URL_DEV_SCIENCE", None)
+BRANCH_NAME = os.getenv("BRANCH_NAME", None)
 
 
 METRICS = [
@@ -138,6 +141,22 @@ def main():
     if result and result.results:
         passed = "passed" if result.results.passed else "failed"
     print(f"Acceptance test completed with status: {passed}")
+
+    if SLACK_WEBHOOK and BRANCH_NAME == "develop":
+        print("Posting to Slack...")
+        response = requests.post(
+            SLACK_WEBHOOK,
+            json={
+                "text": f"Acceptance test {result.id} completed with status: {passed}",
+            },
+        )
+
+        if response.status_code != 200:
+            print(f"Failed to send notification to Slack: {response.text}")
+        else:
+            print("Notification sent to Slack")
+
+    print("Done")
 
 
 if __name__ == "__main__":
