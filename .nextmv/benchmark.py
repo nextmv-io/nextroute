@@ -134,7 +134,7 @@ def main():
     id = f"auto-{tag}"
     print(f"Running acceptance test with ID: {id}")
     print("Waiting for it to complete...")
-    result = run_acceptance_test(app, tag)
+    result = run_acceptance_test(app, id, tag)
     passed = "unknown"
     if result and result.results:
         passed = "passed" if result.results.passed else "failed"
