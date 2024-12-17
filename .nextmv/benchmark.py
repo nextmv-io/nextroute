@@ -146,7 +146,7 @@ def main():
     print("Making sure the working directory is clean...")
     ensure_clean_working_directory()
 
-    client = cloud.Client(api_key=os.getenv("NEXTMV_API_KEY"))
+    client = cloud.Client(api_key=API_KEY)
     app = cloud.Application(client=client, id=APP_ID)
 
     tag = get_tag(app)
