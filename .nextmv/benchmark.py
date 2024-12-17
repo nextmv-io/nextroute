@@ -173,7 +173,7 @@ def main():
         response = requests.post(
             SLACK_WEBHOOK,
             json={
-                "text": f"Acceptance test {result and result.id} completed with status: {passed}"
+                "text": f"nextroute acceptance test {result and result.id} completed with status: {passed}"
                 + f" (<{create_test_url(result and result.id)}|View results>)",
             },
         )
