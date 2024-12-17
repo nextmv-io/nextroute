@@ -17,6 +17,7 @@ from nextmv import cloud
 APP_ID = "nextroute-bench"
 API_KEY = os.environ["BENCHMARK_API_KEY_PROD"]
 SLACK_WEBHOOK = os.getenv("SLACK_URL_DEV_SCIENCE", None)
+ACCOUNT_ID = os.getenv("BENCHMARK_ACCOUNT_ID", None)
 BRANCH_NAME = os.getenv("BRANCH_NAME", None)
 
 
@@ -115,6 +116,26 @@ def run_acceptance_test(
     return result
 
 
+def create_test_url(result_id: str) -> str:
+    """
+    Create a URL to the acceptance test result.
+    """
+    if ACCOUNT_ID:
+        return f"https://cloud.nextmv.io/acc/{ACCOUNT_ID}/app/nextroute-bench/experiments/acceptance/{result_id}"
+    return "unavailable"
+
+
+def write_to_summary(content):
+    """Appends content to the GitHub Actions step summary (if available)."""
+    summary_file = os.getenv("GITHUB_STEP_SUMMARY")
+    if not summary_file:
+        return
+
+    # Write content to the summary file
+    with open(summary_file, "a") as f:
+        f.write(content + "\n")
+
+
 def main():
     """
     Main function that runs the benchmark.
@@ -134,6 +155,11 @@ def main():
     push_new_version(app, tag)
 
     id = f"auto-{tag}"
+    write_to_summary("# Acceptance Test Report")
+    write_to_summary("")
+    write_to_summary(f"ID: {id}")
+    write_to_summary(f"Link: [link]({create_test_url(id)})")
+
     print(f"Running acceptance test with ID: {id}")
     print("Waiting for it to complete...")
     result = run_acceptance_test(app, id, tag)
@@ -147,7 +173,8 @@ def main():
         response = requests.post(
             SLACK_WEBHOOK,
             json={
-                "text": f"Acceptance test {result.id} completed with status: {passed}",
+                "text": f"Acceptance test {result and result.id} completed with status: {passed}"
+                + f" (<{create_test_url(result and result.id)}|View results>)",
             },
         )
 
@@ -155,6 +182,17 @@ def main():
             print(f"Failed to send notification to Slack: {response.text}")
         else:
             print("Notification sent to Slack")
+
+    write_to_summary("")
+    write_to_summary(f"Result: {passed}")
+    if result and result.results:
+        if result.results.error:
+            write_to_summary(f"Error: {result.results.error}")
+        else:
+            write_to_summary("Metrics:")
+            write_to_summary("")
+            for metric in result.results.metric_results:
+                write_to_summary(f"- {metric.metric.field}: {metric.passed}")
 
     print("Done")
 
