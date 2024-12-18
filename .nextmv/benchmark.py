@@ -92,6 +92,18 @@ def push_new_version(app: cloud.Application, tag: str) -> None:
     )
 
 
+def upgrade_baseline(app: cloud.Application, version_id: str) -> None:
+    """
+    Upgrade the baseline instance to use the new version.
+    """
+    instance = app.instance("baseline")
+    app.update_instance(
+        id="baseline",
+        version_id=version_id,
+        name=instance.name,  # Name is required, but we don't want to change it
+    )
+
+
 def run_acceptance_test(
     app: cloud.Application,
     id: str,
@@ -193,6 +205,10 @@ def main():
             write_to_summary("")
             for metric in result.results.metric_results:
                 write_to_summary(f"- {metric.metric.field}: {metric.passed}")
+
+    if BRANCH_NAME == "develop":
+        print("Upgrading baseline instance to use the new version...")
+        upgrade_baseline(app, tag)
 
     print("Done")
 
