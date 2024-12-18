@@ -1,2 +1,2 @@
-nextmv>=v0.14.2-dev.0
+nextmv>=v0.14.2
 requests>=2.32.3
