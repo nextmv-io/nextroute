@@ -8,8 +8,6 @@ env:
 jobs:
   auto-benchmark:
     runs-on: ubuntu-latest
-    env:
-      BENCHMARK_ACCOUNT_ID: ${{ vars.BENCHMARK_ACCOUNT_ID }}
     steps:
       - name: git clone
         uses: actions/checkout@v4
@@ -30,6 +28,8 @@ jobs:
           pip install -r .nextmv/benchmark.requirements.txt
 
       - name: run acceptance test
+        env:
+          BENCHMARK_ACCOUNT_ID: ${{ vars.BENCHMARK_ACCOUNT_ID }}
         run: |
           export BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
           export BENCHMARK_API_KEY_PROD=${{ secrets.BENCHMARK_API_KEY_PROD }}
