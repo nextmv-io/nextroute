@@ -67,6 +67,12 @@
       "duration": 11000000000,
       "iterations": 51,
       "parallel_runs": 1,
+      "plateau": {
+        "absolute_threshold": -1,
+        "duration": 0,
+        "iterations": 0,
+        "relative_threshold": 0
+      },
       "run_deterministically": true,
       "start_solutions": 1
     }
