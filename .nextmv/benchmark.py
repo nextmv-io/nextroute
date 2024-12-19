@@ -134,7 +134,7 @@ def create_test_url(result_id: str) -> str:
     Create a URL to the acceptance test result.
     """
     if ACCOUNT_ID:
-        return f"https://cloud.nextmv.io/acc/{ACCOUNT_ID}/app/nextroute-bench/experiments/acceptance/{result_id}"
+        return f"https://cloud.nextmv.io/acc/{ACCOUNT_ID}/app/nextroute-bench/experiment/acceptance/{result_id}"
     return "unavailable"
 
 
@@ -170,7 +170,9 @@ def main():
     write_to_summary("# Acceptance Test Report")
     write_to_summary("")
     write_to_summary(f"ID: {id}")
-    write_to_summary(f"Link: [link]({create_test_url(id)})")
+    url = create_test_url(id)
+    write_to_summary(f"Link: [link]({url})")
+    print(f"::notice::Acceptance test URL: {url}")
 
     print(f"Running acceptance test with ID: {id}")
     print("Waiting for it to complete...")
