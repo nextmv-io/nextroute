@@ -32,7 +32,7 @@ METRICS = [
             ),
             operator=cloud.Comparison.less_than_or_equal_to,
         ),
-        statistic=cloud.StatisticType.mean,
+        statistic=cloud.StatisticType.shifted_geometric_mean,
     )
 ]
 
