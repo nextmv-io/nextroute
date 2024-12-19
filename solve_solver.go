@@ -30,10 +30,47 @@ type SolverOptions struct {
 	Restart IntParameterOptions `json:"restart"  usage:"restart parameter"`
 }
 
+// PlateauOptions define how the solver should react to plateaus, i.e., periods
+// without significant improvement in the best solution. The solver stops when
+// either the Duration or Iterations condition is met, depending on which occurs
+// first.
+type PlateauOptions struct {
+	// Duration is the maximum duration without (significant) improvement. I.e.,
+	// if the solver does not improve the best solution (significantly) within
+	// this duration, the solver will stop. A duration of 0 means that the
+	// solver will not check for (significant) improvements based on duration,
+	// only based on iterations. If both duration and iterations are set, the
+	// solver will stop if either one of the conditions is met. Default: 0s
+	// (time-based plateau detection disabled).
+	Duration time.Duration `json:"duration"  usage:"maximum duration without (significant) improvement" default:"0s"`
+	// Iterations is the maximum number of iterations without (significant)
+	// improvement. I.e., if the solver does not improve the best solution
+	// within this number of iterations, the solver will stop. A negative value
+	// means that the solver will not check for (significant) improvements based
+	// on iterations, only based on duration. Default: 0 (iteration-based
+	// plateau detection disabled).
+	Iterations int `json:"iterations"  usage:"maximum number of iterations without (significant) improvement" default:"0"`
+	// RelativeThreshold defines the minimum relative improvement of the best
+	// solution withing the plateau duration or iterations to be considered
+	// significant. E.g., a value of 0.1 means that the best solution must
+	// improve by at least 10% to be considered significant, thus resetting the
+	// plateau timer/counter. A negative value means that the relative threshold
+	// is disabled.
+	RelativeThreshold float64 `json:"relative_threshold"  usage:"relative threshold for significant improvement" default:"0.0"`
+	// AbsoluteThreshold defines the minimum absolute improvement of the best
+	// solution withing the plateau duration or iterations to be considered
+	// significant. E.g., a value of 10 means that the best solution must
+	// improve by at least 10 to be considered significant, thus resetting the
+	// plateau timer/counter. A negative value means that the absolute threshold
+	// is disabled.
+	AbsoluteThreshold float64 `json:"absolute_threshold"  usage:"absolute threshold for significant improvement" default:"-1.0"`
+}
+
 // SolveOptions holds the options for the solve process.
 type SolveOptions struct {
-	Iterations int           `json:"iterations"  usage:"maximum number of iterations, -1 assumes no limit" default:"-1"`
-	Duration   time.Duration `json:"duration"  usage:"maximum duration of solver in seconds" default:"30s"`
+	Iterations int            `json:"iterations"  usage:"maximum number of iterations, -1 assumes no limit" default:"-1"`
+	Duration   time.Duration  `json:"duration"  usage:"maximum duration of solver in seconds" default:"30s"`
+	Plateau    PlateauOptions `json:"plateau"  usage:"plateau options"`
 }
 
 // Solver is the interface for the Adaptive Local Neighborhood Search algorithm
@@ -89,6 +126,7 @@ type solveImpl struct {
 	random         *rand.Rand
 	solveOperators SolveOperators
 	parameters     SolveParameters
+	plateauTracker *plateauTracker
 	progression    []ProgressionEntry
 }
 
@@ -211,6 +249,11 @@ func (s *solveImpl) invoke(
 func (s *solveImpl) newBestSolution(solution Solution, solveInformation *solveInformationImpl) {
 	s.bestSolution = solution.Copy()
 	s.solveEvents.NewBestSolution.Trigger(solveInformation)
+	s.plateauTracker.onImprovement(
+		time.Since(solveInformation.Start()).Seconds(),
+		solveInformation.Iteration(),
+		solveInformation.Solver().BestSolution().Score(),
+	)
 }
 
 func (s *solveImpl) Solve(
@@ -252,6 +295,10 @@ func (s *solveImpl) Solve(
 		ctx,
 		start.Add(solveOptions.Duration),
 	)
+
+	if plateauTrackingActivated(solveOptions.Plateau) {
+		s.plateauTracker = newPlateauTracker(solveOptions.Plateau)
+	}
 
 	solveInformation := &solveInformationImpl{
 		iteration:      0,
@@ -304,6 +351,9 @@ func (s *solveImpl) Solve(
 							Solution: s.bestSolution,
 							Error:    nil,
 						}
+					}
+					if s.plateauTracker.IsStop(iteration, time.Since(start)) {
+						break Loop
 					}
 				}
 			}

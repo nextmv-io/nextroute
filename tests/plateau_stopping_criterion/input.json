@@ -1,0 +1,21 @@
+{
+  "defaults": {
+    "vehicles": {
+      "speed": 20,
+      "start_time": "2023-01-01T06:00:00-06:00",
+      "end_time": "2023-01-01T10:00:00-06:00"
+    }
+  },
+  "stops": [
+    {
+      "id": "Fushimi Inari Taisha",
+      "location": { "lon": 135.772695, "lat": 34.967146 }
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1",
+      "start_location": { "lon": 135.672009, "lat": 35.017209 }
+    }
+  ]
+}

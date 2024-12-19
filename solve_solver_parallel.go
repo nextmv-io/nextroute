@@ -21,11 +21,12 @@ const Iterations string = "iterations"
 
 // ParallelSolveOptions holds the options for the parallel solver.
 type ParallelSolveOptions struct {
-	Iterations           int           `json:"iterations"  usage:"maximum number of iterations, -1 assumes no limit; iterations are counted after start solutions are generated" default:"-1"`
-	Duration             time.Duration `json:"duration" usage:"maximum duration of the solver" default:"5s"`
-	ParallelRuns         int           `json:"parallel_runs" usage:"maximum number of parallel runs, -1 results in using all available resources" default:"-1"`
-	StartSolutions       int           `json:"start_solutions" usage:"number of solutions to generate on top of those passed in; one solution generated with sweep algorithm, the rest generated randomly" default:"-1"`
-	RunDeterministically bool          `json:"run_deterministically"  usage:"run the parallel solver deterministically"`
+	Iterations           int            `json:"iterations"  usage:"maximum number of iterations, -1 assumes no limit; iterations are counted after start solutions are generated" default:"-1"`
+	Duration             time.Duration  `json:"duration" usage:"maximum duration of the solver" default:"5s"`
+	Plateau              PlateauOptions `json:"plateau"  usage:"plateau options"`
+	ParallelRuns         int            `json:"parallel_runs" usage:"maximum number of parallel runs, -1 results in using all available resources" default:"-1"`
+	StartSolutions       int            `json:"start_solutions" usage:"number of solutions to generate on top of those passed in; one solution generated with sweep algorithm, the rest generated randomly" default:"-1"`
+	RunDeterministically bool           `json:"run_deterministically"  usage:"run the parallel solver deterministically"`
 }
 
 // ParallelSolver is the interface for parallel solver. The parallel solver will
@@ -136,6 +137,7 @@ type parallelSolverImpl struct {
 	parallelSolveEvents ParallelSolveEvents
 	solveOptionsFactory SolveOptionsFactory
 	solverFactory       SolverFactory
+	plateauTracker      *plateauTracker
 }
 
 func (s *parallelSolverImpl) ParallelSolveEvents() ParallelSolveEvents {
@@ -199,6 +201,7 @@ func (s *parallelSolverImpl) Solve(
 		ParallelRuns:         options.ParallelRuns,
 		StartSolutions:       options.StartSolutions,
 		RunDeterministically: options.RunDeterministically,
+		Plateau:              options.Plateau,
 	}
 
 	if interpretedParallelSolveOptions.ParallelRuns == -1 {
@@ -228,6 +231,10 @@ func (s *parallelSolverImpl) Solve(
 		if solution.Model() != s.model {
 			return nil, fmt.Errorf("start solution at index %v it's model does not match solver model", idx)
 		}
+	}
+
+	if plateauTrackingActivated(interpretedParallelSolveOptions.Plateau) {
+		s.plateauTracker = newPlateauTracker(interpretedParallelSolveOptions.Plateau)
 	}
 
 	start := time.Now()
@@ -284,6 +291,11 @@ func (s *parallelSolverImpl) Solve(
 				Value:          solutionContainer.Solution.Score(),
 				Iterations:     solutionContainer.Iterations,
 			})
+			s.plateauTracker.onImprovement(
+				time.Since(start).Seconds(),
+				solutionContainer.Iterations,
+				solutionContainer.Solution.Score(),
+			)
 		}
 	}
 
@@ -349,6 +361,12 @@ func (s *parallelSolverImpl) Solve(
 
 						solver.SolveEvents().Iterated.Register(func(_ SolveInformation) {
 							if totalIterations.Add(1) >= int64(interpretedParallelSolveOptions.Iterations) {
+								cancel()
+							}
+							if s.plateauTracker.IsStop(
+								int(totalIterations.Load()),
+								time.Since(start),
+							) {
 								cancel()
 							}
 						})
