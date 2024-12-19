@@ -45,15 +45,15 @@ def ensure_clean_working_directory():
         raise Exception("Working directory is not clean")
 
 
-def get_tag(app: cloud.Application) -> str:
+def get_id(app: cloud.Application) -> tuple[str, str]:
     """
-    Get the tag for the new version.
-    If the version already exists, we append a timestamp to the tag.
+    Get the ID for the new version (and just the tag).
+    If the version already exists, we append a timestamp to the ID.
     """
-    # If we don't have a tag, we generate one based on the git sha and a timestamp
-    git_sha = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()[0:8]
-    version_id = f"auto-{git_sha}"
-    # If the version already exists, we append a timestamp to the tag
+    # Create ID based on git sha.
+    tag = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()[0:8]
+    version_id = f"auto-{tag}"
+    # If the version already exists, we append a timestamp to the ID.
     exists = False
     try:
         app.version(version_id)
@@ -70,8 +70,9 @@ def get_tag(app: cloud.Application) -> str:
             .replace("-", "")
         )
         version_id = f"{version_id}-{ts}"
-    # Otherwise, we just use the git sha
-    return version_id
+        tag = f"{tag}-{ts}"
+    # Otherwise, we just use the git sha.
+    return version_id, tag
 
 
 def push_new_version(app: cloud.Application, tag: str) -> None:
@@ -161,12 +162,11 @@ def main():
     client = cloud.Client(api_key=API_KEY)
     app = cloud.Application(client=client, id=APP_ID)
 
-    tag = get_tag(app)
+    id, tag = get_id(app)  # id is used as version and acceptance test ID
 
-    print(f"Pushing new version with tag: {tag}")
-    push_new_version(app, tag)
+    print(f"Pushing new version with ID: {id}")
+    push_new_version(app, id)
 
-    id = f"auto-{tag}"
     write_to_summary("# Acceptance Test Report")
     write_to_summary("")
     write_to_summary(f"ID: {id}")
@@ -208,7 +208,7 @@ def main():
 
     if BRANCH_NAME == "develop":
         print("Upgrading baseline instance to use the new version...")
-        upgrade_baseline(app, tag)
+        upgrade_baseline(app, id)
 
     print("Done")
 
