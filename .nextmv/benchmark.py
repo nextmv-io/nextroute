@@ -172,7 +172,7 @@ def main():
     write_to_summary(f"ID: {id}")
     url = create_test_url(id)
     write_to_summary(f"Link: [link]({url})")
-    print(f"::notice::Acceptance test URL: {url}")
+    print(f"::notice::Acceptance test URL: {url}", flush=True)
 
     print(f"Running acceptance test with ID: {id}")
     print("Waiting for it to complete...")
