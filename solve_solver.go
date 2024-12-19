@@ -51,14 +51,14 @@ type PlateauOptions struct {
 	// plateau detection disabled).
 	Iterations int `json:"iterations"  usage:"maximum number of iterations without (significant) improvement" default:"0"`
 	// RelativeThreshold defines the minimum relative improvement of the best
-	// solution withing the plateau duration or iterations to be considered
+	// solution within the plateau duration or iterations to be considered
 	// significant. E.g., a value of 0.1 means that the best solution must
 	// improve by at least 10% to be considered significant, thus resetting the
 	// plateau timer/counter. A negative value means that the relative threshold
 	// is disabled.
 	RelativeThreshold float64 `json:"relative_threshold"  usage:"relative threshold for significant improvement" default:"0.0"`
 	// AbsoluteThreshold defines the minimum absolute improvement of the best
-	// solution withing the plateau duration or iterations to be considered
+	// solution within the plateau duration or iterations to be considered
 	// significant. E.g., a value of 10 means that the best solution must
 	// improve by at least 10 to be considered significant, thus resetting the
 	// plateau timer/counter. A negative value means that the absolute threshold
