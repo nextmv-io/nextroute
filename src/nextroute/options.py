@@ -89,6 +89,8 @@ class Options(BaseModel):
     """Factor to weigh the late arrival objective."""
     MODEL_OBJECTIVES_MINSTOPS: float = 1.0
     """Factor to weigh the min stops objective."""
+    MODEL_OBJECTIVES_STOPBALANCE: float = 0.0
+    """Factor to weigh the stop balance objective."""
     MODEL_OBJECTIVES_TRAVELDURATION: float = 0.0
     """Factor to weigh the travel duration objective."""
     MODEL_OBJECTIVES_UNPLANNEDPENALTY: float = 1.0
@@ -105,6 +107,8 @@ class Options(BaseModel):
     """Ignore the initial solution."""
     MODEL_PROPERTIES_DISABLE_STOPDURATIONMULTIPLIERS: bool = False
     """Ignore the stop duration multipliers defined on vehicles."""
+    MODEL_PROPERTIES_MAXIMUMTIMEHORIZON: int = 15552000
+    """Maximum time horizon for the model in seconds."""
     MODEL_VALIDATE_DISABLE_RESOURCES: bool = False
     """Disable the resources validation."""
     MODEL_VALIDATE_DISABLE_STARTTIME: bool = False
@@ -125,6 +129,14 @@ class Options(BaseModel):
     Maximum number of parallel runs, -1 results in using all available
     resources.
     """
+    SOLVE_PLATEAU_ABSOLUTETHRESHOLD: float = -1
+    """Absolute threshold for significant improvement."""
+    SOLVE_PLATEAU_DURATION: float = 0
+    """Maximum duration without (significant) improvement."""
+    SOLVE_PLATEAU_ITERATIONS: int = 0
+    """Maximum number of iterations without (significant) improvement."""
+    SOLVE_PLATEAU_RELATIVETHRESHOLD: float = 0
+    """Relative threshold for significant improvement."""
     SOLVE_RUNDETERMINISTICALLY: bool = False
     """Run the parallel solver deterministically."""
     SOLVE_STARTSOLUTIONS: int = -1
