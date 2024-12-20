@@ -360,11 +360,12 @@ func (s *parallelSolverImpl) Solve(
 						s.RegisterEvents(solver.SolveEvents())
 
 						solver.SolveEvents().Iterated.Register(func(_ SolveInformation) {
-							if totalIterations.Add(1) >= int64(interpretedParallelSolveOptions.Iterations) {
+							iterations := totalIterations.Add(1)
+							if iterations >= int64(interpretedParallelSolveOptions.Iterations) {
 								cancel()
 							}
-							if s.plateauTracker.IsStop(
-								int(totalIterations.Load()),
+							if s.plateauTracker.ShouldTerminate(
+								int(iterations),
 								time.Since(start),
 							) {
 								cancel()

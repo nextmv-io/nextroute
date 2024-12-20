@@ -52,8 +52,9 @@ func (t *plateauTracker) onImprovement(elapsed float64, iterations int, value fl
 	})
 }
 
-// IsStop returns true if the solver should stop due to a detected plateau.
-func (t *plateauTracker) IsStop(iterations int, elapsed time.Duration) bool {
+// ShouldTerminate returns true if the solver should terminate due to a detected
+// plateau.
+func (t *plateauTracker) ShouldTerminate(iterations int, elapsed time.Duration) bool {
 	if t == nil {
 		return false
 	}
@@ -72,7 +73,7 @@ func (t *plateauTracker) IsStop(iterations int, elapsed time.Duration) bool {
 		}
 		// If the duration index is at the end of the progression, no
 		// improvement was found within the cutoff.
-		if t.durationIndex == len(t.progression) {
+		if t.durationIndex >= len(t.progression) {
 			return true
 		}
 		// Compare the current value to the value at the duration index.
@@ -98,7 +99,7 @@ func (t *plateauTracker) IsStop(iterations int, elapsed time.Duration) bool {
 		}
 		// If the iterations index is at the end of the progression, no
 		// improvement was found within the cutoff.
-		if t.iterationsIndex == len(t.progression) {
+		if t.iterationsIndex >= len(t.progression) {
 			return true
 		}
 		// Compare the current value to the value at the iterations index.

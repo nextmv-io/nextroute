@@ -352,7 +352,7 @@ func (s *solveImpl) Solve(
 							Error:    nil,
 						}
 					}
-					if s.plateauTracker.IsStop(iteration, time.Since(start)) {
+					if s.plateauTracker.ShouldTerminate(iteration, time.Since(start)) {
 						break Loop
 					}
 				}
