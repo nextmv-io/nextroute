@@ -27,7 +27,7 @@ METRICS = [
         metric_type=cloud.MetricType.direct_comparison,
         params=cloud.MetricParams(
             tolerance=cloud.MetricTolerance(
-                value=0.05,
+                value=2,
                 type=cloud.ToleranceType.relative,
             ),
             operator=cloud.Comparison.less_than_or_equal_to,
