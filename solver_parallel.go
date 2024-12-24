@@ -86,6 +86,7 @@ func (p *parallelSolverWrapperImpl) Solve(
 		ParallelRuns:         solveOptions.ParallelRuns,
 		StartSolutions:       solveOptions.StartSolutions,
 		RunDeterministically: solveOptions.RunDeterministically,
+		Plateau:              solveOptions.Plateau,
 	}
 
 	if interpretedParallelSolveOptions.ParallelRuns == -1 {

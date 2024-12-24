@@ -3,7 +3,7 @@ module github.com/nextmv-io/nextroute
 go 1.21
 
 require (
-	github.com/nextmv-io/sdk v1.8.2
+	github.com/nextmv-io/sdk v1.8.3-0.20241219091227-002f36a342d6
 	gonum.org/v1/gonum v0.14.0
 )
 

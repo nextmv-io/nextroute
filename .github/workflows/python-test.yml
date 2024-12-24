@@ -26,10 +26,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Python unit tests
-        run: python -m unittest
-        working-directory: src
-
       # There appears to be a bug around
       # `nextmv-io/sdk@v1.8.0/golden/file.go:75` specifically in Windows. When
       # attempting to remove a temp file, the following error is encountered:
@@ -43,6 +39,10 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
+
+      - name: Python unit tests
+        run: python -m unittest
+        working-directory: src
 
       - name: golden file tests from Python package
         if: ${{ matrix.platform != 'windows-latest' }}

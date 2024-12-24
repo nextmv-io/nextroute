@@ -65,11 +65,11 @@
     },
     "solve": {
       "duration": 10000000000,
-      "iterations": 50,
+      "iterations": -1,
       "parallel_runs": 1,
       "plateau": {
         "absolute_threshold": -1,
-        "duration": 0,
+        "duration": 500000000,
         "iterations": 0,
         "relative_threshold": 0
       },
@@ -83,10 +83,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 1380,
+            "base": 536.4530622959137,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 1380
+            "value": 536.4530622959137
           },
           {
             "factor": 1,
@@ -94,7 +94,7 @@
             "value": 0
           }
         ],
-        "value": 1380
+        "value": 536.4530622959137
       },
       "unplanned": [],
       "vehicles": [
@@ -102,41 +102,25 @@
           "id": "v1",
           "route": [
             {
-              "arrival_time": "2023-01-01T12:00:00Z",
+              "arrival_time": "2023-01-01T06:00:00-06:00",
               "cumulative_travel_duration": 0,
-              "end_time": "2023-01-01T12:00:00Z",
-              "start_time": "2023-01-01T12:00:00Z",
+              "end_time": "2023-01-01T06:00:00-06:00",
+              "start_time": "2023-01-01T06:00:00-06:00",
               "stop": {
-                "id": "Nijō Castle",
+                "id": "v1-start",
                 "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
+                  "lat": 35.017209,
+                  "lon": 135.672009
                 }
               },
               "travel_duration": 0
             },
             {
-              "arrival_time": "2023-01-01T12:11:00Z",
-              "cumulative_travel_distance": 3994,
-              "cumulative_travel_duration": 660,
-              "end_time": "2023-01-01T12:11:00Z",
-              "start_time": "2023-01-01T12:11:00Z",
-              "stop": {
-                "id": "Kiyomizu-dera",
-                "location": {
-                  "lat": 34.994857,
-                  "lon": 135.78506
-                }
-              },
-              "travel_distance": 3994,
-              "travel_duration": 660
-            },
-            {
-              "arrival_time": "2023-01-01T12:23:00Z",
-              "cumulative_travel_distance": 7274,
-              "cumulative_travel_duration": 1380,
-              "end_time": "2023-01-01T12:23:00Z",
-              "start_time": "2023-01-01T12:23:00Z",
+              "arrival_time": "2023-01-01T06:08:56-06:00",
+              "cumulative_travel_distance": 10729,
+              "cumulative_travel_duration": 536,
+              "end_time": "2023-01-01T06:08:56-06:00",
+              "start_time": "2023-01-01T06:08:56-06:00",
               "stop": {
                 "id": "Fushimi Inari Taisha",
                 "location": {
@@ -144,13 +128,13 @@
                   "lon": 135.772695
                 }
               },
-              "travel_distance": 3280,
-              "travel_duration": 720
+              "travel_distance": 10729,
+              "travel_duration": 536
             }
           ],
-          "route_duration": 1380,
-          "route_travel_distance": 7274,
-          "route_travel_duration": 1380
+          "route_duration": 536,
+          "route_travel_distance": 10729,
+          "route_travel_duration": 536
         }
       ]
     }
@@ -159,20 +143,20 @@
     "result": {
       "custom": {
         "activated_vehicles": 1,
-        "max_duration": 0.123,
-        "max_stops_in_vehicle": 3,
-        "max_travel_duration": 0.123,
-        "min_duration": 0.123,
-        "min_stops_in_vehicle": 3,
-        "min_travel_duration": 0.123,
+        "max_duration": 536,
+        "max_stops_in_vehicle": 1,
+        "max_travel_duration": 536,
+        "min_duration": 536,
+        "min_stops_in_vehicle": 1,
+        "min_travel_duration": 536,
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 0.123
+      "value": 536.4530622959137
     },
     "run": {
-      "duration": 0.123,
-      "iterations": 50
+      "duration": 0.5,
+      "iterations": 123
     },
     "schema": "v1"
   },
