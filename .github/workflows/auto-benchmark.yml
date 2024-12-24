@@ -2,7 +2,7 @@ name: auto benchmark
 on:
   push:
     branches:
-      - "*"
+      - "**"
 
 env:
   GO_VERSION: 1.23
