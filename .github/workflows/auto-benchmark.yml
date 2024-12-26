@@ -1,0 +1,40 @@
+name: auto benchmark
+on:
+  push:
+    branches:
+      - "**"
+
+env:
+  GO_VERSION: 1.23
+  PYTHON_VERSION: 3.12
+
+jobs:
+  auto-benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: git clone
+        uses: actions/checkout@v4
+
+      - name: set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r .nextmv/benchmark.requirements.txt
+
+      - name: run acceptance test
+        env:
+          BENCHMARK_ACCOUNT_ID: ${{ vars.BENCHMARK_ACCOUNT_ID }}
+          BENCHMARK_API_KEY_PROD: ${{ secrets.BENCHMARK_API_KEY_PROD }}
+          SLACK_URL_DEV_SCIENCE: ${{ secrets.SLACK_URL_DEV_SCIENCE }}
+        run: |
+          export BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
+          python .nextmv/benchmark.py
