@@ -61,7 +61,7 @@ func sequenceGeneratorSync(pu SolutionPlanUnit, yield func(SolutionStops)) {
 		inDegree[arc.Destination().Index()]++
 	}
 
-	recSequenceGenerator(
+	recursiveSequenceGenerator(
 		solutionStops,
 		make([]SolutionStop, 0, nSolutionStops),
 		used,
@@ -74,7 +74,7 @@ func sequenceGeneratorSync(pu SolutionPlanUnit, yield func(SolutionStops)) {
 	)
 }
 
-func recSequenceGenerator(
+func recursiveSequenceGenerator(
 	stops []SolutionStop,
 	sequence SolutionStops,
 	used []bool,
@@ -85,10 +85,10 @@ func recSequenceGenerator(
 	yield func(SolutionStops),
 	directSuccessor int,
 ) {
-	nStops := len(stops)
 	if *maxSequences == 0 {
 		return
 	}
+	nStops := len(stops)
 	if len(sequence) == nStops {
 		*maxSequences--
 		if *maxSequences >= 0 {
@@ -134,7 +134,7 @@ func recSequenceGenerator(
 					}
 				}
 			}
-			recSequenceGenerator(
+			recursiveSequenceGenerator(
 				stops, append(sequence, stop), used, inDegree, dag, random, maxSequences, yield, directSuccessor,
 			)
 			// reached the maximum number of sequences

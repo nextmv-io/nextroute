@@ -112,7 +112,6 @@ func SolutionMoveStopsGenerator(
 		return
 	}
 
-	// TODO: we can reuse the stopPositions slice from m
 	positions := m.(*solutionMoveStopsImpl).stopPositions[:0]
 	positions = slices.Grow(positions, len(source))
 	for idx := range source {
