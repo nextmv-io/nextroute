@@ -76,15 +76,18 @@ func (t *plateauTracker) ShouldTerminate(iterations int, elapsed time.Duration) 
 		if t.durationIndex >= len(t.progression) {
 			return true
 		}
-		// Compare the current value to the value at the duration index.
+		// Compare the current value to the first value within the cutoff. It
+		// needs to be (significantly) better to avoid termination.
+		// Note: The cutoff value will always be larger than (or equal to) the
+		// current value, as we are minimizing.
 		cutoffValue := t.progression[t.durationIndex].Value
 		if t.options.AbsoluteThreshold >= 0 &&
-			currentValue-cutoffValue < t.options.AbsoluteThreshold {
+			cutoffValue-currentValue < t.options.AbsoluteThreshold {
 			return true
 		}
 		if t.options.RelativeThreshold >= 0 &&
 			currentValue > 0 && // Relative threshold is only supported for positive values.
-			(currentValue-cutoffValue)/currentValue < t.options.RelativeThreshold {
+			(cutoffValue-currentValue)/currentValue < t.options.RelativeThreshold {
 			return true
 		}
 	}
@@ -102,15 +105,18 @@ func (t *plateauTracker) ShouldTerminate(iterations int, elapsed time.Duration) 
 		if t.iterationsIndex >= len(t.progression) {
 			return true
 		}
-		// Compare the current value to the value at the iterations index.
+		// Compare the current value to the first value within the cutoff. It
+		// needs to be (significantly) better to avoid termination.
+		// Note: The cutoff value will always be larger than (or equal to) the
+		// current value, as we are minimizing.
 		cutoffValue := t.progression[t.iterationsIndex].Value
 		if t.options.AbsoluteThreshold >= 0 &&
-			currentValue-cutoffValue < t.options.AbsoluteThreshold {
+			cutoffValue-currentValue < t.options.AbsoluteThreshold {
 			return true
 		}
 		if t.options.RelativeThreshold >= 0 &&
 			currentValue > 0 && // Relative threshold is only supported for positive values.
-			(currentValue-cutoffValue)/currentValue < t.options.RelativeThreshold {
+			(cutoffValue-currentValue)/currentValue < t.options.RelativeThreshold {
 			return true
 		}
 	}
