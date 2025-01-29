@@ -59,6 +59,10 @@ func (t *plateauTracker) ShouldTerminate(iterations int, elapsed time.Duration) 
 		return false
 	}
 
+	if elapsed < t.options.Delay {
+		return false
+	}
+
 	currentValue := t.progression[len(t.progression)-1].Value
 
 	return t.shouldTerminateDuration(currentValue, elapsed) ||

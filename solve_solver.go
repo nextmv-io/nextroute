@@ -35,6 +35,10 @@ type SolverOptions struct {
 // either the Duration or Iterations condition is met, depending on which occurs
 // first.
 type PlateauOptions struct {
+	// Delay is the delay before plateau detection starts. This is useful to
+	// avoid stopping the solver too early, e.g., when the solver is still
+	// finding the first feasible solution. Default: 0s (no delay).
+	Delay time.Duration `json:"delay"  usage:"delay before plateau detection starts" default:"0s"`
 	// Duration is the maximum duration without (significant) improvement. I.e.,
 	// if the solver does not improve the best solution (significantly) within
 	// this duration, the solver will stop. A duration of 0 means that the
