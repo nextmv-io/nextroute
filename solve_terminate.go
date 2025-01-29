@@ -61,6 +61,13 @@ func (t *plateauTracker) ShouldTerminate(iterations int, elapsed time.Duration) 
 
 	currentValue := t.progression[len(t.progression)-1].Value
 
+	return t.shouldTerminateDuration(currentValue, elapsed) ||
+		t.shouldTerminateIterations(currentValue, iterations)
+}
+
+// shouldTerminateDuration returns true if the solver should terminate due to a
+// temporal plateau.
+func (t *plateauTracker) shouldTerminateDuration(currentValue float64, elapsed time.Duration) bool {
 	// Check if no significantly improving solutions were found during the
 	// configured duration.
 	cutoffSeconds := t.options.Duration.Seconds()
@@ -92,6 +99,12 @@ func (t *plateauTracker) ShouldTerminate(iterations int, elapsed time.Duration) 
 		}
 	}
 
+	return false
+}
+
+// shouldTerminateIterations returns true if the solver should terminate due to
+// an iterations based plateau.
+func (t *plateauTracker) shouldTerminateIterations(currentValue float64, iterations int) bool {
 	// Check if no significantly improving solutions were found during the
 	// configured iterations.
 	if t.options.Iterations > 0 && iterations >= t.options.Iterations {
