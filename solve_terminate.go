@@ -63,9 +63,9 @@ func (t *plateauTracker) ShouldTerminate(iterations int, elapsed time.Duration) 
 
 	// Check if no significantly improving solutions were found during the
 	// configured duration.
-	if t.options.Duration > 0 {
-		cutoffSeconds := t.options.Duration.Seconds()
-		elapsedSeconds := elapsed.Seconds()
+	cutoffSeconds := t.options.Duration.Seconds()
+	elapsedSeconds := elapsed.Seconds()
+	if cutoffSeconds > 0 && elapsedSeconds >= cutoffSeconds {
 		// Move the duration index to the first entry within the cutoff.
 		for t.durationIndex < len(t.progression) &&
 			(elapsedSeconds-t.progression[t.durationIndex].ElapsedSeconds) > cutoffSeconds {
@@ -94,7 +94,7 @@ func (t *plateauTracker) ShouldTerminate(iterations int, elapsed time.Duration) 
 
 	// Check if no significantly improving solutions were found during the
 	// configured iterations.
-	if t.options.Iterations > 0 {
+	if t.options.Iterations > 0 && iterations >= t.options.Iterations {
 		// Move the iterations index to the first entry within the cutoff.
 		for t.iterationsIndex < len(t.progression) &&
 			iterations-t.progression[t.iterationsIndex].Iterations > t.options.Iterations {
