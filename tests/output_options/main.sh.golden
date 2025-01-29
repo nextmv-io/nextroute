@@ -57,6 +57,7 @@
     "iterations": 50,
     "duration": 10000000000,
     "plateau": {
+      "delay": 0,
       "duration": 0,
       "iterations": 0,
       "relative_threshold": 0,
