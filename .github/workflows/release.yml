@@ -149,8 +149,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - image: ubuntu-latest
-            platform: linux
+          - image: ubuntu-24.04
+            platform: linux-amd64
+          - image: ubuntu-24.04-arm
+            platform: linux-arm64
           - image: macos-13
             platform: macos-amd64
           - image: macos-14
@@ -173,12 +175,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
-
-      - name: Set up QEMU
-        if: matrix.platform == 'linux'
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: all
 
       - name: Build wheels
         if: matrix.platform != 'macos-arm64'
