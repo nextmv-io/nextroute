@@ -237,6 +237,18 @@ func TestModel_NewPlanOneOfPlanUnits(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	if solution.UnPlannedPlanUnits().Size() != 1 {
+		t.Fatal("solution should have 1 un-planned plan units, it has", solution.UnPlannedPlanUnits().Size())
+	}
+
+	if solution.SolutionPlanUnit(dpu1ordpu2) != solution.UnPlannedPlanUnits().SolutionPlanUnits()[0] {
+		t.Fatal("The top-level plan unit should be unplanned")
+	}
+
+	if solution.PlannedPlanUnits().Size() != 0 {
+		t.Fatal("solution should have 0 planned plan units, it has", solution.PlannedPlanUnits().Size())
+	}
+
 	move := solution.BestMove(context.Background(), solution.SolutionPlanUnit(dpu1ordpu2))
 
 	if !move.IsExecutable() {
@@ -251,9 +263,75 @@ func TestModel_NewPlanOneOfPlanUnits(t *testing.T) {
 	for _, stop := range solution.Vehicles()[0].SolutionStops() {
 		fmt.Println(stop.ModelStop().ID())
 	}
+
+	if solution.UnPlannedPlanUnits().Size() != 0 {
+		t.Fatal("solution should have 0 un-planned plan units, it has", solution.UnPlannedPlanUnits().Size())
+	}
+
+	// The solutions has two planned plan units 
+	if solution.PlannedPlanUnits().Size() != 1 {
+		t.Fatal("solution should have 1 planned plan units, it has", solution.PlannedPlanUnits().Size())
+	}
+
+	if solution.SolutionPlanUnit(dpu1ordpu2) != solution.PlannedPlanUnits().SolutionPlanUnits()[0] {
+		t.Fatal("The top-level plan unit should be planned")
+	}
+
+	solutionPlanUnit := solution.SolutionPlanUnit(dpu1ordpu2) 
+	unplanned, err := solutionPlanUnit.UnPlan()
+
+	if !unplanned {
+		t.Fatal("Could not unplan OneOfPlanUnit")
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if solutionPlanUnit.IsPlanned() {
+		t.Fatal("Could not unplan OneOfPlanUnit")
+	}
+
+	if solution.UnPlannedPlanUnits().Size() != 1 {
+		t.Fatal("solution should have 1 un-planned plan units, it has", solution.UnPlannedPlanUnits().Size())
+	}
+
+	if solution.PlannedPlanUnits().Size() != 0 {
+		t.Fatal("solution should have 0 planned plan units, it has", solution.PlannedPlanUnits().Size())
+	}
+
+	for _, stop := range solution.Vehicles()[0].SolutionStops() {
+		fmt.Println(stop.ModelStop().ID())
+	}
 }
 
 func TestPlanUnitsUnit(t *testing.T) {
+	testCases := []struct {
+		name                string
+		createPlanUnitsUnit func(model nextroute.Model, s1Unit, s2Unit nextroute.ModelPlanUnit) (nextroute.ModelPlanUnitsUnit, error)
+	}{
+		{
+			name: "PlanOneOfPlanUnits",
+			createPlanUnitsUnit: func(model nextroute.Model, s1Unit, s2Unit nextroute.ModelPlanUnit) (nextroute.ModelPlanUnitsUnit, error) {
+				return model.NewPlanOneOfPlanUnits(s1Unit, s2Unit)
+			},
+		},
+		{
+			name: "PlanAllPlanUnits",
+			createPlanUnitsUnit: func(model nextroute.Model, s1Unit, s2Unit nextroute.ModelPlanUnit) (nextroute.ModelPlanUnitsUnit, error) {
+				return model.NewPlanAllPlanUnits(true, s1Unit, s2Unit)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testPlanUnitsUnit(t, tc.createPlanUnitsUnit)
+		})
+	}
+}
+
+func testPlanUnitsUnit(t *testing.T, createPlanUnitsUnit func(model nextroute.Model, s1Unit, s2Unit nextroute.ModelPlanUnit) (nextroute.ModelPlanUnitsUnit, error)) {
 	model, err := nextroute.NewModel()
 	if err != nil {
 		t.Fatal(err)
@@ -294,7 +372,7 @@ func TestPlanUnitsUnit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	s1ors2Unit, err := model.NewPlanAllPlanUnits(true, s1Unit, s2Unit)
+	s1ors2Unit, err := createPlanUnitsUnit(model, s1Unit, s2Unit)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -355,6 +433,15 @@ func TestPlanUnitsUnit(t *testing.T) {
 	if !success {
 		t.Fatal("move should be successful")
 	}
+
+	if solution.PlannedPlanUnits().Size() != 1 {
+		t.Fatal("solution should have 1 planned plan units, it has", solution.PlannedPlanUnits().Size())
+	}
+
+	if solution.UnPlannedPlanUnits().Size() != 1 {
+		t.Fatal("solution should have 1 un-planned plan units, it has", solution.UnPlannedPlanUnits().Size())
+	}
+
 	move = solution.BestMove(
 		context.Background(),
 		solution.UnPlannedPlanUnits().SolutionPlanUnit(s3Unit),
@@ -373,6 +460,14 @@ func TestPlanUnitsUnit(t *testing.T) {
 	}
 	if !success {
 		t.Fatal("move should be successful")
+	}
+
+	if solution.PlannedPlanUnits().Size() != 2 {
+		t.Fatal("solution should have 2 planned plan units, it has", solution.PlannedPlanUnits().Size())
+	}
+
+	if solution.UnPlannedPlanUnits().Size() != 0 {
+		t.Fatal("solution should have 0 un-planned plan units, it has", solution.UnPlannedPlanUnits().Size())
 	}
 
 	/*

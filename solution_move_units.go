@@ -11,15 +11,6 @@ func newSolutionMoveUnits(
 	planUnit *solutionPlanUnitsUnitImpl,
 	moves SolutionMoves,
 ) solutionMoveUnitsImpl {
-	if len(moves) != len(planUnit.solutionPlanUnits) {
-		panic(
-			fmt.Sprintf("moves and SolutionPlanUnits must have the same length: %v != %v",
-				len(moves),
-				len(planUnit.solutionPlanUnits),
-			),
-		)
-	}
-
 	value := 0.0
 	for _, move := range moves {
 		value += move.Value()
@@ -68,8 +59,11 @@ func (m solutionMoveUnitsImpl) Execute(ctx context.Context) (bool, error) {
 
 	m.solution.model.OnPlan(m)
 
-	m.solution.unPlannedPlanUnits.remove(m.planUnit)
-	m.solution.plannedPlanUnits.add(m.planUnit)
+	// Guarding against nested plan units unit. Only the top-level plan unit should be part of the accounting
+	if _, isElementOfPlanUnitsUnit := m.planUnit.ModelPlanUnit().PlanUnitsUnit(); !isElementOfPlanUnitsUnit {
+		m.solution.unPlannedPlanUnits.remove(m.planUnit)
+		m.solution.plannedPlanUnits.add(m.planUnit)
+	}
 
 	for idx, move := range m.moves {
 		if planned, err := move.Execute(ctx); err != nil || !planned {

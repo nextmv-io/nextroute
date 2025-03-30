@@ -353,12 +353,15 @@ func (v SolutionVehicle) bestMovePlanOneOfUnit(
 ) SolutionMove {
 	move := NotExecutableMove
 
-	for _, planUnit := range planUnit.solutionPlanUnits {
+	for _, pu := range planUnit.solutionPlanUnits {
 		move = move.TakeBest(
-			v.BestMove(ctx, planUnit),
+			v.BestMove(ctx, pu),
 		)
 	}
-	return move
+
+	// This returns a SolutionMoveUnits wrapper around the move. Otherwise the move cannot remove
+	// the plan unit from the solution when move.Execute() is called.
+	return newSolutionMoveUnits(planUnit, SolutionMoves{move})
 }
 
 func revertMoves(moves SolutionMoves) (bool, error) {
