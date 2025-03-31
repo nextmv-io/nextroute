@@ -103,7 +103,8 @@ func (l Location) Latitude() float64 {
 
 // Equals returns true if the invoking location is equal to the other location.
 func (l Location) Equals(other Location) bool {
-	return l.longitude == other.Longitude() && l.latitude == other.Latitude()
+	const tolerance = 0.000001
+	return WithinTolerance(l.latitude, other.latitude, tolerance) && WithinTolerance(l.longitude, other.longitude, tolerance)
 }
 
 // IsValid returns true if the location is valid. A location is valid if
