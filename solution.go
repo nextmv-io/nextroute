@@ -4,6 +4,7 @@ package nextroute
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 	"math/rand"
@@ -475,12 +476,10 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 
 				if isViolated {
 					if solutionPlanUnit.IsFixed() {
-						return fmt.Errorf(
-							reportInfeasibleInitialSolution(
-								move,
-								constraint,
-							),
-						)
+						return errors.New(reportInfeasibleInitialSolution(
+							move,
+							constraint,
+						))
 					}
 					infeasiblePlanUnits[solutionPlanUnit] = true
 					continue PlanUnitLoop
@@ -497,12 +496,10 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 			}
 			if constraint != nil {
 				if planUnit.IsFixed() {
-					return fmt.Errorf(
-						reportInfeasibleInitialSolution(
-							move,
-							solutionObserver.Constraint(),
-						),
-					)
+					return errors.New(reportInfeasibleInitialSolution(
+						move,
+						solutionObserver.Constraint(),
+					))
 				}
 				for _, position := range move.(*solutionMoveStopsImpl).stopPositions {
 					position.Stop().detach()

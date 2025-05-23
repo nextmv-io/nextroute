@@ -162,18 +162,16 @@ func (s *solveObserverImpl) Register(solver nextroute.Solver) error {
 			previousID := solutionVehicle.First().ModelStop().ID()
 			lastID := solutionVehicle.Last().ModelStop().ID()
 			for _, solutionStop := range solutionVehicle.SolutionStops() {
-				_, err := s.file.WriteString(
-					fmt.Sprintf("s;%v;%v;%s;%s;%s;%s%s;%f;%f\n",
-						time.Since(s.start).Nanoseconds(),
-						s.step,
-						solutionVehicle.ModelVehicle().ID(),
-						previousID,
-						solutionStop.ModelStop().ID(),
-						lastID,
-						score,
-						solution.Score(),
-						0.0,
-					),
+				_, err := fmt.Fprintf(s.file, "s;%v;%v;%s;%s;%s;%s%s;%f;%f\n",
+					time.Since(s.start).Nanoseconds(),
+					s.step,
+					solutionVehicle.ModelVehicle().ID(),
+					previousID,
+					solutionStop.ModelStop().ID(),
+					lastID,
+					score,
+					solution.Score(),
+					0.0,
 				)
 				if err != nil {
 					panic(err)
@@ -189,13 +187,11 @@ func (s *solveObserverImpl) Register(solver nextroute.Solver) error {
 			solution nextroute.Solution,
 			info nextroute.SolveInformation,
 		) {
-			_, err := s.file.WriteString(
-				fmt.Sprintf("r;%v;%v;%v;%f\n",
-					time.Since(s.start).Nanoseconds(),
-					s.step,
-					info.Solver().WorkSolution().Score(),
-					solution.Score(),
-				),
+			_, err := fmt.Fprintf(s.file, "r;%v;%v;%v;%f\n",
+				time.Since(s.start).Nanoseconds(),
+				s.step,
+				info.Solver().WorkSolution().Score(),
+				solution.Score(),
 			)
 			if err != nil {
 				panic(err)
@@ -211,13 +207,11 @@ func (s *solveObserverImpl) Register(solver nextroute.Solver) error {
 			for _, term := range info.Solver().BestSolution().Model().Objective().Terms() {
 				score += fmt.Sprintf(";%f", info.Solver().BestSolution().ObjectiveValue(term.Objective()))
 			}
-			_, err := s.file.WriteString(
-				fmt.Sprintf("b;%v;%v%s;%f\n",
-					time.Since(s.start).Nanoseconds(),
-					s.step,
-					score,
-					info.Solver().BestSolution().Score(),
-				),
+			_, err := fmt.Fprintf(s.file, "b;%v;%v%s;%f\n",
+				time.Since(s.start).Nanoseconds(),
+				s.step,
+				score,
+				info.Solver().BestSolution().Score(),
 			)
 			if err != nil {
 				panic(err)
@@ -239,19 +233,18 @@ func (s *solveObserverImpl) Register(solver nextroute.Solver) error {
 		}
 	})
 
-	_, err := s.file.WriteString(
-		fmt.Sprintf(
-			"o;%v;%v",
-			time.Since(s.start).Nanoseconds(),
-			len(solver.Model().Objective().Terms()),
-		),
+	_, err := fmt.Fprintf(
+		s.file,
+		"o;%v;%v",
+		time.Since(s.start).Nanoseconds(),
+		len(solver.Model().Objective().Terms()),
 	)
 	if err != nil {
 		panic(err)
 	}
 
 	for _, term := range solver.Model().Objective().Terms() {
-		_, err = s.file.WriteString(fmt.Sprintf(";%f;%v", term.Factor(), term.Objective()))
+		_, err = fmt.Fprintf(s.file, ";%f;%v", term.Factor(), term.Objective())
 
 		if err != nil {
 			panic(err)
@@ -305,7 +298,7 @@ func (s *solveObserverImpl) OnUnPlanFailed(
 		return
 	}
 
-	_, err := s.file.WriteString(fmt.Sprintf("~;unplan failed: %v\n", planUnit))
+	_, err := fmt.Fprintf(s.file, "~;unplan failed: %v\n", planUnit)
 	if err != nil {
 		panic(err)
 	}
@@ -355,18 +348,16 @@ func (s *solveObserverImpl) OnNewSolutionCreated(solution nextroute.Solution) {
 		previousID := solutionVehicle.First().ModelStop().ID()
 		lastID := solutionVehicle.Last().ModelStop().ID()
 		for _, solutionStop := range solutionVehicle.SolutionStops() {
-			_, err := s.file.WriteString(
-				fmt.Sprintf("s;%v;%v;%s;%s;%s;%s%s;%f;%f\n",
-					time.Since(s.start).Nanoseconds(),
-					s.step,
-					solutionVehicle.ModelVehicle().ID(),
-					previousID,
-					solutionStop.ModelStop().ID(),
-					lastID,
-					score,
-					solution.Score(),
-					0.0,
-				),
+			_, err := fmt.Fprintf(s.file, "s;%v;%v;%s;%s;%s;%s%s;%f;%f\n",
+				time.Since(s.start).Nanoseconds(),
+				s.step,
+				solutionVehicle.ModelVehicle().ID(),
+				previousID,
+				solutionStop.ModelStop().ID(),
+				lastID,
+				score,
+				solution.Score(),
+				0.0,
 			)
 			if err != nil {
 				panic(err)
@@ -432,7 +423,7 @@ func (s *solveObserverImpl) OnPlan(
 }
 
 func (s *solveObserverImpl) OnPlanFailed(move nextroute.SolutionMove, _ nextroute.ModelConstraint) {
-	_, err := s.file.WriteString(fmt.Sprintf("~;plan failed: %v\n", move))
+	_, err := fmt.Fprintf(s.file, "~;plan failed: %v\n", move)
 	if err != nil {
 		panic(err)
 	}

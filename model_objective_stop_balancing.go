@@ -24,8 +24,8 @@ func (t *balanceObjectiveImpl) Value(solution Solution) float64 {
 }
 
 func (t *balanceObjectiveImpl) maxStops(solution Solution, move SolutionMoveStops) (int, int) {
-	max := 0
-	maxBefore := 0
+	maximum := 0
+	maximumBefore := 0
 	moveExists := move != nil
 	var vehicle SolutionVehicle
 	if moveExists {
@@ -34,20 +34,20 @@ func (t *balanceObjectiveImpl) maxStops(solution Solution, move SolutionMoveStop
 
 	for _, v := range solution.(*solutionImpl).vehicles {
 		numberOfStops := v.NumberOfStops()
-		if max < numberOfStops {
-			max = numberOfStops
+		if maximum < numberOfStops {
+			maximum = numberOfStops
 		}
-		if maxBefore < numberOfStops {
-			maxBefore = numberOfStops
+		if maximumBefore < numberOfStops {
+			maximumBefore = numberOfStops
 		}
 		if moveExists && v.Index() == vehicle.Index() {
 			length := move.StopPositionsLength()
-			if max < numberOfStops+length {
-				max = numberOfStops + length
+			if maximum < numberOfStops+length {
+				maximum = numberOfStops + length
 			}
 		}
 	}
-	return maxBefore, max
+	return maximumBefore, maximum
 }
 
 func (t *balanceObjectiveImpl) String() string {
