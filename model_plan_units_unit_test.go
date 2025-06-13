@@ -296,6 +296,11 @@ func TestModel_NewPlanOneOfPlanUnits(t *testing.T) {
 		t.Fatal("solution should have 1 un-planned plan units, it has", solution.UnPlannedPlanUnits().Size())
 	}
 
+	if solutionPlanUnit != solution.UnPlannedPlanUnits().SolutionPlanUnits()[0] {
+		t.Fatal("The top-level plan unit should be unplanned")
+	}
+
+
 	if solution.PlannedPlanUnits().Size() != 0 {
 		t.Fatal("solution should have 0 planned plan units, it has", solution.PlannedPlanUnits().Size())
 	}
