@@ -40,10 +40,8 @@ func addDistanceLimitConstraint(
 		// Check if custom data is set properly.
 		data, ok := vehicleType.Data().(vehicleTypeData)
 		if !ok {
-			return nil, fmt.Errorf(
-				fmt.Sprintf("could not read custom data for vehicle %s",
-					vehicleType.ID(),
-				),
+			return nil, fmt.Errorf("could not read custom data for vehicle %s",
+				vehicleType.ID(),
 			)
 		}
 

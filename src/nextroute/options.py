@@ -16,6 +16,8 @@ from nextroute.base_model import BaseModel
 _DURATIONS_ARGS = [
     "-check.duration",
     "-solve.duration",
+    "-solve.plateau.duration",
+    "-solve.plateau.delay",
 ]
 
 # Arguments that require a string enum.
@@ -129,13 +131,15 @@ class Options(BaseModel):
     Maximum number of parallel runs, -1 results in using all available
     resources.
     """
+    SOLVE_PLATEAU_DELAY: float = 0.0
+    """Delay before starting to monitor for a plateau."""
     SOLVE_PLATEAU_ABSOLUTETHRESHOLD: float = -1
     """Absolute threshold for significant improvement."""
-    SOLVE_PLATEAU_DURATION: float = 0
-    """Maximum duration without (significant) improvement."""
+    SOLVE_PLATEAU_DURATION: float = 0.0
+    """Maximum duration, in seconds, without (significant) improvement."""
     SOLVE_PLATEAU_ITERATIONS: int = 0
     """Maximum number of iterations without (significant) improvement."""
-    SOLVE_PLATEAU_RELATIVETHRESHOLD: float = 0
+    SOLVE_PLATEAU_RELATIVETHRESHOLD: float = 0.0
     """Relative threshold for significant improvement."""
     SOLVE_RUNDETERMINISTICALLY: bool = False
     """Run the parallel solver deterministically."""
