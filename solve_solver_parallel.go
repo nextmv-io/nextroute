@@ -311,7 +311,9 @@ func (s *parallelSolverImpl) Solve(
 	var waitGroup sync.WaitGroup
 
 	go func() {
-		defer close(syncResultChannel)
+		defer func() {
+			close(syncResultChannel)
+		}()
 		runCount := 0
 	Loop:
 		for {
@@ -379,13 +381,20 @@ func (s *parallelSolverImpl) Solve(
 							panic(err)
 						}
 
+						// Adjust the total iterations left by the ones we are
+						// about to run.
 						updatedIterations := iterationsLeft.Add(int64(opt.Iterations) * -1)
-						if updatedIterations+int64(opt.Iterations) <= 0 {
+						// Make sure we do not run more iterations than left.
+						if updatedIterations < 0 {
+							opt.Iterations += int(updatedIterations)
+						}
+						// If we are out of iterations stop this run.
+						if opt.Iterations <= 0 {
+							if totalIterations.Load() >= int64(interpretedParallelSolveOptions.Iterations) {
+								cancel()
+							}
 							<-ctx.Done()
 							return
-						}
-						if updatedIterations < 0 {
-							opt.Iterations = int(updatedIterations + int64(opt.Iterations))
 						}
 
 						s.ParallelSolveEvents().StartSolver.Trigger(
