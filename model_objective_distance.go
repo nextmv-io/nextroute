@@ -71,7 +71,6 @@ func (d *distanceObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float
 		if successor.IsPlanned() {
 			delta += distanceExpr.Value(vehicleType, modelStop, successor.ModelStop())
 		}
-
 	}
 
 	return delta
