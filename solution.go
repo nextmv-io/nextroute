@@ -138,8 +138,8 @@ func NewSolution(
 		slack:                    make([]float64, 0, nrStops),
 		start:                    make([]float64, 0, nrStops),
 		end:                      make([]float64, 0, nrStops),
-		values:                   make(map[int][]float64, nExpressions),
-		cumulativeValues:         make(map[int][]float64, nExpressions),
+		values:                   make([][]float64, nExpressions),
+		cumulativeValues:         make([][]float64, nExpressions),
 		stopToPlanUnit:           make([]*solutionPlanStopsUnitImpl, nrStops),
 		constraintStopData:       make(map[ModelConstraint][]Copier),
 		objectiveStopData:        make(map[ModelObjective][]Copier),
@@ -572,12 +572,12 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 type solutionImpl struct {
 	model                  Model
 	scores                 map[ModelObjective]float64
-	values                 map[int][]float64
+	values                 [][]float64
 	objectiveStopData      map[ModelObjective][]Copier
 	constraintStopData     map[ModelConstraint][]Copier
 	objectiveSolutionData  map[ModelObjective]Copier
 	constraintSolutionData map[ModelConstraint]Copier
-	cumulativeValues       map[int][]float64
+	cumulativeValues       [][]float64
 
 	// TODO: explore if stopToPlanUnit should rather contain interfaces
 	stopToPlanUnit       []*solutionPlanStopsUnitImpl
@@ -709,7 +709,7 @@ func (s *solutionImpl) Copy() Solution {
 		constraintSolutionData:   make(map[ModelConstraint]Copier, len(s.constraintSolutionData)),
 		objectiveSolutionData:    make(map[ModelObjective]Copier, len(s.objectiveSolutionData)),
 		cumulativeTravelDuration: cumulativeTravelDuration,
-		cumulativeValues:         make(map[int][]float64, len(s.cumulativeValues)),
+		cumulativeValues:         make([][]float64, len(s.cumulativeValues)),
 		stopToPlanUnit:           make([]*solutionPlanStopsUnitImpl, len(s.stopToPlanUnit)),
 		end:                      end,
 		first:                    first,
@@ -721,7 +721,7 @@ func (s *solutionImpl) Copy() Solution {
 		start:                    start,
 		stop:                     stop,
 		stopPosition:             stopPosition,
-		values:                   make(map[int][]float64, len(s.values)),
+		values:                   make([][]float64, len(s.values)),
 		vehicleIndices:           vehicleIndices,
 		random:                   random,
 		fixedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
