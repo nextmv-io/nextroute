@@ -311,9 +311,7 @@ func (s *parallelSolverImpl) Solve(
 	var waitGroup sync.WaitGroup
 
 	go func() {
-		defer func() {
-			close(syncResultChannel)
-		}()
+		defer close(syncResultChannel)
 		runCount := 0
 	Loop:
 		for {
