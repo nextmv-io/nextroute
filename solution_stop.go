@@ -64,7 +64,7 @@ func (v SolutionStop) ConstraintData(
 func (v SolutionStop) ObjectiveData(
 	objective ModelObjective,
 ) any {
-	return v.solution.objectiveValue(objective, v.index)
+	return v.solution.objectiveStopValue(objective, v.index)
 }
 
 // Value returns the value of the expression for the stop as a float64.

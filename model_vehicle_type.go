@@ -53,6 +53,11 @@ type ModelVehicleType interface {
 	// vehicle type.
 	SetTravelDurationExpression(expression TimeDependentDurationExpression) error
 
+	// DistanceExpression returns the distance expression of the vehicle type.
+	DistanceExpression() DistanceExpression
+	// SetDistanceExpression modifies the distance expression of the vehicle type.
+	SetDistanceExpression(expression DistanceExpression) error
+
 	// Vehicles returns the vehicles of this vehicle type.
 	Vehicles() ModelVehicles
 }
@@ -65,6 +70,7 @@ type vehicleTypeImpl struct {
 	model          Model
 	travelDuration TimeDependentDurationExpression
 	duration       DurationExpression
+	distance       DistanceExpression
 	id             string
 	vehicles       ModelVehicles
 	index          int
@@ -98,6 +104,10 @@ func (v *vehicleTypeImpl) TravelDurationExpression() TimeDependentDurationExpres
 
 func (v *vehicleTypeImpl) DurationExpression() DurationExpression {
 	return v.duration
+}
+
+func (v *vehicleTypeImpl) DistanceExpression() DistanceExpression {
+	return v.distance
 }
 
 func (v *vehicleTypeImpl) TemporalValues(
@@ -156,5 +166,18 @@ func (v *vehicleTypeImpl) SetDurationExpression(e DurationExpression) error {
 	}
 
 	v.duration = e
+	return nil
+}
+
+func (v *vehicleTypeImpl) SetDistanceExpression(expression DistanceExpression) error {
+	if v.model.IsLocked() {
+		return errors.New("cannot modify vehicle type (set distance expression) after model is locked")
+	}
+
+	if expression == nil {
+		return errors.New("cannot set distance expression to nil")
+	}
+
+	v.distance = expression
 	return nil
 }

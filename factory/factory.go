@@ -118,6 +118,10 @@ func appendObjectiveModifiers(
 		modifiers = append(modifiers, addActivationPenaltyObjective)
 	}
 
+	if options.Objectives.Distance > 0.0 {
+		modifiers = append(modifiers, addDistanceObjective)
+	}
+
 	if options.Objectives.TravelDuration > 0.0 {
 		modifiers = append(modifiers, addTravelDurationObjective)
 	}

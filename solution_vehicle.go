@@ -559,6 +559,17 @@ func (v SolutionVehicle) SolutionStops() SolutionStops {
 	return solutionStops
 }
 
+// ObjectiveData returns the value of the objective for the stop. The
+// objective value of a stop is set by the
+// ObjectiveStopDataUpdater.UpdateObjectiveStopData method of the objective.
+// If the objective is not set on the stop, nil is returned. If the stop is
+// unplanned, the objective value has no semantic meaning.
+func (v SolutionVehicle) ObjectiveData(
+	objective ModelObjective,
+) any {
+	return v.solution.objectiveVehicleValue(objective, v.index)
+}
+
 // ModelVehicle returns the modeled vehicle type of the vehicle.
 func (v SolutionVehicle) ModelVehicle() ModelVehicle {
 	return v.solution.model.Vehicle(v.solution.vehicleIndices[v.index])

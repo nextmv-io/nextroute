@@ -189,6 +189,7 @@ func newVehicleType(
 	vehicleType.SetData(vehicleTypeData{
 		DistanceExpression: distanceExpression,
 	})
+	vehicleType.SetDistanceExpression(distanceExpression)
 
 	return vehicleType, nil
 }

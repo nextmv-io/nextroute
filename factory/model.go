@@ -33,6 +33,7 @@ type Options struct {
 		EarlyArrivalPenalty      float64 `json:"early_arrival_penalty" usage:"factor to weigh the early arrival objective" default:"1.0"`
 		LateArrivalPenalty       float64 `json:"late_arrival_penalty" usage:"factor to weigh the late arrival objective" default:"1.0"`
 		VehicleActivationPenalty float64 `json:"vehicle_activation_penalty" usage:"factor to weigh the vehicle activation objective" default:"1.0"`
+		Distance                 float64 `json:"distance" usage:"factor to weigh the travel distance objective" default:"0.0"`
 		TravelDuration           float64 `json:"travel_duration" usage:"factor to weigh the travel duration objective" default:"0.0"`
 		VehiclesDuration         float64 `json:"vehicles_duration" usage:"factor to weigh the vehicles duration objective" default:"1.0"`
 		UnplannedPenalty         float64 `json:"unplanned_penalty" usage:"factor to weigh the unplanned objective" default:"1.0"`
