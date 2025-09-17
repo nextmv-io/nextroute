@@ -507,12 +507,13 @@ func (d *travelDurationExpression) Value(
 	from ModelStop,
 	to ModelStop,
 ) float64 {
+	model := vehicle.(*vehicleTypeImpl).model
 	return common.DurationValue(
 		common.NewDistance(
 			d.distanceExpression.Value(vehicle, from, to),
-			vehicle.Model().DistanceUnit(),
+			model.DistanceUnit(),
 		),
 		d.speed,
-		vehicle.Model().DurationUnit(),
+		model.DurationUnit(),
 	)
 }

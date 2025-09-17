@@ -220,15 +220,7 @@ func DurationValue(
 	speed Speed,
 	timeUnit time.Duration,
 ) float64 {
-	if timeUnit.Seconds() == 0 {
-		panic(
-			fmt.Errorf(
-				"time unit is zero in duration calculation",
-			),
-		)
-	}
 	seconds := distance.Value(Meters) / speed.Value(MetersPerSecond)
-
 	return seconds / timeUnit.Seconds()
 }
 

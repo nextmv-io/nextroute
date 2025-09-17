@@ -6,7 +6,7 @@ package common
 import "fmt"
 
 // DistanceUnit is the unit of distance.
-type DistanceUnit int
+type DistanceUnit float64
 
 // NewDistance returns a new distance.
 func NewDistance(
@@ -26,14 +26,15 @@ func NewDistance(
 	}
 }
 
+// The constants are encoded by their most common conversion factor to meters.
 const (
 	// Kilometers is 1000 meters.
-	Kilometers DistanceUnit = iota
+	Kilometers DistanceUnit = factorMetersToKilometers
 	// Meters is the distance travelled by light in a vacuum in
 	// 1/299,792,458 seconds.
-	Meters
+	Meters = 1.0
 	// Miles is 1609.34 meters.
-	Miles
+	Miles = factorMetersToMiles
 )
 
 const (
@@ -45,6 +46,10 @@ const (
 	factorKilometersToMeters = 1000
 	factorMilesToMeters      = 1609.34
 )
+
+func (d DistanceUnit) convertFromMeters() float64 {
+	return float64(d)
+}
 
 // String returns the string representation of the distance unit.
 func (d DistanceUnit) String() string {
@@ -67,12 +72,5 @@ type Distance struct {
 
 // Value returns the distance in the specified unit.
 func (d Distance) Value(unit DistanceUnit) float64 {
-	returnValue := d.meters
-	switch unit {
-	case Kilometers:
-		returnValue *= factorMetersToKilometers
-	case Miles:
-		returnValue *= factorMetersToMiles
-	}
-	return returnValue
+	return d.meters * unit.convertFromMeters()
 }

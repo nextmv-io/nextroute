@@ -201,7 +201,8 @@ func NewModel() (Model, error) {
 		distanceUnit:                   common.Meters,
 		durationUnit:                   time.Second,
 		epoch:                          time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
-		expressions:                    make(map[int]ModelExpression),
+		expressionsMap:                 make(map[int]ModelExpression),
+		expressions:                    make([]ModelExpression, 0),
 		isLocked:                       false,
 		objective:                      nil,
 		objectivesWithStopUpdater:      make(ModelObjectives, 0),
@@ -238,10 +239,12 @@ func NewModel() (Model, error) {
 type modelImpl struct {
 	epoch time.Time
 	modelDataImpl
-	objective                  ModelObjectiveSum
-	stopVehicles               map[int]int
-	random                     *rand.Rand
-	expressions                map[int]ModelExpression
+	objective      ModelObjectiveSum
+	stopVehicles   map[int]int
+	random         *rand.Rand
+	expressionsMap map[int]ModelExpression
+	// expressions holds the same values as expressionsMap but is used in the hot path for faster iteration.
+	expressions                []ModelExpression
 	constraintMap              map[CheckedAt]ModelConstraints
 	timeFormat                 string
 	constraints                ModelConstraints
@@ -284,15 +287,19 @@ func (m *modelImpl) SetTimeFormat(timeFormat string) {
 }
 
 func (m *modelImpl) Expressions() ModelExpressions {
-	expressions := make(ModelExpressions, 0, len(m.expressions))
-	for _, expression := range m.expressions {
+	return m.expressions
+}
+
+func (m *modelImpl) updateExpressions() {
+	// a bit expensive to execute after each addition, but additions are done only once during model setup
+	expressions := make(ModelExpressions, 0, len(m.expressionsMap))
+	for _, expression := range m.expressionsMap {
 		expressions = append(expressions, expression)
 	}
 	slices.SortStableFunc(expressions, func(i, j ModelExpression) int {
 		return i.Index() - j.Index()
 	})
-
-	return expressions
+	m.expressions = expressions
 }
 
 func (m *modelImpl) NewVehicle(
@@ -348,7 +355,7 @@ func (m *modelImpl) NewVehicleType(
 }
 
 func (m *modelImpl) addExpression(expression ModelExpression) error {
-	if existingExpression, ok := m.expressions[expression.Index()]; ok {
+	if existingExpression, ok := m.expressionsMap[expression.Index()]; ok {
 		if existingExpression.Name() != expression.Name() {
 			return fmt.Errorf(
 				"expression index %d already exists with name %s,"+
@@ -360,8 +367,9 @@ func (m *modelImpl) addExpression(expression ModelExpression) error {
 			)
 		}
 	} else {
-		m.expressions[expression.Index()] = expression
+		m.expressionsMap[expression.Index()] = expression
 	}
+	m.updateExpressions()
 	return nil
 }
 
