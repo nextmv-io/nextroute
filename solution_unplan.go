@@ -33,7 +33,7 @@ func UnplanIsland(
 				return err
 			}
 			for _, closeModelStop := range closestStops {
-				d := common.HaversineUnsafe(
+				d := haversineDistance(
 					solutionStop.ModelStop().Location(),
 					closeModelStop.Location()).Value(common.Meters)
 				if d <= distance.Value(common.Meters) {

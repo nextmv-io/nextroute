@@ -185,7 +185,7 @@ func compactness(
 	}
 	compactness := 0.0
 	for _, stop := range stops {
-		dist := common.HaversineUnsafe(centroid, stop.modelStop().Location())
+		dist := haversineDistance(centroid, stop.modelStop().Location())
 		compactness += dist.Value(common.Meters) * dist.Value(common.Meters)
 	}
 	return compactness
@@ -238,7 +238,7 @@ func (l *clusterImpl) estimateDeltaScore(
 		centroid := c.location
 
 		if asConstraint {
-			distanceToCentroid := common.HaversineUnsafe(
+			distanceToCentroid := haversineDistance(
 				centroid,
 				candidate.modelStop().Location(),
 			).Value(common.Meters)
@@ -252,7 +252,7 @@ func (l *clusterImpl) estimateDeltaScore(
 					Last().
 					ConstraintData(l).(*centroidData).location
 
-				if common.HaversineUnsafe(
+				if haversineDistance(
 					centroidOtherVehicle,
 					candidate.modelStop().Location(),
 				).Value(common.Meters) < distanceToCentroid {

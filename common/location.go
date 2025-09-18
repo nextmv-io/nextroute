@@ -27,11 +27,9 @@ func NewLocation(longitude float64, latitude float64) (Location, error) {
 // NewInvalidLocation creates a new invalid Location. Longitude and latitude
 // are not important.
 func NewInvalidLocation() Location {
-	return invalidLocation
-}
-
-var invalidLocation = Location{
-	longitudeRadians: math.NaN(),
+	return Location{
+		longitudeRadians: math.NaN(),
+	}
 }
 
 // Locations is a slice of Location.
@@ -99,16 +97,6 @@ func (l Location) Latitude() float64 {
 	return l.latitudeRadians * radiansToDegrees
 }
 
-// LatitudeRadians returns the latitude of the location in radians.
-func (l Location) LatitudeRadians() float64 {
-	return l.latitudeRadians
-}
-
-// LongitudeRadians returns the longitude of the location in radians.
-func (l Location) LongitudeRadians() float64 {
-	return l.longitudeRadians
-}
-
 // Equals returns true if the invoking location is equal to the other location.
 func (l Location) Equals(other Location) bool {
 	return l.longitudeRadians == other.longitudeRadians && l.latitudeRadians == other.latitudeRadians
@@ -118,6 +106,7 @@ func (l Location) Equals(other Location) bool {
 // the bounds of the longitude and latitude are correct.
 func (l Location) IsValid() bool {
 	// an invalid location is encoded as NaN in longitudeRadians
+	// comparing NaN to itself always returns false
 	return l.longitudeRadians == l.longitudeRadians
 }
 
