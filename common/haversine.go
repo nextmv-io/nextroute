@@ -30,7 +30,8 @@ func Haversine(from, to Location) (Distance, error) {
 
 // HaversineUnsafe calculates the distance between two locations using the
 // Haversine formula. This function does not check
-// if the locations are valid.
+// if the locations are valid. In case the locations are invalid, the result
+// will be 0.
 func HaversineUnsafe(from, to Location) Distance {
 	x1 := from.longitudeRadians
 	y1 := from.latitudeRadians
@@ -43,10 +44,13 @@ func HaversineUnsafe(from, to Location) Distance {
 	sdy := math.Sin(dy * 0.5)
 	sdx := math.Sin(dx * 0.5)
 	a := (sdy * sdy) + math.Cos(y1)*math.Cos(y2)*sdx*sdx
-
-	return Distance(
+	d := Distance(
 		2 * radius * math.Atan2(math.Sqrt(a), math.Sqrt(1-a)),
 	)
+	if math.IsNaN(float64(d)) {
+		return 0
+	}
+	return d
 }
 
 const (
