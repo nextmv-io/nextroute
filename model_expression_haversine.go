@@ -59,8 +59,15 @@ func (h *haversineExpression) Value(
 	from ModelStop,
 	to ModelStop,
 ) float64 {
+	fromLocation := from.Location()
+	toLocation := to.Location()
+	if !fromLocation.IsValid() || !toLocation.IsValid() {
+		// if any location is invalid by convention we return a 0
+		// distance
+		return 0
+	}
 	return common.HaversineUnsafe(
-		from.Location(),
-		to.Location(),
+		fromLocation,
+		toLocation,
 	).Value(vehicle.Model().DistanceUnit())
 }

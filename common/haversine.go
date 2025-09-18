@@ -44,13 +44,9 @@ func HaversineUnsafe(from, to Location) Distance {
 	sdy := math.Sin(dy * 0.5)
 	sdx := math.Sin(dx * 0.5)
 	a := (sdy * sdy) + math.Cos(y1)*math.Cos(y2)*sdx*sdx
-	d := Distance(
+	return Distance(
 		2 * radius * math.Atan2(math.Sqrt(a), math.Sqrt(1-a)),
 	)
-	if math.IsNaN(float64(d)) {
-		return 0
-	}
-	return d
 }
 
 const (
