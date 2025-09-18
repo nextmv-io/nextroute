@@ -2,6 +2,10 @@
 
 package nextroute
 
+import (
+	"slices"
+)
+
 // SolutionMoveStopsGeneratorChannel generates all possible moves for a given
 // vehicle and plan unit.
 //
@@ -108,11 +112,13 @@ func SolutionMoveStopsGenerator(
 		return
 	}
 
-	// TODO: we can reuse the stopPositions slice from m
-	positions := make([]StopPosition, len(source))
+	positions := m.(*solutionMoveStopsImpl).stopPositions[:0]
+	positions = slices.Grow(positions, len(source))
 	for idx := range source {
-		positions[idx].stopIndex = source[idx].index
-		positions[idx].solution = source[idx].solution
+		positions = append(positions, StopPosition{
+			stopIndex: source[idx].index,
+			solution:  source[idx].solution,
+		})
 	}
 
 	locations := make([]int, 0, len(source))
