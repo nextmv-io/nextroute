@@ -30,7 +30,7 @@ type FromStopExpression interface {
 
 	// SetValue sets the value of the expression for the given from stop.
 	SetValue(
-		stop ModelStop,
+		stop *ModelStop,
 		value float64,
 	) error
 }
@@ -41,7 +41,7 @@ type StopExpression interface {
 
 	// SetValue sets the value of the expression for the given to stop.
 	SetValue(
-		stop ModelStop,
+		stop *ModelStop,
 		value float64,
 	) error
 }
@@ -72,8 +72,8 @@ type FromToExpression interface {
 	// SetValue sets the value of the expression for the given
 	// from and to stops.
 	SetValue(
-		from ModelStop,
-		to ModelStop,
+		from *ModelStop,
+		to *ModelStop,
 		value float64,
 	) error
 }
@@ -87,8 +87,8 @@ type VehicleFromToExpression interface {
 	// from and to stops.
 	SetValue(
 		vehicle ModelVehicleType,
-		from ModelStop,
-		to ModelStop,
+		from *ModelStop,
+		to *ModelStop,
 		value float64,
 	) error
 }
@@ -246,11 +246,11 @@ func (d *distanceExpression) SetName(n string) {
 	d.name = n
 }
 
-func (d *distanceExpression) Value(v ModelVehicleType, from, to ModelStop) float64 {
+func (d *distanceExpression) Value(v ModelVehicleType, from, to *ModelStop) float64 {
 	return d.modelExpression.Value(v, from, to)
 }
 
-func (d *distanceExpression) Distance(v ModelVehicleType, from, to ModelStop) common.Distance {
+func (d *distanceExpression) Distance(v ModelVehicleType, from, to *ModelStop) common.Distance {
 	return common.NewDistance(d.Value(v, from, to), d.unit)
 }
 
@@ -297,7 +297,7 @@ func (s *fromExpression) DefaultValue() float64 {
 }
 
 func (s *fromExpression) SetValue(
-	stop ModelStop,
+	stop *ModelStop,
 	value float64,
 ) error {
 	if stop.Model().IsLocked() {
@@ -324,8 +324,8 @@ func (s *fromExpression) SetValue(
 
 func (s *fromExpression) Value(
 	_ ModelVehicleType,
-	from ModelStop,
-	_ ModelStop,
+	from *ModelStop,
+	_ *ModelStop,
 ) float64 {
 	index := from.Index()
 	if index >= len(s.values) || index < 0 {
@@ -377,7 +377,7 @@ func (s *toExpression) DefaultValue() float64 {
 }
 
 func (s *toExpression) SetValue(
-	stop ModelStop,
+	stop *ModelStop,
 	value float64,
 ) error {
 	if stop.Model().IsLocked() {
@@ -419,8 +419,8 @@ func expandSlice[T any](slice []T, defaultValue T, requiredLength, maxLength int
 
 func (s *toExpression) Value(
 	_ ModelVehicleType,
-	_ ModelStop,
-	to ModelStop,
+	_ *ModelStop,
+	to *ModelStop,
 ) float64 {
 	index := to.Index()
 	if index >= len(s.values) || index < 0 {
@@ -499,7 +499,7 @@ func (v *vehicleTypeExpressionImpl) ValueForVehicleType(
 
 func (v *vehicleTypeExpressionImpl) Value(
 	vehicleType ModelVehicleType,
-	_, _ ModelStop,
+	_, _ *ModelStop,
 ) float64 {
 	if vehicleType == nil {
 		panic("vehicle type is nil for vehicle type expression")
@@ -586,7 +586,7 @@ func (v *vehicleTypeDistanceExpressionImpl) DistanceForVehicleType(
 }
 
 func (v *vehicleTypeDistanceExpressionImpl) Distance(
-	vehicleType ModelVehicleType, _, _ ModelStop,
+	vehicleType ModelVehicleType, _, _ *ModelStop,
 ) common.Distance {
 	value := v.Value(vehicleType, nil, nil)
 	return common.NewDistance(value, common.Meters)
@@ -594,7 +594,7 @@ func (v *vehicleTypeDistanceExpressionImpl) Distance(
 
 func (v *vehicleTypeDistanceExpressionImpl) Value(
 	vehicleType ModelVehicleType,
-	_, _ ModelStop,
+	_, _ *ModelStop,
 ) float64 {
 	if vehicleType == nil {
 		panic("vehicle type is nil for vehicle type expression")
@@ -655,8 +655,8 @@ func (m *fromToExpression) DefaultValue() float64 {
 }
 
 func (m *fromToExpression) SetValue(
-	from ModelStop,
-	to ModelStop,
+	from *ModelStop,
+	to *ModelStop,
 	value float64,
 ) error {
 	if from.Model().IsLocked() {
@@ -679,8 +679,8 @@ func (m *fromToExpression) SetValue(
 
 func (m *fromToExpression) Value(
 	_ ModelVehicleType,
-	from ModelStop,
-	to ModelStop,
+	from *ModelStop,
+	to *ModelStop,
 ) float64 {
 	if _, ok := m.values[from.Index()]; ok {
 		if value, ok := m.values[from.Index()][to.Index()]; ok {
@@ -731,8 +731,8 @@ func (c *constantExpression) SetValue(value float64) error {
 
 func (c *constantExpression) Value(
 	_ ModelVehicleType,
-	_ ModelStop,
-	_ ModelStop,
+	_ *ModelStop,
+	_ *ModelStop,
 ) float64 {
 	return c.value
 }
@@ -789,8 +789,8 @@ func (m *vehicleTypeFromToExpression) DefaultValue() float64 {
 
 func (m *vehicleTypeFromToExpression) SetValue(
 	vehicle ModelVehicleType,
-	from ModelStop,
-	to ModelStop,
+	from *ModelStop,
+	to *ModelStop,
 	value float64,
 ) error {
 	if from.Model().IsLocked() {
@@ -816,8 +816,8 @@ func (m *vehicleTypeFromToExpression) SetValue(
 
 func (m *vehicleTypeFromToExpression) Value(
 	vehicle ModelVehicleType,
-	from ModelStop,
-	to ModelStop,
+	from *ModelStop,
+	to *ModelStop,
 ) float64 {
 	if _, ok := m.values[vehicle.Index()]; ok {
 		if _, ok := m.values[vehicle.Index()][from.Index()]; ok {

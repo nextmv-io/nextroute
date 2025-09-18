@@ -93,7 +93,7 @@ func (l *maximumWaitStopConstraintImpl) EstimateIsViolated(
 
 		wait := start - arrival
 
-		if wait > l.maxima.Value(nil, nil, to.modelStop()) {
+		if wait > l.maxima.Value(nil, nil, to.ModelStop()) {
 			return true, constNoPositionsHint
 		}
 
@@ -106,7 +106,7 @@ func (l *maximumWaitStopConstraintImpl) EstimateIsViolated(
 func (l *maximumWaitStopConstraintImpl) DoesStopHaveViolations(s SolutionStop) bool {
 	stop := s
 	return stop.StartValue()-stop.ArrivalValue() >
-		l.maxima.Value(nil, nil, stop.modelStop())
+		l.maxima.Value(nil, nil, stop.ModelStop())
 }
 
 func (l *maximumWaitStopConstraintImpl) IsTemporal() bool {

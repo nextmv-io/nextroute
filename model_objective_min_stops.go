@@ -18,7 +18,7 @@ type minStopsObjectiveImpl struct {
 func (t *minStopsObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float64 {
 	moveImpl := move.(*solutionMoveStopsImpl)
 	vehicle := moveImpl.vehicle()
-	modelVehicle := vehicle.ModelVehicle().(*modelVehicleImpl)
+	modelVehicle := vehicle.ModelVehicle()
 	minimum := int(t.minStops.ValueForVehicleType(modelVehicle.vehicleType))
 
 	vehicleStops := vehicle.NumberOfStops()
@@ -57,7 +57,7 @@ func (t *minStopsObjectiveImpl) Value(solution Solution) float64 {
 		if vehicleNumberOfStops == 0 {
 			continue
 		}
-		modelVehicle := vehicle.ModelVehicle().(*modelVehicleImpl)
+		modelVehicle := vehicle.ModelVehicle()
 		minimum := int(t.minStops.ValueForVehicleType(modelVehicle.vehicleType))
 		if vehicleNumberOfStops < minimum {
 			penaltySum += t.minStopsPenalty.ValueForVehicleType(modelVehicle.vehicleType) *

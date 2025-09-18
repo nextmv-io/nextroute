@@ -25,7 +25,7 @@ type AttributesConstraint interface {
 	// in any way. They are only used to determine compatibility between stops
 	// and vehicle types.
 	SetStopAttributes(
-		stop ModelStop,
+		stop *ModelStop,
 		stopAttributes []string,
 	) error
 	// SetVehicleTypeAttributes sets the attributes for the given vehicle type.
@@ -38,7 +38,7 @@ type AttributesConstraint interface {
 	) error
 	// StopAttributes returns the attributes for the given stop. The attributes
 	// are specified as a list of strings.
-	StopAttributes(stop ModelStop) []string
+	StopAttributes(stop *ModelStop) []string
 
 	// VehicleTypeAttributes returns the attributes for the given vehicle type.
 	// The attributes are specified as a list of strings.
@@ -117,7 +117,7 @@ func (l *attributesConstraintImpl) String() string {
 	return l.name
 }
 
-func (l *attributesConstraintImpl) StopAttributes(stop ModelStop) []string {
+func (l *attributesConstraintImpl) StopAttributes(stop *ModelStop) []string {
 	if attributes, hasAttributes := l.stopAttributes[stop.Index()]; hasAttributes {
 		return slices.Clone(attributes)
 	}
@@ -132,7 +132,7 @@ func (l *attributesConstraintImpl) VehicleTypeAttributes(vehicle ModelVehicleTyp
 }
 
 func (l *attributesConstraintImpl) SetStopAttributes(
-	stop ModelStop,
+	stop *ModelStop,
 	stopAttributes []string,
 ) error {
 	if stop.Model().IsLocked() {

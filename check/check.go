@@ -378,7 +378,7 @@ func toID(modelPlanUnit nextroute.ModelPlanUnit) []string {
 	if modelPlanStopsUnit, ok := modelPlanUnit.(nextroute.ModelPlanStopsUnit); ok {
 		return common.MapSlice(
 			modelPlanStopsUnit.Stops(),
-			func(stop nextroute.ModelStop) []string {
+			func(stop *nextroute.ModelStop) []string {
 				return []string{stop.ID()}
 			})
 	}

@@ -18,8 +18,8 @@ type ModelVehicleType interface {
 	// invalid, the returned travelDuration will be 0.
 	TemporalValues(
 		departure float64,
-		from ModelStop,
-		to ModelStop,
+		from *ModelStop,
+		to *ModelStop,
 	) (travelDuration, arrival, start, end float64)
 
 	// Index returns the index of the vehicle type.
@@ -102,8 +102,8 @@ func (v *vehicleTypeImpl) DurationExpression() DurationExpression {
 
 func (v *vehicleTypeImpl) TemporalValues(
 	departure float64,
-	from ModelStop,
-	to ModelStop,
+	from *ModelStop,
+	to *ModelStop,
 ) (travelDuration, arrival, start, end float64) {
 	if from.Location().IsValid() && to.Location().IsValid() {
 		travelDuration = v.travelDuration.ValueAtValue(
@@ -122,9 +122,8 @@ func (v *vehicleTypeImpl) TemporalValues(
 		to,
 	)
 
-	stopImpl := to.(*stopImpl)
 	start = arrival
-	earliestStart := stopImpl.ToEarliestStartValue(arrival)
+	earliestStart := to.ToEarliestStartValue(arrival)
 	if earliestStart > start {
 		start = earliestStart
 	}

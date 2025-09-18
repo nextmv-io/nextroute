@@ -36,7 +36,7 @@ func TestNewSuccessorConstraintConstraint_EstimateIsViolated(t *testing.T) {
 	stop0 := model.Stops()[0]
 	stop2 := model.Stops()[2]
 
-	err = successorConstraint.DisallowSuccessors(stop0, []nextroute.ModelStop{stop2})
+	err = successorConstraint.DisallowSuccessors(stop0, []*nextroute.ModelStop{stop2})
 	if err != nil {
 		t.Error(err)
 	}
@@ -120,7 +120,7 @@ func TestSuccessorMovesGenerated(t *testing.T) {
 	stop1 := model.Stops()[1]
 	stop2 := model.Stops()[2]
 
-	err = successorConstraint.DisallowSuccessors(stop0, []nextroute.ModelStop{stop2})
+	err = successorConstraint.DisallowSuccessors(stop0, []*nextroute.ModelStop{stop2})
 	if err != nil {
 		t.Error(err)
 	}
@@ -237,7 +237,7 @@ func TestMultipleDisallowedSuccessors(t *testing.T) {
 	stop1 := model.Stops()[1]
 	stop2 := model.Stops()[2]
 
-	err = successorConstraint.DisallowSuccessors(stop0, []nextroute.ModelStop{stop1, stop2})
+	err = successorConstraint.DisallowSuccessors(stop0, []*nextroute.ModelStop{stop1, stop2})
 
 	if err != nil {
 		t.Error(err)
@@ -381,7 +381,7 @@ func TestUnplanSuccessorConstrained(t *testing.T) {
 	stop1 := model.Stops()[1]
 	stop2 := model.Stops()[2]
 
-	err = successorConstraint.DisallowSuccessors(stop0, []nextroute.ModelStop{stop1})
+	err = successorConstraint.DisallowSuccessors(stop0, []*nextroute.ModelStop{stop1})
 
 	if err != nil {
 		t.Error(err)

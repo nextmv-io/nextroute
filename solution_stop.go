@@ -331,12 +331,8 @@ func (v SolutionStop) IsZero() bool {
 }
 
 // ModelStop returns the ModelStop that is the basis of the SolutionStop.
-func (v SolutionStop) ModelStop() ModelStop {
+func (v SolutionStop) ModelStop() *ModelStop {
 	return v.solution.model.(*modelImpl).stops[v.solution.stop[v.index]]
-}
-
-func (v SolutionStop) modelStop() *stopImpl {
-	return v.solution.model.(*modelImpl).stops[v.solution.stop[v.index]].(*stopImpl)
 }
 
 // ModelStopIndex is the index of the ModelStop in the Model.

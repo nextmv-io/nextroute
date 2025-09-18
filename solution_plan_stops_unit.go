@@ -20,7 +20,7 @@ type SolutionPlanStopsUnit interface {
 
 	// SolutionStop returns the solution stop for the given model stop.
 	// Will panic if the stop is not part of the unit.
-	SolutionStop(stop ModelStop) SolutionStop
+	SolutionStop(stop *ModelStop) SolutionStop
 	// SolutionStops returns the solution stops in this unit.
 	SolutionStops() SolutionStops
 	// StopPositions returns the stop positions of the invoking plan unit.
@@ -44,11 +44,11 @@ func (p *solutionPlanStopsUnitImpl) String() string {
 	)
 }
 
-func (p *solutionPlanStopsUnitImpl) SolutionStop(stop ModelStop) SolutionStop {
+func (p *solutionPlanStopsUnitImpl) SolutionStop(stop *ModelStop) SolutionStop {
 	return p.solutionStop(stop)
 }
 
-func (p *solutionPlanStopsUnitImpl) solutionStop(stop ModelStop) SolutionStop {
+func (p *solutionPlanStopsUnitImpl) solutionStop(stop *ModelStop) SolutionStop {
 	for _, solutionStop := range p.solutionStops {
 		if solutionStop.ModelStop().Index() == stop.Index() {
 			return solutionStop

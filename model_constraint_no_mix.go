@@ -14,10 +14,10 @@ type NoMixConstraint interface {
 
 	// Insert returns the mix items that are associated with a stop that
 	// inserts items into a vehicle.
-	Insert() map[ModelStop]MixItem
+	Insert() map[*ModelStop]MixItem
 	// Remove returns the mix items that are associated with a stop that
 	// removes items from a vehicle.
-	Remove() map[ModelStop]MixItem
+	Remove() map[*ModelStop]MixItem
 	// Value returns the value of the constraint for a stop. The value is
 	// the amount of items on the vehicle at the moment of the stop. If
 	// the stop is unplanned, the value has no semantic meaning.
@@ -37,10 +37,10 @@ type MixItem struct {
 
 // NewNoMixConstraint returns a new NoMixConstraint.
 func NewNoMixConstraint(
-	deltas map[ModelStop]MixItem,
+	deltas map[*ModelStop]MixItem,
 ) (NoMixConstraint, error) {
-	insert := make(map[ModelStop]MixItem, len(deltas)/2)
-	remove := make(map[ModelStop]MixItem, len(deltas)/2)
+	insert := make(map[*ModelStop]MixItem, len(deltas)/2)
+	remove := make(map[*ModelStop]MixItem, len(deltas)/2)
 	for stop, delta := range deltas {
 		if delta.Quantity > 0 {
 			insert[stop] = MixItem{
@@ -66,8 +66,8 @@ func NewNoMixConstraint(
 }
 
 func validate(
-	insert map[ModelStop]MixItem,
-	remove map[ModelStop]MixItem,
+	insert map[*ModelStop]MixItem,
+	remove map[*ModelStop]MixItem,
 ) error {
 	if len(insert) == 0 && len(remove) == 0 {
 		return nil
@@ -82,7 +82,7 @@ func validate(
 	}
 	deltaPerPlanUnit := make(map[ModelPlanStopsUnit]int)
 	namePerPlanUnit := make(map[ModelPlanStopsUnit]string)
-	stops := make(map[ModelStop]string, len(insert)+len(remove))
+	stops := make(map[*ModelStop]string, len(insert)+len(remove))
 	for stop, i := range insert {
 		if t, ok := stops[stop]; ok {
 			return fmt.Errorf("no-mix constraint, stop %v has two items [%v, %v], a stop can only have one item",
@@ -106,7 +106,7 @@ func validate(
 		}
 		namePerPlanUnit[stop.PlanStopsUnit()] = i.Name
 	}
-	inRemove := make(map[ModelStop]string, len(remove))
+	inRemove := make(map[*ModelStop]string, len(remove))
 	for stop, r := range remove {
 		if t, ok := inRemove[stop]; ok {
 			return fmt.Errorf("no-mix constraint, stop %v has two items [%v, %v], a stop can only have one item",
@@ -185,8 +185,8 @@ func validate(
 
 type noMixConstraintImpl struct {
 	modelConstraintImpl
-	insert map[ModelStop]MixItem
-	remove map[ModelStop]MixItem
+	insert map[*ModelStop]MixItem
+	remove map[*ModelStop]MixItem
 }
 
 type noMixSolutionStopData struct {
@@ -313,16 +313,16 @@ func (l *noMixConstraintImpl) UpdateConstraintStopData(
 	}, nil
 }
 
-func (l *noMixConstraintImpl) Insert() map[ModelStop]MixItem {
-	insert := make(map[ModelStop]MixItem, len(l.insert))
+func (l *noMixConstraintImpl) Insert() map[*ModelStop]MixItem {
+	insert := make(map[*ModelStop]MixItem, len(l.insert))
 	for stop, mixItem := range l.insert {
 		insert[stop] = mixItem
 	}
 	return insert
 }
 
-func (l *noMixConstraintImpl) Remove() map[ModelStop]MixItem {
-	remove := make(map[ModelStop]MixItem, len(l.remove))
+func (l *noMixConstraintImpl) Remove() map[*ModelStop]MixItem {
+	remove := make(map[*ModelStop]MixItem, len(l.remove))
 	for stop, mixItem := range l.remove {
 		remove[stop] = mixItem
 	}

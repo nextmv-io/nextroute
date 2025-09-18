@@ -69,7 +69,7 @@ type Model interface {
 	// NewPlanSingleStop creates a new plan unit. A plan single stop
 	// is a plan unit of a single stop. A plan unit is a collection of
 	// stops which are always planned and unplanned as a single unit.
-	NewPlanSingleStop(stop ModelStop) (ModelPlanStopsUnit, error)
+	NewPlanSingleStop(stop *ModelStop) (ModelPlanStopsUnit, error)
 	// NewPlanMultipleStops creates a new plan of multiple [ModelStops]. A plan
 	// of multiple stops is a [ModelPlanUnit] of more than one stop. A plan
 	// unit is a collection of stops which are always planned and unplanned
@@ -105,7 +105,7 @@ type Model interface {
 
 	// NewStop creates a new stop. The stop is used to create plan units or can
 	// be used to create a first or last stop of a vehicle.
-	NewStop(location common.Location) (ModelStop, error)
+	NewStop(location common.Location) (*ModelStop, error)
 
 	// NewVehicle creates a new vehicle. The vehicle is used to create
 	// solutions. Every vehicle has a first and last stop - even if the vehicle
@@ -113,9 +113,9 @@ type Model interface {
 	NewVehicle(
 		vehicleType ModelVehicleType,
 		start time.Time,
-		first ModelStop,
-		last ModelStop,
-	) (ModelVehicle, error)
+		first *ModelStop,
+		last *ModelStop,
+	) (*ModelVehicle, error)
 	// NewVehicleType creates a new vehicle type. The vehicle type is used to
 	// create vehicles. The travelDuration defines the travel duration going
 	// from one stop to another if the stops are planned on a vehicle of the
@@ -158,7 +158,7 @@ type Model interface {
 	Stops() ModelStops
 
 	// Stop returns the stop with the specified index.
-	Stop(index int) (ModelStop, error)
+	Stop(index int) (*ModelStop, error)
 
 	// TimeFormat returns the time format used for reporting.
 	TimeFormat() string
@@ -177,7 +177,7 @@ type Model interface {
 	VehicleTypes() ModelVehicleTypes
 
 	// Vehicle returns the vehicle with the specified index.
-	Vehicle(index int) ModelVehicle
+	Vehicle(index int) *ModelVehicle
 
 	// MaxTime returns the maximum end time (upper bound) for any stop. This
 	// function uses the [Model.Epoch()] as a starting point and adds a large
@@ -298,15 +298,15 @@ func (m *modelImpl) Expressions() ModelExpressions {
 func (m *modelImpl) NewVehicle(
 	vehicleType ModelVehicleType,
 	start time.Time,
-	first ModelStop,
-	last ModelStop,
-) (ModelVehicle, error) {
+	first *ModelStop,
+	last *ModelStop,
+) (*ModelVehicle, error) {
 	if m.isLocked {
 		return nil,
 			fmt.Errorf(lockErrorMessage, "vehicle")
 	}
 
-	vehicle, err := newModelVehicle(
+	vehicle, err := NewModelVehicle(
 		len(m.vehicles),
 		vehicleType,
 		start,
@@ -521,7 +521,7 @@ func (m *modelImpl) NewPlanAllPlanUnits(
 	return plan, nil
 }
 
-func (m *modelImpl) NewPlanSingleStop(stop ModelStop) (ModelPlanStopsUnit, error) {
+func (m *modelImpl) NewPlanSingleStop(stop *ModelStop) (ModelPlanStopsUnit, error) {
 	if m.IsLocked() {
 		return nil,
 			fmt.Errorf(lockErrorMessage, "plan single stop")
@@ -653,10 +653,9 @@ func (m *modelImpl) lock() error {
 		vehicleIndex := -1
 
 		modelStops := planUnit.Stops()
-		modelStopsInVehicle := make([]ModelStop, 0, len(modelStops))
-		modelStopsNotInVehicle := make([]ModelStop, 0, len(modelStops))
+		modelStopsInVehicle := make([]*ModelStop, 0, len(modelStops))
+		modelStopsNotInVehicle := make([]*ModelStop, 0, len(modelStops))
 		for _, modelStop := range modelStops {
-			modelStopImpl := modelStop.(*stopImpl)
 			if index, inVehicle := m.stopVehicles[modelStop.Index()]; inVehicle {
 				if vehicleIndex == -1 {
 					vehicleIndex = index
@@ -675,7 +674,7 @@ func (m *modelImpl) lock() error {
 				modelStopsNotInVehicle = append(modelStopsNotInVehicle, modelStop)
 			}
 
-			err := modelStopImpl.validate()
+			err := modelStop.validate()
 			if err != nil {
 				return err
 			}
@@ -690,7 +689,7 @@ func (m *modelImpl) lock() error {
 				strings.Join(
 					common.MapSlice(
 						modelStopsInVehicle,
-						func(modelStop ModelStop) []string {
+						func(modelStop *ModelStop) []string {
 							return []string{modelStop.ID()}
 						}),
 					", ",
@@ -699,7 +698,7 @@ func (m *modelImpl) lock() error {
 				strings.Join(
 					common.MapSlice(
 						modelStopsNotInVehicle,
-						func(modelStop ModelStop) []string {
+						func(modelStop *ModelStop) []string {
 							return []string{modelStop.ID()}
 						}),
 					", ",
@@ -725,7 +724,7 @@ func (m *modelImpl) lock() error {
 				strings.Join(
 					common.MapSlice(
 						sequence,
-						func(modelStop ModelStop) []string {
+						func(modelStop *ModelStop) []string {
 							return []string{modelStop.ID()}
 						}),
 					", ",
@@ -759,19 +758,19 @@ func (m *modelImpl) VehicleTypes() ModelVehicleTypes {
 	return slices.Clone(m.vehicleTypes)
 }
 
-func (m *modelImpl) Vehicle(index int) ModelVehicle {
+func (m *modelImpl) Vehicle(index int) *ModelVehicle {
 	return m.vehicles[index]
 }
 
 func (m *modelImpl) NewStop(
 	location common.Location,
-) (ModelStop, error) {
+) (*ModelStop, error) {
 	if m.isLocked {
 		return nil,
 			fmt.Errorf(lockErrorMessage, "stop")
 	}
 
-	stop := &stopImpl{
+	stop := &ModelStop{
 		index:        len(m.stops),
 		measureIndex: len(m.stops),
 		model:        m,
@@ -781,7 +780,7 @@ func (m *modelImpl) NewStop(
 	return stop, nil
 }
 
-func (m *modelImpl) Stop(index int) (ModelStop, error) {
+func (m *modelImpl) Stop(index int) (*ModelStop, error) {
 	if index < 0 || index >= len(m.stops) {
 		return nil,
 			fmt.Errorf(

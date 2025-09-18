@@ -36,7 +36,7 @@ func addInitialSolution(
 		modelVehicle := model.Vehicles()[idx]
 
 		for _, initialStop := range *inputVehicle.InitialStops {
-			var modelStop nextroute.ModelStop
+			var modelStop *nextroute.ModelStop
 
 			if _, defined := inputStopIDToModelStopIndex[initialStop.ID]; defined {
 				modelStop = modelStops[inputStopIDToModelStopIndex[initialStop.ID]]

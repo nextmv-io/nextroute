@@ -51,9 +51,9 @@ func (m *measureByIndexExpression) SetName(n string) {
 	m.name = n
 }
 
-func (m *measureByIndexExpression) Value(_ ModelVehicleType, from, to ModelStop) float64 {
+func (m *measureByIndexExpression) Value(_ ModelVehicleType, from, to *ModelStop) float64 {
 	return m.measure.Cost(
-		from.(*stopImpl).measureIndex,
-		to.(*stopImpl).measureIndex,
+		from.measureIndex,
+		to.measureIndex,
 	)
 }
