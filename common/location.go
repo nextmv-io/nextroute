@@ -19,20 +19,19 @@ func NewLocation(longitude float64, latitude float64) (Location, error) {
 			fmt.Errorf("latitude %f must be between -90 and 90", latitude)
 	}
 	return Location{
-		longitude: longitude,
-		latitude:  latitude,
-		valid:     true,
+		longitudeRadians: longitude * degreesToRadians,
+		latitudeRadians:  latitude * degreesToRadians,
 	}, nil
 }
 
 // NewInvalidLocation creates a new invalid Location. Longitude and latitude
 // are not important.
 func NewInvalidLocation() Location {
-	return Location{
-		longitude: math.NaN(),
-		latitude:  math.NaN(),
-		valid:     false,
-	}
+	return invalidLocation
+}
+
+var invalidLocation = Location{
+	longitudeRadians: math.NaN(),
 }
 
 // Locations is a slice of Location.
@@ -77,39 +76,49 @@ func (l Locations) Centroid() (Location, error) {
 
 // Location represents a location on earth.
 type Location struct {
-	longitude float64
-	latitude  float64
-	valid     bool
+	longitudeRadians float64
+	latitudeRadians  float64
 }
 
 // String returns a string representation of the location.
 func (l Location) String() string {
 	return fmt.Sprintf(
 		"{lat: %v,lon: %v}",
-		l.latitude,
-		l.longitude,
+		l.Latitude(),
+		l.Longitude(),
 	)
 }
 
 // Longitude returns the longitude of the location.
 func (l Location) Longitude() float64 {
-	return l.longitude
+	return l.longitudeRadians * radiansToDegrees
 }
 
 // Latitude returns the latitude of the location.
 func (l Location) Latitude() float64 {
-	return l.latitude
+	return l.latitudeRadians * radiansToDegrees
+}
+
+// LatitudeRadians returns the latitude of the location in radians.
+func (l Location) LatitudeRadians() float64 {
+	return l.latitudeRadians
+}
+
+// LongitudeRadians returns the longitude of the location in radians.
+func (l Location) LongitudeRadians() float64 {
+	return l.longitudeRadians
 }
 
 // Equals returns true if the invoking location is equal to the other location.
 func (l Location) Equals(other Location) bool {
-	return l.longitude == other.Longitude() && l.latitude == other.Latitude()
+	return l.longitudeRadians == other.longitudeRadians && l.latitudeRadians == other.latitudeRadians
 }
 
 // IsValid returns true if the location is valid. A location is valid if
 // the bounds of the longitude and latitude are correct.
 func (l Location) IsValid() bool {
-	return l.valid
+	// an invalid location is encoded as NaN in longitudeRadians
+	return l.longitudeRadians == l.longitudeRadians
 }
 
 func isValidLongitude(longitude float64) bool {
@@ -119,3 +128,8 @@ func isValidLongitude(longitude float64) bool {
 func isValidLatitude(latitude float64) bool {
 	return latitude >= -90 && latitude <= 90
 }
+
+const (
+	radiansToDegrees = 180.0 / math.Pi
+	degreesToRadians = math.Pi / 180.0
+)

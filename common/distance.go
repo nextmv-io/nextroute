@@ -20,10 +20,7 @@ func NewDistance(
 		value *= factorMilesToMeters
 	}
 
-	return Distance{
-		meters: value,
-		unit:   unit,
-	}
+	return Distance(value)
 }
 
 // The constants are encoded by their most common conversion factor to meters.
@@ -64,13 +61,10 @@ func (d DistanceUnit) String() string {
 	return fmt.Sprintf("unknown distance unit %v", int(d))
 }
 
-// Distance is a distance in a given unit.
-type Distance struct {
-	meters float64
-	unit   DistanceUnit
-}
+// Distance is a distance in a given unit. It is stored as meters internally.
+type Distance float64
 
 // Value returns the distance in the specified unit.
 func (d Distance) Value(unit DistanceUnit) float64 {
-	return d.meters * unit.convertFromMeters()
+	return float64(d) * unit.convertFromMeters()
 }

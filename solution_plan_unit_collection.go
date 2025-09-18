@@ -118,15 +118,17 @@ func (p *solutionPlanUnitCollectionBaseImpl) RandomDraw(n int) SolutionPlanUnits
 }
 
 func (p *solutionPlanUnitCollectionBaseImpl) add(solutionPlanUnit SolutionPlanUnit) {
-	if _, ok := p.indices[solutionPlanUnit.ModelPlanUnit().Index()]; ok {
+	planUnitIndex := solutionPlanUnit.ModelPlanUnit().Index()
+	if _, ok := p.indices[planUnitIndex]; ok {
 		return
 	}
-	p.indices[solutionPlanUnit.ModelPlanUnit().Index()] = len(p.solutionPlanUnits)
+	p.indices[planUnitIndex] = len(p.solutionPlanUnits)
 	p.solutionPlanUnits = append(p.solutionPlanUnits, solutionPlanUnit)
 }
 
 func (p *solutionPlanUnitCollectionBaseImpl) remove(solutionPlanUnit SolutionPlanUnit) {
-	index, ok := p.indices[solutionPlanUnit.ModelPlanUnit().Index()]
+	planUnitIndex := solutionPlanUnit.ModelPlanUnit().Index()
+	index, ok := p.indices[planUnitIndex]
 	if !ok {
 		return
 	}
@@ -134,7 +136,7 @@ func (p *solutionPlanUnitCollectionBaseImpl) remove(solutionPlanUnit SolutionPla
 	lastElement := p.solutionPlanUnits[lastIndex]
 	p.solutionPlanUnits[index] = lastElement
 	p.indices[lastElement.ModelPlanUnit().Index()] = index
-	delete(p.indices, solutionPlanUnit.ModelPlanUnit().Index())
+	delete(p.indices, planUnitIndex)
 	p.solutionPlanUnits[lastIndex] = nil
 	p.solutionPlanUnits = p.solutionPlanUnits[:lastIndex]
 }

@@ -719,16 +719,16 @@ func newSolution(
 func HaversineDistance(from, to schema.Location) (common.Distance, error) {
 	fromLocation, err := common.NewLocation(from.Lon, from.Lat)
 	if err != nil {
-		return common.Distance{}, err
+		return 0, err
 	}
 
 	toLocation, err := common.NewLocation(to.Lon, to.Lat)
 	if err != nil {
-		return common.Distance{}, err
+		return 0, err
 	}
 	distance, err := common.Haversine(fromLocation, toLocation)
 	if err != nil {
-		return common.Distance{}, err
+		return 0, err
 	}
 
 	return distance, nil
