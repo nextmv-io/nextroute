@@ -302,11 +302,9 @@ func (s *fromExpression) SetValue(
 ) error {
 	if stop.Model().IsLocked() {
 		return fmt.Errorf(
-			fmt.Sprintf(
-				"cannot set value of stop '%v' on '%v' after model is locked",
-				stop,
-				s,
-			),
+			"cannot set value of stop '%v' on '%v' after model is locked",
+			stop,
+			s,
 		)
 	}
 	s.hasNegativeValues = s.hasNegativeValues || value < 0
