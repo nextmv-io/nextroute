@@ -85,6 +85,8 @@ class Options(BaseModel):
     """
     MODEL_OBJECTIVES_CLUSTER: float = 0.0
     """Factor to weigh the cluster objective."""
+    MODEL_OBJECTIVES_DISTANCE: float = 0.0
+    """Factor to weigh the distance objective."""
     MODEL_OBJECTIVES_EARLYARRIVALPENALTY: float = 1.0
     """Factor to weigh the early arrival objective."""
     MODEL_OBJECTIVES_LATEARRIVALPENALTY: float = 1.0

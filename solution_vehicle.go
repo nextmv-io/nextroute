@@ -544,6 +544,22 @@ func (v SolutionVehicle) End() time.Time {
 	return v.Last().End()
 }
 
+// iterateStops iterates over all stops in the vehicle. The start and
+// end stops are included in the iteration. If the function f returns
+// false, the iteration stops.
+func (v SolutionVehicle) iterateStops(f func(SolutionStop) bool) {
+	solutionStop := v.First()
+	for {
+		if !f(solutionStop) {
+			return
+		}
+		if solutionStop.IsLast() {
+			break
+		}
+		solutionStop = solutionStop.Next()
+	}
+}
+
 // SolutionStops returns the stops in the vehicle. The start and end
 // stops are included in the returned stops.
 func (v SolutionVehicle) SolutionStops() SolutionStops {
@@ -555,6 +571,17 @@ func (v SolutionVehicle) SolutionStops() SolutionStops {
 	}
 	solutionStops = append(solutionStops, solutionStop)
 	return solutionStops
+}
+
+// ObjectiveData returns the value of the objective for the stop. The
+// objective value of a stop is set by the
+// ObjectiveStopDataUpdater.UpdateObjectiveStopData method of the objective.
+// If the objective is not set on the stop, nil is returned. If the stop is
+// unplanned, the objective value has no semantic meaning.
+func (v SolutionVehicle) ObjectiveData(
+	objective ModelObjective,
+) any {
+	return v.solution.objectiveVehicleValue(objective, v.index)
 }
 
 // ModelVehicle returns the modeled vehicle type of the vehicle.
