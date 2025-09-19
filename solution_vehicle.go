@@ -549,13 +549,15 @@ func (v SolutionVehicle) End() time.Time {
 // false, the iteration stops.
 func (v SolutionVehicle) iterateStops(f func(SolutionStop) bool) {
 	solutionStop := v.First()
-	for !solutionStop.IsLast() {
+	for {
 		if !f(solutionStop) {
 			return
 		}
+		if solutionStop.IsLast() {
+			break
+		}
 		solutionStop = solutionStop.Next()
 	}
-	f(solutionStop)
 }
 
 // SolutionStops returns the stops in the vehicle. The start and end
