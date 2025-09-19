@@ -25,13 +25,15 @@ func (d *distanceObjectiveImpl) UpdateObjectiveVehicleData(s SolutionVehicle) (C
 	vehicleType := s.ModelVehicle().(*modelVehicleImpl).vehicleType
 	distanceExpr := vehicleType.(*vehicleTypeImpl).distance
 	var previousStop ModelStop
-	for _, stop := range s.SolutionStops() {
+
+	s.iterateStops(func(stop SolutionStop) bool {
 		modelStop := stop.ModelStop()
 		if previousStop != nil {
 			distance += distanceExpr.Value(vehicleType, previousStop, modelStop)
 		}
 		previousStop = modelStop
-	}
+		return true
+	})
 	return &distanceObjectiveVehicleData{
 		cumulativeDistance: distance,
 	}, nil

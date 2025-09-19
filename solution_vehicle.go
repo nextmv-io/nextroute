@@ -544,6 +544,20 @@ func (v SolutionVehicle) End() time.Time {
 	return v.Last().End()
 }
 
+// iterateStops iterates over all stops in the vehicle. The start and
+// end stops are included in the iteration. If the function f returns
+// false, the iteration stops.
+func (v SolutionVehicle) iterateStops(f func(SolutionStop) bool) {
+	solutionStop := v.First()
+	for !solutionStop.IsLast() {
+		if !f(solutionStop) {
+			return
+		}
+		solutionStop = solutionStop.Next()
+	}
+	f(solutionStop)
+}
+
 // SolutionStops returns the stops in the vehicle. The start and end
 // stops are included in the returned stops.
 func (v SolutionVehicle) SolutionStops() SolutionStops {
