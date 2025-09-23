@@ -36,10 +36,12 @@ func (s *ModelStop) Model() Model {
 	return s.model
 }
 
+// Vehicle returns the vehicle the stop belongs to.
 func (s *ModelStop) Vehicle() *ModelVehicle {
 	return s.vehicle
 }
 
+// String returns a string representation of the stop.
 func (s *ModelStop) String() string {
 	return fmt.Sprintf("stop{%s[%v]}",
 		s.id,
