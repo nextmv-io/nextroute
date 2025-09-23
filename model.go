@@ -205,6 +205,7 @@ func NewModel() (Model, error) {
 		isLocked:                       false,
 		objective:                      nil,
 		objectivesWithStopUpdater:      make(ModelObjectives, 0),
+		objectivesWithVehicleUpdater:   make(ModelObjectives, 0),
 		objectivesWithSolutionUpdater:  make(ModelObjectives, 0),
 		random:                         rand.New(rand.NewSource(0)),
 		timeFormat:                     time.UnixDate,
@@ -253,6 +254,7 @@ type modelImpl struct {
 	vehicles                       ModelVehicles
 	constraintsWithSolutionUpdater ModelConstraints
 	objectivesWithStopUpdater      ModelObjectives
+	objectivesWithVehicleUpdater   ModelObjectives
 	objectivesWithSolutionUpdater  ModelObjectives
 	distanceUnit                   common.DistanceUnit
 	durationUnit                   time.Duration

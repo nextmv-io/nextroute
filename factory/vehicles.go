@@ -189,6 +189,10 @@ func newVehicleType(
 	vehicleType.SetData(vehicleTypeData{
 		DistanceExpression: distanceExpression,
 	})
+	err := vehicleType.SetDistanceExpression(distanceExpression)
+	if err != nil {
+		return nil, err
+	}
 
 	return vehicleType, nil
 }

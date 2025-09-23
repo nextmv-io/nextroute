@@ -21,6 +21,17 @@ type ObjectiveStopDataUpdater interface {
 	UpdateObjectiveStopData(s SolutionStop) (Copier, error)
 }
 
+// ObjectiveVehicleDataUpdater is the interface than can be used by an objective
+// if it wants to store data with each vehicle in a solution.
+type ObjectiveVehicleDataUpdater interface {
+	// UpdateObjectiveVehicleData is called when a vehicle is updated in a
+	// solution. The solutionVehicle has all it's expression values set and
+	// this function can use them to update the objective data for the vehicle.
+	// The data returned can be used by the estimate function and can be
+	// retrieved by the SolutionVehicle.ObjectiveData function.
+	UpdateObjectiveVehicleData(s SolutionVehicle) (Copier, error)
+}
+
 // ObjectiveSolutionDataUpdater is the interface than can be used by an
 // objective if it wants to store data with each solution.
 type ObjectiveSolutionDataUpdater interface {
@@ -167,6 +178,12 @@ func (m *modelObjectiveSumImpl) NewTerm(
 				return nil, err
 			}
 		}
+	}
+	if _, ok := term.Objective().(ObjectiveVehicleDataUpdater); ok {
+		m.model.objectivesWithVehicleUpdater = append(
+			m.model.objectivesWithVehicleUpdater,
+			term.Objective(),
+		)
 	}
 	if _, ok := term.Objective().(ObjectiveStopDataUpdater); ok {
 		m.model.objectivesWithStopUpdater = append(

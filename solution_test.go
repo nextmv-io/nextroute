@@ -70,7 +70,8 @@ func TestLimitAllocations(t *testing.T) {
 			t.Fatal(err)
 		}
 	})
-	if allocs > 66 {
-		t.Errorf("expected 66 allocations, got %v", allocs)
+	maxAllocs := 67.0
+	if allocs > maxAllocs {
+		t.Errorf("expected %f allocations, got %v", maxAllocs, allocs)
 	}
 }

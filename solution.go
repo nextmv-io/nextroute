@@ -4,6 +4,7 @@ package nextroute
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 	"math/rand"
@@ -143,6 +144,7 @@ func NewSolution(
 		stopToPlanUnit:           make([]*solutionPlanStopsUnitImpl, nrStops),
 		constraintStopData:       make(map[ModelConstraint][]Copier),
 		objectiveStopData:        make(map[ModelObjective][]Copier),
+		objectiveVehicleData:     make(map[ModelObjective][]Copier),
 		constraintSolutionData:   make(map[ModelConstraint]Copier),
 		objectiveSolutionData:    make(map[ModelObjective]Copier),
 		random:                   random,
@@ -175,6 +177,10 @@ func NewSolution(
 
 	for _, objective := range model.objectivesWithStopUpdater {
 		solution.objectiveStopData[objective] = make([]Copier, nrStops)
+	}
+
+	for _, objective := range model.objectivesWithVehicleUpdater {
+		solution.objectiveVehicleData[objective] = make([]Copier, nrVehicles)
 	}
 
 	stopsUsed := make(map[int]bool)
@@ -475,12 +481,10 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 
 				if isViolated {
 					if solutionPlanUnit.IsFixed() {
-						return fmt.Errorf(
-							reportInfeasibleInitialSolution(
-								move,
-								constraint,
-							),
-						)
+						return errors.New(reportInfeasibleInitialSolution(
+							move,
+							constraint,
+						))
 					}
 					infeasiblePlanUnits[solutionPlanUnit] = true
 					continue PlanUnitLoop
@@ -497,12 +501,10 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 			}
 			if constraint != nil {
 				if planUnit.IsFixed() {
-					return fmt.Errorf(
-						reportInfeasibleInitialSolution(
-							move,
-							solutionObserver.Constraint(),
-						),
-					)
+					return errors.New(reportInfeasibleInitialSolution(
+						move,
+						solutionObserver.Constraint(),
+					))
 				}
 				for _, position := range move.(*solutionMoveStopsImpl).stopPositions {
 					position.Stop().detach()
@@ -575,6 +577,7 @@ type solutionImpl struct {
 	values                 map[int][]float64
 	objectiveStopData      map[ModelObjective][]Copier
 	constraintStopData     map[ModelConstraint][]Copier
+	objectiveVehicleData   map[ModelObjective][]Copier
 	objectiveSolutionData  map[ModelObjective]Copier
 	constraintSolutionData map[ModelConstraint]Copier
 	cumulativeValues       map[int][]float64
@@ -706,6 +709,7 @@ func (s *solutionImpl) Copy() Solution {
 		slack:                    slack,
 		constraintStopData:       make(map[ModelConstraint][]Copier, len(s.constraintStopData)),
 		objectiveStopData:        make(map[ModelObjective][]Copier, len(s.objectiveStopData)),
+		objectiveVehicleData:     make(map[ModelObjective][]Copier, len(s.objectiveVehicleData)),
 		constraintSolutionData:   make(map[ModelConstraint]Copier, len(s.constraintSolutionData)),
 		objectiveSolutionData:    make(map[ModelObjective]Copier, len(s.objectiveSolutionData)),
 		cumulativeTravelDuration: cumulativeTravelDuration,
@@ -783,6 +787,20 @@ func (s *solutionImpl) Copy() Solution {
 				solution.objectiveStopData[objective][idx] = nil
 			} else {
 				solution.objectiveStopData[objective][idx] = data.Copy()
+			}
+		}
+	}
+
+	for _, objective := range model.objectivesWithVehicleUpdater {
+		solution.objectiveVehicleData[objective] = make(
+			[]Copier,
+			len(s.objectiveVehicleData[objective]),
+		)
+		for idx, data := range s.objectiveVehicleData[objective] {
+			if data == nil {
+				solution.objectiveVehicleData[objective][idx] = nil
+			} else {
+				solution.objectiveVehicleData[objective][idx] = data.Copy()
 			}
 		}
 	}
@@ -893,6 +911,14 @@ func (s *solutionImpl) newVehicle(
 	for _, objective := range model.objectivesWithStopUpdater {
 		s.objectiveStopData[objective] = append(
 			s.objectiveStopData[objective],
+			nil,
+			nil,
+		)
+	}
+
+	for _, objective := range model.objectivesWithVehicleUpdater {
+		s.objectiveVehicleData[objective] = append(
+			s.objectiveVehicleData[objective],
 			nil,
 			nil,
 		)
@@ -1141,11 +1167,21 @@ func (s *solutionImpl) constraintValue(
 	return nil
 }
 
-func (s *solutionImpl) objectiveValue(
+func (s *solutionImpl) objectiveStopValue(
 	objective ModelObjective,
 	index int,
 ) any {
 	if data, ok := s.objectiveStopData[objective]; ok {
+		return data[index]
+	}
+	return nil
+}
+
+func (s *solutionImpl) objectiveVehicleValue(
+	objective ModelObjective,
+	index int,
+) any {
+	if data, ok := s.objectiveVehicleData[objective]; ok {
 		return data[index]
 	}
 	return nil
@@ -1176,6 +1212,19 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 	solutionStop := SolutionStop{
 		solution: s,
 		index:    index,
+	}
+
+	solutionVehicle := s.vehicles[s.inVehicle[index]]
+
+	for _, objective := range model.objectivesWithVehicleUpdater {
+		value, err := objective.(ObjectiveVehicleDataUpdater).
+			UpdateObjectiveVehicleData(
+				solutionVehicle,
+			)
+		if err != nil {
+			return nil, -1, err
+		}
+		s.objectiveVehicleData[objective][solutionVehicle.index] = value
 	}
 
 	for _, constraint := range model.constraintsWithStopUpdater {

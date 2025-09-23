@@ -34,7 +34,7 @@
       "objectives": {
         "capacities": "",
         "cluster": 0,
-        "distance": 0,
+        "distance": 1,
         "early_arrival_penalty": 1,
         "late_arrival_penalty": 1,
         "min_stops": 1,
@@ -42,7 +42,7 @@
         "travel_duration": 0,
         "unplanned_penalty": 1,
         "vehicle_activation_penalty": 1,
-        "vehicles_duration": 1
+        "vehicles_duration": 0
       },
       "properties": {
         "disable": {
@@ -65,8 +65,8 @@
       }
     },
     "solve": {
-      "duration": 10000000000,
-      "iterations": 50,
+      "duration": 5000000000,
+      "iterations": 2000,
       "parallel_runs": 1,
       "plateau": {
         "absolute_threshold": -1,
@@ -82,13 +82,13 @@
   "solutions": [
     {
       "objective": {
-        "name": "1 * vehicles_duration + 1 * unplanned_penalty",
+        "name": "1 * distance + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 1101.3248523907805,
+            "base": 3,
             "factor": 1,
-            "name": "vehicles_duration",
-            "value": 1101.3248523907805
+            "name": "distance",
+            "value": 3
           },
           {
             "factor": 1,
@@ -96,7 +96,7 @@
             "value": 0
           }
         ],
-        "value": 1101.3248523907805
+        "value": 3
       },
       "unplanned": [],
       "vehicles": [
@@ -106,96 +106,57 @@
             {
               "cumulative_travel_duration": 0,
               "stop": {
-                "id": "Fushimi Inari Taisha",
+                "id": "s1",
                 "location": {
-                  "lat": 34.967146,
-                  "lon": 135.772695
+                  "lat": 1,
+                  "lon": 1
                 }
               },
               "travel_duration": 0
             },
             {
-              "cumulative_travel_distance": 3280,
-              "cumulative_travel_duration": 164,
+              "cumulative_travel_distance": 1,
+              "cumulative_travel_duration": 10,
               "stop": {
-                "id": "Kiyomizu-dera",
+                "id": "s2",
                 "location": {
-                  "lat": 34.994857,
-                  "lon": 135.78506
+                  "lat": 1,
+                  "lon": 1
                 }
               },
-              "travel_distance": 3280,
-              "travel_duration": 164
+              "travel_distance": 1,
+              "travel_duration": 10
             },
             {
-              "cumulative_travel_distance": 7273,
-              "cumulative_travel_duration": 363,
+              "cumulative_travel_distance": 2,
+              "cumulative_travel_duration": 20,
               "stop": {
-                "id": "Kyoto Imperial Palace",
+                "id": "s3",
                 "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762057
+                  "lat": 1,
+                  "lon": 1
                 }
               },
-              "travel_distance": 3993,
-              "travel_duration": 199
+              "travel_distance": 1,
+              "travel_duration": 10
             },
             {
-              "cumulative_travel_distance": 10112,
-              "cumulative_travel_duration": 505,
+              "cumulative_travel_distance": 3,
+              "cumulative_travel_duration": 30,
               "stop": {
-                "id": "Gionmachi",
+                "id": "s4",
                 "location": {
-                  "lat": 35.002457,
-                  "lon": 135.775682
+                  "lat": 1,
+                  "lon": 1
                 }
               },
-              "travel_distance": 2839,
-              "travel_duration": 141
-            },
-            {
-              "cumulative_travel_distance": 12942,
-              "cumulative_travel_duration": 647,
-              "stop": {
-                "id": "Nijō Castle",
-                "location": {
-                  "lat": 35.014239,
-                  "lon": 135.748134
-                }
-              },
-              "travel_distance": 2830,
-              "travel_duration": 141
-            },
-            {
-              "cumulative_travel_distance": 16271,
-              "cumulative_travel_duration": 813,
-              "stop": {
-                "id": "Kinkaku-ji",
-                "location": {
-                  "lat": 35.039705,
-                  "lon": 135.728898
-                }
-              },
-              "travel_distance": 3329,
-              "travel_duration": 166
-            },
-            {
-              "cumulative_travel_distance": 22023,
-              "cumulative_travel_duration": 1101,
-              "stop": {
-                "id": "Arashiyama Bamboo Forest",
-                "location": {
-                  "lat": 35.017209,
-                  "lon": 135.672009
-                }
-              },
-              "travel_distance": 5752,
-              "travel_duration": 287
+              "travel_distance": 1,
+              "travel_duration": 10
             }
           ],
-          "route_duration": 1101,
-          "route_travel_distance": 22023,
-          "route_travel_duration": 1101
+          "route_duration": 30,
+          "route_travel_distance": 3,
+          "route_travel_duration": 30
         }
       ]
     }
@@ -204,20 +165,20 @@
     "result": {
       "custom": {
         "activated_vehicles": 1,
-        "max_duration": 0.123,
-        "max_stops_in_vehicle": 7,
-        "max_travel_duration": 0.123,
-        "min_duration": 0.123,
-        "min_stops_in_vehicle": 7,
-        "min_travel_duration": 0.123,
+        "max_duration": 30,
+        "max_stops_in_vehicle": 4,
+        "max_travel_duration": 30,
+        "min_duration": 30,
+        "min_stops_in_vehicle": 4,
+        "min_travel_duration": 30,
         "unplanned_stops": 0
       },
       "duration": 0.123,
-      "value": 0.123
+      "value": 3
     },
     "run": {
       "duration": 0.123,
-      "iterations": 50
+      "iterations": 2000
     },
     "schema": "v1"
   },
