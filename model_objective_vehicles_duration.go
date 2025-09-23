@@ -110,11 +110,10 @@ func (t *vehiclesDurationObjectiveImpl) EstimateDeltaValue(
 }
 
 func (t *vehiclesDurationObjectiveImpl) Value(
-	solution Solution,
+	solution *Solution,
 ) float64 {
-	solutionImp := solution.(*solutionImpl)
 	score := 0.0
-	for _, r := range solutionImp.vehicles {
+	for _, r := range solution.vehicles {
 		score += r.DurationValue()
 	}
 	return score

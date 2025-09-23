@@ -164,7 +164,7 @@ func (d *solveOperatorUnPlanImpl) unplanClosestStops(
 }
 
 func (d *solveOperatorUnPlanImpl) unplanOneIsland(
-	solution Solution,
+	solution *Solution,
 	numberOfStops int,
 ) (int, error) {
 	planUnit := solution.PlannedPlanUnits().RandomElement()
@@ -180,7 +180,7 @@ func (d *solveOperatorUnPlanImpl) unplanOneIsland(
 }
 
 func (d *solveOperatorUnPlanImpl) unplanSomeStopsOfOneVehicle(
-	solution Solution,
+	solution *Solution,
 	chance float64,
 ) (int, error) {
 	vehicles := common.Filter(solution.Vehicles(), func(vehicle SolutionVehicle) bool {

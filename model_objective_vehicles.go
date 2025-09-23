@@ -43,9 +43,9 @@ func (t *vehiclesObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float
 	return 0.0
 }
 
-func (t *vehiclesObjectiveImpl) Value(solution Solution) float64 {
+func (t *vehiclesObjectiveImpl) Value(solution *Solution) float64 {
 	vehicleCost := 0.0
-	for _, vehicle := range solution.(*solutionImpl).vehiclesMutable() {
+	for _, vehicle := range solution.Vehicles() {
 		if vehicle.NumberOfStops() > 0 {
 			vehicleCost += t.expression.Value(
 				vehicle.ModelVehicle().VehicleType(),

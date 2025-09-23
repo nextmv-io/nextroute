@@ -402,13 +402,10 @@ func (l *maximumImpl) EstimateDeltaValue(
 }
 
 func (l *maximumImpl) Value(
-	solution Solution,
+	solution *Solution,
 ) (value float64) {
-	solutionImp := solution.(*solutionImpl)
-
 	score := 0.0
-
-	for _, vehicle := range solutionImp.vehicles {
+	for _, vehicle := range solution.vehicles {
 		vehicleType := vehicle.ModelVehicle().VehicleType()
 		maximum := l.maximumByVehicleType[vehicleType.Index()]
 

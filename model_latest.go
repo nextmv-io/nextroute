@@ -186,10 +186,9 @@ func (l *latestImpl) Lateness(stop SolutionStop) float64 {
 	return math.Max(0, reference-latest)
 }
 
-func (l *latestImpl) Value(s Solution) float64 {
-	solution := s.(*solutionImpl)
+func (l *latestImpl) Value(s *Solution) float64 {
 	value := 0.0
-	for _, vehicle := range solution.vehicles {
+	for _, vehicle := range s.vehicles {
 		solutionStop := vehicle.First().Next()
 		lastSolutionStop := vehicle.Last()
 		for {

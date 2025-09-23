@@ -4,7 +4,7 @@ package nextroute
 
 // SolutionInfo contains solutions and error if one raised.
 type SolutionInfo struct {
-	Solution
+	*Solution
 	Error error
 }
 
@@ -12,25 +12,25 @@ type SolutionInfo struct {
 type SolutionChannel <-chan SolutionInfo
 
 // All returns all solutions in the channel.
-func (solutions SolutionChannel) All() ([]Solution, error) {
-	solutionArray := make([]Solution, 0)
+func (solutions SolutionChannel) All() ([]*Solution, error) {
+	solutionArray := make([]*Solution, 0)
 	for s := range solutions {
 		if s.Error != nil {
 			return nil, s.Error
 		}
-		solutionArray = append(solutionArray, s)
+		solutionArray = append(solutionArray, s.Solution)
 	}
 	return solutionArray, nil
 }
 
 // Last returns the last solution in the channel.
-func (solutions SolutionChannel) Last() (Solution, error) {
-	var solution Solution
+func (solutions SolutionChannel) Last() (*Solution, error) {
+	var solution *Solution
 	for s := range solutions {
 		if s.Error != nil {
 			return nil, s.Error
 		}
-		solution = s
+		solution = s.Solution
 	}
 	return solution, nil
 }

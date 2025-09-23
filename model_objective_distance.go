@@ -78,10 +78,9 @@ func (d *distanceObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float
 	return delta
 }
 
-func (d *distanceObjectiveImpl) Value(solution Solution) float64 {
-	s := solution.(*solutionImpl)
+func (d *distanceObjectiveImpl) Value(solution *Solution) float64 {
 	total := 0.0
-	for _, v := range s.vehicles {
+	for _, v := range solution.vehicles {
 		data := v.ObjectiveData(d).(*distanceObjectiveVehicleData)
 		total += data.cumulativeDistance
 	}

@@ -44,7 +44,7 @@ type ParallelSolver interface {
 	SetSolveOptionsFactory(SolveOptionsFactory)
 	// Solve starts the solving process using the given options. It returns the
 	// solutions as a channel.
-	Solve(context.Context, ParallelSolveOptions, ...Solution) (SolutionChannel, error)
+	Solve(context.Context, ParallelSolveOptions, ...*Solution) (SolutionChannel, error)
 	// SolveEvents returns the solve-events used by the individual solver instances.
 	SolveEvents() SolveEvents
 	// ParallelSolveEvents returns the solve-events used by the parallel solver.
@@ -62,7 +62,7 @@ type SolveOptionsFactory func(
 // used by the parallel solver to create new solver for a new run.
 type SolverFactory func(
 	information ParallelSolveInformation,
-	solution Solution) (Solver, error)
+	solution *Solution) (Solver, error)
 
 // ParallelSolveInformation holds the information about the current parallel
 // solve run.
@@ -157,7 +157,7 @@ func (s *parallelSolverImpl) Progression() []ProgressionEntry {
 }
 
 type solutionContainer struct {
-	Solution   Solution
+	Solution   *Solution
 	Error      error
 	Iterations int
 }
@@ -177,7 +177,7 @@ func (s *parallelSolverImpl) SetSolveOptionsFactory(
 func (s *parallelSolverImpl) Solve(
 	ctx context.Context,
 	options ParallelSolveOptions,
-	startSolutions ...Solution,
+	startSolutions ...*Solution,
 ) (SolutionChannel, error) {
 	// TODO: check options
 	if s.solveOptionsFactory == nil {
@@ -248,7 +248,7 @@ func (s *parallelSolverImpl) Solve(
 		start.Add(interpretedParallelSolveOptions.Duration),
 	)
 
-	solutions := make([]Solution, len(startSolutions))
+	solutions := make([]*Solution, len(startSolutions))
 	copy(solutions, startSolutions)
 
 	parallelRuns := interpretedParallelSolveOptions.ParallelRuns
@@ -419,7 +419,7 @@ func (s *parallelSolverImpl) Solve(
 							}
 
 							syncResultChannel <- solutionContainer{
-								Solution:   sol,
+								Solution:   sol.Solution,
 								Error:      sol.Error,
 								Iterations: int(totalIterations.Load()),
 							}
@@ -496,7 +496,7 @@ func (s *parallelSolverImpl) RegisterEvents(
 	events.Start.Register(func(info SolveInformation) {
 		s.solveEvents.Start.Trigger(info)
 	})
-	events.Reset.Register(func(solution Solution, info SolveInformation) {
+	events.Reset.Register(func(solution *Solution, info SolveInformation) {
 		s.solveEvents.Reset.Trigger(solution, info)
 	})
 	events.Done.Register(func(info SolveInformation) {

@@ -62,7 +62,7 @@ type customOutput struct {
 	Value  float64 `json:"value,omitempty"`
 }
 
-func toOutput(solution nextroute.Solution) customOutput {
+func toOutput(solution *nextroute.Solution) customOutput {
 	value := 0.0
 	for _, t := range solution.Model().Objective().Terms() {
 		value += solution.ObjectiveValue(t.Objective())

@@ -90,7 +90,7 @@ type solverWrapperImpl struct {
 func (s *solverWrapperImpl) Solve(
 	ctx context.Context,
 	solveOptions SolveOptions,
-	startSolutions ...Solution,
+	startSolutions ...*Solution,
 ) (SolutionChannel, error) {
 	start := ctx.Value(run.Start).(time.Time)
 	ctx, _ = context.WithDeadline(
@@ -131,11 +131,11 @@ func (s *solverWrapperImpl) HasWorkSolution() bool {
 	return s.solver.HasWorkSolution()
 }
 
-func (s *solverWrapperImpl) BestSolution() Solution {
+func (s *solverWrapperImpl) BestSolution() *Solution {
 	return s.solver.BestSolution()
 }
 
-func (s *solverWrapperImpl) WorkSolution() Solution {
+func (s *solverWrapperImpl) WorkSolution() *Solution {
 	return s.solver.WorkSolution()
 }
 
@@ -144,7 +144,7 @@ func (s *solverWrapperImpl) Model() Model {
 }
 
 func (s *solverWrapperImpl) Reset(
-	solution Solution,
+	solution *Solution,
 	solveInformation SolveInformation,
 ) {
 	s.solver.Reset(solution, solveInformation)
@@ -158,7 +158,7 @@ func (s *solverWrapperImpl) SolveOperators() SolveOperators {
 func DefaultSolverFactory() SolverFactory {
 	return func(
 		_ ParallelSolveInformation,
-		solution Solution,
+		solution *Solution,
 	) (Solver, error) {
 		nrPlanUnits := len(solution.Model().PlanUnits())
 

@@ -23,11 +23,9 @@ func (t *travelDurationObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops)
 	return move.(*solutionMoveStopsImpl).deltaTravelDurationValue()
 }
 
-func (t *travelDurationObjectiveImpl) Value(solution Solution) float64 {
-	solutionImp := solution.(*solutionImpl)
-
+func (t *travelDurationObjectiveImpl) Value(solution *Solution) float64 {
 	score := 0.0
-	for _, vehicle := range solutionImp.vehicles {
+	for _, vehicle := range solution.vehicles {
 		score += vehicle.Last().CumulativeTravelDurationValue()
 	}
 	return score

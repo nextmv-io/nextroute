@@ -44,7 +44,7 @@ type ConstraintSolutionDataUpdater interface {
 	// can use them to update the constraint data for the solution. The data
 	// returned can be used by the estimate function and can be retrieved by the
 	// Solution.ConstraintData function.
-	UpdateConstraintSolutionData(s Solution) (Copier, error)
+	UpdateConstraintSolutionData(s *Solution) (Copier, error)
 }
 
 // RegisteredModelExpressions is the interface that exposes the expressions
@@ -101,7 +101,7 @@ type SolutionViolationCheck interface {
 	// DoesSolutionHaveViolations returns true if the solution violates the
 	// constraint. The solution is not allowed to be nil. This method is only
 	// called if CheckedAt returns AtEachSolution.
-	DoesSolutionHaveViolations(solution Solution) bool
+	DoesSolutionHaveViolations(solution *Solution) bool
 }
 
 // ModelConstraint is the interface that all constraints must implement.
@@ -134,7 +134,7 @@ type modelConstraintImpl struct {
 
 func (m *modelConstraintImpl) EstimateIsViolated(
 	_ SolutionMoveStops,
-	_ Solution,
+	_ *Solution,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	panic("implement me in derived class")
 }

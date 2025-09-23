@@ -20,7 +20,7 @@ type SolutionPlanUnit interface {
 	PlannedPlanStopsUnits() SolutionPlanStopsUnits
 
 	// Solution returns the solution this unit is part of.
-	Solution() Solution
+	Solution() *Solution
 
 	// UnPlan un-plans the unit by removing the underlying solution stops
 	// from the solution. Returns true if the unit was unplanned
@@ -35,7 +35,7 @@ type SolutionPlanUnits []SolutionPlanUnit
 
 func copySolutionPlanUnit(
 	solutionPlanUnit SolutionPlanUnit,
-	solution *solutionImpl,
+	solution *Solution,
 ) SolutionPlanUnit {
 	switch p := solutionPlanUnit.(type) {
 	case SolutionPlanStopsUnit:
@@ -48,7 +48,7 @@ func copySolutionPlanUnit(
 
 func copySolutionPlanStopsUnit(
 	solutionPlanUnit SolutionPlanStopsUnit,
-	solution *solutionImpl,
+	solution *Solution,
 ) SolutionPlanStopsUnit {
 	solutionPlanUnitImpl := solutionPlanUnit.(*solutionPlanStopsUnitImpl)
 	copyOfSolutionPlanUnit := &solutionPlanStopsUnitImpl{
@@ -67,7 +67,7 @@ func copySolutionPlanStopsUnit(
 
 func copySolutionPlanUnitsUnit(
 	solutionPlanUnit SolutionPlanUnitsUnit,
-	solution *solutionImpl,
+	solution *Solution,
 ) SolutionPlanUnitsUnit {
 	solutionPlanUnitImpl := solutionPlanUnit.(*solutionPlanUnitsUnitImpl)
 	copyOfSolutionPlanUnit := &solutionPlanUnitsUnitImpl{

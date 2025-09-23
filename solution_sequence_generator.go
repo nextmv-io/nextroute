@@ -50,7 +50,7 @@ func sequenceGeneratorSync(pu SolutionPlanUnit, yield func(SolutionStops)) {
 		yield(planUnit.SolutionStops())
 		return
 	}
-	solution := planUnit.solution()
+	solution := planUnit.Solution()
 	maxSequences := int64(solution.Model().SequenceSampleSize())
 	nSolutionStops := len(solutionStops)
 	used := make([]bool, nSolutionStops)

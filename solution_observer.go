@@ -8,12 +8,12 @@ type SolutionObserver interface {
 	// OnNewSolution is called when a new solution is going to be created.
 	OnNewSolution(model Model)
 	// OnNewSolutionCreated is called when a new solution has been created.
-	OnNewSolutionCreated(solution Solution)
+	OnNewSolutionCreated(solution *Solution)
 
 	// OnCopySolution is called when a solution is going to be copied.
-	OnCopySolution(solution Solution)
+	OnCopySolution(solution *Solution)
 	// OnCopiedSolution is called when a solution has been copied.
-	OnCopiedSolution(solution Solution)
+	OnCopiedSolution(solution *Solution)
 
 	// OnCheckConstraint is called when a constraint is going to be checked.
 	OnCheckConstraint(
@@ -63,7 +63,7 @@ type SolutionObserver interface {
 		estimate float64,
 	)
 	// OnBestMove is called when the solution is asked for it's best move.
-	OnBestMove(solution Solution)
+	OnBestMove(solution *Solution)
 	// OnBestMoveFound is called when the solution has found it's best move.
 	OnBestMoveFound(move SolutionMove)
 
@@ -195,7 +195,7 @@ func (s *solutionObservedImpl) SolutionObservers() SolutionObservers {
 	return observers
 }
 
-func (s *solutionObservedImpl) OnBestMove(solution Solution) {
+func (s *solutionObservedImpl) OnBestMove(solution *Solution) {
 	if len(s.observers) == 0 {
 		return
 	}
@@ -222,7 +222,7 @@ func (s *solutionObservedImpl) OnNewSolution(model Model) {
 	}
 }
 
-func (s *solutionObservedImpl) OnNewSolutionCreated(solution Solution) {
+func (s *solutionObservedImpl) OnNewSolutionCreated(solution *Solution) {
 	if len(s.observers) == 0 {
 		return
 	}
@@ -231,7 +231,7 @@ func (s *solutionObservedImpl) OnNewSolutionCreated(solution Solution) {
 	}
 }
 
-func (s *solutionObservedImpl) OnCopySolution(solution Solution) {
+func (s *solutionObservedImpl) OnCopySolution(solution *Solution) {
 	if len(s.observers) == 0 {
 		return
 	}
@@ -240,7 +240,7 @@ func (s *solutionObservedImpl) OnCopySolution(solution Solution) {
 	}
 }
 
-func (s *solutionObservedImpl) OnCopiedSolution(solution Solution) {
+func (s *solutionObservedImpl) OnCopiedSolution(solution *Solution) {
 	if len(s.observers) == 0 {
 		return
 	}

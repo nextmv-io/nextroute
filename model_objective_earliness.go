@@ -96,7 +96,7 @@ func (l *earlinessObjectiveImpl) earliness(stop SolutionStop) float64 {
 	return math.Max(0, targetTime-compare)
 }
 
-func (l *earlinessObjectiveImpl) Value(solution Solution) float64 {
+func (l *earlinessObjectiveImpl) Value(solution *Solution) float64 {
 	value := 0.0
 	for _, vehicle := range solution.Vehicles() {
 		for s := vehicle.First().Next(); !s.IsLast(); s = s.Next() {

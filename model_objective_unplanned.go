@@ -76,7 +76,7 @@ func (t *unplannedObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) floa
 	return -1 * t.costs[move.(*solutionMoveStopsImpl).planUnit.modelPlanStopsUnit.Index()]
 }
 
-func (t *unplannedObjectiveImpl) Value(solution Solution) float64 {
+func (t *unplannedObjectiveImpl) Value(solution *Solution) float64 {
 	unplannedScore := 0.0
 
 	units := solution.UnPlannedPlanUnits().(*solutionPlanUnitCollectionBaseImpl).solutionPlanUnits

@@ -82,12 +82,8 @@ func (p *solutionPlanStopsUnitImpl) Index() int {
 	return p.modelPlanStopsUnit.Index()
 }
 
-func (p *solutionPlanStopsUnitImpl) Solution() Solution {
+func (p *solutionPlanStopsUnitImpl) Solution() *Solution {
 	return p.solutionStops[0].Solution()
-}
-
-func (p *solutionPlanStopsUnitImpl) solution() *solutionImpl {
-	return p.solutionStops[0].solution
 }
 
 func (p *solutionPlanStopsUnitImpl) Stops() ModelStops {
@@ -130,7 +126,7 @@ func (p *solutionPlanStopsUnitImpl) UnPlan() (bool, error) {
 		return false, nil
 	}
 
-	solution := p.Solution().(*solutionImpl)
+	solution := p.Solution()
 
 	solution.Model().OnUnPlan(p)
 
@@ -186,7 +182,7 @@ var unplanSolutionMove = sync.Pool{
 }
 
 func (p *solutionPlanStopsUnitImpl) unplan() (bool, error) {
-	solution := p.solutionStops[0].Solution().(*solutionImpl)
+	solution := p.solutionStops[0].Solution()
 
 	// TODO: solutionStop.detach() modifies the solution so we have to
 	// create the move here, even though we don't need it only if

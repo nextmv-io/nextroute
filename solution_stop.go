@@ -11,17 +11,17 @@ import (
 // A SolutionStop is a stop that is planned to be visited by a vehicle. It is
 // part of a SolutionPlanUnit and is based on a ModelStop.
 type SolutionStop struct {
-	solution *solutionImpl
+	solution *Solution
 	index    int
 }
 
 // SolutionStops is a slice of SolutionStop.
 type SolutionStops []SolutionStop
 
-func toSolutionStop(solution Solution, index int) SolutionStop {
+func toSolutionStop(solution *Solution, index int) SolutionStop {
 	return SolutionStop{
 		index:    index,
-		solution: solution.(*solutionImpl),
+		solution: solution,
 	}
 }
 
@@ -87,7 +87,7 @@ func (v SolutionStop) CumulativeValue(
 }
 
 // Solution returns the Solution that the stop is part of.
-func (v SolutionStop) Solution() Solution {
+func (v SolutionStop) Solution() *Solution {
 	return v.solution
 }
 

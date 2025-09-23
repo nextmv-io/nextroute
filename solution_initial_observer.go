@@ -60,13 +60,13 @@ func (i *initialSolutionObserver) Constraint() ModelConstraint {
 func (i *initialSolutionObserver) OnNewSolution(_ Model) {
 }
 
-func (i *initialSolutionObserver) OnNewSolutionCreated(_ Solution) {
+func (i *initialSolutionObserver) OnNewSolutionCreated(_ *Solution) {
 }
 
-func (i *initialSolutionObserver) OnCopySolution(_ Solution) {
+func (i *initialSolutionObserver) OnCopySolution(_ *Solution) {
 }
 
-func (i *initialSolutionObserver) OnCopiedSolution(_ Solution) {
+func (i *initialSolutionObserver) OnCopiedSolution(_ *Solution) {
 }
 
 func (i *initialSolutionObserver) OnCheckConstraint(_ ModelConstraint, _ CheckedAt) {
@@ -91,7 +91,7 @@ func (i *initialSolutionObserver) OnEstimateDeltaObjectiveScore() {
 func (i *initialSolutionObserver) OnEstimatedDeltaObjectiveScore(_ float64) {
 }
 
-func (i *initialSolutionObserver) OnBestMove(_ Solution) {
+func (i *initialSolutionObserver) OnBestMove(_ *Solution) {
 }
 
 func (i *initialSolutionObserver) OnBestMoveFound(_ SolutionMove) {
