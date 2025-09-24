@@ -10,7 +10,7 @@ import (
 )
 
 type groupedStopsTest struct {
-	model nextroute.Model
+	model *nextroute.Model
 	s1    *nextroute.ModelStop
 	s2    *nextroute.ModelStop
 	s3    *nextroute.ModelStop

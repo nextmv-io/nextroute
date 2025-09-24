@@ -16,9 +16,9 @@ import (
 // addWindowsConstraint adds the time windows to the Model.
 func addWindowsConstraint(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	latestStartExpression, model, err := latestStartExpression(model)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func addWindowsConstraint(
 
 func addWindowsStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	latestStartExpression nextroute.StopTimeExpression,
 ) (bool, error) {
 	hasTimeWindow := false
@@ -84,7 +84,7 @@ func addWindowsStops(
 
 func addWindowsAlternateStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	latestStartExpression nextroute.StopTimeExpression,
 ) (bool, error) {
 	if input.AlternateStops == nil {

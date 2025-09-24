@@ -10,9 +10,9 @@ import (
 // addStopBalanceObjective adds the stop balance objective to the model.
 func addStopBalanceObjective(
 	_ schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	balance := nextroute.NewStopBalanceObjective()
 	if _, err := model.Objective().NewTerm(options.Objectives.StopBalance, balance); err != nil {
 		return nil, err

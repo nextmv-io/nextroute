@@ -13,9 +13,9 @@ import (
 // addInitialSolution sets the initial solution.
 func addInitialSolution(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err

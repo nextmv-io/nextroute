@@ -123,7 +123,7 @@ func SolutionMoveStopsGenerator(
 
 	locations := make([]int, 0, len(source))
 
-	model := vehicle.solution.model.(*modelImpl)
+	model := vehicle.solution.model
 	if model.hasDisallowedSuccessors() || model.hasDirectSuccessors {
 		generate(positions, locations, source, target, func() {
 			m.(*solutionMoveStopsImpl).reset()
@@ -155,14 +155,14 @@ func SolutionMoveStopsGenerator(
 	}
 }
 
-func isNotAllowed(model *modelImpl, from, to SolutionStop) bool {
+func isNotAllowed(model *Model, from, to SolutionStop) bool {
 	if !model.hasDisallowedSuccessors() {
 		return false
 	}
 	return model.disallowedSuccessors[from.ModelStopIndex()][to.ModelStopIndex()]
 }
 
-func mustBeNeighbours(model *modelImpl, from, to SolutionStop) bool {
+func mustBeNeighbours(model *Model, from, to SolutionStop) bool {
 	if !model.hasDirectSuccessors {
 		return false
 	}

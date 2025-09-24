@@ -14,9 +14,9 @@ const defaultUnplannedPenaltyAlternateStop = 2_000_000
 // create a new objective and add it to the model.
 func addUnplannedObjective(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	if options.Objectives.UnplannedPenalty == 0 {
 		return model, nil
 	}
@@ -45,7 +45,7 @@ func addUnplannedObjective(
 
 func addUnplannedPenaltyStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	unplannedPenaltyExpression nextroute.StopExpression,
 ) error {
 	for s, inputStop := range input.Stops {
@@ -66,7 +66,7 @@ func addUnplannedPenaltyStops(
 
 func addUnplannedPenaltyAlternateStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	unplannedPenaltyExpression nextroute.StopExpression,
 ) error {
 	if input.AlternateStops == nil {

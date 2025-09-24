@@ -15,182 +15,9 @@ import (
 	"github.com/nextmv-io/nextroute/common"
 )
 
-// Model defines routing problem.
-type Model interface {
-	ModelData
-	SolutionObserved
-
-	// AddConstraint adds a constraint to the model. The constraint is
-	// checked at the specified violation.
-	AddConstraint(constraint ModelConstraint) error
-
-	// Constraints returns all constraints of the model.
-	Constraints() ModelConstraints
-
-	// ConstraintsCheckedAt returns all constraints of the model that
-	// are checked at the specified time of having calculated the new
-	// information for the changed solution.
-	ConstraintsCheckedAt(violation CheckedAt) ModelConstraints
-
-	// DistanceUnit returns the unit of distance used in the model. The
-	// unit is used to convert distances to values and vice versa. This is
-	// also used for reporting.
-	DistanceUnit() common.DistanceUnit
-
-	// DurationUnit returns the unit of duration used in the model. The
-	// unit is used to convert durations to values and vice versa. This is
-	// also used for reporting.
-	DurationUnit() time.Duration
-
-	// DurationToValue converts the specified duration to a value as it used
-	// internally in the model.
-	DurationToValue(duration time.Duration) float64
-
-	// Epoch returns the epoch of the model. The epoch is used to convert
-	// time.Time to float64 and vice versa. All float64 values are relative
-	// to the epoch.
-	Epoch() time.Time
-
-	// Expressions returns all expressions of the model for which a solution
-	// has to calculate values. The expressions are sorted by their index. The
-	// constraints register their expressions with the model.
-	Expressions() ModelExpressions
-
-	// IsLocked returns true if the model is locked. The model is
-	// locked after a solution has been created using the model.
-	IsLocked() bool
-
-	// NewPlanSequence creates a new plan sequence. A plan sequence is a plan
-	// unit. A plan unit is a collection of stops which are always planned and
-	// unplanned as a single unit. In this case they have to be planned as a
-	// sequence on the same vehicle in the order of the stops provided as an
-	// argument.
-	NewPlanSequence(stops ModelStops) (ModelPlanStopsUnit, error)
-	// NewPlanSingleStop creates a new plan unit. A plan single stop
-	// is a plan unit of a single stop. A plan unit is a collection of
-	// stops which are always planned and unplanned as a single unit.
-	NewPlanSingleStop(stop *ModelStop) (ModelPlanStopsUnit, error)
-	// NewPlanMultipleStops creates a new plan of multiple [ModelStops]. A plan
-	// of multiple stops is a [ModelPlanUnit] of more than one stop. A plan
-	// unit is a collection of stops which are always planned and unplanned
-	// as a single entity. When planned, they are always assigned to the same
-	// vehicle. The function takes in a sequence represented by a
-	// [DirectedAcyclicGraph] (DAG) which restricts the order in which the
-	// stops can be planned on the vehicle. Using an empty DAG means that the
-	// stops can be planned in any order, and they will always be assigned to
-	// the same vehicle. Consider the stops [s1, s2, s3] and the sequence [s1
-	// -> s2, s1 -> s3]. This means that we are restricting that the stop s1
-	// must come before s2 and s3. However, we are not specifying the order of
-	// s2 and s3. This means that we can plan s2 before s3 or s3 before s2.
-	NewPlanMultipleStops(
-		stops ModelStops,
-		sequence DirectedAcyclicGraph,
-	) (ModelPlanStopsUnit, error)
-
-	// NewPlanAllPlanUnits creates a new plan units unit. A plan all plan
-	// units unit is a collection of plan units which are always planned and
-	// unplanned as a single unit. The sameVehicle argument specifies if the
-	// plan units have to be planned on the same vehicle or not. If sameVehicle
-	// is true, the plan units have to be planned on the same vehicle.
-	// The plan units can only be part of one plan units unit.
-	NewPlanAllPlanUnits(
-		sameVehicle bool,
-		planUnits ...ModelPlanUnit,
-	) (ModelPlanUnitsUnit, error)
-
-	// NewPlanOneOfPlanUnits creates a new plan units unit. A plan one of plan
-	// units unit is a collection of plan units from which exactly one has to
-	// be planned.
-	NewPlanOneOfPlanUnits(planUnits ...ModelPlanUnit) (ModelPlanUnitsUnit, error)
-
-	// NewStop creates a new stop. The stop is used to create plan units or can
-	// be used to create a first or last stop of a vehicle.
-	NewStop(location common.Location) (*ModelStop, error)
-
-	// NewVehicle creates a new vehicle. The vehicle is used to create
-	// solutions. Every vehicle has a first and last stop - even if the vehicle
-	// is empty.
-	NewVehicle(
-		vehicleType ModelVehicleType,
-		start time.Time,
-		first *ModelStop,
-		last *ModelStop,
-	) (*ModelVehicle, error)
-	// NewVehicleType creates a new vehicle type. The vehicle type is used to
-	// create vehicles. The travelDuration defines the travel duration going
-	// from one stop to another if the stops are planned on a vehicle of the
-	// constructed type. The duration defines the duration of a stop that gets
-	// planned on a vehicle of the constructed type.
-	NewVehicleType(
-		travelDuration TimeDependentDurationExpression,
-		duration DurationExpression,
-	) (ModelVehicleType, error)
-
-	// NumberOfStops returns the number of stops in the model.
-	NumberOfStops() int
-
-	// Objective returns the objective of the model.
-	Objective() ModelObjectiveSum
-
-	// PlanUnits returns all plan units of the model. A plan unit
-	// is a collection of stops which are always planned and unplanned as a
-	// single unit.
-	PlanUnits() ModelPlanUnits
-
-	// PlanStopsUnits returns all plan units of the model that plan stops.
-	PlanStopsUnits() ModelPlanStopsUnits
-
-	// SequenceSampleSize returns the number of samples to take from all
-	// possible permutations of the stops in a PlanUnit.
-	SequenceSampleSize() int
-
-	// SetSequenceSampleSize sets the number of samples to take from all
-	// possible permutations of the stops in a PlanUnit.
-	SetSequenceSampleSize(sequenceSampleSize int)
-
-	// Random returns a random number generator.
-	Random() *rand.Rand
-
-	// SetRandom sets the random number generator of the model.
-	SetRandom(random *rand.Rand)
-
-	// Stops returns all stops of the model.
-	Stops() ModelStops
-
-	// Stop returns the stop with the specified index.
-	Stop(index int) (*ModelStop, error)
-
-	// TimeFormat returns the time format used for reporting.
-	TimeFormat() string
-
-	// TimeToValue converts the specified time to a value as used
-	// internally in the model.
-	TimeToValue(time time.Time) float64
-
-	// ValueToTime converts the specified value to a time.Time as used
-	// by the user. It is assuming value represents time since
-	// the [Model.Epoch()] in the unit [Model.DurationUnit()].
-	ValueToTime(value float64) time.Time
-	// Vehicles returns all vehicles of the model.
-	Vehicles() ModelVehicles
-	// VehicleTypes returns all vehicle types of the model.
-	VehicleTypes() ModelVehicleTypes
-
-	// Vehicle returns the vehicle with the specified index.
-	Vehicle(index int) *ModelVehicle
-
-	// MaxTime returns the maximum end time (upper bound) for any stop. This
-	// function uses the [Model.Epoch()] as a starting point and adds a large
-	// number to provide a large enough upper bound.
-	MaxTime() time.Time
-
-	// MaxDuration returns the maximum duration (upper bound) for any stop.
-	MaxDuration() time.Duration
-}
-
 // NewModel returns a new model.
-func NewModel() (Model, error) {
-	m := &modelImpl{
+func NewModel() (*Model, error) {
+	m := &Model{
 		modelDataImpl:                  newModelDataImpl(),
 		constraintMap:                  make(map[CheckedAt]ModelConstraints),
 		constraints:                    make(ModelConstraints, 0),
@@ -236,7 +63,8 @@ func NewModel() (Model, error) {
 	return m, nil
 }
 
-type modelImpl struct {
+// Model defines routing problem.
+type Model struct {
 	epoch time.Time
 	modelDataImpl
 	objective                  ModelObjectiveSum
@@ -265,27 +93,37 @@ type modelImpl struct {
 	hasDirectSuccessors            bool
 }
 
-func (m *modelImpl) Vehicles() ModelVehicles {
+// Vehicles returns all vehicles of the model.
+func (m *Model) Vehicles() ModelVehicles {
 	return slices.Clone(m.vehicles)
 }
 
-func (m *modelImpl) SetRandom(random *rand.Rand) {
+// SetRandom sets the random number generator of the model.
+func (m *Model) SetRandom(random *rand.Rand) {
 	m.random = random
 }
 
-func (m *modelImpl) SequenceSampleSize() int {
+// SequenceSampleSize returns the number of samples to take from all
+// possible permutations of the stops in a PlanUnit.
+func (m *Model) SequenceSampleSize() int {
 	return m.sequenceSampleSize
 }
 
-func (m *modelImpl) SetSequenceSampleSize(sequenceSampleSize int) {
+// SetSequenceSampleSize sets the number of samples to take from all
+// possible permutations of the stops in a PlanUnit.
+func (m *Model) SetSequenceSampleSize(sequenceSampleSize int) {
 	m.sequenceSampleSize = sequenceSampleSize
 }
 
-func (m *modelImpl) SetTimeFormat(timeFormat string) {
+// SetTimeFormat sets the time format used for reporting.
+func (m *Model) SetTimeFormat(timeFormat string) {
 	m.timeFormat = timeFormat
 }
 
-func (m *modelImpl) Expressions() ModelExpressions {
+// Expressions returns all expressions of the model for which a solution
+// has to calculate values. The expressions are sorted by their index. The
+// constraints register their expressions with the model.
+func (m *Model) Expressions() ModelExpressions {
 	expressions := make(ModelExpressions, 0, len(m.expressions))
 	for _, expression := range m.expressions {
 		expressions = append(expressions, expression)
@@ -297,7 +135,10 @@ func (m *modelImpl) Expressions() ModelExpressions {
 	return expressions
 }
 
-func (m *modelImpl) NewVehicle(
+// NewVehicle creates a new vehicle. The vehicle is used to create
+// solutions. Every vehicle has a first and last stop - even if the vehicle
+// is empty.
+func (m *Model) NewVehicle(
 	vehicleType ModelVehicleType,
 	start time.Time,
 	first *ModelStop,
@@ -330,7 +171,12 @@ func (m *modelImpl) NewVehicle(
 	return vehicle, nil
 }
 
-func (m *modelImpl) NewVehicleType(
+// NewVehicleType creates a new vehicle type. The vehicle type is used to
+// create vehicles. The travelDuration defines the travel duration going
+// from one stop to another if the stops are planned on a vehicle of the
+// constructed type. The duration defines the duration of a stop that gets
+// planned on a vehicle of the constructed type.
+func (m *Model) NewVehicleType(
 	travelDuration TimeDependentDurationExpression,
 	processDuration DurationExpression,
 ) (ModelVehicleType, error) {
@@ -349,7 +195,7 @@ func (m *modelImpl) NewVehicleType(
 	return vehicle, nil
 }
 
-func (m *modelImpl) addExpression(expression ModelExpression) error {
+func (m *Model) addExpression(expression ModelExpression) error {
 	if existingExpression, ok := m.expressions[expression.Index()]; ok {
 		if existingExpression.Name() != expression.Name() {
 			return fmt.Errorf(
@@ -367,7 +213,7 @@ func (m *modelImpl) addExpression(expression ModelExpression) error {
 	return nil
 }
 
-func (m *modelImpl) setConstraintEstimationOrder() {
+func (m *Model) setConstraintEstimationOrder() {
 	sort.SliceStable(m.constraints, func(i, j int) bool {
 		ci := m.constraints[i]
 		cj := m.constraints[j]
@@ -387,14 +233,16 @@ func (m *modelImpl) setConstraintEstimationOrder() {
 	})
 }
 
-func (m *modelImpl) addToCheckAt(checkAt CheckedAt, constraint ModelConstraint) {
+func (m *Model) addToCheckAt(checkAt CheckedAt, constraint ModelConstraint) {
 	if _, ok := m.constraintMap[checkAt]; !ok {
 		m.constraintMap[checkAt] = make(ModelConstraints, 0, 1)
 	}
 	m.constraintMap[checkAt] = append(m.constraintMap[checkAt], constraint)
 }
 
-func (m *modelImpl) AddConstraint(constraint ModelConstraint) error {
+// AddConstraint adds a constraint to the model. The constraint is
+// checked at the specified violation.
+func (m *Model) AddConstraint(constraint ModelConstraint) error {
 	if m.IsLocked() {
 		return fmt.Errorf(lockErrorMessage, "constraint")
 	}
@@ -452,33 +300,45 @@ func (m *modelImpl) AddConstraint(constraint ModelConstraint) error {
 	return nil
 }
 
-func (m *modelImpl) Epoch() time.Time {
+// Epoch returns the epoch of the model. The epoch is used to convert
+// time.Time to float64 and vice versa. All float64 values are relative
+// to the epoch.
+func (m *Model) Epoch() time.Time {
 	return m.epoch
 }
 
-func (m *modelImpl) Constraints() ModelConstraints {
+// Constraints returns all constraints of the model.
+func (m *Model) Constraints() ModelConstraints {
 	return slices.Clone(m.constraints)
 }
 
-func (m *modelImpl) ConstraintsCheckedAt(violation CheckedAt) ModelConstraints {
+// ConstraintsCheckedAt returns all constraints of the model that
+// are checked at the specified time of having calculated the new
+// information for the changed solution.
+func (m *Model) ConstraintsCheckedAt(violation CheckedAt) ModelConstraints {
 	if constraints, ok := m.constraintMap[violation]; ok {
 		return slices.Clone(constraints)
 	}
 	return make(ModelConstraints, 0)
 }
 
-func (m *modelImpl) Random() *rand.Rand {
+// Random returns a random number generator.
+func (m *Model) Random() *rand.Rand {
 	return m.random
 }
 
-func (m *modelImpl) Objective() ModelObjectiveSum {
+// Objective returns the objective of the model.
+func (m *Model) Objective() ModelObjectiveSum {
 	return m.objective
 }
 
 const lockErrorMessage = "model is locked, can not create a %s," +
 	" a model is locked once a solution has been created using this model"
 
-func (m *modelImpl) NewPlanOneOfPlanUnits(
+// NewPlanOneOfPlanUnits creates a new plan units unit. A plan one of plan
+// units unit is a collection of plan units from which exactly one has to
+// be planned.
+func (m *Model) NewPlanOneOfPlanUnits(
 	planUnits ...ModelPlanUnit,
 ) (ModelPlanUnitsUnit, error) {
 	if m.IsLocked() {
@@ -500,7 +360,13 @@ func (m *modelImpl) NewPlanOneOfPlanUnits(
 	return plan, nil
 }
 
-func (m *modelImpl) NewPlanAllPlanUnits(
+// NewPlanAllPlanUnits creates a new plan units unit. A plan all plan
+// units unit is a collection of plan units which are always planned and
+// unplanned as a single unit. The sameVehicle argument specifies if the
+// plan units have to be planned on the same vehicle or not. If sameVehicle
+// is true, the plan units have to be planned on the same vehicle.
+// The plan units can only be part of one plan units unit.
+func (m *Model) NewPlanAllPlanUnits(
 	sameVehicle bool,
 	planUnits ...ModelPlanUnit,
 ) (ModelPlanUnitsUnit, error) {
@@ -523,7 +389,10 @@ func (m *modelImpl) NewPlanAllPlanUnits(
 	return plan, nil
 }
 
-func (m *modelImpl) NewPlanSingleStop(stop *ModelStop) (ModelPlanStopsUnit, error) {
+// NewPlanSingleStop creates a new plan unit. A plan single stop
+// is a plan unit of a single stop. A plan unit is a collection of
+// stops which are always planned and unplanned as a single unit.
+func (m *Model) NewPlanSingleStop(stop *ModelStop) (ModelPlanStopsUnit, error) {
 	if m.IsLocked() {
 		return nil,
 			fmt.Errorf(lockErrorMessage, "plan single stop")
@@ -539,7 +408,12 @@ func (m *modelImpl) NewPlanSingleStop(stop *ModelStop) (ModelPlanStopsUnit, erro
 	return planSingleStop, nil
 }
 
-func (m *modelImpl) NewPlanSequence(stops ModelStops) (ModelPlanStopsUnit, error) {
+// NewPlanSequence creates a new plan sequence. A plan sequence is a plan
+// unit. A plan unit is a collection of stops which are always planned and
+// unplanned as a single unit. In this case they have to be planned as a
+// sequence on the same vehicle in the order of the stops provided as an
+// argument.
+func (m *Model) NewPlanSequence(stops ModelStops) (ModelPlanStopsUnit, error) {
 	if m.IsLocked() {
 		return nil,
 			fmt.Errorf(lockErrorMessage, "plan sequence")
@@ -556,7 +430,19 @@ func (m *modelImpl) NewPlanSequence(stops ModelStops) (ModelPlanStopsUnit, error
 	return m.NewPlanMultipleStops(stops, directedAcyclicGraph)
 }
 
-func (m *modelImpl) NewPlanMultipleStops(
+// NewPlanMultipleStops creates a new plan of multiple [ModelStops]. A plan
+// of multiple stops is a [ModelPlanUnit] of more than one stop. A plan
+// unit is a collection of stops which are always planned and unplanned
+// as a single entity. When planned, they are always assigned to the same
+// vehicle. The function takes in a sequence represented by a
+// [DirectedAcyclicGraph] (DAG) which restricts the order in which the
+// stops can be planned on the vehicle. Using an empty DAG means that the
+// stops can be planned in any order, and they will always be assigned to
+// the same vehicle. Consider the stops [s1, s2, s3] and the sequence [s1
+// -> s2, s1 -> s3]. This means that we are restricting that the stop s1
+// must come before s2 and s3. However, we are not specifying the order of
+// s2 and s3. This means that we can plan s2 before s3 or s3 before s2.
+func (m *Model) NewPlanMultipleStops(
 	stops ModelStops,
 	sequence DirectedAcyclicGraph,
 ) (ModelPlanStopsUnit, error) {
@@ -575,11 +461,15 @@ func (m *modelImpl) NewPlanMultipleStops(
 	return planUnit, nil
 }
 
-func (m *modelImpl) PlanUnits() ModelPlanUnits {
+// PlanUnits returns all plan units of the model. A plan unit
+// is a collection of stops which are always planned and unplanned as a
+// single unit.
+func (m *Model) PlanUnits() ModelPlanUnits {
 	return slices.Clone(m.planUnits)
 }
 
-func (m *modelImpl) PlanStopsUnits() ModelPlanStopsUnits {
+// PlanStopsUnits returns all plan units of the model that plan stops.
+func (m *Model) PlanStopsUnits() ModelPlanStopsUnits {
 	planStopsUnits := make(ModelPlanStopsUnits, 0, len(m.planUnits))
 	for _, planUnit := range m.planUnits {
 		if planStopsUnit, ok := planUnit.(ModelPlanStopsUnit); ok {
@@ -589,31 +479,45 @@ func (m *modelImpl) PlanStopsUnits() ModelPlanStopsUnits {
 	return planStopsUnits
 }
 
-func (m *modelImpl) TimeFormat() string {
+// TimeFormat returns the time format used for reporting.
+func (m *Model) TimeFormat() string {
 	return m.timeFormat
 }
 
-func (m *modelImpl) DistanceUnit() common.DistanceUnit {
+// DistanceUnit returns the unit of distance used in the model. The
+// unit is used to convert distances to values and vice versa. This is
+// also used for reporting.
+func (m *Model) DistanceUnit() common.DistanceUnit {
 	return m.distanceUnit
 }
 
-func (m *modelImpl) DurationUnit() time.Duration {
+// DurationUnit returns the unit of duration used in the model. The
+// unit is used to convert durations to values and vice versa. This is
+// also used for reporting.
+func (m *Model) DurationUnit() time.Duration {
 	return m.durationUnit
 }
 
-func (m *modelImpl) DurationToValue(duration time.Duration) float64 {
+// DurationToValue converts the specified duration to a value as it used
+// internally in the model.
+func (m *Model) DurationToValue(duration time.Duration) float64 {
 	return duration.Seconds()
 }
 
-func (m *modelImpl) TimeToValue(time time.Time) float64 {
+// TimeToValue converts the specified time to a value as used
+// internally in the model.
+func (m *Model) TimeToValue(time time.Time) float64 {
 	return m.DurationToValue(time.Sub(m.epoch))
 }
 
-func (m *modelImpl) ValueToTime(value float64) time.Time {
+// ValueToTime converts the specified value to a time.Time as used
+// by the user. It is assuming value represents time since
+// the [Model.Epoch()] in the unit [Model.DurationUnit()].
+func (m *Model) ValueToTime(value float64) time.Time {
 	return m.epoch.Add(time.Duration(value) * m.durationUnit)
 }
 
-func (m *modelImpl) lock() error {
+func (m *Model) lock() error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	if m.isLocked {
@@ -750,21 +654,27 @@ func (m *modelImpl) lock() error {
 	return nil
 }
 
-func (m *modelImpl) IsLocked() bool {
+// IsLocked returns true if the model is locked. The model is
+// locked after a solution has been created using the model.
+func (m *Model) IsLocked() bool {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
 	return m.isLocked
 }
 
-func (m *modelImpl) VehicleTypes() ModelVehicleTypes {
+// VehicleTypes returns all vehicle types of the model.
+func (m *Model) VehicleTypes() ModelVehicleTypes {
 	return slices.Clone(m.vehicleTypes)
 }
 
-func (m *modelImpl) Vehicle(index int) *ModelVehicle {
+// Vehicle returns the vehicle with the specified index.
+func (m *Model) Vehicle(index int) *ModelVehicle {
 	return m.vehicles[index]
 }
 
-func (m *modelImpl) NewStop(
+// NewStop creates a new stop. The stop is used to create plan units or can
+// be used to create a first or last stop of a vehicle.
+func (m *Model) NewStop(
 	location common.Location,
 ) (*ModelStop, error) {
 	if m.isLocked {
@@ -782,7 +692,8 @@ func (m *modelImpl) NewStop(
 	return stop, nil
 }
 
-func (m *modelImpl) Stop(index int) (*ModelStop, error) {
+// Stop returns the stop with the specified index.
+func (m *Model) Stop(index int) (*ModelStop, error) {
 	if index < 0 || index >= len(m.stops) {
 		return nil,
 			fmt.Errorf(
@@ -794,22 +705,28 @@ func (m *modelImpl) Stop(index int) (*ModelStop, error) {
 	return m.stops[index], nil
 }
 
-func (m *modelImpl) Stops() ModelStops {
+// Stops returns all stops of the model.
+func (m *Model) Stops() ModelStops {
 	return slices.Clone(m.stops)
 }
 
-func (m *modelImpl) NumberOfStops() int {
+// NumberOfStops returns the number of stops in the model.
+func (m *Model) NumberOfStops() int {
 	return len(m.stops)
 }
 
-func (m *modelImpl) MaxTime() time.Time {
+// MaxTime returns the maximum end time (upper bound) for any stop. This
+// function uses the [Model.Epoch()] as a starting point and adds a large
+// number to provide a large enough upper bound.
+func (m *Model) MaxTime() time.Time {
 	return m.epoch.Add(time.Duration(24*365*200) * time.Hour)
 }
 
-func (m *modelImpl) MaxDuration() time.Duration {
+// MaxDuration returns the maximum duration (upper bound) for any stop.
+func (m *Model) MaxDuration() time.Duration {
 	return m.MaxTime().Sub(m.epoch)
 }
 
-func (m *modelImpl) hasDisallowedSuccessors() bool {
+func (m *Model) hasDisallowedSuccessors() bool {
 	return m.disallowedSuccessors != nil
 }

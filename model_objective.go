@@ -95,7 +95,7 @@ func newModelObjectiveImpl() modelObjectiveImpl {
 
 type modelObjectiveSumImpl struct {
 	modelObjectiveImpl
-	model *modelImpl
+	model *Model
 	terms ModelObjectiveTerms
 }
 
@@ -103,7 +103,7 @@ func (m *modelObjectiveSumImpl) ModelExpressions() ModelExpressions {
 	return ModelExpressions{}
 }
 
-func newModelObjectiveSum(m *modelImpl) ModelObjectiveSum {
+func newModelObjectiveSum(m *Model) ModelObjectiveSum {
 	return &modelObjectiveSumImpl{
 		modelObjectiveImpl: newModelObjectiveImpl(),
 		terms:              make(ModelObjectiveTerms, 0, 1),

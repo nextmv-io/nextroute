@@ -120,7 +120,7 @@ func (v *ModelVehicle) AddStop(
 			v.ID(),
 		)
 	}
-	if vIdx, stopAddedToVehicle := v.Model().(*modelImpl).stopVehicles[stop.Index()]; stopAddedToVehicle {
+	if vIdx, stopAddedToVehicle := v.Model().stopVehicles[stop.Index()]; stopAddedToVehicle {
 		return fmt.Errorf("can not add a stop `%v` to vehicle `%v` "+
 			"the stop is already added to vehicle `%v`",
 			stop.ID(),
@@ -139,7 +139,7 @@ func (v *ModelVehicle) AddStop(
 }
 
 // Model returns the model of the vehicle.
-func (v *ModelVehicle) Model() Model {
+func (v *ModelVehicle) Model() *Model {
 	return v.vehicleType.Model()
 }
 

@@ -18,7 +18,7 @@ import (
 
 // Solution is a solution to a model.
 type Solution struct {
-	model                  Model
+	model                  *Model
 	scores                 map[ModelObjective]float64
 	values                 map[int][]float64
 	objectiveStopData      map[ModelObjective][]Copier
@@ -58,17 +58,15 @@ type Solutions []*Solution
 
 // NewSolution returns a new Solution.
 func NewSolution(
-	m Model,
+	model *Model,
 ) (*Solution, error) {
-	model := m.(*modelImpl)
-
 	err := model.lock()
 
 	if err != nil {
 		return nil, err
 	}
 
-	model.OnNewSolution(m)
+	model.OnNewSolution(model)
 
 	nrStops := 0
 	nrFixedPlanUnits := 0
@@ -87,12 +85,12 @@ func NewSolution(
 		}
 	}
 
-	random := rand.New(rand.NewSource(m.Random().Int63()))
+	random := rand.New(rand.NewSource(model.Random().Int63()))
 
 	nExpressions := len(model.expressions)
 
 	solution := &Solution{
-		model: m,
+		model: model,
 
 		vehicleIndices:           make([]int, 0, nrVehicles),
 		vehicles:                 make([]SolutionVehicle, 0, nrVehicles),
@@ -279,11 +277,11 @@ func NewSolution(
 		}
 	}
 
-	if err := solution.addInitialSolution(m); err != nil {
+	if err := solution.addInitialSolution(model); err != nil {
 		return nil, err
 	}
 
-	m.OnNewSolutionCreated(solution)
+	model.OnNewSolutionCreated(solution)
 
 	return solution, nil
 }
@@ -324,9 +322,7 @@ func reportInfeasibleInitialSolution(
 	)
 }
 
-func (s *Solution) addInitialSolution(m Model) error {
-	model := m.(*modelImpl)
-
+func (s *Solution) addInitialSolution(model *Model) error {
 	solutionObserver := newInitialSolutionObserver()
 
 	model.AddSolutionObserver(solutionObserver)
@@ -614,7 +610,7 @@ func (s *Solution) solutionVehicle(vehicle *ModelVehicle) (SolutionVehicle, bool
 
 // Copy returns a deep copy of the solution.
 func (s *Solution) Copy() *Solution {
-	model := s.model.(*modelImpl)
+	model := s.model
 
 	model.OnCopySolution(s)
 	s.randomMutex.Lock()
@@ -791,7 +787,7 @@ func (s *Solution) newVehicle(
 		return SolutionVehicle{}, fmt.Errorf("modelVehicle is nil")
 	}
 
-	model := s.model.(*modelImpl)
+	model := s.model
 
 	start := modelVehicle.Start().Sub(model.Epoch()) / model.DurationUnit()
 
@@ -873,7 +869,7 @@ func (s *Solution) newVehicle(
 func (s *Solution) checkConstraintsAndEstimateDeltaScore(
 	m SolutionMoveStops,
 ) (deltaScore float64, feasible bool, planPositionsHint StopPositionsHint) {
-	model := s.model.(*modelImpl)
+	model := s.model
 	for _, constraint := range model.constraints {
 		s.model.OnEstimateIsViolated(
 			constraint,
@@ -920,7 +916,7 @@ var constNoPositionsHintImpl = noPositionsHint()
 func (s *Solution) checkConstraints(
 	m SolutionMoveStops,
 ) (feasible bool, planPositionsHint *stopPositionHintImpl) {
-	model := s.model.(*modelImpl)
+	model := s.model
 	for _, constraint := range model.constraints {
 		s.model.OnEstimateIsViolated(
 			constraint,
@@ -959,7 +955,7 @@ func (s *Solution) estimateDeltaScore(
 ) (deltaScore float64) {
 	s.model.OnEstimateDeltaObjectiveScore()
 
-	objectiveEstimate := s.model.(*modelImpl).objective.EstimateDeltaValue(m)
+	objectiveEstimate := s.model.objective.EstimateDeltaValue(m)
 
 	s.model.OnEstimatedDeltaObjectiveScore(objectiveEstimate)
 
@@ -1090,7 +1086,7 @@ func (s *Solution) BestMove(ctx context.Context, planUnit SolutionPlanUnit) Solu
 }
 
 // Model returns the model of the solution.
-func (s *Solution) Model() Model {
+func (s *Solution) Model() *Model {
 	return s.model
 }
 
@@ -1161,7 +1157,7 @@ func (s *Solution) isFeasible(index int, includeTemporal bool) (
 	violatedIndex int,
 	err error,
 ) {
-	model := s.model.(*modelImpl)
+	model := s.model
 	vehicle := s.model.Vehicle(s.vehicleIndices[s.inVehicle[index]])
 	vehicleType := vehicle.VehicleType()
 

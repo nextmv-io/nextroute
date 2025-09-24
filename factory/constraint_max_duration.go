@@ -16,9 +16,9 @@ import (
 // earlier time than what is already set, then the value is changed.
 func addMaximumDurationConstraint(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	latestEndExpression, model, err := latestEndExpression(model)
 	if err != nil {
 		return nil, err

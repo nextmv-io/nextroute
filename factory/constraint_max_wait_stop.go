@@ -13,9 +13,9 @@ import (
 // addMaximumWaitStopConstraint adds a MaximumWaitStopConstraint to the model.
 func addMaximumWaitStopConstraint(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	maximumWaitPerStop := nextroute.NewStopDurationExpression("stop-wait-max", model.MaxDuration())
 
 	maximumWaitPresent := addMaximumWaitStops(input, model, maximumWaitPerStop)
@@ -44,7 +44,7 @@ func addMaximumWaitStopConstraint(
 
 func addMaximumWaitStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	stopLimit nextroute.StopDurationExpression,
 ) bool {
 	present := false
@@ -62,7 +62,7 @@ func addMaximumWaitStops(
 
 func addMaximumWaitAlternateStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	stopLimit nextroute.StopDurationExpression,
 ) (bool, error) {
 	if input.AlternateStops == nil {

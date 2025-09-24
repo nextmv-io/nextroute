@@ -14,9 +14,9 @@ import (
 // value is changed.
 func addVehicleEndTimeConstraint(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	latestEndExpression, model, err := latestEndExpression(model)
 	if err != nil {
 		return nil, err

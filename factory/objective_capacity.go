@@ -110,9 +110,9 @@ func parseCapacityObjectives(capacities string) ([]capacityObjective, error) {
 // to create a new objective and add it to the model.
 func addCapacityObjective(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	if options.Objectives.Capacities == "" {
 		return model, nil
 	}
@@ -196,12 +196,12 @@ func addCapacityObjective(
 // expressions that the Model uses. Because it receives and returns a Model, it
 // mutates it to add maximum as a constraint.
 func addMaximumObjectives(
-	model nextroute.Model,
+	model *nextroute.Model,
 	names map[string]bool,
 	options Options,
 	capacityObjectives []capacityObjective,
 ) (
-	nextroute.Model,
+	*nextroute.Model,
 	map[string]bool,
 	map[string]nextroute.StopExpression,
 	map[string]nextroute.VehicleTypeValueExpression,

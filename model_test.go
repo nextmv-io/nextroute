@@ -58,7 +58,7 @@ func TestModel(t *testing.T) {
 	}
 }
 
-func createModel(input Input) (nextroute.Model, error) {
+func createModel(input Input) (*nextroute.Model, error) {
 	model, err := nextroute.NewModel()
 	if err != nil {
 		return nil, err

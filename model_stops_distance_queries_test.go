@@ -9,7 +9,7 @@ import (
 	"github.com/nextmv-io/nextroute/common"
 )
 
-func createTestModel() (nextroute.Model, error) {
+func createTestModel() (*nextroute.Model, error) {
 	model, err := nextroute.NewModel()
 	if err != nil {
 		return nil, err

@@ -14,9 +14,9 @@ import (
 // addNoMixConstraint.
 func addNoMixConstraint(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	mixingItems := make(map[string]map[*nextroute.ModelStop]nextroute.MixItem)
 
 	for index, inputStop := range input.Stops {

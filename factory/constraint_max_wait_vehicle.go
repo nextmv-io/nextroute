@@ -13,9 +13,9 @@ import (
 // model.
 func addMaximumWaitVehicleConstraint(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	vehicleLimit := nextroute.NewVehicleTypeDurationExpression("vehicle-wait-max", model.MaxDuration())
 
 	present := false

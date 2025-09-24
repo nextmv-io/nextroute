@@ -17,9 +17,9 @@ import (
 // expressions to add a new maximum constraint to the model.
 func addCapacityConstraint(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	quantities, names, quantitiesPresent, err := stopQuantities(input.Stops)
 	if err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func stopQuantities(stops []schema.Stop) (
 
 func alternateStopQuantities(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	requirements map[int]map[string]float64,
 	names map[string]bool,
 ) (
@@ -338,10 +338,10 @@ func stringAnyMap[T anyOrInt](
 // expressions that the Model uses. Because it receives and returns a Model, it
 // mutates it to add maximum as a constraint.
 func addMaximumConstraint(
-	model nextroute.Model,
+	model *nextroute.Model,
 	names map[string]bool,
 ) (
-	nextroute.Model,
+	*nextroute.Model,
 	map[string]nextroute.StopExpression,
 	map[string]nextroute.VehicleTypeValueExpression,
 	error,

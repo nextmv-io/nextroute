@@ -11,9 +11,9 @@ import (
 // duration to the model.
 func addVehiclesDurationObjective(
 	_ schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	o := nextroute.NewVehiclesDurationObjective()
 	_, err := model.Objective().NewTerm(options.Objectives.VehiclesDuration, o)
 	if err != nil {

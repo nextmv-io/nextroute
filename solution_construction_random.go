@@ -9,7 +9,7 @@ import (
 )
 
 // NewRandomSolution returns a random solution for the given model.
-func NewRandomSolution(ctx context.Context, model Model) (*Solution, error) {
+func NewRandomSolution(ctx context.Context, model *Model) (*Solution, error) {
 	solution, err := NewSolution(model)
 	if err != nil {
 		return nil, err

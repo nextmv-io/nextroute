@@ -22,7 +22,7 @@ type ConstraintReporter interface {
 // structures that are used to check the constraint.
 type Locker interface {
 	// Lock locks the constraint on locking a model.
-	Lock(model Model) error
+	Lock(model *Model) error
 }
 
 // ConstraintStopDataUpdater is the interface than can be used by a constraint if

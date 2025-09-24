@@ -33,7 +33,7 @@ type maximumStopsConstraintImpl struct {
 	modelConstraintImpl
 }
 
-func (l *maximumStopsConstraintImpl) Lock(model Model) error {
+func (l *maximumStopsConstraintImpl) Lock(model *Model) error {
 	vehicleTypes := model.VehicleTypes()
 	l.maximumStopsByVehicleType = make([]float64, len(vehicleTypes))
 	for _, vehicleType := range vehicleTypes {

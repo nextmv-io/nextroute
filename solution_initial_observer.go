@@ -57,7 +57,7 @@ func (i *initialSolutionObserver) Constraint() ModelConstraint {
 	return i.constraint
 }
 
-func (i *initialSolutionObserver) OnNewSolution(_ Model) {
+func (i *initialSolutionObserver) OnNewSolution(_ *Model) {
 }
 
 func (i *initialSolutionObserver) OnNewSolutionCreated(_ *Solution) {

@@ -83,7 +83,7 @@ type StopClusterFilter interface {
 // ModelFactory returns a new model for the given input and options.
 type ModelFactory interface {
 	// NewModel returns a new model for the given input and options.
-	NewModel(schema.Input, Options) (nextroute.Model, error)
+	NewModel(schema.Input, Options) (*nextroute.Model, error)
 }
 
 // NewStartSolution returns a start solution. It uses input, factoryOptions and
@@ -297,7 +297,7 @@ type defaultModelFactoryImpl struct{}
 func (d defaultModelFactoryImpl) NewModel(
 	input schema.Input,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	return NewModel(input, options)
 }
 

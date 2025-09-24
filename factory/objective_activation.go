@@ -11,9 +11,9 @@ import (
 // objective to the Model.
 func addActivationPenaltyObjective(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	activationPenalty := nextroute.NewVehicleTypeValueExpression("activation_penalty", 0.0)
 	present := false
 	for v, vehicle := range input.Vehicles {
