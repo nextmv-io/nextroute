@@ -35,7 +35,7 @@ func (e *expressionObjectiveImpl) Index() int {
 	return e.index
 }
 
-func (e *expressionObjectiveImpl) Value(solution Solution) float64 {
+func (e *expressionObjectiveImpl) Value(solution *Solution) float64 {
 	score := 0.0
 	for _, r := range solution.Vehicles() {
 		score += r.Last().CumulativeValue(e.expression)

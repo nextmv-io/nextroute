@@ -28,12 +28,12 @@ func Format(
 	ctx context.Context,
 	options any,
 	progressioner Progressioner,
-	toSolutionOutputFn func(Solution) any,
-	inputSolutions ...Solution,
+	toSolutionOutputFn func(*Solution) any,
+	inputSolutions ...*Solution,
 ) schema.Output {
 	solutions := common.Filter(
 		inputSolutions,
-		func(solution Solution) bool {
+		func(solution *Solution) bool {
 			return solution != nil
 		},
 	)

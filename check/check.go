@@ -41,7 +41,7 @@ func ModelCheck(
 
 // SolutionCheck is the check of a solution returning a [Output].
 func SolutionCheck(
-	solution nextroute.Solution,
+	solution *nextroute.Solution,
 	options Options,
 ) (schema.Output, error) {
 	if solution == nil {
@@ -87,7 +87,7 @@ func SolutionCheck(
 }
 
 type checkImpl struct {
-	solution  nextroute.Solution
+	solution  *nextroute.Solution
 	output    schema.Output
 	verbosity Verbosity
 }
@@ -391,7 +391,7 @@ func toID(modelPlanUnit nextroute.ModelPlanUnit) []string {
 	return []string{"unknown plan unit"}
 }
 
-func removePlanUnits(solution nextroute.Solution) error {
+func removePlanUnits(solution *nextroute.Solution) error {
 	if solution == nil {
 		return fmt.Errorf("solution is nil")
 	}

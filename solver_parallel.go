@@ -72,7 +72,7 @@ func (p *parallelSolverWrapperImpl) Progression() []ProgressionEntry {
 func (p *parallelSolverWrapperImpl) Solve(
 	ctx context.Context,
 	solveOptions ParallelSolveOptions,
-	startSolutions ...Solution,
+	startSolutions ...*Solution,
 ) (SolutionChannel, error) {
 	start := ctx.Value(run.Start).(time.Time)
 	ctx, _ = context.WithDeadline(
@@ -114,7 +114,7 @@ func (p *parallelSolverWrapperImpl) Solve(
 			return nil, err
 		}
 		for idx := 0; idx < interpretedParallelSolveOptions.StartSolutions; idx++ {
-			go func(idx int, sol Solution) {
+			go func(idx int, sol *Solution) {
 				defer wg.Done()
 				randomSolution, err := RandomSolutionConstruction(ctx, sol)
 				if err != nil {

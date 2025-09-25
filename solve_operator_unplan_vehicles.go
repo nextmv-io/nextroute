@@ -62,7 +62,7 @@ func (d *solveOperatorUnPlanVehiclesImpl) Execute(
 ) error {
 	workSolution := runTimeInformation.
 		Solver().
-		WorkSolution().(*solutionImpl)
+		WorkSolution()
 
 	if workSolution.PlannedPlanUnits().Size() == 0 {
 		return nil

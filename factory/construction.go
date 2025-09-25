@@ -99,7 +99,7 @@ func NewStartSolution(
 	modelFactory ModelFactory,
 	solveOptions nextroute.ParallelSolveOptions,
 	clusterSolutionOptions ClusterSolutionOptions,
-) (nextroute.Solution, error) {
+) (*nextroute.Solution, error) {
 	if cont.Value(run.Start) == nil {
 		cont = context.WithValue(cont, run.Start, time.Now())
 	}
@@ -200,7 +200,7 @@ func NewStartSolution(
 
 			type experimentResult struct {
 				side     float64
-				solution nextroute.Solution
+				solution *nextroute.Solution
 			}
 
 			experimentResults := make(chan experimentResult, n)
@@ -266,7 +266,7 @@ func NewGreedySolution(
 	options Options,
 	greedySolutionOptions GreedySolutionOptions,
 	modelFactory ModelFactory,
-) (nextroute.Solution, error) {
+) (*nextroute.Solution, error) {
 	return NewClusterSolution(
 		ctx,
 		input,
@@ -545,7 +545,7 @@ func NewClusterSolution(
 	stopClusterFilter StopClusterFilter,
 	stopClusterOptions ClusterSolutionOptions,
 	modelFactory ModelFactory,
-) (nextroute.Solution, error) {
+) (*nextroute.Solution, error) {
 	if modelFactory == nil {
 		modelFactory = NewDefaultModelFactory()
 	}
@@ -695,7 +695,7 @@ func newSolution(
 	options Options,
 	parallelSolveOptions nextroute.ParallelSolveOptions,
 	modelFactory ModelFactory,
-) (nextroute.Solution, error) {
+) (*nextroute.Solution, error) {
 	model, err := modelFactory.NewModel(input, options)
 	if err != nil {
 		return nil, err

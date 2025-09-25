@@ -18,12 +18,12 @@ func (t *balanceObjectiveImpl) EstimateDeltaValue(
 	return float64(newMax - oldMax)
 }
 
-func (t *balanceObjectiveImpl) Value(solution Solution) float64 {
+func (t *balanceObjectiveImpl) Value(solution *Solution) float64 {
 	maxBefore, _ := t.maxStops(solution, nil)
 	return float64(maxBefore)
 }
 
-func (t *balanceObjectiveImpl) maxStops(solution Solution, move SolutionMoveStops) (int, int) {
+func (t *balanceObjectiveImpl) maxStops(solution *Solution, move SolutionMoveStops) (int, int) {
 	maximum := 0
 	maximumBefore := 0
 	moveExists := move != nil
@@ -32,7 +32,7 @@ func (t *balanceObjectiveImpl) maxStops(solution Solution, move SolutionMoveStop
 		vehicle = move.Vehicle()
 	}
 
-	for _, v := range solution.(*solutionImpl).vehicles {
+	for _, v := range solution.vehicles {
 		numberOfStops := v.NumberOfStops()
 		if maximum < numberOfStops {
 			maximum = numberOfStops

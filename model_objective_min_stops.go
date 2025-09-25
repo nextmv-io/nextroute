@@ -49,10 +49,9 @@ func (t *minStopsObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float
 		-float64(oldDelta) * float64(oldDelta)
 }
 
-func (t *minStopsObjectiveImpl) Value(solution Solution) float64 {
-	solutionImpl := solution.(*solutionImpl)
+func (t *minStopsObjectiveImpl) Value(solution *Solution) float64 {
 	penaltySum := 0.0
-	for _, vehicle := range solutionImpl.vehicles {
+	for _, vehicle := range solution.vehicles {
 		vehicleNumberOfStops := vehicle.NumberOfStops()
 		if vehicleNumberOfStops == 0 {
 			continue

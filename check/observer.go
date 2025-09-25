@@ -59,13 +59,13 @@ func (o *observerImpl) Reset() {
 func (o *observerImpl) OnNewSolution(_ nextroute.Model) {
 }
 
-func (o *observerImpl) OnNewSolutionCreated(_ nextroute.Solution) {
+func (o *observerImpl) OnNewSolutionCreated(_ *nextroute.Solution) {
 }
 
-func (o *observerImpl) OnCopySolution(_ nextroute.Solution) {
+func (o *observerImpl) OnCopySolution(_ *nextroute.Solution) {
 }
 
-func (o *observerImpl) OnCopiedSolution(_ nextroute.Solution) {
+func (o *observerImpl) OnCopiedSolution(_ *nextroute.Solution) {
 }
 
 func (o *observerImpl) OnCheckConstraint(_ nextroute.ModelConstraint, _ nextroute.CheckedAt) {
@@ -94,7 +94,7 @@ func (o *observerImpl) OnEstimateDeltaObjectiveScore() {
 func (o *observerImpl) OnEstimatedDeltaObjectiveScore(_ float64) {
 }
 
-func (o *observerImpl) OnBestMove(_ nextroute.Solution) {
+func (o *observerImpl) OnBestMove(_ *nextroute.Solution) {
 }
 
 func (o *observerImpl) OnBestMoveFound(_ nextroute.SolutionMove) {

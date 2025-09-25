@@ -150,7 +150,7 @@ func (p *performanceObserverImpl) OnVehicleConstraintChecked(
 	}
 }
 
-func (p *performanceObserverImpl) OnBestMove(_ nextroute.Solution) {
+func (p *performanceObserverImpl) OnBestMove(_ *nextroute.Solution) {
 	p.moveMutex.Lock()
 	defer p.moveMutex.Unlock()
 
@@ -204,7 +204,7 @@ func (p *performanceObserverImpl) OnNewSolution(_ nextroute.Model) {
 	p.solutionData.lastNewStart[p.routineName()] = time.Now()
 }
 
-func (p *performanceObserverImpl) OnNewSolutionCreated(_ nextroute.Solution) {
+func (p *performanceObserverImpl) OnNewSolutionCreated(_ *nextroute.Solution) {
 	p.solutionMutex.Lock()
 	defer p.solutionMutex.Unlock()
 
@@ -213,7 +213,7 @@ func (p *performanceObserverImpl) OnNewSolutionCreated(_ nextroute.Solution) {
 	)
 }
 
-func (p *performanceObserverImpl) OnCopySolution(_ nextroute.Solution) {
+func (p *performanceObserverImpl) OnCopySolution(_ *nextroute.Solution) {
 	p.solutionMutex.Lock()
 	defer p.solutionMutex.Unlock()
 
@@ -221,7 +221,7 @@ func (p *performanceObserverImpl) OnCopySolution(_ nextroute.Solution) {
 	p.solutionData.lastCopyStart[p.routineName()] = time.Now()
 }
 
-func (p *performanceObserverImpl) OnCopiedSolution(_ nextroute.Solution) {
+func (p *performanceObserverImpl) OnCopiedSolution(_ *nextroute.Solution) {
 	p.solutionMutex.Lock()
 	defer p.solutionMutex.Unlock()
 

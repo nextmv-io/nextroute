@@ -17,79 +17,49 @@ import (
 )
 
 // Solution is a solution to a model.
-type Solution interface {
-	// BestMove returns the best move for the given solution plan unit. The
-	// best move is the move that has the lowest score. If there are no moves
-	// available for the given solution plan unit, a move is returned which
-	// is not executable, SolutionMoveStops.IsExecutable.
-	BestMove(context.Context, SolutionPlanUnit) SolutionMove
+type Solution struct {
+	model                  Model
+	scores                 map[ModelObjective]float64
+	values                 map[int][]float64
+	objectiveStopData      map[ModelObjective][]Copier
+	constraintStopData     map[ModelConstraint][]Copier
+	objectiveVehicleData   map[ModelObjective][]Copier
+	objectiveSolutionData  map[ModelObjective]Copier
+	constraintSolutionData map[ModelConstraint]Copier
+	cumulativeValues       map[int][]float64
 
-	// ConstraintData returns the data of the constraint for the solution. The
-	// constraint data of a solution is set by the
-	// ConstraintSolutionDataUpdater.UpdateConstraintSolutionData method of the
-	// constraint.
-	ConstraintData(constraint ModelConstraint) any
-	// Copy returns a deep copy of the solution.
-	Copy() Solution
+	// TODO: explore if stopToPlanUnit should rather contain interfaces
+	stopToPlanUnit       []*solutionPlanStopsUnitImpl
+	random               *rand.Rand
+	plannedPlanUnits     solutionPlanUnitCollectionBaseImpl
+	fixedPlanUnits       solutionPlanUnitCollectionBaseImpl
+	unPlannedPlanUnits   solutionPlanUnitCollectionBaseImpl
+	propositionPlanUnits solutionPlanUnitCollectionBaseImpl
+	vehicleIndices       []int
 
-	// FixedPlanUnits returns the solution plan units that are fixed.
-	// Fixed plan units are plan units that are not allowed to be planned or
-	// unplanned. The union of fixed, planned and unplanned plan units
-	// is the set of all plan units in the model.
-	FixedPlanUnits() ImmutableSolutionPlanUnitCollection
-
-	// Model returns the model of the solution.
-	Model() Model
-
-	// ObjectiveData returns the value of the objective for the solution. The
-	// objective value of a solution is set by the
-	// ObjectiveSolutionDataUpdater.UpdateObjectiveSolutionData method of the
-	// objective. If the objective is not set on the solution, nil is returned.
-	ObjectiveData(objective ModelObjective) any
-	// ObjectiveValue returns the objective value for the objective in the
-	// solution. Also returns 0.0 if the objective is not part of the solution.
-	ObjectiveValue(objective ModelObjective) float64
-
-	// PlannedPlanUnits returns the solution plan units that are planned as
-	// a collection of solution plan units.
-	PlannedPlanUnits() ImmutableSolutionPlanUnitCollection
-
-	// Random returns the random number generator of the solution.
-	Random() *rand.Rand
-
-	// Score returns the score of the solution.
-	Score() float64
-
-	// SetRandom sets the random number generator of the solution. Returns an
-	// error if the random number generator is nil.
-	SetRandom(random *rand.Rand) error
-
-	// SolutionPlanStopsUnit returns the [SolutionPlanStopsUnit] for the given
-	// model plan unit.
-	SolutionPlanStopsUnit(planUnit ModelPlanStopsUnit) SolutionPlanStopsUnit
-	// SolutionPlanUnit returns the [SolutionPlanUnit] for the given
-	// model plan unit.
-	SolutionPlanUnit(planUnit ModelPlanUnit) SolutionPlanUnit
-	// SolutionStop returns the solution stop for the given model stop.
-	SolutionStop(stop *ModelStop) SolutionStop
-	// SolutionVehicle returns the solution vehicle for the given model vehicle.
-	SolutionVehicle(vehicle *ModelVehicle) SolutionVehicle
-
-	// UnPlannedPlanUnits returns the solution plan units that are not
-	// planned.
-	UnPlannedPlanUnits() ImmutableSolutionPlanUnitCollection
-
-	// Vehicles returns the vehicles of the solution.
-	Vehicles() SolutionVehicles
+	vehicles                 []SolutionVehicle
+	start                    []float64
+	slack                    []float64
+	arrival                  []float64
+	next                     []int
+	stopPosition             []int
+	first                    []int
+	stop                     []int
+	cumulativeTravelDuration []float64
+	end                      []float64
+	previous                 []int
+	inVehicle                []int
+	last                     []int
+	randomMutex              sync.Mutex
 }
 
 // Solutions is a slice of solutions.
-type Solutions []Solution
+type Solutions []*Solution
 
 // NewSolution returns a new Solution.
 func NewSolution(
 	m Model,
-) (Solution, error) {
+) (*Solution, error) {
 	model := m.(*modelImpl)
 
 	err := model.lock()
@@ -121,12 +91,11 @@ func NewSolution(
 
 	nExpressions := len(model.expressions)
 
-	solution := &solutionImpl{
+	solution := &Solution{
 		model: m,
 
 		vehicleIndices:           make([]int, 0, nrVehicles),
 		vehicles:                 make([]SolutionVehicle, 0, nrVehicles),
-		solutionVehicles:         make([]SolutionVehicle, 0, nrVehicles),
 		first:                    make([]int, 0, nrVehicles),
 		last:                     make([]int, 0, nrVehicles),
 		stop:                     make([]int, 0, nrStops),
@@ -319,7 +288,7 @@ func NewSolution(
 	return solution, nil
 }
 
-func (s *solutionImpl) unwrapRootPlanUnit(planUnit SolutionPlanUnit) SolutionPlanUnit {
+func (s *Solution) unwrapRootPlanUnit(planUnit SolutionPlanUnit) SolutionPlanUnit {
 	planUnitsUnit, isElementOfPlanUnitsUnit := planUnit.ModelPlanUnit().PlanUnitsUnit()
 	for isElementOfPlanUnitsUnit {
 		planUnit = s.solutionPlanUnitsUnit(planUnitsUnit)
@@ -355,7 +324,7 @@ func reportInfeasibleInitialSolution(
 	)
 }
 
-func (s *solutionImpl) addInitialSolution(m Model) error {
+func (s *Solution) addInitialSolution(m Model) error {
 	model := m.(*modelImpl)
 
 	solutionObserver := newInitialSolutionObserver()
@@ -571,59 +540,25 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 	return nil
 }
 
-type solutionImpl struct {
-	model                  Model
-	scores                 map[ModelObjective]float64
-	values                 map[int][]float64
-	objectiveStopData      map[ModelObjective][]Copier
-	constraintStopData     map[ModelConstraint][]Copier
-	objectiveVehicleData   map[ModelObjective][]Copier
-	objectiveSolutionData  map[ModelObjective]Copier
-	constraintSolutionData map[ModelConstraint]Copier
-	cumulativeValues       map[int][]float64
-
-	// TODO: explore if stopToPlanUnit should rather contain interfaces
-	stopToPlanUnit       []*solutionPlanStopsUnitImpl
-	random               *rand.Rand
-	plannedPlanUnits     solutionPlanUnitCollectionBaseImpl
-	fixedPlanUnits       solutionPlanUnitCollectionBaseImpl
-	unPlannedPlanUnits   solutionPlanUnitCollectionBaseImpl
-	propositionPlanUnits solutionPlanUnitCollectionBaseImpl
-	vehicleIndices       []int
-
-	// TODO: explore if vehicles should rather be interfaces, then we can avoid creating new vehicles on the fly
-	vehicles                 []SolutionVehicle
-	solutionVehicles         []SolutionVehicle
-	start                    []float64
-	slack                    []float64
-	arrival                  []float64
-	next                     []int
-	stopPosition             []int
-	first                    []int
-	stop                     []int
-	cumulativeTravelDuration []float64
-	end                      []float64
-	previous                 []int
-	inVehicle                []int
-	last                     []int
-	randomMutex              sync.Mutex
-}
-
-func (s *solutionImpl) SolutionPlanStopsUnit(planUnit ModelPlanStopsUnit) SolutionPlanStopsUnit {
+// SolutionPlanStopsUnit returns the [SolutionPlanStopsUnit] for the given
+// model plan unit.
+func (s *Solution) SolutionPlanStopsUnit(planUnit ModelPlanStopsUnit) SolutionPlanStopsUnit {
 	if planUnit == nil {
 		return nil
 	}
 	return s.solutionPlanStopsUnit(planUnit)
 }
 
-func (s *solutionImpl) SolutionPlanUnit(planUnit ModelPlanUnit) SolutionPlanUnit {
+// SolutionPlanUnit returns the [SolutionPlanUnit] for the given
+// model plan unit.
+func (s *Solution) SolutionPlanUnit(planUnit ModelPlanUnit) SolutionPlanUnit {
 	if planUnit == nil {
 		return nil
 	}
 	return s.solutionPlanUnit(planUnit)
 }
 
-func (s *solutionImpl) solutionPlanUnit(planUnit ModelPlanUnit) SolutionPlanUnit {
+func (s *Solution) solutionPlanUnit(planUnit ModelPlanUnit) SolutionPlanUnit {
 	solutionPlanUnit := s.plannedPlanUnits.SolutionPlanUnit(planUnit)
 	if solutionPlanUnit != nil {
 		return solutionPlanUnit
@@ -643,29 +578,31 @@ func (s *solutionImpl) solutionPlanUnit(planUnit ModelPlanUnit) SolutionPlanUnit
 	return nil
 }
 
-func (s *solutionImpl) solutionPlanStopsUnit(planUnit ModelPlanStopsUnit) *solutionPlanStopsUnitImpl {
+func (s *Solution) solutionPlanStopsUnit(planUnit ModelPlanStopsUnit) *solutionPlanStopsUnitImpl {
 	return s.solutionPlanUnit(planUnit).(*solutionPlanStopsUnitImpl)
 }
 
-func (s *solutionImpl) solutionPlanUnitsUnit(planUnit ModelPlanUnitsUnit) *solutionPlanUnitsUnitImpl {
+func (s *Solution) solutionPlanUnitsUnit(planUnit ModelPlanUnitsUnit) *solutionPlanUnitsUnitImpl {
 	return s.solutionPlanUnit(planUnit).(*solutionPlanUnitsUnitImpl)
 }
 
-func (s *solutionImpl) SolutionStop(stop *ModelStop) SolutionStop {
+// SolutionStop returns the solution stop for the given model stop.
+func (s *Solution) SolutionStop(stop *ModelStop) SolutionStop {
 	if stop != nil && stop.HasPlanStopsUnit() {
 		return s.SolutionPlanStopsUnit(stop.PlanStopsUnit()).SolutionStop(stop)
 	}
 	return SolutionStop{}
 }
 
-func (s *solutionImpl) SolutionVehicle(vehicle *ModelVehicle) SolutionVehicle {
+// SolutionVehicle returns the solution vehicle for the given model vehicle.
+func (s *Solution) SolutionVehicle(vehicle *ModelVehicle) SolutionVehicle {
 	if solutionVehicle, ok := s.solutionVehicle(vehicle); ok {
 		return solutionVehicle
 	}
 	return SolutionVehicle{}
 }
 
-func (s *solutionImpl) solutionVehicle(vehicle *ModelVehicle) (SolutionVehicle, bool) {
+func (s *Solution) solutionVehicle(vehicle *ModelVehicle) (SolutionVehicle, bool) {
 	if vehicle != nil {
 		return SolutionVehicle{
 			index:    vehicle.Index(),
@@ -675,7 +612,8 @@ func (s *solutionImpl) solutionVehicle(vehicle *ModelVehicle) (SolutionVehicle, 
 	return SolutionVehicle{}, false
 }
 
-func (s *solutionImpl) Copy() Solution {
+// Copy returns a deep copy of the solution.
+func (s *Solution) Copy() *Solution {
 	model := s.model.(*modelImpl)
 
 	model.OnCopySolution(s)
@@ -704,7 +642,7 @@ func (s *solutionImpl) Copy() Solution {
 	arrival, floats := common.CopySliceFrom(floats, s.arrival)
 	slack, floats := common.CopySliceFrom(floats, s.slack)
 	cumulativeTravelDuration, floats := common.CopySliceFrom(floats, s.cumulativeTravelDuration)
-	solution := &solutionImpl{
+	solution := &Solution{
 		arrival:                  arrival,
 		slack:                    slack,
 		constraintStopData:       make(map[ModelConstraint][]Copier, len(s.constraintStopData)),
@@ -744,11 +682,9 @@ func (s *solutionImpl) Copy() Solution {
 	}
 
 	solution.vehicles = slices.Clone(s.vehicles)
-	solution.solutionVehicles = slices.Clone(s.solutionVehicles)
 	// update solution reference
 	for idx := range solution.vehicles {
 		solution.vehicles[idx].solution = solution
-		solution.solutionVehicles[idx] = solution.vehicles[idx]
 	}
 
 	for _, expression := range model.expressions {
@@ -832,7 +768,9 @@ func (s *solutionImpl) Copy() Solution {
 	return solution
 }
 
-func (s *solutionImpl) SetRandom(random *rand.Rand) error {
+// SetRandom sets the random number generator of the solution. Returns an
+// error if the random number generator is nil.
+func (s *Solution) SetRandom(random *rand.Rand) error {
 	if random == nil {
 		return fmt.Errorf("random is nil")
 	}
@@ -841,11 +779,12 @@ func (s *solutionImpl) SetRandom(random *rand.Rand) error {
 	return nil
 }
 
-func (s *solutionImpl) Random() *rand.Rand {
+// Random returns the random number generator of the solution.
+func (s *Solution) Random() *rand.Rand {
 	return s.random
 }
 
-func (s *solutionImpl) newVehicle(
+func (s *Solution) newVehicle(
 	modelVehicle *ModelVehicle,
 ) (SolutionVehicle, error) {
 	if modelVehicle == nil {
@@ -874,10 +813,6 @@ func (s *solutionImpl) newVehicle(
 	)
 	s.vehicleIndices = append(s.vehicleIndices, modelVehicle.Index())
 	s.vehicles = append(s.vehicles, SolutionVehicle{
-		index:    modelVehicle.Index(),
-		solution: s,
-	})
-	s.solutionVehicles = append(s.solutionVehicles, SolutionVehicle{
 		index:    modelVehicle.Index(),
 		solution: s,
 	})
@@ -935,7 +870,7 @@ func (s *solutionImpl) newVehicle(
 	return toSolutionVehicle(s, len(s.vehicles)-1), nil
 }
 
-func (s *solutionImpl) checkConstraintsAndEstimateDeltaScore(
+func (s *Solution) checkConstraintsAndEstimateDeltaScore(
 	m SolutionMoveStops,
 ) (deltaScore float64, feasible bool, planPositionsHint StopPositionsHint) {
 	model := s.model.(*modelImpl)
@@ -982,7 +917,7 @@ func (s *solutionImpl) checkConstraintsAndEstimateDeltaScore(
 
 var constNoPositionsHintImpl = noPositionsHint()
 
-func (s *solutionImpl) checkConstraints(
+func (s *Solution) checkConstraints(
 	m SolutionMoveStops,
 ) (feasible bool, planPositionsHint *stopPositionHintImpl) {
 	model := s.model.(*modelImpl)
@@ -1019,7 +954,7 @@ func (s *solutionImpl) checkConstraints(
 	return true, constNoPositionsHintImpl
 }
 
-func (s *solutionImpl) estimateDeltaScore(
+func (s *Solution) estimateDeltaScore(
 	m SolutionMoveStops,
 ) (deltaScore float64) {
 	s.model.OnEstimateDeltaObjectiveScore()
@@ -1031,34 +966,53 @@ func (s *solutionImpl) estimateDeltaScore(
 	return objectiveEstimate
 }
 
-func (s *solutionImpl) ConstraintData(constraint ModelConstraint) any {
+// ConstraintData returns the data of the constraint for the solution. The
+// constraint data of a solution is set by the
+// ConstraintSolutionDataUpdater.UpdateConstraintSolutionData method of the
+// constraint.
+func (s *Solution) ConstraintData(constraint ModelConstraint) any {
 	return s.constraintSolutionData[constraint]
 }
 
-func (s *solutionImpl) ObjectiveData(objective ModelObjective) any {
+// ObjectiveData returns the value of the objective for the solution. The
+// objective value of a solution is set by the
+// ObjectiveSolutionDataUpdater.UpdateObjectiveSolutionData method of the
+// objective. If the objective is not set on the solution, nil is returned.
+func (s *Solution) ObjectiveData(objective ModelObjective) any {
 	return s.objectiveSolutionData[objective]
 }
 
-func (s *solutionImpl) ObjectiveValue(objective ModelObjective) float64 {
+// ObjectiveValue returns the objective value for the objective in the
+// solution. Also returns 0.0 if the objective is not part of the solution.
+func (s *Solution) ObjectiveValue(objective ModelObjective) float64 {
 	if value, ok := s.scores[objective]; ok {
 		return value
 	}
 	return 0.0
 }
 
-func (s *solutionImpl) Score() float64 {
+// Score returns the score of the solution.
+func (s *Solution) Score() float64 {
 	return s.scores[s.model.Objective()]
 }
 
-func (s *solutionImpl) FixedPlanUnits() ImmutableSolutionPlanUnitCollection {
+// FixedPlanUnits returns the solution plan units that are fixed.
+// Fixed plan units are plan units that are not allowed to be planned or
+// unplanned. The union of fixed, planned and unplanned plan units
+// is the set of all plan units in the model.
+func (s *Solution) FixedPlanUnits() ImmutableSolutionPlanUnitCollection {
 	return &s.fixedPlanUnits
 }
 
-func (s *solutionImpl) PlannedPlanUnits() ImmutableSolutionPlanUnitCollection {
+// PlannedPlanUnits returns the solution plan units that are planned as
+// a collection of solution plan units.
+func (s *Solution) PlannedPlanUnits() ImmutableSolutionPlanUnitCollection {
 	return &s.plannedPlanUnits
 }
 
-func (s *solutionImpl) UnPlannedPlanUnits() ImmutableSolutionPlanUnitCollection {
+// UnPlannedPlanUnits returns the solution plan units that are not
+// planned.
+func (s *Solution) UnPlannedPlanUnits() ImmutableSolutionPlanUnitCollection {
 	return &s.unPlannedPlanUnits
 }
 
@@ -1084,8 +1038,12 @@ func NewPreAllocatedMoveContainer(planUnit SolutionPlanUnit) *PreAllocatedMoveCo
 	return &allocations
 }
 
-func (s *solutionImpl) BestMove(ctx context.Context, planUnit SolutionPlanUnit) SolutionMove {
-	if planUnit.Solution().(*solutionImpl) != s {
+// BestMove returns the best move for the given solution plan unit. The
+// best move is the move that has the lowest score. If there are no moves
+// available for the given solution plan unit, a move is returned which
+// is not executable, SolutionMoveStops.IsExecutable.
+func (s *Solution) BestMove(ctx context.Context, planUnit SolutionPlanUnit) SolutionMove {
+	if planUnit.Solution() != s {
 		panic("plan planUnit does not belong to this solution")
 	}
 
@@ -1131,33 +1089,31 @@ func (s *solutionImpl) BestMove(ctx context.Context, planUnit SolutionPlanUnit) 
 	return bestMove
 }
 
-func (s *solutionImpl) Model() Model {
+// Model returns the model of the solution.
+func (s *Solution) Model() Model {
 	return s.model
 }
 
-func (s *solutionImpl) Vehicles() SolutionVehicles {
-	return slices.Clone(s.solutionVehicles)
+// Vehicles returns the vehicles of the solution.
+func (s *Solution) Vehicles() SolutionVehicles {
+	return s.vehicles
 }
 
-func (s *solutionImpl) vehiclesMutable() SolutionVehicles {
-	return s.solutionVehicles
-}
-
-func (s *solutionImpl) value(
+func (s *Solution) value(
 	expression ModelExpression,
 	index int,
 ) float64 {
 	return s.values[expression.Index()][index]
 }
 
-func (s *solutionImpl) cumulativeValue(
+func (s *Solution) cumulativeValue(
 	expression ModelExpression,
 	index int,
 ) float64 {
 	return s.cumulativeValues[expression.Index()][index]
 }
 
-func (s *solutionImpl) constraintValue(
+func (s *Solution) constraintValue(
 	constraint ModelConstraint,
 	index int,
 ) any {
@@ -1167,7 +1123,7 @@ func (s *solutionImpl) constraintValue(
 	return nil
 }
 
-func (s *solutionImpl) objectiveStopValue(
+func (s *Solution) objectiveStopValue(
 	objective ModelObjective,
 	index int,
 ) any {
@@ -1177,7 +1133,7 @@ func (s *solutionImpl) objectiveStopValue(
 	return nil
 }
 
-func (s *solutionImpl) objectiveVehicleValue(
+func (s *Solution) objectiveVehicleValue(
 	objective ModelObjective,
 	index int,
 ) any {
@@ -1200,7 +1156,7 @@ func filterConstraint(constraint ModelConstraint, includeTemporal bool) bool {
 // isFeasible returns the first constraint that is not feasible or nil if all
 // constraints are feasible. Furthermore, it returns the index of the stop
 // causing the violation.
-func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
+func (s *Solution) isFeasible(index int, includeTemporal bool) (
 	violatedConstraint ModelConstraint,
 	violatedIndex int,
 	err error,
@@ -1378,7 +1334,7 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 	return nil, -1, nil
 }
 
-func (s *solutionImpl) isStopNotFeasible(
+func (s *Solution) isStopNotFeasible(
 	constraint ModelConstraint,
 	stop SolutionStop,
 ) bool {
@@ -1388,7 +1344,7 @@ func (s *solutionImpl) isStopNotFeasible(
 	return violated
 }
 
-func (s *solutionImpl) isVehicleNotFeasible(
+func (s *Solution) isVehicleNotFeasible(
 	constraint ModelConstraint,
 	vehicleIndex int,
 ) bool {
@@ -1401,7 +1357,7 @@ func (s *solutionImpl) isVehicleNotFeasible(
 	return violated
 }
 
-func (s *solutionImpl) isSolutionNotFeasible(
+func (s *Solution) isSolutionNotFeasible(
 	constraint ModelConstraint,
 ) bool {
 	s.model.OnCheckConstraint(constraint, AtEachSolution)

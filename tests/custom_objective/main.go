@@ -147,7 +147,7 @@ func (c *customObjective) EstimateDeltaValue(
 
 // Value returns the value of the custom objective's score, calculated for a
 // given solution.
-func (c *customObjective) Value(solution nextroute.Solution) float64 {
+func (c *customObjective) Value(solution *nextroute.Solution) float64 {
 	maxNumStops := 0
 	minNumStops := solution.Model().NumberOfStops()
 

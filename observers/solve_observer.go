@@ -184,7 +184,7 @@ func (s *solveObserverImpl) Register(solver nextroute.Solver) error {
 
 	solver.SolveEvents().Reset.Register(
 		func(
-			solution nextroute.Solution,
+			solution *nextroute.Solution,
 			info nextroute.SolveInformation,
 		) {
 			_, err := fmt.Fprintf(s.file, "r;%v;%v;%v;%f\n",
@@ -336,7 +336,7 @@ func (s *solveObserverImpl) OnUnPlanSucceeded(
 func (s *solveObserverImpl) OnNewSolution(_ nextroute.Model) {
 }
 
-func (s *solveObserverImpl) OnNewSolutionCreated(solution nextroute.Solution) {
+func (s *solveObserverImpl) OnNewSolutionCreated(solution *nextroute.Solution) {
 	score := ""
 	for _, term := range solution.Model().Objective().Terms() {
 		score += fmt.Sprintf(";%f", solution.ObjectiveValue(term.Objective()))
@@ -368,10 +368,10 @@ func (s *solveObserverImpl) OnNewSolutionCreated(solution nextroute.Solution) {
 	}
 }
 
-func (s *solveObserverImpl) OnCopySolution(_ nextroute.Solution) {
+func (s *solveObserverImpl) OnCopySolution(_ *nextroute.Solution) {
 }
 
-func (s *solveObserverImpl) OnCopiedSolution(_ nextroute.Solution) {
+func (s *solveObserverImpl) OnCopiedSolution(_ *nextroute.Solution) {
 }
 
 func (s *solveObserverImpl) OnCheckConstraint(
@@ -408,7 +408,7 @@ func (s *solveObserverImpl) OnEstimatedDeltaObjectiveScore(
 }
 
 func (s *solveObserverImpl) OnBestMove(
-	_ nextroute.Solution,
+	_ *nextroute.Solution,
 ) {
 }
 

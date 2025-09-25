@@ -215,7 +215,7 @@ func (l *clusterImpl) estimateDeltaScore(
 	move SolutionMoveStops,
 	asConstraint bool,
 ) (deltaScore float64, stopPositionsHint StopPositionsHint) {
-	solutionImpl := move.Solution().(*solutionImpl)
+	solution := move.Solution()
 	moveImpl := move.(*solutionMoveStopsImpl)
 	stopPositions := moveImpl.stopPositions
 	deltaScore = 0.0
@@ -243,7 +243,7 @@ func (l *clusterImpl) estimateDeltaScore(
 				candidate.ModelStop().Location(),
 			).Value(common.Meters)
 
-			for _, otherVehicle := range solutionImpl.vehicles {
+			for _, otherVehicle := range solution.vehicles {
 				if otherVehicle.IsEmpty() ||
 					otherVehicle.Index() == vehicle.Index() {
 					continue
@@ -283,9 +283,9 @@ func (l *clusterImpl) getSolutionStops(vehicle SolutionVehicle) []SolutionStop {
 	}
 	return stops
 }
-func (l *clusterImpl) Value(solutionStop Solution) float64 {
+func (l *clusterImpl) Value(solutionStop *Solution) float64 {
 	sum := 0.0
-	for _, vehicle := range solutionStop.(*solutionImpl).vehiclesMutable() {
+	for _, vehicle := range solutionStop.Vehicles() {
 		if vehicle.IsEmpty() {
 			continue
 		}

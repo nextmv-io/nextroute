@@ -26,7 +26,7 @@ func newSolutionMoveUnits(
 	}
 
 	return solutionMoveUnitsImpl{
-		solution:  planUnit.Solution().(*solutionImpl),
+		solution:  planUnit.Solution(),
 		planUnit:  planUnit,
 		moves:     moves,
 		value:     value,
@@ -37,7 +37,7 @@ func newSolutionMoveUnits(
 
 func newNotExecutableSolutionMoveUnits(planUnit *solutionPlanUnitsUnitImpl) *solutionMoveUnitsImpl {
 	return &solutionMoveUnitsImpl{
-		solution:  planUnit.Solution().(*solutionImpl),
+		solution:  planUnit.Solution(),
 		planUnit:  planUnit,
 		valueSeen: 1,
 	}
@@ -45,7 +45,7 @@ func newNotExecutableSolutionMoveUnits(planUnit *solutionPlanUnitsUnitImpl) *sol
 
 type solutionMoveUnitsImpl struct {
 	planUnit  *solutionPlanUnitsUnitImpl
-	solution  *solutionImpl
+	solution  *Solution
 	moves     SolutionMoves
 	valueSeen int
 	value     float64

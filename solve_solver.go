@@ -85,7 +85,7 @@ type Solver interface {
 	AddSolveOperators(...SolveOperator)
 
 	// BestSolution returns the best solution found so far.
-	BestSolution() Solution
+	BestSolution() *Solution
 
 	// HasBestSolution returns true if the solver has a best solution.
 	HasBestSolution() bool
@@ -98,18 +98,18 @@ type Solver interface {
 	// Random returns the random number generator used by the solver.
 	Random() *rand.Rand
 	// Reset will reset the solver to use solution as work solution.
-	Reset(solution Solution, solveInformation SolveInformation)
+	Reset(solution *Solution, solveInformation SolveInformation)
 
 	// Solve starts the solving process using the given options. It returns the
 	// solutions as a channel.
-	Solve(context.Context, SolveOptions, ...Solution) (SolutionChannel, error)
+	Solve(context.Context, SolveOptions, ...*Solution) (SolutionChannel, error)
 	// SolveEvents returns the solve-events used by the solver.
 	SolveEvents() SolveEvents
 	// SolveOperators returns the solve-operators used by the solver.
 	SolveOperators() SolveOperators
 
 	// WorkSolution returns the current work solution.
-	WorkSolution() Solution
+	WorkSolution() *Solution
 }
 
 // NewSkeletonSolver creates a new solver for the given model.
@@ -125,8 +125,8 @@ func NewSkeletonSolver(model Model) (Solver, error) {
 type solveImpl struct {
 	model          Model
 	solveEvents    SolveEvents
-	workSolution   Solution
-	bestSolution   Solution
+	workSolution   *Solution
+	bestSolution   *Solution
 	random         *rand.Rand
 	solveOperators SolveOperators
 	parameters     SolveParameters
@@ -184,7 +184,7 @@ func (s *solveImpl) SolveOperators() SolveOperators {
 	return solveOperators
 }
 
-func (s *solveImpl) Reset(solution Solution, solveInformation SolveInformation) {
+func (s *solveImpl) Reset(solution *Solution, solveInformation SolveInformation) {
 	s.solveEvents.Reset.Trigger(solution, solveInformation)
 	s.workSolution = solution.Copy()
 	if s.workSolution.Score() < s.bestSolution.Score() {
@@ -202,11 +202,11 @@ func (s *solveImpl) HasWorkSolution() bool {
 	return s.workSolution != nil
 }
 
-func (s *solveImpl) BestSolution() Solution {
+func (s *solveImpl) BestSolution() *Solution {
 	return s.bestSolution
 }
 
-func (s *solveImpl) WorkSolution() Solution {
+func (s *solveImpl) WorkSolution() *Solution {
 	return s.workSolution
 }
 
@@ -250,7 +250,7 @@ func (s *solveImpl) invoke(
 	return true, nil
 }
 
-func (s *solveImpl) newBestSolution(solution Solution, solveInformation *solveInformationImpl) {
+func (s *solveImpl) newBestSolution(solution *Solution, solveInformation *solveInformationImpl) {
 	s.bestSolution = solution.Copy()
 	s.solveEvents.NewBestSolution.Trigger(solveInformation)
 	s.plateauTracker.onImprovement(
@@ -263,7 +263,7 @@ func (s *solveImpl) newBestSolution(solution Solution, solveInformation *solveIn
 func (s *solveImpl) Solve(
 	ctx context.Context,
 	solveOptions SolveOptions,
-	startSolutions ...Solution,
+	startSolutions ...*Solution,
 ) (SolutionChannel, error) {
 	if len(startSolutions) == 0 {
 		startSolution, err := NewSolution(s.model)

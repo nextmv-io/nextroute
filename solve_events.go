@@ -25,7 +25,7 @@ type SolveEvents struct {
 	OperatorExecuting *BaseEvent1[SolveInformation]
 
 	// Reset is fired when the solver is reset.
-	Reset *BaseEvent2[Solution, SolveInformation]
+	Reset *BaseEvent2[*Solution, SolveInformation]
 
 	// Start is fired when the solver is started.
 	Start *BaseEvent1[SolveInformation]
@@ -41,7 +41,7 @@ func NewSolveEvents() SolveEvents {
 		Iterated:          &BaseEvent1[SolveInformation]{},
 		ContextDone:       &BaseEvent1[SolveInformation]{},
 		Start:             &BaseEvent1[SolveInformation]{},
-		Reset:             &BaseEvent2[Solution, SolveInformation]{},
+		Reset:             &BaseEvent2[*Solution, SolveInformation]{},
 		Done:              &BaseEvent1[SolveInformation]{},
 	}
 }

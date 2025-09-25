@@ -18,13 +18,13 @@ func Format(
 	options any,
 	checkOptions Options,
 	progressioner nextroute.Progressioner,
-	solutions ...nextroute.Solution,
+	solutions ...*nextroute.Solution,
 ) (runSchema.Output, error) {
 	return nextroute.Format(
 		ctx,
 		options,
 		progressioner,
-		func(solution nextroute.Solution) any {
+		func(solution *nextroute.Solution) any {
 			solutionOutput := factory.ToSolutionOutput(solution)
 			if checkOptions.Duration > 0 &&
 				ToVerbosity(checkOptions.Verbosity) != Off {

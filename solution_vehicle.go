@@ -15,7 +15,7 @@ import (
 
 // SolutionVehicle is a vehicle in a solution.
 type SolutionVehicle struct {
-	solution *solutionImpl
+	solution *Solution
 	index    int
 }
 
@@ -23,12 +23,12 @@ type SolutionVehicle struct {
 type SolutionVehicles []SolutionVehicle
 
 func toSolutionVehicle(
-	solution Solution,
+	solution *Solution,
 	index int,
 ) SolutionVehicle {
 	return SolutionVehicle{
 		index:    index,
-		solution: solution.(*solutionImpl),
+		solution: solution,
 	}
 }
 
@@ -188,7 +188,7 @@ func (v SolutionVehicle) bestMovePlanSingleStop(
 	bestMoveContainer := moveContainer{
 		value: math.Inf(1),
 	}
-	solution := planUnit.solution()
+	solution := planUnit.Solution()
 	rand := solution.random
 
 	for !stop.IsLast() {

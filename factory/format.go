@@ -21,13 +21,13 @@ func Format(
 	ctx context.Context,
 	options any,
 	progressioner nextroute.Progressioner,
-	solutions ...nextroute.Solution,
+	solutions ...*nextroute.Solution,
 ) runSchema.Output {
 	return nextroute.Format(
 		ctx,
 		options,
 		progressioner,
-		func(solution nextroute.Solution) any {
+		func(solution *nextroute.Solution) any {
 			return ToSolutionOutput(solution)
 		},
 		solutions...,
@@ -57,7 +57,7 @@ func toSolutionOutputStops(solutionPlanUnit nextroute.SolutionPlanUnit) []schema
 }
 
 // ToSolutionOutput converts a solution to a [schema.SolutionOutput].
-func ToSolutionOutput(solution nextroute.Solution) schema.SolutionOutput {
+func ToSolutionOutput(solution *nextroute.Solution) schema.SolutionOutput {
 	unplannedStops := common.MapSlice(
 		solution.UnPlannedPlanUnits().SolutionPlanUnits(),
 		toSolutionOutputStops,
@@ -227,7 +227,7 @@ func toVehicleOutput(vehicle nextroute.SolutionVehicle) schema.VehicleOutput {
 	return vehicleOutput
 }
 
-func toObjectiveOutput(solution nextroute.Solution) schema.ObjectiveOutput {
+func toObjectiveOutput(solution *nextroute.Solution) schema.ObjectiveOutput {
 	return schema.ObjectiveOutput{
 		Name: fmt.Sprintf("%v", solution.Model().Objective()),
 		Objectives: common.Map(
@@ -247,7 +247,7 @@ func toObjectiveOutput(solution nextroute.Solution) schema.ObjectiveOutput {
 
 // DefaultCustomResultStatistics creates default custom statistics for a given
 // solution.
-func DefaultCustomResultStatistics(solution nextroute.Solution) schema.CustomResultStatistics {
+func DefaultCustomResultStatistics(solution *nextroute.Solution) schema.CustomResultStatistics {
 	vehicleCount := 0
 	maxTravelDuration := 0
 	minTravelDuration := math.MaxInt64

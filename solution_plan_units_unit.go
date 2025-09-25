@@ -86,7 +86,7 @@ func (p *solutionPlanUnitsUnitImpl) Index() int {
 	return p.modelPlanUnitsUnit.Index()
 }
 
-func (p *solutionPlanUnitsUnitImpl) Solution() Solution {
+func (p *solutionPlanUnitsUnitImpl) Solution() *Solution {
 	return p.solutionPlanUnits[0].Solution()
 }
 
@@ -128,7 +128,7 @@ func (p *solutionPlanUnitsUnitImpl) UnPlan() (bool, error) {
 		return false, nil
 	}
 
-	solution := p.Solution().(*solutionImpl)
+	solution := p.Solution()
 
 	solution.plannedPlanUnits.remove(p)
 	solution.unPlannedPlanUnits.add(p)

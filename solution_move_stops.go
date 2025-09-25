@@ -58,7 +58,7 @@ type SolutionMoveStops interface {
 	Vehicle() SolutionVehicle
 
 	// Solution returns the solution that is affected by the move.
-	Solution() Solution
+	Solution() *Solution
 }
 
 // StopPosition is the definition of the change in the solution for a
@@ -69,7 +69,7 @@ type SolutionMoveStops interface {
 // unplanned set to the planned set by positioning it directly before the
 // Next.
 type StopPosition struct {
-	solution          *solutionImpl
+	solution          *Solution
 	previousStopIndex int
 	stopIndex         int
 	nextStopIndex     int
@@ -124,8 +124,8 @@ func (m *solutionMoveStopsImpl) String() string {
 	)
 }
 
-func (m *solutionMoveStopsImpl) Solution() Solution {
-	return m.planUnit.solution()
+func (m *solutionMoveStopsImpl) Solution() *Solution {
+	return m.planUnit.Solution()
 }
 
 func (m *solutionMoveStopsImpl) Vehicle() SolutionVehicle {
@@ -173,11 +173,11 @@ func (m *solutionMoveStopsImpl) Execute(_ context.Context) (bool, error) {
 		return false, nil
 	}
 
-	m.planUnit.solution().model.OnPlan(m)
+	m.planUnit.Solution().model.OnPlan(m)
 
 	if _, isElementOfPlanUnitsUnit := m.planUnit.ModelPlanUnit().PlanUnitsUnit(); !isElementOfPlanUnitsUnit {
-		m.planUnit.solution().unPlannedPlanUnits.remove(m.planUnit)
-		m.planUnit.solution().plannedPlanUnits.add(m.planUnit)
+		m.planUnit.Solution().unPlannedPlanUnits.remove(m.planUnit)
+		m.planUnit.Solution().plannedPlanUnits.add(m.planUnit)
 	}
 
 	startPropagate, err := m.attach()
@@ -185,23 +185,23 @@ func (m *solutionMoveStopsImpl) Execute(_ context.Context) (bool, error) {
 		return false, err
 	}
 
-	constraint, _, err := m.planUnit.solution().isFeasible(startPropagate, true)
+	constraint, _, err := m.planUnit.Solution().isFeasible(startPropagate, true)
 	if err != nil {
 		return false, err
 	}
 
 	if constraint != nil {
-		m.planUnit.solution().model.OnPlanFailed(m, constraint)
+		m.planUnit.Solution().model.OnPlanFailed(m, constraint)
 		if _, isElementOfPlanUnitsUnit := m.planUnit.ModelPlanUnit().PlanUnitsUnit(); !isElementOfPlanUnitsUnit {
-			m.planUnit.solution().unPlannedPlanUnits.add(m.planUnit)
-			m.planUnit.solution().plannedPlanUnits.remove(m.planUnit)
+			m.planUnit.Solution().unPlannedPlanUnits.add(m.planUnit)
+			m.planUnit.Solution().plannedPlanUnits.remove(m.planUnit)
 		}
 
 		for _, position := range m.stopPositions {
 			position.Stop().detach()
 		}
 
-		constraint, _, err := m.planUnit.solution().isFeasible(startPropagate, true)
+		constraint, _, err := m.planUnit.Solution().isFeasible(startPropagate, true)
 		if err != nil {
 			return false, err
 		}
@@ -215,7 +215,7 @@ func (m *solutionMoveStopsImpl) Execute(_ context.Context) (bool, error) {
 
 		return false, nil
 	}
-	m.planUnit.solution().model.OnPlanSucceeded(m)
+	m.planUnit.Solution().model.OnPlanSucceeded(m)
 
 	return true, nil
 }
@@ -307,7 +307,7 @@ func (m *solutionMoveStopsImpl) TakeBest(that SolutionMove) SolutionMove {
 	if m.value < that.Value() {
 		return m
 	}
-	if m.planUnit.solution().random.Intn(m.ValueSeen()+that.ValueSeen()) == 0 {
+	if m.planUnit.Solution().random.Intn(m.ValueSeen()+that.ValueSeen()) == 0 {
 		m.valueSeen++
 		return m
 	}
@@ -629,7 +629,7 @@ func newMoveStops(
 		allowed:       true,
 	}
 	if checkConstraintsAndEstimateDeltaScore {
-		value, allowed, _ := planUnit.(*solutionPlanStopsUnitImpl).solution().checkConstraintsAndEstimateDeltaScore(move)
+		value, allowed, _ := planUnit.(*solutionPlanStopsUnitImpl).Solution().checkConstraintsAndEstimateDeltaScore(move)
 		move.value = value
 		move.allowed = allowed
 		move.valueSeen = 1
