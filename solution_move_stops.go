@@ -319,7 +319,7 @@ func (m *solutionMoveStopsImpl) TakeBest(that SolutionMove) SolutionMove {
 // This is more efficient than calling the two functions separately.
 // But only call it if the travel time is not dependent on time.
 func (m *solutionMoveStopsImpl) deltaStopTravelDurationValue(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 ) float64 {
 	if len(m.stopPositions) == 0 || m.stopPositions[0].Stop().IsPlanned() {
 		return 0
