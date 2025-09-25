@@ -18,9 +18,9 @@ type ComposedPerVehicleTypeExpression interface {
 	// Get returns the expression that is defined for the given vehicle type. If
 	// no expression is defined for the given vehicle type, the default
 	// expression is returned.
-	Get(vehicleType ModelVehicleType) ModelExpression
+	Get(vehicleType *ModelVehicleType) ModelExpression
 	// Set sets the expression for the given vehicle type.
-	Set(vehicleType ModelVehicleType, expression ModelExpression)
+	Set(vehicleType *ModelVehicleType, expression ModelExpression)
 }
 
 // NewComposedPerVehicleTypeExpression returns a new ComposedPerVehicleTypeExpression.
@@ -44,7 +44,7 @@ type composedPerVehicleTypeExpressionImpl struct {
 	index             int
 }
 
-func (t *composedPerVehicleTypeExpressionImpl) Get(vehicleType ModelVehicleType) ModelExpression {
+func (t *composedPerVehicleTypeExpressionImpl) Get(vehicleType *ModelVehicleType) ModelExpression {
 	idx := vehicleType.Index()
 	if idx >= 0 && idx < len(t.expressions) {
 		if expression := t.expressions[idx]; expression != nil {
@@ -55,7 +55,7 @@ func (t *composedPerVehicleTypeExpressionImpl) Get(vehicleType ModelVehicleType)
 }
 
 func (t *composedPerVehicleTypeExpressionImpl) Set(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	expression ModelExpression,
 ) {
 	idx := vehicleType.Index()
@@ -113,7 +113,7 @@ func (t *composedPerVehicleTypeExpressionImpl) DefaultExpression() ModelExpressi
 }
 
 func (t *composedPerVehicleTypeExpressionImpl) Value(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from, to *ModelStop,
 ) float64 {
 	idx := vehicleType.Index()

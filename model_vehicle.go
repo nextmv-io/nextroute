@@ -15,7 +15,7 @@ type ModelVehicles []*ModelVehicle
 type ModelVehicle struct {
 	start time.Time
 	modelDataImpl
-	vehicleType ModelVehicleType
+	vehicleType *ModelVehicleType
 	id          string
 	stops       ModelStops
 	index       int
@@ -25,7 +25,7 @@ type ModelVehicle struct {
 // Always use this function to create a new ModelVehicle.
 func NewModelVehicle(
 	index int,
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	start time.Time,
 	first *ModelStop,
 	last *ModelStop,
@@ -55,7 +55,7 @@ func NewModelVehicle(
 }
 
 // VehicleType returns the vehicle type of the vehicle.
-func (v *ModelVehicle) VehicleType() ModelVehicleType {
+func (v *ModelVehicle) VehicleType() *ModelVehicleType {
 	return v.vehicleType
 }
 

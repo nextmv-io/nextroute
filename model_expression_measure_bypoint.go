@@ -51,7 +51,7 @@ func (m *measureByPointExpression) SetName(n string) {
 	m.name = n
 }
 
-func (m *measureByPointExpression) Value(_ ModelVehicleType, from, to *ModelStop) float64 {
+func (m *measureByPointExpression) Value(_ *ModelVehicleType, from, to *ModelStop) float64 {
 	locFrom, locTo := from.Location(), to.Location()
 	value := m.measure.Cost(
 		measure.Point{locFrom.Longitude(), locFrom.Latitude()},

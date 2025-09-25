@@ -23,7 +23,7 @@ type distanceObjectiveVehicleData struct {
 func (d *distanceObjectiveImpl) UpdateObjectiveVehicleData(s SolutionVehicle) (Copier, error) {
 	distance := 0.0
 	vehicleType := s.ModelVehicle().vehicleType
-	distanceExpr := vehicleType.(*vehicleTypeImpl).distance
+	distanceExpr := vehicleType.distance
 	var previousStop *ModelStop
 
 	s.iterateStops(func(stop SolutionStop) bool {

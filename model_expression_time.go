@@ -11,7 +11,7 @@ import (
 type TimeExpression interface {
 	ModelExpression
 	// Time returns the time for the given parameters.
-	Time(ModelVehicleType, *ModelStop, *ModelStop) time.Time
+	Time(*ModelVehicleType, *ModelStop, *ModelStop) time.Time
 }
 
 // StopTimeExpression is a ModelExpression that returns a time per stop and
@@ -86,14 +86,14 @@ func (t *timeExpressionImpl) SetName(n string) {
 }
 
 func (t *timeExpressionImpl) Value(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from, to *ModelStop,
 ) float64 {
 	return t.expression.Value(vehicleType, from, to)
 }
 
 func (t *timeExpressionImpl) Time(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from, to *ModelStop,
 ) time.Time {
 	value := t.expression.Value(vehicleType, from, to)
@@ -132,7 +132,7 @@ func (s *stopTimeExpressionImpl) SetName(n string) {
 }
 
 func (s *stopTimeExpressionImpl) Value(
-	_ ModelVehicleType,
+	_ *ModelVehicleType,
 	_,
 	to *ModelStop,
 ) float64 {

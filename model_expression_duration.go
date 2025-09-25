@@ -23,8 +23,8 @@ type VehicleTypeDurationExpression interface {
 	DurationExpression
 	VehicleTypeExpression
 	// SetDuration sets the duration for the given vehicle type.
-	SetDuration(ModelVehicleType, time.Duration)
-	DurationForVehicleType(ModelVehicleType) time.Duration
+	SetDuration(*ModelVehicleType, time.Duration)
+	DurationForVehicleType(*ModelVehicleType) time.Duration
 }
 
 // DurationExpression is an expression that returns a duration.
@@ -32,7 +32,7 @@ type DurationExpression interface {
 	ModelExpression
 	// Duration returns the duration for the given vehicle type, start and
 	// end stop.
-	Duration(ModelVehicleType, *ModelStop, *ModelStop) time.Duration
+	Duration(*ModelVehicleType, *ModelStop, *ModelStop) time.Duration
 }
 
 // DistanceExpression is an expression that returns a distance.
@@ -40,7 +40,7 @@ type DistanceExpression interface {
 	ModelExpression
 	// Distance returns the distance for the given vehicle type, start and
 	// end stop.
-	Distance(ModelVehicleType, *ModelStop, *ModelStop) common.Distance
+	Distance(*ModelVehicleType, *ModelStop, *ModelStop) common.Distance
 }
 
 // VehicleTypeDistanceExpression is an expression that returns a distance per
@@ -49,9 +49,9 @@ type VehicleTypeDistanceExpression interface {
 	DistanceExpression
 	VehicleTypeExpression
 
-	SetDistance(ModelVehicleType, common.Distance) error
+	SetDistance(*ModelVehicleType, common.Distance) error
 
-	DistanceForVehicleType(ModelVehicleType) common.Distance
+	DistanceForVehicleType(*ModelVehicleType) common.Distance
 }
 
 // TravelDurationExpression is an expression that returns a duration based on
@@ -198,7 +198,7 @@ func (s *scaledDurationExpressionImpl) Index() int {
 }
 
 func (s *scaledDurationExpressionImpl) Value(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from *ModelStop,
 	to *ModelStop,
 ) float64 {
@@ -210,7 +210,7 @@ func (s *scaledDurationExpressionImpl) Value(
 }
 
 func (s *scaledDurationExpressionImpl) Duration(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from *ModelStop,
 	to *ModelStop,
 ) time.Duration {
@@ -258,7 +258,7 @@ func (s *stopDurationExpressionImpl) SetName(n string) {
 }
 
 func (s *stopDurationExpressionImpl) Value(
-	_ ModelVehicleType,
+	_ *ModelVehicleType,
 	_ *ModelStop,
 	stop *ModelStop,
 ) float64 {
@@ -269,7 +269,7 @@ func (s *stopDurationExpressionImpl) Value(
 }
 
 func (s *stopDurationExpressionImpl) Duration(
-	_ ModelVehicleType,
+	_ *ModelVehicleType,
 	_ *ModelStop,
 	stop *ModelStop,
 ) time.Duration {
@@ -341,7 +341,7 @@ func (v *vehicleTypeDurationExpressionImpl) DefaultValue() float64 {
 }
 
 func (v *vehicleTypeDurationExpressionImpl) Value(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	_ *ModelStop,
 	_ *ModelStop,
 ) float64 {
@@ -352,19 +352,19 @@ func (v *vehicleTypeDurationExpressionImpl) Value(
 }
 
 func (v *vehicleTypeDurationExpressionImpl) ValueForVehicleType(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 ) float64 {
 	return v.Duration(vehicleType, nil, nil).Seconds()
 }
 
 func (v *vehicleTypeDurationExpressionImpl) DurationForVehicleType(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 ) time.Duration {
 	return v.Duration(vehicleType, nil, nil)
 }
 
 func (v *vehicleTypeDurationExpressionImpl) Duration(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	_ *ModelStop,
 	_ *ModelStop,
 ) time.Duration {
@@ -373,7 +373,7 @@ func (v *vehicleTypeDurationExpressionImpl) Duration(
 }
 
 func (v *vehicleTypeDurationExpressionImpl) SetDuration(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	duration time.Duration,
 ) {
 	if vehicleType == nil {
@@ -429,14 +429,14 @@ func (c *constantDurationExpressionImpl) SetName(n string) {
 }
 
 func (c *constantDurationExpressionImpl) Value(
-	_ ModelVehicleType,
+	_ *ModelVehicleType,
 	_, _ *ModelStop,
 ) float64 {
 	return c.duration.Seconds()
 }
 
 func (c *constantDurationExpressionImpl) Duration(
-	_ ModelVehicleType,
+	_ *ModelVehicleType,
 	_ *ModelStop,
 	_ *ModelStop,
 ) time.Duration {
@@ -487,7 +487,7 @@ func (d *travelDurationExpression) Speed() common.Speed {
 }
 
 func (d *travelDurationExpression) Duration(
-	vehicle ModelVehicleType,
+	vehicle *ModelVehicleType,
 	from *ModelStop,
 	to *ModelStop,
 ) time.Duration {
@@ -503,7 +503,7 @@ func (d *travelDurationExpression) Duration(
 }
 
 func (d *travelDurationExpression) Value(
-	vehicle ModelVehicleType,
+	vehicle *ModelVehicleType,
 	from *ModelStop,
 	to *ModelStop,
 ) float64 {

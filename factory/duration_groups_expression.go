@@ -99,7 +99,7 @@ func (d *durationGroupDurationImpl) SetGroupDuration(stops nextroute.ModelStops,
 
 // Duration implements DurationGroupsExpression.
 func (d *durationGroupDurationImpl) Duration(
-	_ nextroute.ModelVehicleType,
+	_ *nextroute.ModelVehicleType,
 	from *nextroute.ModelStop,
 	to *nextroute.ModelStop,
 ) time.Duration {
@@ -180,7 +180,7 @@ func (d *durationGroupDurationImpl) SetName(string) {
 
 // Value implements DurationGroupsExpression.
 func (d *durationGroupDurationImpl) Value(
-	_ nextroute.ModelVehicleType,
+	_ *nextroute.ModelVehicleType,
 	from *nextroute.ModelStop,
 	to *nextroute.ModelStop,
 ) float64 {

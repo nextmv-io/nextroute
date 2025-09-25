@@ -59,13 +59,13 @@ type TimeDependentDurationExpression interface {
 	// ValueAtTime returns the value for the given time.
 	ValueAtTime(
 		time time.Time,
-		vehicleType ModelVehicleType,
+		vehicleType *ModelVehicleType,
 		from, to *ModelStop,
 	) float64
 	// ValueAtValue returns the value for the given value.
 	ValueAtValue(
 		value float64,
-		vehicleType ModelVehicleType,
+		vehicleType *ModelVehicleType,
 		from, to *ModelStop,
 	) float64
 }
@@ -186,7 +186,7 @@ func (t *timeDependentDurationExpressionImpl) Expressions() []DurationExpression
 }
 
 func (t *timeDependentDurationExpressionImpl) Value(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from, to *ModelStop,
 ) float64 {
 	if t.IsDependentOnTime() {
@@ -196,7 +196,7 @@ func (t *timeDependentDurationExpressionImpl) Value(
 }
 
 func (t *timeDependentDurationExpressionImpl) Duration(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from, to *ModelStop,
 ) time.Duration {
 	if t.IsDependentOnTime() {
@@ -431,7 +431,7 @@ func (t *timeDependentDurationExpressionImpl) ExpressionAtValue(
 
 func (t *timeDependentDurationExpressionImpl) ValueAtTime(
 	atTime time.Time,
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from, to *ModelStop,
 ) float64 {
 	return t.ValueAtValue(
@@ -444,7 +444,7 @@ func (t *timeDependentDurationExpressionImpl) ValueAtTime(
 
 func (t *timeDependentDurationExpressionImpl) ValueAtValue(
 	value float64,
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from, to *ModelStop,
 ) float64 {
 	if len(t.elements) == 0 {
@@ -518,7 +518,7 @@ func (t *timeIndependentDurationExpressionImpl) Expressions() []DurationExpressi
 }
 
 func (t *timeIndependentDurationExpressionImpl) Duration(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from, to *ModelStop,
 ) time.Duration {
 	return t.expression.Duration(vehicleType, from, to)
@@ -533,7 +533,7 @@ func (t *timeIndependentDurationExpressionImpl) Name() string {
 }
 
 func (t *timeIndependentDurationExpressionImpl) Value(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from, to *ModelStop,
 ) float64 {
 	return t.expression.Value(vehicleType, from, to)
@@ -578,7 +578,7 @@ func (t *timeIndependentDurationExpressionImpl) ExpressionAtValue(
 
 func (t *timeIndependentDurationExpressionImpl) ValueAtTime(
 	_ time.Time,
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from, to *ModelStop,
 ) float64 {
 	return t.expression.Value(vehicleType, from, to)
@@ -586,7 +586,7 @@ func (t *timeIndependentDurationExpressionImpl) ValueAtTime(
 
 func (t *timeIndependentDurationExpressionImpl) ValueAtValue(
 	_ float64,
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	from, to *ModelStop,
 ) float64 {
 	return t.expression.Value(vehicleType, from, to)

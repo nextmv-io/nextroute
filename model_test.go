@@ -117,7 +117,7 @@ func createModel(input Input) (*nextroute.Model, error) {
 		}
 	}
 
-	vehicleTypes := make(map[string]nextroute.ModelVehicleType)
+	vehicleTypes := make(map[string]*nextroute.ModelVehicleType)
 
 	for _, vt := range input.VehicleTypes {
 		if vt.Speed.MetersPerSecond < 0 {
