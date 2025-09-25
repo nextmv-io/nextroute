@@ -20,13 +20,13 @@ import (
 type Solution struct {
 	model                  *Model
 	scores                 map[ModelObjective]float64
-	values                 map[int][]float64
+	values                 [][]float64
 	objectiveStopData      map[ModelObjective][]Copier
 	constraintStopData     map[ModelConstraint][]Copier
 	objectiveVehicleData   map[ModelObjective][]Copier
 	objectiveSolutionData  map[ModelObjective]Copier
 	constraintSolutionData map[ModelConstraint]Copier
-	cumulativeValues       map[int][]float64
+	cumulativeValues       [][]float64
 
 	// TODO: explore if stopToPlanUnit should rather contain interfaces
 	stopToPlanUnit       []*solutionPlanStopsUnitImpl
@@ -106,8 +106,8 @@ func NewSolution(
 		slack:                    make([]float64, 0, nrStops),
 		start:                    make([]float64, 0, nrStops),
 		end:                      make([]float64, 0, nrStops),
-		values:                   make(map[int][]float64, nExpressions),
-		cumulativeValues:         make(map[int][]float64, nExpressions),
+		values:                   make([][]float64, nExpressions),
+		cumulativeValues:         make([][]float64, nExpressions),
 		stopToPlanUnit:           make([]*solutionPlanStopsUnitImpl, nrStops),
 		constraintStopData:       make(map[ModelConstraint][]Copier),
 		objectiveStopData:        make(map[ModelObjective][]Copier),
@@ -133,9 +133,9 @@ func NewSolution(
 		),
 	}
 
-	for _, expression := range model.expressions {
-		solution.values[expression.Index()] = make([]float64, nrStops)
-		solution.cumulativeValues[expression.Index()] = make([]float64, nrStops)
+	for ei := range model.expressions {
+		solution.values[ei] = make([]float64, nrStops)
+		solution.cumulativeValues[ei] = make([]float64, nrStops)
 	}
 
 	for _, constraint := range model.constraintsWithStopUpdater {
@@ -647,7 +647,7 @@ func (s *Solution) Copy() *Solution {
 		constraintSolutionData:   make(map[ModelConstraint]Copier, len(s.constraintSolutionData)),
 		objectiveSolutionData:    make(map[ModelObjective]Copier, len(s.objectiveSolutionData)),
 		cumulativeTravelDuration: cumulativeTravelDuration,
-		cumulativeValues:         make(map[int][]float64, len(s.cumulativeValues)),
+		cumulativeValues:         make([][]float64, len(s.cumulativeValues)),
 		stopToPlanUnit:           make([]*solutionPlanStopsUnitImpl, len(s.stopToPlanUnit)),
 		end:                      end,
 		first:                    first,
@@ -659,7 +659,7 @@ func (s *Solution) Copy() *Solution {
 		start:                    start,
 		stop:                     stop,
 		stopPosition:             stopPosition,
-		values:                   make(map[int][]float64, len(s.values)),
+		values:                   make([][]float64, len(s.values)),
 		vehicleIndices:           vehicleIndices,
 		random:                   random,
 		fixedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
@@ -683,8 +683,7 @@ func (s *Solution) Copy() *Solution {
 		solution.vehicles[idx].solution = solution
 	}
 
-	for _, expression := range model.expressions {
-		eIndex := expression.Index()
+	for eIndex := range model.expressions {
 		solution.cumulativeValues[eIndex], floats = common.CopySliceFrom(floats, s.cumulativeValues[eIndex])
 		solution.values[eIndex], floats = common.CopySliceFrom(floats, s.values[eIndex])
 	}
@@ -813,19 +812,19 @@ func (s *Solution) newVehicle(
 		solution: s,
 	})
 
-	for _, expression := range model.expressions {
+	for ei, expression := range model.expressions {
 		value := expression.Value(
 			modelVehicle.VehicleType(),
 			modelVehicle.First(),
 			modelVehicle.First(),
 		)
-		s.values[expression.Index()] = append(
-			s.values[expression.Index()],
+		s.values[ei] = append(
+			s.values[ei],
 			value,
 			0,
 		)
-		s.cumulativeValues[expression.Index()] = append(
-			s.cumulativeValues[expression.Index()],
+		s.cumulativeValues[ei] = append(
+			s.cumulativeValues[ei],
 			value,
 			value,
 		)
@@ -1099,14 +1098,16 @@ func (s *Solution) value(
 	expression ModelExpression,
 	index int,
 ) float64 {
-	return s.values[expression.Index()][index]
+	idx := s.model.expressionsIndexMap[expression.Index()]
+	return s.values[idx][index]
 }
 
 func (s *Solution) cumulativeValue(
 	expression ModelExpression,
 	index int,
 ) float64 {
-	return s.cumulativeValues[expression.Index()][index]
+	idx := s.model.expressionsIndexMap[expression.Index()]
+	return s.cumulativeValues[idx][index]
 }
 
 func (s *Solution) constraintValue(
@@ -1205,14 +1206,14 @@ func (s *Solution) isFeasible(index int, includeTemporal bool) (
 		end := s.end[index]
 		next := s.next[index]
 
-		for _, expression := range model.expressions {
+		for ei, expression := range model.expressions {
 			value := expression.Value(
 				vehicleType,
 				model.stops[s.stop[index]],
 				model.stops[s.stop[next]],
 			)
-			s.values[expression.Index()][next] = value
-			s.cumulativeValues[expression.Index()][next] = s.cumulativeValues[expression.Index()][index] + value
+			s.values[ei][next] = value
+			s.cumulativeValues[ei][next] = s.cumulativeValues[ei][index] + value
 		}
 
 		travelDuration, arrival, start, end := vehicleType.TemporalValues(

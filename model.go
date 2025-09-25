@@ -28,7 +28,8 @@ func NewModel() (*Model, error) {
 		distanceUnit:                   common.Meters,
 		durationUnit:                   time.Second,
 		epoch:                          time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
-		expressions:                    make(map[int]ModelExpression),
+		expressions:                    []ModelExpression{},
+		expressionsIndexMap:            map[int]int{},
 		isLocked:                       false,
 		objective:                      nil,
 		objectivesWithStopUpdater:      make(ModelObjectives, 0),
@@ -67,10 +68,12 @@ func NewModel() (*Model, error) {
 type Model struct {
 	epoch time.Time
 	modelDataImpl
-	objective                  ModelObjectiveSum
-	stopVehicles               map[int]int
-	random                     *rand.Rand
-	expressions                map[int]ModelExpression
+	objective    ModelObjectiveSum
+	stopVehicles map[int]int
+	random       *rand.Rand
+	expressions  []ModelExpression
+	// expressionsIndexMap maps expression index to its position
+	expressionsIndexMap        map[int]int
 	constraintMap              map[CheckedAt]ModelConstraints
 	timeFormat                 string
 	constraints                ModelConstraints
@@ -196,7 +199,8 @@ func (m *Model) NewVehicleType(
 }
 
 func (m *Model) addExpression(expression ModelExpression) error {
-	if existingExpression, ok := m.expressions[expression.Index()]; ok {
+	if eIdx, ok := m.expressionsIndexMap[expression.Index()]; ok {
+		existingExpression := m.expressions[eIdx]
 		if existingExpression.Name() != expression.Name() {
 			return fmt.Errorf(
 				"expression index %d already exists with name %s,"+
@@ -208,7 +212,8 @@ func (m *Model) addExpression(expression ModelExpression) error {
 			)
 		}
 	} else {
-		m.expressions[expression.Index()] = expression
+		m.expressions = append(m.expressions, expression)
+		m.expressionsIndexMap[expression.Index()] = len(m.expressions) - 1
 	}
 	return nil
 }

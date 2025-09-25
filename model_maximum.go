@@ -417,13 +417,16 @@ func (l *maximumImpl) Value(
 			}
 			continue
 		}
-
-		for _, solutionStop := range vehicle.SolutionStops() {
-			solutionStop.CumulativeValue(l.resourceExpression)
+		solutionStop := vehicle.First()
+		for {
 			excess := solutionStop.CumulativeValue(l.resourceExpression) - maximum
 			if excess > 0 {
 				score += excess
 			}
+			if solutionStop.IsLast() {
+				break
+			}
+			solutionStop = solutionStop.Next()
 		}
 	}
 
