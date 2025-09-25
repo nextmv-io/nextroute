@@ -7,6 +7,8 @@ import (
 	"math"
 )
 
+const EPSILON = float64(1e-10)
+
 // Maximum can be used as a constraint or an objective that limits the maximum
 // cumulative value can be assigned to a vehicle type. The maximum cumulative
 // value is defined by the expression and the maximum value is defined by the
@@ -124,7 +126,7 @@ func (l *maximumImpl) Lock(model Model) error {
 		for _, stop := range planUnit.Stops() {
 			value := l.Expression().Value(nil, nil, stop)
 			delta += value
-			if value != 0 {
+			if value > EPSILON || value < -EPSILON {
 				hasNoEffect = false
 			}
 		}
@@ -185,7 +187,7 @@ func (l *maximumImpl) DoesStopHaveViolations(s SolutionStop) bool {
 		nil,
 	)
 
-	return cumulativeValue > maximum || cumulativeValue < 0.0
+	return cumulativeValue > maximum+EPSILON || cumulativeValue < -EPSILON
 }
 
 func (l *maximumImpl) EstimateIsViolated(
@@ -212,7 +214,7 @@ func (l *maximumImpl) EstimateIsViolated(
 
 	if l.hasConstantExpression {
 		value := expression.Value(nil, nil, nil)
-		if value > maximum || value < 0 {
+		if value > maximum+EPSILON || value < -EPSILON {
 			return true, constSkipVehiclePositionsHint
 		}
 		return false, constNoPositionsHint
@@ -247,7 +249,7 @@ func (l *maximumImpl) EstimateIsViolated(
 			modelStop,
 		)
 
-		if level > maximum || level < 0 {
+		if level > maximum+EPSILON || level < -EPSILON {
 			return true, constNoPositionsHint
 		}
 		previousStop = solutionStop
@@ -268,7 +270,7 @@ func (l *maximumImpl) EstimateIsViolated(
 		for !stop.IsLast() {
 			level += stop.Value(expression)
 
-			if level > maximum || level < 0 {
+			if level > maximum+EPSILON || level < -EPSILON {
 				// TODO we can hint the move has to be past this stop
 				return true, constNoPositionsHint
 			}
@@ -298,15 +300,17 @@ func (l *maximumImpl) UpdateObjectiveStopData(
 			hasViolation: false,
 		}, nil
 	}
+
 	hasViolation := solutionStop.Previous().ObjectiveData(l).(*maximumObjectiveDate).hasViolation
 
 	if !hasViolation {
-		maximum := l.maximumByVehicleType[solutionStop.Vehicle().ModelVehicle().VehicleType().Index()]
 		value := solutionStop.CumulativeValue(l.resourceExpression)
-		if value > maximum || value < 0 {
+		maximum := l.maximumByVehicleType[solutionStop.Vehicle().ModelVehicle().VehicleType().Index()]
+		if value > maximum+EPSILON || value < -EPSILON {
 			hasViolation = true
 		}
 	}
+
 	return &maximumObjectiveDate{
 		hasViolation: hasViolation,
 	}, nil
@@ -330,10 +334,10 @@ func (l *maximumImpl) EstimateDeltaValue(
 
 	if l.hasConstantExpression {
 		value := l.resourceExpression.Value(nil, nil, nil)
-		if value > maximum {
+		if value > maximum+EPSILON {
 			return value - maximum + l.penaltyOffset
 		}
-		if value < 0 {
+		if value < -EPSILON {
 			return math.Abs(value) + l.penaltyOffset
 		}
 		return 0.0
@@ -348,7 +352,7 @@ func (l *maximumImpl) EstimateDeltaValue(
 
 		returnValue := 0.0
 		excess := cumulativeValue + l.deltas[moveImpl.planUnit.modelPlanStopsUnit.Index()] - maximum
-		if excess > 0 {
+		if excess > EPSILON {
 			if !hasViolation {
 				returnValue += l.penaltyOffset
 			}
@@ -361,7 +365,6 @@ func (l *maximumImpl) EstimateDeltaValue(
 
 	generator := newSolutionStopGenerator(*moveImpl, false, true)
 	defer generator.release()
-
 	previousStop, _ := generator.next()
 
 	level := previousStop.CumulativeValue(l.resourceExpression)
@@ -375,12 +378,12 @@ func (l *maximumImpl) EstimateDeltaValue(
 			modelStop,
 		)
 
-		if level > maximum || level < 0 {
+		if level > maximum+EPSILON || level < -EPSILON {
 			deltaViolation := level - maximum
 			if solutionStop.IsPlanned() {
 				deltaViolation -= solutionStop.CumulativeValue(l.resourceExpression)
 			}
-			if deltaViolation > 0. {
+			if deltaViolation > EPSILON {
 				estimateDeltaValue += deltaViolation
 				if !hasViolation {
 					estimateDeltaValue += l.penaltyOffset
@@ -415,7 +418,7 @@ func (l *maximumImpl) Value(
 		if l.hasStopExpressionAndNoNegativeValues {
 			cumulativeValue := vehicle.Last().CumulativeValue(l.resourceExpression)
 			excess := cumulativeValue - maximum
-			if excess > 0 {
+			if excess > EPSILON {
 				score += excess
 			}
 			continue
@@ -423,7 +426,7 @@ func (l *maximumImpl) Value(
 		solutionStop := vehicle.First()
 		for {
 			excess := solutionStop.CumulativeValue(l.resourceExpression) - maximum
-			if excess > 0 {
+			if excess > EPSILON {
 				score += excess
 			}
 			if solutionStop.IsLast() {
