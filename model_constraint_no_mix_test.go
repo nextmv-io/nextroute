@@ -88,7 +88,7 @@ func TestNoMixConstraint(t *testing.T) {
 		return planUnit.NumberOfStops() > 1
 	})
 
-	deltas := make(map[nextroute.ModelStop]nextroute.MixItem)
+	deltas := make(map[*nextroute.ModelStop]nextroute.MixItem)
 
 	deltas[sequencePlanUnits[0].Stops()[0]] = nextroute.MixItem{
 		Name:     "A",
@@ -805,7 +805,7 @@ func TestNoMixConstraint_ArgumentMismatch(t *testing.T) {
 
 	{
 		cnstr, err := nextroute.NewNoMixConstraint(
-			map[nextroute.ModelStop]nextroute.MixItem{},
+			map[*nextroute.ModelStop]nextroute.MixItem{},
 		)
 		if err != nil {
 			t.Fatal(err)
@@ -816,7 +816,7 @@ func TestNoMixConstraint_ArgumentMismatch(t *testing.T) {
 		}
 	}
 	{
-		deltas := make(map[nextroute.ModelStop]nextroute.MixItem)
+		deltas := make(map[*nextroute.ModelStop]nextroute.MixItem)
 
 		deltas[sequencePlanUnits[0].Stops()[0]] = nextroute.MixItem{
 			Name:     "A",
@@ -844,7 +844,7 @@ func TestNoMixConstraint_ArgumentMismatch(t *testing.T) {
 	{
 		stop := model.Stops()[0]
 
-		deltas := make(map[nextroute.ModelStop]nextroute.MixItem)
+		deltas := make(map[*nextroute.ModelStop]nextroute.MixItem)
 
 		deltas[stop] = nextroute.MixItem{
 			Name:     "A",
@@ -865,7 +865,7 @@ func TestNoMixConstraint_ArgumentMismatch(t *testing.T) {
 		}
 	}
 	{
-		deltas := make(map[nextroute.ModelStop]nextroute.MixItem)
+		deltas := make(map[*nextroute.ModelStop]nextroute.MixItem)
 
 		deltas[sequencePlanUnits[0].Stops()[0]] = nextroute.MixItem{
 			Name:     "A",

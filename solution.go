@@ -71,9 +71,9 @@ type Solution interface {
 	// model plan unit.
 	SolutionPlanUnit(planUnit ModelPlanUnit) SolutionPlanUnit
 	// SolutionStop returns the solution stop for the given model stop.
-	SolutionStop(stop ModelStop) SolutionStop
+	SolutionStop(stop *ModelStop) SolutionStop
 	// SolutionVehicle returns the solution vehicle for the given model vehicle.
-	SolutionVehicle(vehicle ModelVehicle) SolutionVehicle
+	SolutionVehicle(vehicle *ModelVehicle) SolutionVehicle
 
 	// UnPlannedPlanUnits returns the solution plan units that are not
 	// planned.
@@ -382,7 +382,7 @@ func (s *solutionImpl) addInitialSolution(m Model) error {
 		planUnits := common.UniqueDefined(
 			common.Map(
 				initialModelStops,
-				func(modelStop ModelStop) SolutionPlanStopsUnit {
+				func(modelStop *ModelStop) SolutionPlanStopsUnit {
 					return s.SolutionStop(modelStop).PlanStopsUnit()
 				}),
 			func(planUnit SolutionPlanStopsUnit) int {
@@ -651,21 +651,21 @@ func (s *solutionImpl) solutionPlanUnitsUnit(planUnit ModelPlanUnitsUnit) *solut
 	return s.solutionPlanUnit(planUnit).(*solutionPlanUnitsUnitImpl)
 }
 
-func (s *solutionImpl) SolutionStop(stop ModelStop) SolutionStop {
+func (s *solutionImpl) SolutionStop(stop *ModelStop) SolutionStop {
 	if stop != nil && stop.HasPlanStopsUnit() {
 		return s.SolutionPlanStopsUnit(stop.PlanStopsUnit()).SolutionStop(stop)
 	}
 	return SolutionStop{}
 }
 
-func (s *solutionImpl) SolutionVehicle(vehicle ModelVehicle) SolutionVehicle {
+func (s *solutionImpl) SolutionVehicle(vehicle *ModelVehicle) SolutionVehicle {
 	if solutionVehicle, ok := s.solutionVehicle(vehicle); ok {
 		return solutionVehicle
 	}
 	return SolutionVehicle{}
 }
 
-func (s *solutionImpl) solutionVehicle(vehicle ModelVehicle) (SolutionVehicle, bool) {
+func (s *solutionImpl) solutionVehicle(vehicle *ModelVehicle) (SolutionVehicle, bool) {
 	if vehicle != nil {
 		return SolutionVehicle{
 			index:    vehicle.Index(),
@@ -846,7 +846,7 @@ func (s *solutionImpl) Random() *rand.Rand {
 }
 
 func (s *solutionImpl) newVehicle(
-	modelVehicle ModelVehicle,
+	modelVehicle *ModelVehicle,
 ) (SolutionVehicle, error) {
 	if modelVehicle == nil {
 		return SolutionVehicle{}, fmt.Errorf("modelVehicle is nil")
@@ -1206,7 +1206,7 @@ func (s *solutionImpl) isFeasible(index int, includeTemporal bool) (
 	err error,
 ) {
 	model := s.model.(*modelImpl)
-	vehicle := s.model.Vehicle(s.vehicleIndices[s.inVehicle[index]]).(*modelVehicleImpl)
+	vehicle := s.model.Vehicle(s.vehicleIndices[s.inVehicle[index]])
 	vehicleType := vehicle.VehicleType()
 
 	solutionStop := SolutionStop{

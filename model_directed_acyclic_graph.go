@@ -14,9 +14,9 @@ import (
 // vehicle's route.
 type Arc interface {
 	// Origin returns the origin node ([ModelStop]) of the arc.
-	Origin() ModelStop
+	Origin() *ModelStop
 	// Destination returns the destination node ([ModelStop]) of the arc.
-	Destination() ModelStop
+	Destination() *ModelStop
 	// IsDirect returns true if the Destination has to be a direct successor of
 	// the Origin, otherwise returns false.
 	IsDirect() bool
@@ -45,20 +45,20 @@ type DirectedAcyclicGraph interface {
 
 	// HasDirectArc returns true if there is a direct arc between the origin and
 	// destination stops, otherwise returns false.
-	HasDirectArc(origin, destination ModelStop) bool
+	HasDirectArc(origin, destination *ModelStop) bool
 
 	// ModelStops returns all [ModelStops] in the graph.
 	ModelStops() ModelStops
 	// AddArc adds a new [Arc] in the graph if it was not already added. The new
 	// [Arc] should not cause a cycle.
-	AddArc(origin, destination ModelStop) error
+	AddArc(origin, destination *ModelStop) error
 	// AddDirectArc adds a new [Arc] marked direct in the graph if it was not
 	// already added. The new [Arc] should not cause a cycle. The destination
 	// stop should be the next stop after the origin stop.
-	AddDirectArc(origin, destination ModelStop) error
+	AddDirectArc(origin, destination *ModelStop) error
 	// OutboundArcs returns all [Arcs] that have the given [ModelStop] as their
 	// origin.
-	OutboundArcs(stop ModelStop) Arcs
+	OutboundArcs(stop *ModelStop) Arcs
 }
 
 // NewDirectedAcyclicGraph connects NewDirectedAcyclicGraph.
@@ -81,7 +81,7 @@ type directedAcyclicGraphImpl struct {
 	arcs               Arcs
 }
 
-func (d *directedAcyclicGraphImpl) addArc(origin, destination ModelStop, isDirect bool) error {
+func (d *directedAcyclicGraphImpl) addArc(origin, destination *ModelStop, isDirect bool) error {
 	if isDirect {
 		if arc, alreadyDefined := d.outboundDirectArcs[origin.Index()]; alreadyDefined {
 			if arc.Destination().Index() != destination.Index() {
@@ -125,7 +125,7 @@ func (d *directedAcyclicGraphImpl) addArc(origin, destination ModelStop, isDirec
 	return nil
 }
 
-func (d *directedAcyclicGraphImpl) AddArc(origin, destination ModelStop) error {
+func (d *directedAcyclicGraphImpl) AddArc(origin, destination *ModelStop) error {
 	if origin == nil {
 		return fmt.Errorf("origin stop cannot be nil")
 	}
@@ -143,7 +143,7 @@ func (d *directedAcyclicGraphImpl) AddArc(origin, destination ModelStop) error {
 	return nil
 }
 
-func (d *directedAcyclicGraphImpl) HasDirectArc(origin, destination ModelStop) bool {
+func (d *directedAcyclicGraphImpl) HasDirectArc(origin, destination *ModelStop) bool {
 	return d.hasDirectArc(origin.Index(), destination.Index())
 }
 
@@ -154,7 +154,7 @@ func (d *directedAcyclicGraphImpl) hasDirectArc(originIndex, destinationIndex in
 	return false
 }
 
-func (d *directedAcyclicGraphImpl) AddDirectArc(origin, destination ModelStop) error {
+func (d *directedAcyclicGraphImpl) AddDirectArc(origin, destination *ModelStop) error {
 	if origin == nil {
 		return fmt.Errorf("origin stop cannot be nil")
 	}
@@ -226,7 +226,7 @@ func (d *directedAcyclicGraphImpl) IsAllowed(stops ModelStops) (bool, error) {
 		return true, nil
 	}
 
-	uniqueStops := common.UniqueDefined(stops, func(stop ModelStop) int {
+	uniqueStops := common.UniqueDefined(stops, func(stop *ModelStop) int {
 		return stop.Index()
 	})
 
@@ -293,7 +293,7 @@ func (d *directedAcyclicGraphImpl) ModelStops() ModelStops {
 	return modelStops
 }
 
-func (d *directedAcyclicGraphImpl) OutboundArcs(stop ModelStop) Arcs {
+func (d *directedAcyclicGraphImpl) OutboundArcs(stop *ModelStop) Arcs {
 	return slices.Clone(d.outboundArcs[stop.Index()])
 }
 
@@ -336,16 +336,16 @@ func (d *directedAcyclicGraphImpl) isCyclicUtil(vertex int, visited map[int]bool
 
 // arcImpl implements Arc.
 type arcImpl struct {
-	origin      ModelStop
-	destination ModelStop
+	origin      *ModelStop
+	destination *ModelStop
 	isDirect    bool
 }
 
-func (a arcImpl) Origin() ModelStop {
+func (a arcImpl) Origin() *ModelStop {
 	return a.origin
 }
 
-func (a arcImpl) Destination() ModelStop {
+func (a arcImpl) Destination() *ModelStop {
 	return a.destination
 }
 

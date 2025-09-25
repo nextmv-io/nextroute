@@ -8,7 +8,7 @@ import "fmt"
 // planned after other stops.
 type SuccessorConstraint interface {
 	ModelConstraint
-	DisallowSuccessors(ModelStop, ModelStops) error
+	DisallowSuccessors(*ModelStop, ModelStops) error
 }
 
 // NewSuccessorConstraint returns a new SuccessorConstraint.
@@ -18,13 +18,13 @@ func NewSuccessorConstraint() (SuccessorConstraint, error) {
 			"successor",
 			ModelExpressions{},
 		),
-		disallowedSuccessors: make(map[ModelStop]ModelStops),
+		disallowedSuccessors: make(map[*ModelStop]ModelStops),
 	}, nil
 }
 
 type successorConstraintImpl struct {
 	modelConstraintImpl
-	disallowedSuccessors map[ModelStop]ModelStops
+	disallowedSuccessors map[*ModelStop]ModelStops
 }
 
 func (l *successorConstraintImpl) Lock(model Model) error {
@@ -46,7 +46,7 @@ func (l *successorConstraintImpl) Lock(model Model) error {
 }
 
 func (l *successorConstraintImpl) DisallowSuccessors(
-	stop ModelStop,
+	stop *ModelStop,
 	successors ModelStops,
 ) error {
 	if stop == nil {
@@ -93,7 +93,7 @@ func (l *successorConstraintImpl) DoesStopHaveViolations(
 ) bool {
 	modelImpl := stop.Solution().Model().(*modelImpl)
 	stopImpl := stop
-	previousModelStop := stopImpl.Previous().modelStop()
+	previousModelStop := stopImpl.Previous().ModelStop()
 	if disallowed := modelImpl.disallowedSuccessors[previousModelStop.Index()][stop.ModelStop().Index()]; disallowed {
 		return true
 	}

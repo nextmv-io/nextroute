@@ -82,7 +82,7 @@ func (l *earlinessObjectiveImpl) Earliness(stop SolutionStop) float64 {
 }
 
 func (l *earlinessObjectiveImpl) earliness(stop SolutionStop) float64 {
-	targetTime := l.targetTime.Value(nil, nil, stop.modelStop())
+	targetTime := l.targetTime.Value(nil, nil, stop.ModelStop())
 	compare := 0.
 	switch l.temporalReference {
 	case OnStart:
@@ -180,7 +180,7 @@ func (l *earlinessObjectiveImpl) EstimateDeltaValue(
 		}
 
 		previousStop = solutionStop
-		targetTime := l.targetTime.Value(nil, nil, solutionStop.modelStop())
+		targetTime := l.targetTime.Value(nil, nil, solutionStop.ModelStop())
 
 		earlinessFactor := l.earlinessFactor.Value(
 			nil,

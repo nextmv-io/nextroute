@@ -25,10 +25,10 @@ type LatestEnd interface {
 
 	// SetFactor adds a factor with which a deviating stop is multiplied. This
 	// is only taken into account if the construct is used as an objective.
-	SetFactor(factor float64, stop ModelStop) error
+	SetFactor(factor float64, stop *ModelStop) error
 
 	// Factor returns the multiplication factor for the given stop expression.
-	Factor(stop ModelStop) float64
+	Factor(stop *ModelStop) float64
 }
 
 // LatestStart is a construct that can be added to the model as a constraint or
@@ -49,10 +49,10 @@ type LatestStart interface {
 
 	// SetFactor adds a factor with which a deviating stop is multiplied. This
 	// is only taken into account if the construct is used as an objective.
-	SetFactor(factor float64, stop ModelStop) error
+	SetFactor(factor float64, stop *ModelStop) error
 
 	// Factor returns the multiplication factor for the given stop expression.
-	Factor(stop ModelStop) float64
+	Factor(stop *ModelStop) float64
 }
 
 // LatestArrival is a construct that can be added to the model as a constraint
@@ -73,10 +73,10 @@ type LatestArrival interface {
 
 	// SetFactor adds a factor with which a deviating stop is multiplied. This
 	// is only taken into account if the construct is used as an objective.
-	SetFactor(factor float64, stop ModelStop) error
+	SetFactor(factor float64, stop *ModelStop) error
 
 	// Factor returns the multiplication factor for the given stop expression.
-	Factor(stop ModelStop) float64
+	Factor(stop *ModelStop) float64
 }
 
 // NewLatestEnd returns a new LatestEnd construct.
@@ -131,14 +131,14 @@ type latestImpl struct {
 	temporalReference TemporalReference
 }
 
-func (l *latestImpl) SetFactor(factor float64, stop ModelStop) error {
+func (l *latestImpl) SetFactor(factor float64, stop *ModelStop) error {
 	if factor >= 0 {
 		return l.latenessFactor.SetValue(stop, factor)
 	}
 	return nil
 }
 
-func (l *latestImpl) Factor(stop ModelStop) float64 {
+func (l *latestImpl) Factor(stop *ModelStop) float64 {
 	return l.latenessFactor.Value(nil, nil, stop)
 }
 
@@ -313,7 +313,7 @@ func (l *latestImpl) DoesStopHaveViolations(s SolutionStop) bool {
 		VehicleType().
 		TravelDurationExpression().
 		SatisfiesTriangleInequality() {
-		latest := l.latest.Value(nil, nil, stop.modelStop())
+		latest := l.latest.Value(nil, nil, stop.ModelStop())
 		switch l.temporalReference {
 		case OnArrival:
 			return stop.ArrivalValue() > latest

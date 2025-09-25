@@ -83,8 +83,8 @@ func (n *sumExpressionImpl) SetName(name string) {
 
 func (n *sumExpressionImpl) Value(
 	vehicle ModelVehicleType,
-	from ModelStop,
-	to ModelStop,
+	from *ModelStop,
+	to *ModelStop,
 ) float64 {
 	value := 0.0
 	for _, expression := range n.expressions {

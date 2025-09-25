@@ -133,7 +133,7 @@ func (d *solveOperatorUnPlanImpl) unplanClosestStops(
 
 	solution := solutionStop.Solution()
 
-	stops, err := solutionStop.ModelStop().(*stopImpl).closestStops()
+	stops, err := solutionStop.ModelStop().closestStops()
 	if err != nil {
 		return planUnits, err
 	}

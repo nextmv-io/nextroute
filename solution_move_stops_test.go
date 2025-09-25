@@ -20,7 +20,7 @@ func TestSolutionMoveStops(t *testing.T) {
 	s3 := model.Stops()[2]
 	s4 := model.Stops()[3]
 
-	mixItems := map[nextroute.ModelStop]nextroute.MixItem{
+	mixItems := map[*nextroute.ModelStop]nextroute.MixItem{
 		s1: {
 			Name:     "avocados",
 			Quantity: 1,

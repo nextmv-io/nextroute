@@ -28,7 +28,7 @@ func UnplanIsland(
 			stop = stop.Previous()
 		}
 		if distance.Value(common.Meters) > 0 {
-			closestStops, err := solutionStop.modelStop().closestStops()
+			closestStops, err := solutionStop.ModelStop().closestStops()
 			if err != nil {
 				return err
 			}

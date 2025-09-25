@@ -8,49 +8,11 @@ import (
 	"time"
 )
 
-// ModelVehicle is a vehicle in the model. A vehicle is a sequence of stops.
-type ModelVehicle interface {
-	ModelData
-
-	// AddStop adds a stop to the vehicle. The stop is added to the end of the
-	// vehicle, before the last stop. If fixed is true stop will be fixed and
-	// can not be unplanned.
-	AddStop(stop ModelStop, fixed bool) error
-
-	// First returns the first stop of the vehicle.
-	First() ModelStop
-
-	// ID returns the identifier of the vehicle.
-	ID() string
-	// Index returns the index of the vehicle.
-	Index() int
-
-	// Last returns the last stop of the vehicle.
-	Last() ModelStop
-
-	// Model returns the model of the vehicle.
-	Model() Model
-
-	// SetID sets the identifier of the vehicle. This identifier is not used by
-	// nextroute, and therefore it does not have to be unique for nextroute
-	// internally. However, to make this ID useful for debugging and reporting it
-	// should be made unique.
-	SetID(string)
-	// Start returns the start time of the vehicle.
-	Start() time.Time
-	// Stops returns the stops of the vehicle that are provided as a start
-	// assignment. The first and last stop of the vehicle are not included in
-	// the returned slice.
-	Stops() ModelStops
-
-	// VehicleType returns the vehicle type of the vehicle.
-	VehicleType() ModelVehicleType
-}
-
 // ModelVehicles is a slice of ModelVehicle.
-type ModelVehicles []ModelVehicle
+type ModelVehicles []*ModelVehicle
 
-type modelVehicleImpl struct {
+// ModelVehicle is a vehicle in the model. A vehicle is a sequence of stops.
+type ModelVehicle struct {
 	start time.Time
 	modelDataImpl
 	vehicleType ModelVehicleType
@@ -59,13 +21,15 @@ type modelVehicleImpl struct {
 	index       int
 }
 
-func newModelVehicle(
+// NewModelVehicle returns a new ModelVehicle.
+// Always use this function to create a new ModelVehicle.
+func NewModelVehicle(
 	index int,
 	vehicleType ModelVehicleType,
 	start time.Time,
-	first ModelStop,
-	last ModelStop,
-) (ModelVehicle, error) {
+	first *ModelStop,
+	last *ModelStop,
+) (*ModelVehicle, error) {
 	if first.HasPlanStopsUnit() {
 		return nil,
 			fmt.Errorf("first stop %s already has a plan unit", first)
@@ -76,12 +40,12 @@ func newModelVehicle(
 			fmt.Errorf("last stop %s already has a plan unit", last)
 	}
 
-	first.(*stopImpl).firstOrLast = true
-	first.(*stopImpl).fixed = true
-	last.(*stopImpl).fixed = true
-	last.(*stopImpl).firstOrLast = true
+	first.firstOrLast = true
+	first.fixed = true
+	last.fixed = true
+	last.firstOrLast = true
 
-	return &modelVehicleImpl{
+	return &ModelVehicle{
 		modelDataImpl: newModelDataImpl(),
 		index:         index,
 		vehicleType:   vehicleType,
@@ -90,23 +54,30 @@ func newModelVehicle(
 	}, nil
 }
 
-func (v *modelVehicleImpl) VehicleType() ModelVehicleType {
+// VehicleType returns the vehicle type of the vehicle.
+func (v *ModelVehicle) VehicleType() ModelVehicleType {
 	return v.vehicleType
 }
 
-func (v *modelVehicleImpl) Index() int {
+// Index returns the index of the vehicle.
+func (v *ModelVehicle) Index() int {
 	return v.index
 }
 
-func (v *modelVehicleImpl) First() ModelStop {
+// First returns the first stop of the vehicle.
+func (v *ModelVehicle) First() *ModelStop {
 	return v.stops[0]
 }
 
-func (v *modelVehicleImpl) Last() ModelStop {
+// Last returns the last stop of the vehicle.
+func (v *ModelVehicle) Last() *ModelStop {
 	return v.stops[len(v.stops)-1]
 }
 
-func (v *modelVehicleImpl) Stops() ModelStops {
+// Stops returns the stops of the vehicle that are provided as a start
+// assignment. The first and last stop of the vehicle are not included in
+// the returned slice.
+func (v *ModelVehicle) Stops() ModelStops {
 	result := make(ModelStops, len(v.stops)-2)
 	if len(v.stops) > 2 {
 		copy(result, v.stops[1:len(v.stops)-1])
@@ -114,8 +85,11 @@ func (v *modelVehicleImpl) Stops() ModelStops {
 	return result
 }
 
-func (v *modelVehicleImpl) AddStop(
-	stop ModelStop,
+// AddStop adds a stop to the vehicle. The stop is added to the end of the
+// vehicle, before the last stop. If fixed is true stop will be fixed and
+// can not be unplanned.
+func (v *ModelVehicle) AddStop(
+	stop *ModelStop,
 	fixed bool,
 ) error {
 	message := "can not add a stop `%v` to vehicle `%v`, "
@@ -155,32 +129,39 @@ func (v *modelVehicleImpl) AddStop(
 		)
 	}
 
-	stop.(*stopImpl).model.stopVehicles[stop.Index()] = v.Index()
-	stop.(*stopImpl).fixed = fixed
+	stop.model.stopVehicles[stop.Index()] = v.Index()
+	stop.fixed = fixed
 
 	v.stops = append(v.stops, v.stops[len(v.stops)-1])
-	v.stops[len(v.stops)-2] = stop.(*stopImpl)
+	v.stops[len(v.stops)-2] = stop
 
 	return nil
 }
 
-func (v *modelVehicleImpl) Model() Model {
+// Model returns the model of the vehicle.
+func (v *ModelVehicle) Model() Model {
 	return v.vehicleType.Model()
 }
 
-func (v *modelVehicleImpl) Start() time.Time {
+// Start returns the start time of the vehicle.
+func (v *ModelVehicle) Start() time.Time {
 	return v.start
 }
 
-func (v *modelVehicleImpl) ID() string {
+// ID returns the identifier of the vehicle.
+func (v *ModelVehicle) ID() string {
 	return v.id
 }
 
-func (v *modelVehicleImpl) SetID(id string) {
+// SetID sets the identifier of the vehicle. This identifier is not used by
+// nextroute, and therefore it does not have to be unique for nextroute
+// internally. However, to make this ID useful for debugging and reporting it
+// should be made unique.
+func (v *ModelVehicle) SetID(id string) {
 	v.id = id
 }
 
-func (v *modelVehicleImpl) String() string {
+func (v *ModelVehicle) String() string {
 	var sb strings.Builder
 
 	_, _ = fmt.Fprintf(

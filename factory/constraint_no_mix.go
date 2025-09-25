@@ -17,7 +17,7 @@ func addNoMixConstraint(
 	model nextroute.Model,
 	_ Options,
 ) (nextroute.Model, error) {
-	mixingItems := make(map[string]map[nextroute.ModelStop]nextroute.MixItem)
+	mixingItems := make(map[string]map[*nextroute.ModelStop]nextroute.MixItem)
 
 	for index, inputStop := range input.Stops {
 		if inputStop.MixingItems == nil {
@@ -42,7 +42,7 @@ func addNoMixConstraint(
 		case map[string]nextroute.MixItem:
 			for t, mixingItem := range typeValue {
 				if _, ok := mixingItems[t]; !ok {
-					mixingItems[t] = make(map[nextroute.ModelStop]nextroute.MixItem)
+					mixingItems[t] = make(map[*nextroute.ModelStop]nextroute.MixItem)
 				}
 				mixingItems[t][stop] = mixingItem
 			}
@@ -71,8 +71,8 @@ func addNoMixConstraint(
 }
 
 func addMixingItems(
-	items map[string]map[nextroute.ModelStop]nextroute.MixItem,
-	stop nextroute.ModelStop,
+	items map[string]map[*nextroute.ModelStop]nextroute.MixItem,
+	stop *nextroute.ModelStop,
 	parsed map[string]any,
 ) error {
 	for t, anyValue := range parsed {
@@ -123,7 +123,7 @@ func addMixingItems(
 				)
 			}
 			if _, ok := items[t]; !ok {
-				items[t] = make(map[nextroute.ModelStop]nextroute.MixItem)
+				items[t] = make(map[*nextroute.ModelStop]nextroute.MixItem)
 			}
 
 			stopsItems := items[t]

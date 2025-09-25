@@ -83,7 +83,7 @@ func addPlanUnits(
 		units := make([]nextroute.ModelPlanUnit, 0, len(group.stops))
 
 		common.RangeMap(group.stops, func(id string, _ struct{}) bool {
-			var stop nextroute.ModelStop
+			var stop *nextroute.ModelStop
 			stop, err = model.Stop(data.stopIDToIndex[id])
 			if err != nil {
 				return true

@@ -114,7 +114,7 @@ func (t *composedPerVehicleTypeExpressionImpl) DefaultExpression() ModelExpressi
 
 func (t *composedPerVehicleTypeExpressionImpl) Value(
 	vehicleType ModelVehicleType,
-	from, to ModelStop,
+	from, to *ModelStop,
 ) float64 {
 	idx := vehicleType.Index()
 	if idx >= 0 && idx < len(t.expressions) {

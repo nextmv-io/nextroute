@@ -16,11 +16,11 @@ type ModelStopsDistanceQueries interface {
 	ModelStops() ModelStops
 	// NearestStops returns the n nearest stops to the given stop, the stop must
 	// be present in the original set of stops.
-	NearestStops(stop ModelStop, n int) (ModelStops, error)
+	NearestStops(stop *ModelStop, n int) (ModelStops, error)
 	// WithinDistanceStops returns the stops within the given distance of the
 	// given stop, the stop must be present in the original set of stops.
 	WithinDistanceStops(
-		stop ModelStop,
+		stop *ModelStop,
 		distance common.Distance,
 	) (ModelStops, error)
 }
@@ -32,7 +32,7 @@ func NewModelStopsDistanceQueries(
 	stops ModelStops,
 ) (ModelStopsDistanceQueries, error) {
 	wrappers := make(modelStopWrappers, len(stops))
-	present := make(map[ModelStop]struct{})
+	present := make(map[*ModelStop]struct{})
 	for i, stop := range stops {
 		if !stop.Location().IsValid() {
 			return nil,
@@ -50,12 +50,12 @@ func NewModelStopsDistanceQueries(
 
 type modelStopsDistanceQueryImpl struct {
 	stops   modelStopWrappers
-	present map[ModelStop]struct{}
+	present map[*ModelStop]struct{}
 	tree    *kdtree.Tree
 }
 
 func (m modelStopsDistanceQueryImpl) WithinDistanceStops(
-	stop ModelStop,
+	stop *ModelStop,
 	distance common.Distance,
 ) (ModelStops, error) {
 	if _, ok := m.present[stop]; !ok {
@@ -91,7 +91,7 @@ func (m modelStopsDistanceQueryImpl) ModelStops() ModelStops {
 }
 
 func (m modelStopsDistanceQueryImpl) NearestStops(
-	stop ModelStop,
+	stop *ModelStop,
 	n int,
 ) (ModelStops, error) {
 	if _, ok := m.present[stop]; !ok {
@@ -118,7 +118,7 @@ func (m modelStopsDistanceQueryImpl) NearestStops(
 }
 
 type modelStopWrapper struct {
-	stop ModelStop
+	stop *ModelStop
 }
 
 func (p modelStopWrapper) Compare(

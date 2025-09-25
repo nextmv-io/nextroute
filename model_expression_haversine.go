@@ -37,7 +37,7 @@ func (h *haversineExpression) String() string {
 
 func (h *haversineExpression) Distance(
 	vehicleType ModelVehicleType,
-	from, to ModelStop,
+	from, to *ModelStop,
 ) common.Distance {
 	return common.NewDistance(h.Value(vehicleType, from, to), common.Meters)
 }
@@ -56,8 +56,8 @@ func (h *haversineExpression) SetName(n string) {
 
 func (h *haversineExpression) Value(
 	vehicle ModelVehicleType,
-	from ModelStop,
-	to ModelStop,
+	from *ModelStop,
+	to *ModelStop,
 ) float64 {
 	return haversineDistance(
 		from.Location(),

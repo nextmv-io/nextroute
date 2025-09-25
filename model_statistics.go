@@ -63,14 +63,14 @@ func NewModelStatistics(model Model) ModelStatistics {
 }
 
 // NewVehicleStatistics returns a new vehicle statistics implementation.
-func NewVehicleStatistics(vehicle ModelVehicle) VehicleStatistics {
+func NewVehicleStatistics(vehicle *ModelVehicle) VehicleStatistics {
 	return vehicleStatisticsImpl{
 		vehicle: vehicle,
 	}
 }
 
 type vehicleStatisticsImpl struct {
-	vehicle ModelVehicle
+	vehicle *ModelVehicle
 }
 
 func (v vehicleStatisticsImpl) FirstToLastSeconds() float64 {
@@ -88,7 +88,7 @@ func (v vehicleStatisticsImpl) FromFirstSeconds() common.Statistics {
 	}
 	return common.NewStatistics(
 		stops,
-		func(stop ModelStop) float64 {
+		func(stop *ModelStop) float64 {
 			return v.vehicle.VehicleType().TravelDurationExpression().Duration(
 				v.vehicle.VehicleType(),
 				v.vehicle.First(),
@@ -105,7 +105,7 @@ func (v vehicleStatisticsImpl) ToLastSeconds() common.Statistics {
 	}
 	return common.NewStatistics(
 		stops,
-		func(stop ModelStop) float64 {
+		func(stop *ModelStop) float64 {
 			return v.vehicle.VehicleType().TravelDurationExpression().Duration(
 				v.vehicle.VehicleType(),
 				stop,
@@ -161,7 +161,7 @@ func (m modelStatisticsImpl) LastLocations() int {
 		common.UniqueDefined(
 			common.Map(
 				m.model.Vehicles(),
-				func(vehicle ModelVehicle) common.Location {
+				func(vehicle *ModelVehicle) common.Location {
 					return vehicle.Last().Location()
 				},
 			),
@@ -179,7 +179,7 @@ func (m modelStatisticsImpl) Locations() int {
 		common.UniqueDefined(
 			common.Map(
 				stops,
-				func(stop ModelStop) common.Location {
+				func(stop *ModelStop) common.Location {
 					return stop.Location()
 				},
 			),
@@ -193,7 +193,7 @@ func (m modelStatisticsImpl) FirstLocations() int {
 		common.UniqueDefined(
 			common.Map(
 				m.model.Vehicles(),
-				func(vehicle ModelVehicle) common.Location {
+				func(vehicle *ModelVehicle) common.Location {
 					return vehicle.First().Location()
 				},
 			),
@@ -253,7 +253,7 @@ func (m modelStatisticsImpl) Report() string {
 		line)
 
 	uniqueVehicles := common.GroupBy(m.model.Vehicles(),
-		func(t ModelVehicle) string {
+		func(t *ModelVehicle) string {
 			return fmt.Sprintf("%v-%v-%v-%v",
 				t.VehicleType().Index(),
 				t.First().Index(),
@@ -262,7 +262,7 @@ func (m modelStatisticsImpl) Report() string {
 			)
 		},
 	)
-	common.RangeMap(uniqueVehicles, func(_ string, uniqueVehicle []ModelVehicle) bool {
+	common.RangeMap(uniqueVehicles, func(_ string, uniqueVehicle []*ModelVehicle) bool {
 		fmt.Fprintf(&sb, "Vehicle type index          : %v\n",
 			uniqueVehicle[0].VehicleType().Index())
 		fmt.Fprintf(&sb, "Travel duration expression  : %v\n",

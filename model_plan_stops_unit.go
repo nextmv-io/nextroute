@@ -34,7 +34,7 @@ type ModelPlanStopsUnit interface {
 // ModelPlanStopsUnits is a slice of model plan stops units .
 type ModelPlanStopsUnits []ModelPlanStopsUnit
 
-func checkCanBeUsedInPlanUnit(stop ModelStop) error {
+func checkCanBeUsedInPlanUnit(stop *ModelStop) error {
 	if stop == nil {
 		return fmt.Errorf("stop cannot be nil")
 	}
@@ -60,7 +60,7 @@ func checkCanBeUsedInPlanUnit(stop ModelStop) error {
 
 func newPlanSingleStop(
 	index int,
-	stop ModelStop,
+	stop *ModelStop,
 ) (ModelPlanStopsUnit, error) {
 	err := checkCanBeUsedInPlanUnit(stop)
 
@@ -74,7 +74,7 @@ func newPlanSingleStop(
 		stops:         ModelStops{stop},
 		dag:           NewDirectedAcyclicGraph(),
 	}
-	stop.(*stopImpl).planUnit = planUnit
+	stop.planUnit = planUnit
 
 	return planUnit, nil
 }
@@ -95,7 +95,7 @@ func newPlanMultipleStops(
 		dag:           sequence,
 	}
 	inStops := make(map[int]bool)
-	stops := make([]ModelStop, len(modelStops))
+	stops := make([]*ModelStop, len(modelStops))
 	for s, modelStop := range modelStops {
 		err := checkCanBeUsedInPlanUnit(modelStop)
 
@@ -113,7 +113,7 @@ func newPlanMultipleStops(
 		}
 
 		inStops[modelStop.Index()] = true
-		modelStop.(*stopImpl).planUnit = planUnit
+		modelStop.planUnit = planUnit
 		stops[s] = modelStop
 	}
 
@@ -164,7 +164,7 @@ func (p *planMultipleStopsImpl) String() string {
 }
 
 func (p *planMultipleStopsImpl) Centroid() (common.Location, error) {
-	locations := common.Map(p.stops, func(stop ModelStop) common.Location {
+	locations := common.Map(p.stops, func(stop *ModelStop) common.Location {
 		return stop.Location()
 	})
 	return common.Locations(locations).Centroid()

@@ -202,7 +202,7 @@ func newVehicle(
 	vehicleType nextroute.ModelVehicleType,
 	model nextroute.Model,
 	options Options,
-) (nextroute.ModelVehicle, error) {
+) (*nextroute.ModelVehicle, error) {
 	startLocation := common.NewInvalidLocation()
 	var err error
 	if inputVehicle.StartLocation != nil {

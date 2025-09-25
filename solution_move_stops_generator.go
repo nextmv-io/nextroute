@@ -167,7 +167,7 @@ func mustBeNeighbours(model *modelImpl, from, to SolutionStop) bool {
 		return false
 	}
 
-	fromModelStop := from.modelStop()
+	fromModelStop := from.ModelStop()
 	if !fromModelStop.HasPlanStopsUnit() {
 		return false
 	}
@@ -200,7 +200,7 @@ func generate(
 		start = combination[len(combination)-1] - 1
 	}
 
-	model := target[0].modelStop().model
+	model := target[0].ModelStop().model
 
 	for i := start; i < len(target)-1; i++ {
 		if i > 0 && mustBeNeighbours(model, target[i], target[i+1]) {

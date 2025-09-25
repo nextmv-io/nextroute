@@ -10,96 +10,16 @@ import (
 	"github.com/nextmv-io/nextroute/common"
 )
 
-// ModelStop is a stop to be assigned to a vehicle.
-type ModelStop interface {
-	ModelData
-
-	// ClosestStops returns a slice containing the closest stops to the
-	// invoking stop. The slice is sorted by increasing distance to the
-	// location. The slice first stop is the stop itself. The distance used
-	// is the common.Haversine distance between the stops. All the stops
-	// in the model are used in the slice. Slice with similar distance are
-	// sorted by their index (increasing).
-	ClosestStops() (ModelStops, error)
-
-	// HasPlanStopsUnit returns true if the stop belongs to a plan unit. For example,
-	// start and end stops of a vehicle do not belong to a plan unit.
-	HasPlanStopsUnit() bool
-
-	// ID returns the identifier of the stop.
-	ID() string
-
-	// Index returns the unique index of the stop.
-	Index() int
-
-	// IsFirstOrLast returns true if the stop is the first or last stop of one
-	// or more vehicles. A stop which is the first or last stop of one or more
-	// vehicles is not allowed to be part of a plan unit. A stop which is the
-	// first or last stop of one or more vehicles is by definition fixed.
-	IsFirstOrLast() bool
-
-	// IsFixed returns true if fixed.
-	IsFixed() bool
-
-	// Location returns the location of the stop.
-	Location() common.Location
-
-	// Model returns the model of the stop.
-	Model() Model
-
-	// EarliestStart returns the earliest start time of the stop.
-	EarliestStart() (t time.Time)
-
-	// Windows returns the time windows of the stop.
-	Windows() [][2]time.Time
-
-	// PlanStopsUnit returns the [ModelPlanStopsUnit] associated with the stop.
-	// A stop is associated with at most one plan unit. Can be nil if the stop
-	// is not part of a stops plan unit.
-	PlanStopsUnit() ModelPlanStopsUnit
-
-	// MeasureIndex returns the measure index of the invoking stop . This index
-	// is not necessarily unique.
-	// This index is used by the model expression constructed by the factory
-	// NewMeasureByIndexExpression to calculate the value of the measure
-	// expression. By default, the measure index is the same as the index of
-	// the stop.
-	MeasureIndex() int
-
-	// SetEarliestStart sets the earliest start time of the stop.
-	SetEarliestStart(t time.Time) error
-
-	// SetMeasureIndex sets the reference index of the stop, by default the
-	// measure index is the same as the index of the stop.
-	// This index is used by the model expression constructed by the factory
-	// NewMeasureByIndexExpression to calculate the value of the measure
-	// expression.
-	SetMeasureIndex(int)
-
-	// SetWindows sets the time windows of the stop.
-	SetWindows(windows [][2]time.Time) error
-
-	// ToEarliestStartValue returns the earliest start time if the vehicle
-	// arrives at the stop at the given arrival time in seconds since
-	// [Model.Epoch].
-	ToEarliestStartValue(arrival float64) float64
-
-	// SetID sets the identifier of the stop. This identifier is not used by
-	// nextroute, and therefore it does not have to be unique for nextroute
-	// internally. However, to make this ID useful for debugging and reporting
-	// it should be made unique.
-	SetID(string)
-}
-
 // ModelStops is a slice of stops.
-type ModelStops []ModelStop
+type ModelStops []*ModelStop
 
-type stopImpl struct {
+// ModelStop is a stop to be assigned to a vehicle.
+type ModelStop struct {
 	windowChecker common.IntervalChecker
 	planUnit      ModelPlanStopsUnit
 	location      common.Location
 	modelDataImpl
-	vehicle           *modelVehicleImpl
+	vehicle           *ModelVehicle
 	model             *modelImpl
 	id                string
 	closest           ModelStops
@@ -111,34 +31,42 @@ type stopImpl struct {
 	fixed             bool
 }
 
-func (s *stopImpl) Model() Model {
+// Model returns the model of the stop.
+func (s *ModelStop) Model() Model {
 	return s.model
 }
 
-func (s *stopImpl) Vehicle() ModelVehicle {
+// Vehicle returns the vehicle the stop belongs to.
+func (s *ModelStop) Vehicle() *ModelVehicle {
 	return s.vehicle
 }
 
-func (s *stopImpl) String() string {
+// String returns a string representation of the stop.
+func (s *ModelStop) String() string {
 	return fmt.Sprintf("stop{%s[%v]}",
 		s.id,
 		s.index,
 	)
 }
 
-func (s *stopImpl) IsFirstOrLast() bool {
+// IsFirstOrLast returns true if the stop is the first or last stop of one
+// or more vehicles. A stop which is the first or last stop of one or more
+// vehicles is not allowed to be part of a plan unit. A stop which is the
+// first or last stop of one or more vehicles is by definition fixed.
+func (s *ModelStop) IsFirstOrLast() bool {
 	return s.firstOrLast
 }
 
-func (s *stopImpl) IsFixed() bool {
+// IsFixed returns true if fixed.
+func (s *ModelStop) IsFixed() bool {
 	return s.fixed
 }
 
-func (s *stopImpl) cacheClosestStops() error {
+func (s *ModelStop) cacheClosestStops() error {
 	if s.HasPlanStopsUnit() {
 		n := 20
 		modelStopsDistanceQueries, err := NewModelStopsDistanceQueries(
-			common.Filter(s.model.Stops(), func(stop ModelStop) bool {
+			common.Filter(s.model.Stops(), func(stop *ModelStop) bool {
 				return stop.Location().IsValid()
 			}),
 		)
@@ -153,7 +81,7 @@ func (s *stopImpl) cacheClosestStops() error {
 	return nil
 }
 
-func (s *stopImpl) closestStops() (ModelStops, error) {
+func (s *ModelStop) closestStops() (ModelStops, error) {
 	if s.closest == nil {
 		s.model.mutex.Lock()
 		defer s.model.mutex.Unlock()
@@ -167,7 +95,13 @@ func (s *stopImpl) closestStops() (ModelStops, error) {
 	return s.closest, nil
 }
 
-func (s *stopImpl) ClosestStops() (ModelStops, error) {
+// ClosestStops returns a slice containing the closest stops to the
+// invoking stop. The slice is sorted by increasing distance to the
+// location. The slice first stop is the stop itself. The distance used
+// is the common.Haversine distance between the stops. All the stops
+// in the model are used in the slice. Slice with similar distance are
+// sorted by their index (increasing).
+func (s *ModelStop) ClosestStops() (ModelStops, error) {
 	closestStops, err := s.closestStops()
 	if err != nil {
 		return nil, err
@@ -177,39 +111,63 @@ func (s *stopImpl) ClosestStops() (ModelStops, error) {
 	return s.closest, nil
 }
 
-func (s *stopImpl) HasPlanStopsUnit() bool {
+// HasPlanStopsUnit returns true if the stop belongs to a plan unit. For example,
+// start and end stops of a vehicle do not belong to a plan unit.
+func (s *ModelStop) HasPlanStopsUnit() bool {
 	return s.planUnit != nil
 }
 
-func (s *stopImpl) PlanStopsUnit() ModelPlanStopsUnit {
+// PlanStopsUnit returns the [ModelPlanStopsUnit] associated with the stop.
+// A stop is associated with at most one plan unit. Can be nil if the stop
+// is not part of a stops plan unit.
+func (s *ModelStop) PlanStopsUnit() ModelPlanStopsUnit {
 	return s.planUnit
 }
 
-func (s *stopImpl) SetID(id string) {
+// SetID sets the identifier of the stop. This identifier is not used by
+// nextroute, and therefore it does not have to be unique for nextroute
+// internally. However, to make this ID useful for debugging and reporting
+// it should be made unique.
+func (s *ModelStop) SetID(id string) {
 	s.id = id
 }
 
-func (s *stopImpl) Index() int {
+// Index returns the unique index of the stop.
+func (s *ModelStop) Index() int {
 	return s.index
 }
 
-func (s *stopImpl) MeasureIndex() int {
+// MeasureIndex returns the measure index of the invoking stop . This index
+// is not necessarily unique.
+// This index is used by the model expression constructed by the factory
+// NewMeasureByIndexExpression to calculate the value of the measure
+// expression. By default, the measure index is the same as the index of
+// the stop.
+func (s *ModelStop) MeasureIndex() int {
 	return s.measureIndex
 }
 
-func (s *stopImpl) SetMeasureIndex(index int) {
+// SetMeasureIndex sets the reference index of the stop, by default the
+// measure index is the same as the index of the stop.
+// This index is used by the model expression constructed by the factory
+// NewMeasureByIndexExpression to calculate the value of the measure
+// expression.
+func (s *ModelStop) SetMeasureIndex(index int) {
 	s.measureIndex = index
 }
 
-func (s *stopImpl) ID() string {
+// ID returns the identifier of the stop.
+func (s *ModelStop) ID() string {
 	return s.id
 }
 
-func (s *stopImpl) Location() common.Location {
+// Location returns the location of the stop.
+func (s *ModelStop) Location() common.Location {
 	return s.location
 }
 
-func (s *stopImpl) Windows() [][2]time.Time {
+// Windows returns the time windows of the stop.
+func (s *ModelStop) Windows() [][2]time.Time {
 	windows := make([][2]time.Time, len(s.windows))
 	for i, window := range s.windows {
 		windows[i] = [2]time.Time{
@@ -220,7 +178,8 @@ func (s *stopImpl) Windows() [][2]time.Time {
 	return windows
 }
 
-func (s *stopImpl) SetWindows(windows [][2]time.Time) error {
+// SetWindows sets the time windows of the stop.
+func (s *ModelStop) SetWindows(windows [][2]time.Time) error {
 	if s.model.IsLocked() {
 		return fmt.Errorf("can not set window of stop %s once the model is locked",
 			s.ID(),
@@ -272,7 +231,8 @@ func (s *stopImpl) SetWindows(windows [][2]time.Time) error {
 	return nil
 }
 
-func (s *stopImpl) SetEarliestStart(t time.Time) error {
+// SetEarliestStart sets the earliest start time of the stop.
+func (s *ModelStop) SetEarliestStart(t time.Time) error {
 	if s.model.IsLocked() {
 		return fmt.Errorf("can not set earliest start of stop %s once the model is locked",
 			s.ID(),
@@ -283,11 +243,12 @@ func (s *stopImpl) SetEarliestStart(t time.Time) error {
 	return nil
 }
 
-func (s *stopImpl) EarliestStart() (t time.Time) {
+// EarliestStart returns the earliest start time of the stop.
+func (s *ModelStop) EarliestStart() (t time.Time) {
 	return s.model.Epoch().Add(time.Duration(s.earliestStartTime) * time.Second)
 }
 
-func (s *stopImpl) validate() error {
+func (s *ModelStop) validate() error {
 	if s.earliestStartTime != 0.0 && s.windows != nil {
 		return fmt.Errorf(
 			"stop `%v` has both earliest start and windows set",
@@ -297,9 +258,10 @@ func (s *stopImpl) validate() error {
 	return nil
 }
 
-// ToEarliestStartValue determines the earliest time to start servicing the stop,
-// given the current (given) time.
-func (s *stopImpl) ToEarliestStartValue(arrivalTime float64) float64 {
+// ToEarliestStartValue returns the earliest start time if the vehicle
+// arrives at the stop at the given arrival time in seconds since
+// [Model.Epoch].
+func (s *ModelStop) ToEarliestStartValue(arrivalTime float64) float64 {
 	if s.windowChecker != nil {
 		inWindow, windowOpening := s.windowChecker.Check(arrivalTime)
 		if inWindow {
@@ -317,6 +279,6 @@ func (s *stopImpl) ToEarliestStartValue(arrivalTime float64) float64 {
 	return math.Max(arrivalTime, s.earliestStartTime)
 }
 
-func (s *stopImpl) canIncurWaitingTime() bool {
+func (s *ModelStop) canIncurWaitingTime() bool {
 	return s.windowChecker != nil || s.earliestStartTime != 0.0
 }

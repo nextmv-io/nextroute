@@ -129,7 +129,7 @@ func NewStartSolution(
 	for _, planUnit := range model.PlanUnits() {
 		stops := getStops(planUnit)
 		boundingBox := common.NewBoundingBox(
-			common.Map(stops, func(stop nextroute.ModelStop) common.Location {
+			common.Map(stops, func(stop *nextroute.ModelStop) common.Location {
 				return stop.Location()
 			}),
 		)
@@ -654,21 +654,21 @@ VehicleLoop:
 }
 
 // getStops returns the stops of the given plan unit.
-func getStops(planUnit nextroute.ModelPlanUnit) []nextroute.ModelStop {
-	return getStopsImpl(planUnit, []nextroute.ModelStop{})
+func getStops(planUnit nextroute.ModelPlanUnit) []*nextroute.ModelStop {
+	return getStopsImpl(planUnit, []*nextroute.ModelStop{})
 }
 
 // getInputStops returns the stops of the given plan unit.
 func getInputStops(planUnit nextroute.ModelPlanUnit) []schema.Stop {
 	return common.Map(
 		getStops(planUnit),
-		func(stop nextroute.ModelStop) schema.Stop {
+		func(stop *nextroute.ModelStop) schema.Stop {
 			return stop.Data().(schema.Stop)
 		},
 	)
 }
 
-func getStopsImpl(planUnit nextroute.ModelPlanUnit, stops []nextroute.ModelStop) []nextroute.ModelStop {
+func getStopsImpl(planUnit nextroute.ModelPlanUnit, stops []*nextroute.ModelStop) []*nextroute.ModelStop {
 	if planStopsUnit, ok := planUnit.(nextroute.ModelPlanStopsUnit); ok {
 		for _, stop := range planStopsUnit.Stops() {
 			stops = append(stops, stop)

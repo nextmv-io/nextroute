@@ -76,7 +76,7 @@ func ToSolutionOutput(solution nextroute.Solution) schema.SolutionOutput {
 	}
 }
 
-func toStopOutput(modelStop nextroute.ModelStop) schema.StopOutput {
+func toStopOutput(modelStop *nextroute.ModelStop) schema.StopOutput {
 	var customData any
 	if inputStop, ok := modelStop.Data().(schema.Stop); ok {
 		customData = inputStop.CustomData

@@ -585,7 +585,7 @@ func (v SolutionVehicle) ObjectiveData(
 }
 
 // ModelVehicle returns the modeled vehicle type of the vehicle.
-func (v SolutionVehicle) ModelVehicle() ModelVehicle {
+func (v SolutionVehicle) ModelVehicle() *ModelVehicle {
 	return v.solution.model.Vehicle(v.solution.vehicleIndices[v.index])
 }
 

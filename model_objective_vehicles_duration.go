@@ -16,8 +16,8 @@ func NewVehiclesDurationObjective() VehiclesDurationObjective {
 }
 
 func (t *vehiclesDurationObjectiveImpl) Lock(model Model) error {
-	t.canIncurWaitingTime = slices.ContainsFunc(model.Stops(), func(stop ModelStop) bool {
-		return stop.(*stopImpl).canIncurWaitingTime()
+	t.canIncurWaitingTime = slices.ContainsFunc(model.Stops(), func(stop *ModelStop) bool {
+		return stop.canIncurWaitingTime()
 	})
 	vehicleTypes := model.VehicleTypes()
 	t.isDependentOnTimeByVehicleType = make([]bool, len(vehicleTypes))

@@ -477,7 +477,7 @@ func newMoveStops(
 		)
 	}
 
-	stops := common.Map(stopPositions, func(i StopPosition) ModelStop {
+	stops := common.Map(stopPositions, func(i StopPosition) *ModelStop {
 		return i.Stop().ModelStop()
 	})
 

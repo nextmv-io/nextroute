@@ -11,7 +11,7 @@ import (
 type TimeExpression interface {
 	ModelExpression
 	// Time returns the time for the given parameters.
-	Time(ModelVehicleType, ModelStop, ModelStop) time.Time
+	Time(ModelVehicleType, *ModelStop, *ModelStop) time.Time
 }
 
 // StopTimeExpression is a ModelExpression that returns a time per stop and
@@ -19,9 +19,9 @@ type TimeExpression interface {
 type StopTimeExpression interface {
 	ModelExpression
 	// Time returns the time for the given stop.
-	Time(stop ModelStop) time.Time
+	Time(stop *ModelStop) time.Time
 	// SetTime sets the time for the given stop.
-	SetTime(ModelStop, time.Time)
+	SetTime(*ModelStop, time.Time)
 }
 
 // NewTimeExpression returns a new TimeExpression.
@@ -87,14 +87,14 @@ func (t *timeExpressionImpl) SetName(n string) {
 
 func (t *timeExpressionImpl) Value(
 	vehicleType ModelVehicleType,
-	from, to ModelStop,
+	from, to *ModelStop,
 ) float64 {
 	return t.expression.Value(vehicleType, from, to)
 }
 
 func (t *timeExpressionImpl) Time(
 	vehicleType ModelVehicleType,
-	from, to ModelStop,
+	from, to *ModelStop,
 ) time.Time {
 	value := t.expression.Value(vehicleType, from, to)
 	return t.epoch.Add(
@@ -134,7 +134,7 @@ func (s *stopTimeExpressionImpl) SetName(n string) {
 func (s *stopTimeExpressionImpl) Value(
 	_ ModelVehicleType,
 	_,
-	to ModelStop,
+	to *ModelStop,
 ) float64 {
 	idx := to.Index()
 	if idx >= 0 && idx < len(s.hasValue) && s.hasValue[idx] {
@@ -160,7 +160,7 @@ func (s *stopTimeExpressionImpl) defaultTimeValue(model Model) float64 {
 	return s.defaultValue
 }
 
-func (s *stopTimeExpressionImpl) Time(stop ModelStop) time.Time {
+func (s *stopTimeExpressionImpl) Time(stop *ModelStop) time.Time {
 	idx := stop.Index()
 	if idx >= 0 && idx < len(s.hasValue) && s.hasValue[idx] {
 		value := s.values[idx]
@@ -169,7 +169,7 @@ func (s *stopTimeExpressionImpl) Time(stop ModelStop) time.Time {
 	return s.defaultTime
 }
 
-func (s *stopTimeExpressionImpl) SetTime(stop ModelStop, t time.Time) {
+func (s *stopTimeExpressionImpl) SetTime(stop *ModelStop, t time.Time) {
 	if stop.Model().IsLocked() {
 		panic(
 			fmt.Sprintf(

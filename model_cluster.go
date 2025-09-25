@@ -148,10 +148,10 @@ func (l *clusterImpl) updateData(
 
 	location, err := common.NewLocation(
 		centroid.location.Longitude()+
-			(solutionStop.modelStop().Location().Longitude()-
+			(solutionStop.ModelStop().Location().Longitude()-
 				centroid.location.Longitude())/float64(nrStops),
 		centroid.location.Latitude()+
-			(solutionStop.modelStop().Location().Latitude()-
+			(solutionStop.ModelStop().Location().Latitude()-
 				centroid.location.Latitude())/float64(nrStops),
 	)
 	if err != nil {
@@ -171,7 +171,7 @@ func compactness(
 ) float64 {
 	if newStopIsSet {
 		numberOfStops := len(stops)
-		location := newStop.modelStop().location
+		location := newStop.ModelStop().location
 		newLat := (centroid.Latitude()*float64(numberOfStops) +
 			location.Latitude()) / float64(numberOfStops+1)
 		newLong := (centroid.Longitude()*float64(numberOfStops) +
@@ -185,7 +185,7 @@ func compactness(
 	}
 	compactness := 0.0
 	for _, stop := range stops {
-		dist := haversineDistance(centroid, stop.modelStop().Location())
+		dist := haversineDistance(centroid, stop.ModelStop().Location())
 		compactness += dist.Value(common.Meters) * dist.Value(common.Meters)
 	}
 	return compactness
@@ -240,7 +240,7 @@ func (l *clusterImpl) estimateDeltaScore(
 		if asConstraint {
 			distanceToCentroid := haversineDistance(
 				centroid,
-				candidate.modelStop().Location(),
+				candidate.ModelStop().Location(),
 			).Value(common.Meters)
 
 			for _, otherVehicle := range solutionImpl.vehicles {
@@ -254,7 +254,7 @@ func (l *clusterImpl) estimateDeltaScore(
 
 				if haversineDistance(
 					centroidOtherVehicle,
-					candidate.modelStop().Location(),
+					candidate.ModelStop().Location(),
 				).Value(common.Meters) < distanceToCentroid {
 					return 1.0, constSkipVehiclePositionsHint
 				}
