@@ -27,7 +27,7 @@ func (t *vehiclesDurationObjectiveImpl) Lock(model *Model) error {
 			IsDependentOnTime()
 	}
 	// caching the vehicle type by index for performance
-	t.vehicleTypesByIndex = make([]ModelVehicleType, len(vehicleTypes))
+	t.vehicleTypesByIndex = make([]*ModelVehicleType, len(vehicleTypes))
 	for _, vehicle := range model.Vehicles() {
 		t.vehicleTypesByIndex[vehicle.Index()] = vehicle.VehicleType()
 	}
@@ -36,7 +36,7 @@ func (t *vehiclesDurationObjectiveImpl) Lock(model *Model) error {
 
 type vehiclesDurationObjectiveImpl struct {
 	isDependentOnTimeByVehicleType []bool
-	vehicleTypesByIndex            []ModelVehicleType
+	vehicleTypesByIndex            []*ModelVehicleType
 	canIncurWaitingTime            bool
 }
 

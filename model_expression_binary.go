@@ -87,7 +87,7 @@ func (b *binaryExpression) Right() ModelExpression {
 }
 
 func (b *binaryExpression) Value(
-	vehicle ModelVehicleType,
+	vehicle *ModelVehicleType,
 	from, to *ModelStop,
 ) float64 {
 	return b.operator(

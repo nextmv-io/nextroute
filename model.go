@@ -139,7 +139,7 @@ func (m *Model) Expressions() ModelExpressions {
 // solutions. Every vehicle has a first and last stop - even if the vehicle
 // is empty.
 func (m *Model) NewVehicle(
-	vehicleType ModelVehicleType,
+	vehicleType *ModelVehicleType,
 	start time.Time,
 	first *ModelStop,
 	last *ModelStop,
@@ -163,8 +163,8 @@ func (m *Model) NewVehicle(
 
 	m.vehicles = append(m.vehicles, vehicle)
 
-	vehicleType.(*vehicleTypeImpl).vehicles = append(
-		vehicleType.(*vehicleTypeImpl).vehicles,
+	vehicleType.vehicles = append(
+		vehicleType.vehicles,
 		vehicle,
 	)
 
@@ -179,12 +179,12 @@ func (m *Model) NewVehicle(
 func (m *Model) NewVehicleType(
 	travelDuration TimeDependentDurationExpression,
 	processDuration DurationExpression,
-) (ModelVehicleType, error) {
+) (*ModelVehicleType, error) {
 	if m.isLocked {
 		return nil,
 			fmt.Errorf(lockErrorMessage, "vehicle type")
 	}
-	vehicle := &vehicleTypeImpl{
+	vehicle := &ModelVehicleType{
 		index:          len(m.vehicleTypes),
 		model:          m,
 		travelDuration: travelDuration,

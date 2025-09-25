@@ -21,7 +21,7 @@ func addServiceDurations(
 	durationExpressions := common.UniqueDefined(
 		common.Map(
 			model.VehicleTypes(),
-			func(vt nextroute.ModelVehicleType) nextroute.DurationExpression {
+			func(vt *nextroute.ModelVehicleType) nextroute.DurationExpression {
 				return vt.DurationExpression()
 			}),
 		func(e nextroute.DurationExpression) int {
@@ -152,7 +152,7 @@ func addDurationGroups(
 	durationExpressions := common.UniqueDefined(
 		common.Map(
 			model.VehicleTypes(),
-			func(vt nextroute.ModelVehicleType) nextroute.DurationExpression {
+			func(vt *nextroute.ModelVehicleType) nextroute.DurationExpression {
 				return vt.DurationExpression()
 			}),
 		func(e nextroute.DurationExpression) int {
@@ -205,7 +205,7 @@ func addDurationMultipliers(
 	container :=
 		common.Map(
 			model.VehicleTypes(),
-			func(vt nextroute.ModelVehicleType) containerType {
+			func(vt *nextroute.ModelVehicleType) containerType {
 				multiplier := 1.0
 				if input.Vehicles[vt.Index()].StopDurationMultiplier != nil {
 					multiplier = *input.Vehicles[vt.Index()].StopDurationMultiplier

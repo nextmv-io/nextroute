@@ -81,7 +81,7 @@ func (t *termExpression) Expression() ModelExpression {
 }
 
 func (t *termExpression) Value(
-	vehicle ModelVehicleType,
+	vehicle *ModelVehicleType,
 	from, to *ModelStop,
 ) float64 {
 	return t.factor * t.expression.Value(vehicle, from, to)

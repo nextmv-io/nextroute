@@ -151,7 +151,7 @@ func newVehicleType(
 	distanceExpression nextroute.DistanceExpression,
 	durationExpression nextroute.DurationExpression,
 	durationGroupsExpression DurationGroupsExpression,
-) (nextroute.ModelVehicleType, error) {
+) (*nextroute.ModelVehicleType, error) {
 	if durationExpression == nil {
 		s := common.NewSpeed(*vehicle.Speed, common.MetersPerSecond)
 		durationExpression = nextroute.NewTravelDurationExpression(distanceExpression, s)
@@ -163,7 +163,7 @@ func newVehicleType(
 		))
 	}
 
-	var vehicleType nextroute.ModelVehicleType
+	var vehicleType *nextroute.ModelVehicleType
 	switch expression := durationExpression.(type) {
 	case nextroute.TimeDependentDurationExpression:
 		vt, err := model.NewVehicleType(
@@ -199,7 +199,7 @@ func newVehicleType(
 
 func newVehicle(
 	inputVehicle schema.Vehicle,
-	vehicleType nextroute.ModelVehicleType,
+	vehicleType *nextroute.ModelVehicleType,
 	model *nextroute.Model,
 	options Options,
 ) (*nextroute.ModelVehicle, error) {
