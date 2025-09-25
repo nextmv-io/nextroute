@@ -11,9 +11,9 @@ import (
 // Model.
 func addMinStopsObjective(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	minStops := nextroute.NewVehicleTypeValueExpression("min_stops", 0)
 	minStopsPenalty := nextroute.NewVehicleTypeValueExpression("min_stops_penalty", 0)
 	present := false

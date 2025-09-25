@@ -12,9 +12,9 @@ import (
 // Model.
 func addEarlinessObjective(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	targetTimeExpression, model, err := targetTimeExpression(model)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func addEarlinessObjective(
 
 func addEarlinessTargetStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	factorExpression nextroute.StopExpression,
 	targetTimeExpression nextroute.StopTimeExpression,
 ) (bool, error) {
@@ -98,7 +98,7 @@ func addEarlinessTargetStops(
 
 func addEarlinessTargetsAlternateStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	factorExpression nextroute.StopExpression,
 	targetTimeExpression nextroute.StopTimeExpression,
 ) (bool, error) {
@@ -158,9 +158,9 @@ func addEarlinessTargetsAlternateStops(
 // Model.
 func addLatenessObjective(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	if options.Objectives.LateArrivalPenalty == 0.0 {
 		return model, nil
 	}
@@ -200,7 +200,7 @@ func addLatenessObjective(
 
 func addLatenessTargetStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	objective nextroute.LatestArrival,
 ) (bool, error) {
 	hasTargets := false
@@ -229,7 +229,7 @@ func addLatenessTargetStops(
 
 func addLatenessTargetsAlternateStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	objective nextroute.LatestArrival,
 ) (bool, error) {
 	if input.AlternateStops == nil {

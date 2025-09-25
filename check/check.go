@@ -16,7 +16,7 @@ import (
 
 // ModelCheck is the check of a model returning a [Output].
 func ModelCheck(
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
 ) (schema.Output, error) {
 	if model == nil {

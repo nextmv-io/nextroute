@@ -93,7 +93,7 @@ type Solver interface {
 	HasWorkSolution() bool
 
 	// Model returns the model used by the solver.
-	Model() Model
+	Model() *Model
 
 	// Random returns the random number generator used by the solver.
 	Random() *rand.Rand
@@ -113,7 +113,7 @@ type Solver interface {
 }
 
 // NewSkeletonSolver creates a new solver for the given model.
-func NewSkeletonSolver(model Model) (Solver, error) {
+func NewSkeletonSolver(model *Model) (Solver, error) {
 	solver := &solveImpl{
 		solveEvents: NewSolveEvents(),
 		model:       model,
@@ -123,7 +123,7 @@ func NewSkeletonSolver(model Model) (Solver, error) {
 }
 
 type solveImpl struct {
-	model          Model
+	model          *Model
 	solveEvents    SolveEvents
 	workSolution   *Solution
 	bestSolution   *Solution
@@ -145,7 +145,7 @@ func (s *solveImpl) Progression() []ProgressionEntry {
 	return slices.Clone(s.progression)
 }
 
-func (s *solveImpl) Model() Model {
+func (s *solveImpl) Model() *Model {
 	return s.model
 }
 

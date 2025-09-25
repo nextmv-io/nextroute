@@ -206,7 +206,7 @@ func (l *noMixSolutionStopData) Copy() Copier {
 	}
 }
 
-func (l *noMixConstraintImpl) Lock(_ Model) error {
+func (l *noMixConstraintImpl) Lock(_ *Model) error {
 	return validate(l.insert, l.remove)
 }
 

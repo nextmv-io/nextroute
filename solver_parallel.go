@@ -14,7 +14,7 @@ import (
 
 // NewParallelSolver creates a new parallel solver.
 func NewParallelSolver(
-	model Model,
+	model *Model,
 ) (ParallelSolver, error) {
 	parallelSolver, err := NewSkeletonParallelSolver(model)
 	if err != nil {
@@ -49,7 +49,7 @@ func (p *parallelSolverWrapperImpl) ParallelSolveEvents() ParallelSolveEvents {
 	return p.solver.ParallelSolveEvents()
 }
 
-func (p *parallelSolverWrapperImpl) Model() Model {
+func (p *parallelSolverWrapperImpl) Model() *Model {
 	return p.solver.Model()
 }
 

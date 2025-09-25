@@ -15,9 +15,9 @@ import (
 // addServiceDurations sets the time it takes them to service a stop.
 func addServiceDurations(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	durationExpressions := common.UniqueDefined(
 		common.Map(
 			model.VehicleTypes(),
@@ -44,7 +44,7 @@ func addServiceDurations(
 
 func addServiceDurationsStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	durationExpressions []nextroute.DurationExpression) error {
 	for s, inputStop := range input.Stops {
 		if inputStop.Duration == nil || *inputStop.Duration == 0 {
@@ -74,7 +74,7 @@ func addServiceDurationsStops(
 
 func addServiceDurationsAlternateStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	durationExpressions []nextroute.DurationExpression) error {
 	if input.AlternateStops == nil {
 		return nil
@@ -120,7 +120,7 @@ func addServiceDurationsAlternateStops(
 	return nil
 }
 
-func groupToStops(ids []string, model nextroute.Model) (nextroute.ModelStops, error) {
+func groupToStops(ids []string, model *nextroute.Model) (nextroute.ModelStops, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err
@@ -143,9 +143,9 @@ func groupToStops(ids []string, model nextroute.Model) (nextroute.ModelStops, er
 // addDurationGroups sets the time it takes them to service a stop.
 func addDurationGroups(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	if input.DurationGroups == nil {
 		return model, nil
 	}
@@ -192,9 +192,9 @@ func addDurationGroups(
 // addServiceDurations sets the time it takes them to service a stop.
 func addDurationMultipliers(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	// containerType struct with a field called durationExpression and a field called
 	// inputVehicle
 	type containerType struct {

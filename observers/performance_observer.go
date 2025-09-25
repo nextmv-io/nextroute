@@ -33,7 +33,7 @@ type PerformanceObserver interface {
 //
 // To use the observer, you need to register it with the model using the
 // AddSolutionObserver method.
-func NewPerformanceObserver(model nextroute.Model) PerformanceObserver {
+func NewPerformanceObserver(model *nextroute.Model) PerformanceObserver {
 	observer := performanceObserverImpl{
 		model:          model,
 		start:          time.Now(),
@@ -90,7 +90,7 @@ type performanceObserverImpl struct {
 	objectiveMutex  sync.Mutex
 	moveMutex       sync.Mutex
 	solutionMutex   sync.Mutex
-	model           nextroute.Model
+	model           *nextroute.Model
 	start           time.Time
 	constraintData  map[nextroute.ModelConstraint]constraintData
 	objectiveData   objectiveData
@@ -196,7 +196,7 @@ func (p *performanceObserverImpl) OnPlan(_ nextroute.SolutionMove) {
 	p.solutionData.lastMoveStart[p.routineName()] = time.Now()
 }
 
-func (p *performanceObserverImpl) OnNewSolution(_ nextroute.Model) {
+func (p *performanceObserverImpl) OnNewSolution(_ *nextroute.Model) {
 	p.solutionMutex.Lock()
 	defer p.solutionMutex.Unlock()
 

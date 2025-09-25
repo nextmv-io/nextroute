@@ -11,9 +11,9 @@ import (
 // to the vehicle whose centroid is closest.
 func addClusterConstraint(
 	_ schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	cluster, err := nextroute.NewCluster()
 	if err != nil {
 		return model, err

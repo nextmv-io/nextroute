@@ -12,9 +12,9 @@ import (
 // in a particular order.
 func addGroupInformation(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	if input.StopGroups == nil || len(*input.StopGroups) == 0 {
 		return model, nil
 	}

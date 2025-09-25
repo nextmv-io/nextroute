@@ -10,9 +10,9 @@ import (
 // addDistanceObjective adds the minimization of travel distance to the Model.
 func addDistanceObjective(
 	_ schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	o := nextroute.NewDistanceObjective()
 	_, err := model.Objective().NewTerm(options.Objectives.Distance, o)
 	if err != nil {

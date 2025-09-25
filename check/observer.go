@@ -56,7 +56,7 @@ func (o *observerImpl) Reset() {
 	o.onPlanFailedConstraints = o.onPlanFailedConstraints[:0]
 }
 
-func (o *observerImpl) OnNewSolution(_ nextroute.Model) {
+func (o *observerImpl) OnNewSolution(_ *nextroute.Model) {
 }
 
 func (o *observerImpl) OnNewSolutionCreated(_ *nextroute.Solution) {

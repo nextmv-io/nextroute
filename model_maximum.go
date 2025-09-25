@@ -87,7 +87,7 @@ func (l *maximumImpl) SetPenaltyOffset(penaltyOffset float64) error {
 	return nil
 }
 
-func (l *maximumImpl) Lock(model Model) error {
+func (l *maximumImpl) Lock(model *Model) error {
 	l.hasNegativeValues = l.Expression().HasNegativeValues()
 	l.hasPositiveValues = l.Expression().HasPositiveValues()
 	if _, ok := l.Expression().(ConstantExpression); ok {

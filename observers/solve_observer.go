@@ -333,7 +333,7 @@ func (s *solveObserverImpl) OnUnPlanSucceeded(
 	}
 }
 
-func (s *solveObserverImpl) OnNewSolution(_ nextroute.Model) {
+func (s *solveObserverImpl) OnNewSolution(_ *nextroute.Model) {
 }
 
 func (s *solveObserverImpl) OnNewSolutionCreated(solution *nextroute.Solution) {

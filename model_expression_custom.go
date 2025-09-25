@@ -483,7 +483,7 @@ func (v *vehicleTypeExpressionImpl) SetValue(
 	v.hasNegativeValues = v.hasNegativeValues || value < 0
 	v.hasPositiveValues = v.hasPositiveValues || value > 0
 	index := vehicle.Index()
-	v.values = expandSlice(v.values, v.defaultValue, index, len(vehicle.Model().(*modelImpl).vehicleTypes))
+	v.values = expandSlice(v.values, v.defaultValue, index, len(vehicle.Model().vehicleTypes))
 	v.values[index] = value
 
 	return nil
@@ -566,7 +566,7 @@ func (v *vehicleTypeDistanceExpressionImpl) SetDistance(
 	v.hasNegativeValues = v.hasNegativeValues || value.Value(common.Meters) < 0
 	v.hasPositiveValues = v.hasPositiveValues || value.Value(common.Meters) > 0
 	index := vehicle.Index()
-	v.values = expandSlice(v.values, v.defaultValue, index, len(vehicle.Model().(*modelImpl).vehicleTypes))
+	v.values = expandSlice(v.values, v.defaultValue, index, len(vehicle.Model().vehicleTypes))
 	v.values[index] = value
 	return nil
 }

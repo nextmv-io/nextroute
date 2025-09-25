@@ -36,7 +36,7 @@ type ParallelSolver interface {
 	Progressioner
 
 	// Model returns the model of the solver.
-	Model() Model
+	Model() *Model
 
 	// SetSolverFactory sets the factory for creating new solver.
 	SetSolverFactory(SolverFactory)
@@ -90,7 +90,7 @@ type ParallelSolveInformation interface {
 // SolverFactory.
 
 // NewSkeletonParallelSolver creates a new parallel solver.
-func NewSkeletonParallelSolver(model Model) (ParallelSolver, error) {
+func NewSkeletonParallelSolver(model *Model) (ParallelSolver, error) {
 	if model == nil {
 		return nil, fmt.Errorf("model cannot be nil")
 	}
@@ -131,7 +131,7 @@ func (s metaSolveInformationImpl) Random() *rand.Rand {
 }
 
 type parallelSolverImpl struct {
-	model               Model
+	model               *Model
 	progression         []ProgressionEntry
 	solveEvents         SolveEvents
 	parallelSolveEvents ParallelSolveEvents
@@ -148,7 +148,7 @@ func (s *parallelSolverImpl) SolveEvents() SolveEvents {
 	return s.solveEvents
 }
 
-func (s *parallelSolverImpl) Model() Model {
+func (s *parallelSolverImpl) Model() *Model {
 	return s.model
 }
 

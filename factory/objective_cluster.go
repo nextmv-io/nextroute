@@ -10,9 +10,9 @@ import (
 // addClusterObjective adds an objective which prefers clustered routes.
 func addClusterObjective(
 	_ schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	cluster, err := nextroute.NewCluster()
 	if err != nil {
 		return model, err

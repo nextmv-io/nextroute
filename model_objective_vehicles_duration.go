@@ -15,7 +15,7 @@ func NewVehiclesDurationObjective() VehiclesDurationObjective {
 	return &vehiclesDurationObjectiveImpl{}
 }
 
-func (t *vehiclesDurationObjectiveImpl) Lock(model Model) error {
+func (t *vehiclesDurationObjectiveImpl) Lock(model *Model) error {
 	t.canIncurWaitingTime = slices.ContainsFunc(model.Stops(), func(stop *ModelStop) bool {
 		return stop.canIncurWaitingTime()
 	})

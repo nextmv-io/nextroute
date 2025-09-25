@@ -14,9 +14,9 @@ import (
 
 func addPlanUnits(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err
@@ -222,7 +222,7 @@ func toExistingUnit(
 // buildDirectedAcyclicGraph return the Directed Acyclic Graph
 // that make up a ModelPlanUnit.
 func buildDirectedAcyclicGraph(
-	model nextroute.Model,
+	model *nextroute.Model,
 	sequences []sequence,
 ) (
 	nextroute.DirectedAcyclicGraph,

@@ -15,9 +15,9 @@ import (
 // addVehicles adds the vehicle types to the Model.
 func addVehicles(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err
@@ -147,7 +147,7 @@ func addVehicles(
 // newVehicleType returns the VehicleType that the Model needs.
 func newVehicleType(
 	vehicle schema.Vehicle,
-	model nextroute.Model,
+	model *nextroute.Model,
 	distanceExpression nextroute.DistanceExpression,
 	durationExpression nextroute.DurationExpression,
 	durationGroupsExpression DurationGroupsExpression,
@@ -200,7 +200,7 @@ func newVehicleType(
 func newVehicle(
 	inputVehicle schema.Vehicle,
 	vehicleType nextroute.ModelVehicleType,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
 ) (*nextroute.ModelVehicle, error) {
 	startLocation := common.NewInvalidLocation()
@@ -275,7 +275,7 @@ func travelDurationExpression(matrix [][]float64) nextroute.DurationExpression {
 
 func dependentTravelDurationExpression(
 	durationMatrices schema.TimeDependentMatrix,
-	model nextroute.Model,
+	model *nextroute.Model,
 ) (nextroute.DurationExpression, error) {
 	if durationMatrices.DefaultMatrix == nil {
 		return nil, errors.New("no duration matrix provided")

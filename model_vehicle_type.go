@@ -26,7 +26,7 @@ type ModelVehicleType interface {
 	Index() int
 
 	// Model returns the model of the vehicle type.
-	Model() Model
+	Model() *Model
 
 	// ID returns the identifier of the vehicle.
 	ID() string
@@ -67,7 +67,7 @@ type ModelVehicleTypes []ModelVehicleType
 
 type vehicleTypeImpl struct {
 	modelDataImpl
-	model          Model
+	model          *Model
 	travelDuration TimeDependentDurationExpression
 	duration       DurationExpression
 	distance       DistanceExpression
@@ -94,7 +94,7 @@ func (v *vehicleTypeImpl) SetID(id string) {
 	v.id = id
 }
 
-func (v *vehicleTypeImpl) Model() Model {
+func (v *vehicleTypeImpl) Model() *Model {
 	return v.model
 }
 

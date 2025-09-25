@@ -15,9 +15,9 @@ import (
 // "precedes" or "succeeds" field is not nil.
 func addPrecedenceInformation(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	present := false
 	var sequences []sequence
 	stopIDToIndex := map[string]int{}

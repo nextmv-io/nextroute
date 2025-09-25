@@ -54,9 +54,9 @@ type sequence struct {
 // latest start time at a stop. If the expression hasn't been added to the Model
 // data, it is added. On the other hand, if the expression already exists, it
 // is returned, as opposed to being created again.
-func latestStartExpression(model nextroute.Model) (
+func latestStartExpression(model *nextroute.Model) (
 	nextroute.StopTimeExpression,
-	nextroute.Model,
+	*nextroute.Model,
 	error,
 ) {
 	data, err := getModelData(model)
@@ -79,9 +79,9 @@ func latestStartExpression(model nextroute.Model) (
 // added to the model. If there is, it does nothing. If there isn't, it adds it
 // to the model.
 func addLatestStartConstraint(
-	model nextroute.Model,
+	model *nextroute.Model,
 	expression nextroute.StopTimeExpression,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err
@@ -111,9 +111,9 @@ func addLatestStartConstraint(
 // latest end time at a stop. If the expression hasn't been added to the Model
 // data, it is added. On the other hand, if the expression already exists, it
 // is returned, as opposed to being created again.
-func latestEndExpression(model nextroute.Model) (
+func latestEndExpression(model *nextroute.Model) (
 	nextroute.StopTimeExpression,
-	nextroute.Model,
+	*nextroute.Model,
 	error,
 ) {
 	data, err := getModelData(model)
@@ -136,9 +136,9 @@ func latestEndExpression(model nextroute.Model) (
 // added to the model. If there is, it does nothing. If there isn't, it adds it
 // to the model.
 func addLatestEndConstraint(
-	model nextroute.Model,
+	model *nextroute.Model,
 	expression nextroute.StopTimeExpression,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err
@@ -168,9 +168,9 @@ func addLatestEndConstraint(
 // target time at a stop. If the expression hasn't been added to the Model
 // data, it is added. On the other hand, if the expression already exists, it
 // is returned, as opposed to being created again.
-func targetTimeExpression(model nextroute.Model) (
+func targetTimeExpression(model *nextroute.Model) (
 	nextroute.StopTimeExpression,
-	nextroute.Model,
+	*nextroute.Model,
 	error,
 ) {
 	data, err := getModelData(model)
@@ -191,7 +191,7 @@ func targetTimeExpression(model nextroute.Model) (
 
 // getModelData safely accesses the custom Model data and parses it to the type
 // that is used across the model modifier functions.
-func getModelData(model nextroute.Model) (modelData, error) {
+func getModelData(model *nextroute.Model) (modelData, error) {
 	data := modelData{
 		groups:        make([]group, 0),
 		stopIDToIndex: make(map[string]int),

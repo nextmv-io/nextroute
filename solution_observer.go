@@ -6,7 +6,7 @@ package nextroute
 // solution manipulation process.
 type SolutionObserver interface {
 	// OnNewSolution is called when a new solution is going to be created.
-	OnNewSolution(model Model)
+	OnNewSolution(model *Model)
 	// OnNewSolutionCreated is called when a new solution has been created.
 	OnNewSolutionCreated(solution *Solution)
 
@@ -213,7 +213,7 @@ func (s *solutionObservedImpl) OnBestMoveFound(move SolutionMove) {
 	}
 }
 
-func (s *solutionObservedImpl) OnNewSolution(model Model) {
+func (s *solutionObservedImpl) OnNewSolution(model *Model) {
 	if len(s.observers) == 0 {
 		return
 	}

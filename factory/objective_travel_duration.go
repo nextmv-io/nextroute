@@ -10,9 +10,9 @@ import (
 // addTravelDurationObjective adds the minimization of travel duration to the Model.
 func addTravelDurationObjective(
 	_ schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	options Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	o := nextroute.NewTravelDurationObjective()
 	_, err := model.Objective().NewTerm(options.Objectives.TravelDuration, o)
 	if err != nil {

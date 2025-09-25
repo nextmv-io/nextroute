@@ -56,7 +56,7 @@ type VehicleStatistics interface {
 }
 
 // NewModelStatistics returns a new model statistics implementation.
-func NewModelStatistics(model Model) ModelStatistics {
+func NewModelStatistics(model *Model) ModelStatistics {
 	return modelStatisticsImpl{
 		model: model,
 	}
@@ -135,7 +135,7 @@ func (v vehicleStatisticsImpl) Report() string {
 }
 
 type modelStatisticsImpl struct {
-	model Model
+	model *Model
 }
 
 func (m modelStatisticsImpl) PlanUnits() int {

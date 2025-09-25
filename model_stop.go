@@ -20,7 +20,7 @@ type ModelStop struct {
 	location      common.Location
 	modelDataImpl
 	vehicle           *ModelVehicle
-	model             *modelImpl
+	model             *Model
 	id                string
 	closest           ModelStops
 	windows           [][2]float64
@@ -32,7 +32,7 @@ type ModelStop struct {
 }
 
 // Model returns the model of the stop.
-func (s *ModelStop) Model() Model {
+func (s *ModelStop) Model() *Model {
 	return s.model
 }
 

@@ -14,9 +14,9 @@ import (
 // addAlternates adds the alternate stops to the Model.
 func addAlternates(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	if input.AlternateStops == nil {
 		return model, nil
 	}

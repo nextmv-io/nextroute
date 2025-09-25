@@ -11,9 +11,9 @@ import (
 // addStops adds the stops to the Model.
 func addStops(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	data, err := getModelData(model)
 	if err != nil {
 		return nil, err

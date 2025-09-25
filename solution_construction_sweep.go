@@ -13,7 +13,7 @@ import (
 
 // NewSweepSolution returns a solution for the given model using the sweep
 // heuristic.
-func NewSweepSolution(ctx context.Context, model Model) (*Solution, error) {
+func NewSweepSolution(ctx context.Context, model *Model) (*Solution, error) {
 	solution, err := NewSolution(model)
 	if err != nil {
 		return nil, err

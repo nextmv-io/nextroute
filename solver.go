@@ -14,7 +14,7 @@ import (
 
 // NewSolver creates a new nextroute solver using the given model and options.
 func NewSolver(
-	model Model,
+	model *Model,
 	options SolverOptions,
 ) (Solver, error) {
 	solver, err := NewSkeletonSolver(model)
@@ -139,7 +139,7 @@ func (s *solverWrapperImpl) WorkSolution() *Solution {
 	return s.solver.WorkSolution()
 }
 
-func (s *solverWrapperImpl) Model() Model {
+func (s *solverWrapperImpl) Model() *Model {
 	return s.solver.Model()
 }
 

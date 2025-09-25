@@ -73,7 +73,7 @@ type TimeDependentDurationExpression interface {
 // NewTimeDependentDurationExpression returns a new
 // TimeDependentDurationExpression.
 func NewTimeDependentDurationExpression(
-	model Model,
+	model *Model,
 	expression DurationExpression,
 ) (TimeDependentDurationExpression, error) {
 	if model.Epoch().Second() != 0 || model.Epoch().Nanosecond() != 0 {
@@ -124,7 +124,7 @@ type expressionElement struct {
 }
 
 type timeDependentDurationExpressionImpl struct {
-	model                       Model
+	model                       *Model
 	defaultExpression           DurationExpression
 	elements                    map[int64]*expressionElement
 	startElement                *expressionElement

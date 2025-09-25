@@ -143,7 +143,7 @@ func (s *stopTimeExpressionImpl) Value(
 	return s.defaultTimeValue(to.Model())
 }
 
-func (s *stopTimeExpressionImpl) defaultTimeValue(model Model) float64 {
+func (s *stopTimeExpressionImpl) defaultTimeValue(model *Model) float64 {
 	if s.defaultValue < 0 {
 		if s.defaultTime.Before(model.Epoch()) {
 			panic(

@@ -27,19 +27,17 @@ type successorConstraintImpl struct {
 	disallowedSuccessors map[*ModelStop]ModelStops
 }
 
-func (l *successorConstraintImpl) Lock(model Model) error {
-	modelImpl := model.(*modelImpl)
-
+func (l *successorConstraintImpl) Lock(model *Model) error {
 	// initialize disallowedSuccessors
-	modelImpl.disallowedSuccessors = make([][]bool, modelImpl.NumberOfStops())
-	for i := range modelImpl.disallowedSuccessors {
-		modelImpl.disallowedSuccessors[i] = make([]bool, modelImpl.NumberOfStops())
+	model.disallowedSuccessors = make([][]bool, model.NumberOfStops())
+	for i := range model.disallowedSuccessors {
+		model.disallowedSuccessors[i] = make([]bool, model.NumberOfStops())
 	}
 
 	// copy the information from disallowedSuccessors to the model
 	for stop, successors := range l.disallowedSuccessors {
 		for _, successor := range successors {
-			modelImpl.disallowedSuccessors[stop.Index()][successor.Index()] = true
+			model.disallowedSuccessors[stop.Index()][successor.Index()] = true
 		}
 	}
 	return nil
@@ -76,12 +74,12 @@ func (l *successorConstraintImpl) EstimationCost() Cost {
 func (l *successorConstraintImpl) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
-	modelImpl := move.PlanStopsUnit().Solution().Model().(*modelImpl)
+	model := move.PlanStopsUnit().Solution().Model()
 	stopPositions := move.StopPositions()
 	for _, stopPosition := range stopPositions {
 		stop := stopPosition.Stop().ModelStop()
 		nextModelStop := stopPosition.Next().ModelStop()
-		if disallowed := modelImpl.disallowedSuccessors[stop.Index()][nextModelStop.Index()]; disallowed {
+		if disallowed := model.disallowedSuccessors[stop.Index()][nextModelStop.Index()]; disallowed {
 			return true, noPositionsHint()
 		}
 	}
@@ -91,10 +89,10 @@ func (l *successorConstraintImpl) EstimateIsViolated(
 func (l *successorConstraintImpl) DoesStopHaveViolations(
 	stop SolutionStop,
 ) bool {
-	modelImpl := stop.Solution().Model().(*modelImpl)
+	model := stop.Solution().Model()
 	stopImpl := stop
 	previousModelStop := stopImpl.Previous().ModelStop()
-	if disallowed := modelImpl.disallowedSuccessors[previousModelStop.Index()][stop.ModelStop().Index()]; disallowed {
+	if disallowed := model.disallowedSuccessors[previousModelStop.Index()][stop.ModelStop().Index()]; disallowed {
 		return true
 	}
 	return false

@@ -65,11 +65,10 @@ type attributesConstraintImpl struct {
 	vehicleTypes int
 }
 
-func (l *attributesConstraintImpl) Lock(model Model) error {
+func (l *attributesConstraintImpl) Lock(model *Model) error {
 	vehicleTypeAttributes := make(map[int]map[string]bool)
 	vehicleTypes := model.VehicleTypes()
 	l.vehicleTypes = len(vehicleTypes)
-	modelImpl := model.(*modelImpl) // we assume that the model is a modelImpl
 	for _, vehicleType := range vehicleTypes {
 		vehicleTypeAttributes[vehicleType.Index()] = make(map[string]bool)
 		for _, attribute := range l.vehicleTypeAttributes[vehicleType.Index()] {
@@ -80,7 +79,7 @@ func (l *attributesConstraintImpl) Lock(model Model) error {
 	// Determine which stops are individually compatible with which vehicle
 	// types.
 	stopVehicleCompatible := make([]bool, model.NumberOfStops()*len(vehicleTypes))
-	for _, stop := range modelImpl.stops {
+	for _, stop := range model.stops {
 		for _, vehicleType := range vehicleTypes {
 			idx := l.mapTwoIndices(stop.Index(), vehicleType.Index())
 			stopVehicleCompatible[idx] = len(l.stopAttributes[stop.Index()]) == 0
@@ -96,7 +95,7 @@ func (l *attributesConstraintImpl) Lock(model Model) error {
 	// Determine which plan unit is compatible with which vehicle type by
 	// gathering all the stops in the plan unit and checking if they are
 	// compatible with the vehicle type.
-	l.compatible = make([]bool, len(modelImpl.planUnits)*len(vehicleTypes))
+	l.compatible = make([]bool, len(model.planUnits)*len(vehicleTypes))
 	for _, planUnit := range model.PlanStopsUnits() {
 		stops := planUnit.Stops()
 		for _, vehicleType := range vehicleTypes {

@@ -10,9 +10,9 @@ import (
 // addAttributesConstraint adds the attributes constraint to the model.
 func addAttributesConstraint(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	constraint, err := nextroute.NewAttributesConstraint()
 	if err != nil {
 		return nil, err

@@ -10,13 +10,13 @@ import (
 // modelModifier is a function that modifies a Model. The Model that is passed
 // as an argument is mutated and returned. This allows developers to
 // encapsulate Model-modifying logic individually in easy to digest functions.
-type modelModifier func(schema.Input, nextroute.Model, Options) (nextroute.Model, error)
+type modelModifier func(schema.Input, *nextroute.Model, Options) (*nextroute.Model, error)
 
 // NewModel is the implementation of NewModel.
 func NewModel(
 	input schema.Input,
 	modelOptions Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	input = applyDefaults(input)
 	err := validate(input, modelOptions)
 	if err != nil {

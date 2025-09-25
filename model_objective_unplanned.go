@@ -55,7 +55,7 @@ func (t *unplannedObjectiveImpl) calculateCosts(
 	}
 }
 
-func (t *unplannedObjectiveImpl) Lock(model Model) error {
+func (t *unplannedObjectiveImpl) Lock(model *Model) error {
 	units := model.PlanUnits()
 	t.costs = make([]float64, len(units))
 	for _, planUnit := range units {

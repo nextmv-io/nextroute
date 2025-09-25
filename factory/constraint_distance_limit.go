@@ -14,9 +14,9 @@ import (
 // addDistanceLimitConstraint adds a distance limit for routes to the model.
 func addDistanceLimitConstraint(
 	input schema.Input,
-	model nextroute.Model,
+	model *nextroute.Model,
 	_ Options,
-) (nextroute.Model, error) {
+) (*nextroute.Model, error) {
 	composed := nextroute.NewComposedPerVehicleTypeExpression(
 		nextroute.NewConstantExpression(
 			"constant-route-distance",
