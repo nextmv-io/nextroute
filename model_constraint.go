@@ -126,29 +126,3 @@ type ConstraintDataUpdater interface {
 	// UpdateConstraintData is deprecated.
 	UpdateConstraintData(s SolutionStop) (Copier, error)
 }
-
-type modelConstraintImpl struct {
-	name        string
-	expressions ModelExpressions
-}
-
-func (m *modelConstraintImpl) EstimateIsViolated(
-	_ SolutionMoveStops,
-	_ *Solution,
-) (isViolated bool, stopPositionsHint StopPositionsHint) {
-	panic("implement me in derived class")
-}
-
-func newModelConstraintImpl(
-	name string,
-	expressions ModelExpressions,
-) modelConstraintImpl {
-	return modelConstraintImpl{
-		expressions: expressions,
-		name:        name,
-	}
-}
-
-func (m *modelConstraintImpl) ModelExpressions() ModelExpressions {
-	return m.expressions
-}

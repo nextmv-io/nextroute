@@ -17,55 +17,24 @@ import (
 // at least one of them. Stops that do not have any specified attributes are
 // compatible with any vehicle. Vehicles that do not have any specified
 // attributes are only compatible with stops without attributes.
-type AttributesConstraint interface {
-	ModelConstraint
-
-	// SetStopAttributes sets the attributes for the given stop. The attributes
-	// are specified as a list of strings. The attributes are not interpreted
-	// in any way. They are only used to determine compatibility between stops
-	// and vehicle types.
-	SetStopAttributes(
-		stop *ModelStop,
-		stopAttributes []string,
-	) error
-	// SetVehicleTypeAttributes sets the attributes for the given vehicle type.
-	// The attributes are specified as a list of strings. The attributes are not
-	// interpreted in any way. They are only used to determine compatibility
-	// between stops and vehicle types.
-	SetVehicleTypeAttributes(
-		vehicle *ModelVehicleType,
-		vehicleAttributes []string,
-	) error
-	// StopAttributes returns the attributes for the given stop. The attributes
-	// are specified as a list of strings.
-	StopAttributes(stop *ModelStop) []string
-
-	// VehicleTypeAttributes returns the attributes for the given vehicle type.
-	// The attributes are specified as a list of strings.
-	VehicleTypeAttributes(vehicle *ModelVehicleType) []string
+type AttributesConstraint struct {
+	stopAttributes        map[int][]string
+	vehicleTypeAttributes map[int][]string
+	compatible            []bool
+	vehicleTypes          int
 }
 
 // NewAttributesConstraint returns a new AttributesConstraint.
-func NewAttributesConstraint() (AttributesConstraint, error) {
-	return &attributesConstraintImpl{
-		modelConstraintImpl: newModelConstraintImpl(
-			"attributes",
-			ModelExpressions{},
-		),
+func NewAttributesConstraint() (*AttributesConstraint, error) {
+	return &AttributesConstraint{
 		stopAttributes:        make(map[int][]string),
 		vehicleTypeAttributes: make(map[int][]string),
 	}, nil
 }
 
-type attributesConstraintImpl struct {
-	stopAttributes        map[int][]string
-	vehicleTypeAttributes map[int][]string
-	modelConstraintImpl
-	compatible   []bool
-	vehicleTypes int
-}
-
-func (l *attributesConstraintImpl) Lock(model *Model) error {
+// Lock locks the constraint to the given model. After locking, no more
+// attributes can be set for stops and vehicle types.
+func (l *AttributesConstraint) Lock(model *Model) error {
 	vehicleTypeAttributes := make(map[int]map[string]bool)
 	vehicleTypes := model.VehicleTypes()
 	l.vehicleTypes = len(vehicleTypes)
@@ -112,25 +81,34 @@ func (l *attributesConstraintImpl) Lock(model *Model) error {
 	return nil
 }
 
-func (l *attributesConstraintImpl) String() string {
-	return l.name
+// String returns the string representation of the constraint.
+func (l *AttributesConstraint) String() string {
+	return "attributes"
 }
 
-func (l *attributesConstraintImpl) StopAttributes(stop *ModelStop) []string {
+// StopAttributes returns the attributes for the given stop. The attributes
+// are specified as a list of strings.
+func (l *AttributesConstraint) StopAttributes(stop *ModelStop) []string {
 	if attributes, hasAttributes := l.stopAttributes[stop.Index()]; hasAttributes {
 		return slices.Clone(attributes)
 	}
 	return []string{}
 }
 
-func (l *attributesConstraintImpl) VehicleTypeAttributes(vehicle *ModelVehicleType) []string {
+// VehicleTypeAttributes returns the attributes for the given vehicle type.
+// The attributes are specified as a list of strings.
+func (l *AttributesConstraint) VehicleTypeAttributes(vehicle *ModelVehicleType) []string {
 	if attributes, hasAttributes := l.vehicleTypeAttributes[vehicle.Index()]; hasAttributes {
 		return slices.Clone(attributes)
 	}
 	return []string{}
 }
 
-func (l *attributesConstraintImpl) SetStopAttributes(
+// SetStopAttributes sets the attributes for the given stop. The attributes
+// are specified as a list of strings. The attributes are not interpreted
+// in any way. They are only used to determine compatibility between stops
+// and vehicle types.
+func (l *AttributesConstraint) SetStopAttributes(
 	stop *ModelStop,
 	stopAttributes []string,
 ) error {
@@ -141,7 +119,11 @@ func (l *attributesConstraintImpl) SetStopAttributes(
 	return nil
 }
 
-func (l *attributesConstraintImpl) SetVehicleTypeAttributes(
+// SetVehicleTypeAttributes sets the attributes for the given vehicle type.
+// The attributes are specified as a list of strings. The attributes are not
+// interpreted in any way. They are only used to determine compatibility
+// between stops and vehicle types.
+func (l *AttributesConstraint) SetVehicleTypeAttributes(
 	vehicleType *ModelVehicleType,
 	vehicleAttributes []string,
 ) error {
@@ -152,11 +134,13 @@ func (l *attributesConstraintImpl) SetVehicleTypeAttributes(
 	return nil
 }
 
-func (l *attributesConstraintImpl) EstimationCost() Cost {
+// EstimationCost returns the cost of the constraint for estimation purposes.
+func (l *AttributesConstraint) EstimationCost() Cost {
 	return Constant
 }
 
-func (l *attributesConstraintImpl) EstimateIsViolated(
+// EstimateIsViolated estimates whether the given move violates the constraint.
+func (l *AttributesConstraint) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
@@ -170,6 +154,6 @@ func (l *attributesConstraintImpl) EstimateIsViolated(
 	return true, constSkipVehiclePositionsHint
 }
 
-func (l *attributesConstraintImpl) mapTwoIndices(i, j int) int {
+func (l *AttributesConstraint) mapTwoIndices(i, j int) int {
 	return i*l.vehicleTypes + j
 }

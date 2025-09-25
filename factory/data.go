@@ -14,9 +14,9 @@ type modelData struct {
 	// Expression and constraint to represent the latest end time at a stop,
 	// including the vehicle's ending location.
 	latestEndExpression   nextroute.StopTimeExpression
-	latestStartConstraint nextroute.LatestStart
+	latestStartConstraint *nextroute.LatestStart
 	latestStartExpression nextroute.StopTimeExpression
-	latestEndConstraint   nextroute.LatestEnd
+	latestEndConstraint   *nextroute.LatestEnd
 	targetTime            nextroute.StopTimeExpression
 
 	// Stop ID -> index in the input stops array.

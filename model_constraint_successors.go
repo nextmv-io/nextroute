@@ -6,28 +6,19 @@ import "fmt"
 
 // SuccessorConstraint is a constraint that disallows certain stops to be
 // planned after other stops.
-type SuccessorConstraint interface {
-	ModelConstraint
-	DisallowSuccessors(*ModelStop, ModelStops) error
+type SuccessorConstraint struct {
+	disallowedSuccessors map[*ModelStop]ModelStops
 }
 
 // NewSuccessorConstraint returns a new SuccessorConstraint.
-func NewSuccessorConstraint() (SuccessorConstraint, error) {
-	return &successorConstraintImpl{
-		modelConstraintImpl: newModelConstraintImpl(
-			"successor",
-			ModelExpressions{},
-		),
+func NewSuccessorConstraint() (*SuccessorConstraint, error) {
+	return &SuccessorConstraint{
 		disallowedSuccessors: make(map[*ModelStop]ModelStops),
 	}, nil
 }
 
-type successorConstraintImpl struct {
-	modelConstraintImpl
-	disallowedSuccessors map[*ModelStop]ModelStops
-}
-
-func (l *successorConstraintImpl) Lock(model *Model) error {
+// Lock locks the constraint to the model.
+func (l *SuccessorConstraint) Lock(model *Model) error {
 	// initialize disallowedSuccessors
 	model.disallowedSuccessors = make([][]bool, model.NumberOfStops())
 	for i := range model.disallowedSuccessors {
@@ -43,7 +34,9 @@ func (l *successorConstraintImpl) Lock(model *Model) error {
 	return nil
 }
 
-func (l *successorConstraintImpl) DisallowSuccessors(
+// DisallowSuccessors disallows the given successors to be planned after the
+// given stop.
+func (l *SuccessorConstraint) DisallowSuccessors(
 	stop *ModelStop,
 	successors ModelStops,
 ) error {
@@ -63,15 +56,19 @@ func (l *successorConstraintImpl) DisallowSuccessors(
 	return nil
 }
 
-func (l *successorConstraintImpl) String() string {
-	return l.name
+// String returns the name of the constraint.
+func (l *SuccessorConstraint) String() string {
+	return "successor"
 }
 
-func (l *successorConstraintImpl) EstimationCost() Cost {
+// EstimationCost returns the cost of estimating whether a move violates the
+// constraint.
+func (l *SuccessorConstraint) EstimationCost() Cost {
 	return LinearStop
 }
 
-func (l *successorConstraintImpl) EstimateIsViolated(
+// EstimateIsViolated estimates whether the given move violates the constraint.
+func (l *SuccessorConstraint) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	model := move.PlanStopsUnit().Solution().Model()
@@ -86,7 +83,9 @@ func (l *successorConstraintImpl) EstimateIsViolated(
 	return false, noPositionsHint()
 }
 
-func (l *successorConstraintImpl) DoesStopHaveViolations(
+// DoesStopHaveViolations returns true if the stop has violations of the
+// constraint.
+func (l *SuccessorConstraint) DoesStopHaveViolations(
 	stop SolutionStop,
 ) bool {
 	model := stop.Solution().Model()

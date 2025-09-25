@@ -8,20 +8,10 @@ import (
 
 // NoMixConstraint limits the order in which stops are assigned to a vehicle
 // based upon the items the stops insert or remove from a vehicle.
-type NoMixConstraint interface {
-	Identifier
-	ModelConstraint
-
-	// Insert returns the mix items that are associated with a stop that
-	// inserts items into a vehicle.
-	Insert() map[*ModelStop]MixItem
-	// Remove returns the mix items that are associated with a stop that
-	// removes items from a vehicle.
-	Remove() map[*ModelStop]MixItem
-	// Value returns the value of the constraint for a stop. The value is
-	// the amount of items on the vehicle at the moment of the stop. If
-	// the stop is unplanned, the value has no semantic meaning.
-	Value(solutionStop SolutionStop) MixItem
+type NoMixConstraint struct {
+	name   string
+	insert map[*ModelStop]MixItem
+	remove map[*ModelStop]MixItem
 }
 
 // MixItem is an item that is used to specify the type of mix.
@@ -38,7 +28,7 @@ type MixItem struct {
 // NewNoMixConstraint returns a new NoMixConstraint.
 func NewNoMixConstraint(
 	deltas map[*ModelStop]MixItem,
-) (NoMixConstraint, error) {
+) (*NoMixConstraint, error) {
 	insert := make(map[*ModelStop]MixItem, len(deltas)/2)
 	remove := make(map[*ModelStop]MixItem, len(deltas)/2)
 	for stop, delta := range deltas {
@@ -55,11 +45,8 @@ func NewNoMixConstraint(
 		}
 	}
 
-	return &noMixConstraintImpl{
-		modelConstraintImpl: newModelConstraintImpl(
-			"no_mix",
-			ModelExpressions{},
-		),
+	return &NoMixConstraint{
+		name:   "no_mix",
 		insert: insert,
 		remove: remove,
 	}, nil
@@ -183,12 +170,6 @@ func validate(
 	return nil
 }
 
-type noMixConstraintImpl struct {
-	modelConstraintImpl
-	insert map[*ModelStop]MixItem
-	remove map[*ModelStop]MixItem
-}
-
 type noMixSolutionStopData struct {
 	content  MixItem
 	tour     int
@@ -206,11 +187,15 @@ func (l *noMixSolutionStopData) Copy() Copier {
 	}
 }
 
-func (l *noMixConstraintImpl) Lock(_ *Model) error {
+// Lock implements the Locker interface.
+func (l *NoMixConstraint) Lock(_ *Model) error {
 	return validate(l.insert, l.remove)
 }
 
-func (l *noMixConstraintImpl) Value(solutionStop SolutionStop) MixItem {
+// Value returns the value of the constraint for a stop. The value is
+// the amount of items on the vehicle at the moment of the stop. If
+// the stop is unplanned, the value has no semantic meaning.
+func (l *NoMixConstraint) Value(solutionStop SolutionStop) MixItem {
 	if !solutionStop.IsPlanned() {
 		return MixItem{
 			Name:     "",
@@ -222,7 +207,8 @@ func (l *noMixConstraintImpl) Value(solutionStop SolutionStop) MixItem {
 	return noMixSolutionStopData.content
 }
 
-func (l *noMixConstraintImpl) UpdateConstraintStopData(
+// UpdateConstraintStopData implements the ConstraintStopDataUpdater interface.
+func (l *NoMixConstraint) UpdateConstraintStopData(
 	solutionStop SolutionStop,
 ) (Copier, error) {
 	solutionStopImp := solutionStop
@@ -313,7 +299,9 @@ func (l *noMixConstraintImpl) UpdateConstraintStopData(
 	}, nil
 }
 
-func (l *noMixConstraintImpl) Insert() map[*ModelStop]MixItem {
+// Insert returns the mix items that are associated with a stop that
+// inserts items into a vehicle.
+func (l *NoMixConstraint) Insert() map[*ModelStop]MixItem {
 	insert := make(map[*ModelStop]MixItem, len(l.insert))
 	for stop, mixItem := range l.insert {
 		insert[stop] = mixItem
@@ -321,7 +309,9 @@ func (l *noMixConstraintImpl) Insert() map[*ModelStop]MixItem {
 	return insert
 }
 
-func (l *noMixConstraintImpl) Remove() map[*ModelStop]MixItem {
+// Remove returns the mix items that are associated with a stop that
+// removes items from a vehicle.
+func (l *NoMixConstraint) Remove() map[*ModelStop]MixItem {
 	remove := make(map[*ModelStop]MixItem, len(l.remove))
 	for stop, mixItem := range l.remove {
 		remove[stop] = mixItem
@@ -329,23 +319,29 @@ func (l *noMixConstraintImpl) Remove() map[*ModelStop]MixItem {
 	return remove
 }
 
-func (l *noMixConstraintImpl) String() string {
+// String implements the fmt.Stringer interface.
+func (l *NoMixConstraint) String() string {
 	return l.name
 }
 
-func (l *noMixConstraintImpl) ID() string {
+// ID implements the Identifier interface.
+func (l *NoMixConstraint) ID() string {
 	return l.name
 }
 
-func (l *noMixConstraintImpl) SetID(id string) {
+// SetID implements the Identifier interface.
+func (l *NoMixConstraint) SetID(id string) {
 	l.name = id
 }
 
-func (l *noMixConstraintImpl) EstimationCost() Cost {
+// EstimationCost returns the cost of estimating whether a move violates the
+// constraint.
+func (l *NoMixConstraint) EstimationCost() Cost {
 	return LinearStop
 }
 
-func (l *noMixConstraintImpl) EstimateIsViolated(
+// EstimateIsViolated estimates whether the given move violates the constraint.
+func (l *NoMixConstraint) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)

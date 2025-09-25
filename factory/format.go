@@ -135,7 +135,7 @@ func toPlannedStopOutput(solutionStop nextroute.SolutionStop) schema.PlannedStop
 
 		mixItems := make(map[string]nextroute.MixItem)
 		for _, constraint := range solutionStop.Vehicle().ModelVehicle().Model().Constraints() {
-			if noMixConstraint, ok := constraint.(nextroute.NoMixConstraint); ok {
+			if noMixConstraint, ok := constraint.(*nextroute.NoMixConstraint); ok {
 				mixItems[strings.TrimPrefix(noMixConstraint.ID(), "no_mix_")] = noMixConstraint.Value(solutionStop)
 			}
 		}
