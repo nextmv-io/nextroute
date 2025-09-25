@@ -419,25 +419,26 @@ func (l *maximumImpl) Value(
 			cumulativeValue := vehicle.Last().CumulativeValue(l.resourceExpression)
 			excess := cumulativeValue - maximum
 			if excess > EPSILON {
-				score += excess
+				score += excess + l.penaltyOffset
 			}
 			continue
 		}
+		vehicleScore := 0.0
 		solutionStop := vehicle.First()
 		for {
 			excess := solutionStop.CumulativeValue(l.resourceExpression) - maximum
 			if excess > EPSILON {
-				score += excess
+				vehicleScore += excess
 			}
 			if solutionStop.IsLast() {
 				break
 			}
 			solutionStop = solutionStop.Next()
 		}
-	}
-
-	if score > 0 {
-		score += l.penaltyOffset
+		if vehicleScore > EPSILON {
+			vehicleScore += l.penaltyOffset
+		}
+		score += vehicleScore
 	}
 
 	return score
