@@ -50,7 +50,7 @@ func TestMaximumConstraint_EstimateIsViolated1(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	cnstr.(nextroute.Identifier).SetID("maximum_constraint")
+	cnstr.SetID("maximum_constraint")
 
 	err = model.AddConstraint(cnstr)
 
@@ -188,7 +188,7 @@ func TestMaximumConstraint_EstimateIsViolated2(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	cnstr.(nextroute.Identifier).SetID("maximum_constraint")
+	cnstr.SetID("maximum_constraint")
 
 	err = model.AddConstraint(cnstr)
 

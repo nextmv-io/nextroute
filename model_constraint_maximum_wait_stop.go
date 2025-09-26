@@ -10,12 +10,8 @@ import (
 // wait between two stops. Wait is defined as the time between arriving at a
 // location of a stop and starting (to work),
 // [SolutionStop.StartValue()] - [SolutionStop.ArrivalValue()].
-type MaximumWaitStopConstraint interface {
-	ModelConstraint
-
-	// Maximum returns the maximum expression which defines the maximum time a
-	// vehicle can wait at a stop. Returns nil if not set.
-	Maximum() StopDurationExpression
+type MaximumWaitStopConstraint struct {
+	maxima StopDurationExpression
 }
 
 // NewMaximumWaitStopConstraint returns a new MaximumWaitStopConstraint. The
@@ -24,39 +20,36 @@ type MaximumWaitStopConstraint interface {
 // stop and starting to do whatever you need to do,
 // [SolutionStop.StartValue()] - [SolutionStop.ArrivalValue()].
 func NewMaximumWaitStopConstraint(maxima StopDurationExpression) (
-	MaximumWaitStopConstraint,
+	*MaximumWaitStopConstraint,
 	error,
 ) {
 	if maxima == nil {
 		return nil, fmt.Errorf("maxima must not be nil")
 	}
-	return &maximumWaitStopConstraintImpl{
-		modelConstraintImpl: newModelConstraintImpl(
-			"maximum_stop_wait",
-			ModelExpressions{},
-		),
+	return &MaximumWaitStopConstraint{
 		maxima: maxima,
 	}, nil
 }
 
-type maximumWaitStopConstraintImpl struct {
-	maxima StopDurationExpression
-	modelConstraintImpl
+// String returns the name of the constraint.
+func (l *MaximumWaitStopConstraint) String() string {
+	return "maximum_stop_wait"
 }
 
-func (l *maximumWaitStopConstraintImpl) String() string {
-	return l.name
-}
-
-func (l *maximumWaitStopConstraintImpl) EstimationCost() Cost {
+// EstimationCost returns the cost of estimating whether a move violates the
+// constraint.
+func (l *MaximumWaitStopConstraint) EstimationCost() Cost {
 	return LinearStop
 }
 
-func (l *maximumWaitStopConstraintImpl) Maximum() StopDurationExpression {
+// Maximum returns the maximum expression which defines the maximum time a
+// vehicle can wait at a stop. Returns nil if not set.
+func (l *MaximumWaitStopConstraint) Maximum() StopDurationExpression {
 	return l.maxima
 }
 
-func (l *maximumWaitStopConstraintImpl) EstimateIsViolated(
+// EstimateIsViolated estimates whether the given move violates the constraint.
+func (l *MaximumWaitStopConstraint) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	solutionMoveStops := move.(*solutionMoveStopsImpl)
@@ -103,12 +96,15 @@ func (l *maximumWaitStopConstraintImpl) EstimateIsViolated(
 	return false, constNoPositionsHint
 }
 
-func (l *maximumWaitStopConstraintImpl) DoesStopHaveViolations(s SolutionStop) bool {
+// DoesStopHaveViolations returns true if the stop has violations of the
+// constraint.
+func (l *MaximumWaitStopConstraint) DoesStopHaveViolations(s SolutionStop) bool {
 	stop := s
 	return stop.StartValue()-stop.ArrivalValue() >
 		l.maxima.Value(nil, nil, stop.ModelStop())
 }
 
-func (l *maximumWaitStopConstraintImpl) IsTemporal() bool {
+// IsTemporal returns true if the constraint is temporal.
+func (l *MaximumWaitStopConstraint) IsTemporal() bool {
 	return true
 }

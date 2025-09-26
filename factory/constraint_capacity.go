@@ -355,7 +355,7 @@ func addMaximumConstraint(
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		maximum.(nextroute.Identifier).SetID("capacity_" + name)
+		maximum.SetID("capacity_" + name)
 		err = model.AddConstraint(maximum)
 		if err != nil {
 			return nil, nil, nil, err

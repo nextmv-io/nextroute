@@ -10,139 +10,89 @@ import (
 // LatestEnd is a construct that can be added to the model as a constraint or
 // as an objective. The latest end of a stop is the latest time a stop can end
 // at the location of the stop.
-type LatestEnd interface {
-	ConstraintReporter
-	ModelConstraint
-	ModelObjective
-
-	// Latest returns the latest end time expression which defines the latest
-	// end of a stop.
-	Latest() StopTimeExpression
-
-	// Lateness returns the lateness of a stop. The lateness is the difference
-	// between the actual end and its target end time.
-	Lateness(stop SolutionStop) float64
-
-	// SetFactor adds a factor with which a deviating stop is multiplied. This
-	// is only taken into account if the construct is used as an objective.
-	SetFactor(factor float64, stop *ModelStop) error
-
-	// Factor returns the multiplication factor for the given stop expression.
-	Factor(stop *ModelStop) float64
+type LatestEnd struct {
+	*latest
 }
 
 // LatestStart is a construct that can be added to the model as a constraint or
 // as an objective. The latest start of a stop is the latest time a stop can
 // start at the location of the stop.
-type LatestStart interface {
-	ConstraintReporter
-	ModelConstraint
-	ModelObjective
-
-	// Latest returns the latest start expression which defines the latest
-	// start of a stop.
-	Latest() StopTimeExpression
-
-	// Lateness returns the lateness of a stop. The lateness is the difference
-	// between the actual start and its target start time.
-	Lateness(stop SolutionStop) float64
-
-	// SetFactor adds a factor with which a deviating stop is multiplied. This
-	// is only taken into account if the construct is used as an objective.
-	SetFactor(factor float64, stop *ModelStop) error
-
-	// Factor returns the multiplication factor for the given stop expression.
-	Factor(stop *ModelStop) float64
+type LatestStart struct {
+	*latest
 }
 
 // LatestArrival is a construct that can be added to the model as a constraint
 // or as an objective. The latest arrival of a stop is the latest time a stop
 // can arrive at the location of the stop.
-type LatestArrival interface {
-	ConstraintReporter
-	ModelConstraint
-	ModelObjective
+type LatestArrival struct {
+	*latest
+}
 
-	// Latest returns the latest arrival expression which defines the latest
-	// arrival of a stop.
-	Latest() StopTimeExpression
-
-	// Lateness returns the lateness of a stop. The lateness is the difference
-	// between the actual arrival and its target arrival time.
-	Lateness(stop SolutionStop) float64
-
-	// SetFactor adds a factor with which a deviating stop is multiplied. This
-	// is only taken into account if the construct is used as an objective.
-	SetFactor(factor float64, stop *ModelStop) error
-
-	// Factor returns the multiplication factor for the given stop expression.
-	Factor(stop *ModelStop) float64
+type latest struct {
+	latest            StopTimeExpression
+	latenessFactor    StopExpression
+	name              string
+	temporalReference TemporalReference
 }
 
 // NewLatestEnd returns a new LatestEnd construct.
 func NewLatestEnd(
 	latestEnd StopTimeExpression,
-) (LatestEnd, error) {
-	return &latestImpl{
-		modelConstraintImpl: newModelConstraintImpl(
-			"late_end_penalty",
-			ModelExpressions{},
-		),
-		latest:            latestEnd,
-		latenessFactor:    NewStopExpression("lateness_penalty_factor", 1.0),
-		temporalReference: OnEnd,
+) (*LatestEnd, error) {
+	return &LatestEnd{
+		latest: &latest{
+			latest:            latestEnd,
+			latenessFactor:    NewStopExpression("lateness_penalty_factor", 1.0),
+			temporalReference: OnEnd,
+			name:              "late_end_penalty",
+		},
 	}, nil
 }
 
 // NewLatestStart returns a new LatestStart construct.
 func NewLatestStart(
 	latestStart StopTimeExpression,
-) (LatestStart, error) {
-	return &latestImpl{
-		modelConstraintImpl: newModelConstraintImpl(
-			"late_start_penalty",
-			ModelExpressions{},
-		),
-		latest:            latestStart,
-		latenessFactor:    NewStopExpression("lateness_penalty_factor", 1.0),
-		temporalReference: OnStart,
+) (*LatestStart, error) {
+	return &LatestStart{
+		latest: &latest{
+			latest:            latestStart,
+			latenessFactor:    NewStopExpression("lateness_penalty_factor", 1.0),
+			temporalReference: OnStart,
+			name:              "late_start_penalty",
+		},
 	}, nil
 }
 
 // NewLatestArrival returns a new LatestArrival construct.
 func NewLatestArrival(
-	latest StopTimeExpression,
-) (LatestArrival, error) {
-	return &latestImpl{
-		modelConstraintImpl: newModelConstraintImpl(
-			"late_arrival_penalty",
-			ModelExpressions{},
-		),
-		latest:            latest,
-		latenessFactor:    NewStopExpression("lateness_penalty_factor", 1.0),
-		temporalReference: OnArrival,
+	l StopTimeExpression,
+) (*LatestArrival, error) {
+	return &LatestArrival{
+		latest: &latest{
+			latest:            l,
+			latenessFactor:    NewStopExpression("lateness_penalty_factor", 1.0),
+			temporalReference: OnArrival,
+			name:              "late_arrival_penalty",
+		},
 	}, nil
 }
 
-type latestImpl struct {
-	latest         StopTimeExpression
-	latenessFactor StopExpression
-	modelConstraintImpl
-	temporalReference TemporalReference
-}
-
-func (l *latestImpl) SetFactor(factor float64, stop *ModelStop) error {
+// SetFactor adds a factor with which a deviating stop is multiplied. This
+// is only taken into account if the construct is used as an objective.
+func (l *latest) SetFactor(factor float64, stop *ModelStop) error {
 	if factor >= 0 {
 		return l.latenessFactor.SetValue(stop, factor)
 	}
 	return nil
 }
 
-func (l *latestImpl) Factor(stop *ModelStop) float64 {
+// Factor returns the multiplication factor for the given stop expression.
+func (l *latest) Factor(stop *ModelStop) float64 {
 	return l.latenessFactor.Value(nil, nil, stop)
 }
 
-func (l *latestImpl) ReportConstraint(stop SolutionStop) map[string]any {
+// ReportConstraint returns a report of the constraint for the given stop.
+func (l *latest) ReportConstraint(stop SolutionStop) map[string]any {
 	var t time.Time
 	switch l.temporalReference {
 	case OnArrival:
@@ -159,19 +109,54 @@ func (l *latestImpl) ReportConstraint(stop SolutionStop) map[string]any {
 	}
 }
 
-func (l *latestImpl) String() string {
+// String returns the name of the constraint or objective.
+func (l *latest) String() string {
 	return l.name
 }
 
-func (l *latestImpl) Latest() StopTimeExpression {
-	return l.latest
+// Latest returns the latest arrival expression which defines the latest
+// arrival of a stop.
+func (l *LatestArrival) Latest() StopTimeExpression {
+	return l.latest.latest
 }
 
-func (l *latestImpl) EstimationCost() Cost {
+// Lateness returns the lateness of a stop. The lateness is the difference
+// between the actual arrival and its target arrival time.
+func (l *LatestArrival) Lateness(stop SolutionStop) float64 {
+	return l.lateness(stop)
+}
+
+// Latest returns the latest start expression which defines the latest
+// start of a stop.
+func (l *LatestStart) Latest() StopTimeExpression {
+	return l.latest.latest
+}
+
+// Lateness returns the lateness of a stop. The lateness is the difference
+// between the actual start and its target start time.
+func (l *LatestStart) Lateness(stop SolutionStop) float64 {
+	return l.lateness(stop)
+}
+
+// Latest returns the latest end time expression which defines the latest
+// end of a stop.
+func (l *LatestEnd) Latest() StopTimeExpression {
+	return l.latest.latest
+}
+
+// Lateness returns the lateness of a stop. The lateness is the difference
+// between the actual end and its target end time.
+func (l *LatestEnd) Lateness(stop SolutionStop) float64 {
+	return l.lateness(stop)
+}
+
+// EstimationCost returns the cost of estimating whether a move violates the
+// constraint.
+func (l *latest) EstimationCost() Cost {
 	return LinearStop
 }
 
-func (l *latestImpl) Lateness(stop SolutionStop) float64 {
+func (l *latest) lateness(stop SolutionStop) float64 {
 	latest := l.latest.Value(nil, nil, stop.ModelStop())
 	reference := 0.
 	switch l.temporalReference {
@@ -186,7 +171,8 @@ func (l *latestImpl) Lateness(stop SolutionStop) float64 {
 	return math.Max(0, reference-latest)
 }
 
-func (l *latestImpl) Value(s *Solution) float64 {
+// Value returns objective value for a given solution.
+func (l *latest) Value(s *Solution) float64 {
 	value := 0.0
 	for _, vehicle := range s.vehicles {
 		solutionStop := vehicle.First().Next()
@@ -197,7 +183,7 @@ func (l *latestImpl) Value(s *Solution) float64 {
 				nil,
 				solutionStop.ModelStop(),
 			)
-			value += l.Lateness(solutionStop) * latenessFactor
+			value += l.lateness(solutionStop) * latenessFactor
 
 			if solutionStop == lastSolutionStop {
 				break
@@ -210,7 +196,8 @@ func (l *latestImpl) Value(s *Solution) float64 {
 	return value
 }
 
-func (l *latestImpl) EstimateIsViolated(
+// EstimateIsViolated estimates whether the given move violates the constraint.
+func (l *latest) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	score, hint := l.estimateDeltaScore(
@@ -220,7 +207,8 @@ func (l *latestImpl) EstimateIsViolated(
 	return score != 0.0, hint.(*stopPositionHintImpl)
 }
 
-func (l *latestImpl) EstimateDeltaValue(
+// EstimateDeltaValue estimates the change in value for the given move.
+func (l *latest) EstimateDeltaValue(
 	move SolutionMoveStops,
 ) float64 {
 	score, _ := l.estimateDeltaScore(
@@ -230,7 +218,7 @@ func (l *latestImpl) EstimateDeltaValue(
 	return score
 }
 
-func (l *latestImpl) estimateDeltaScore(
+func (l *latest) estimateDeltaScore(
 	move *solutionMoveStopsImpl,
 	asConstraint bool,
 ) (deltaScore float64, stopPositionsHint StopPositionsHint) {
@@ -304,7 +292,7 @@ func (l *latestImpl) estimateDeltaScore(
 	return deltaScore, constNoPositionsHint
 }
 
-func (l *latestImpl) DoesStopHaveViolations(s SolutionStop) bool {
+func (l *latest) DoesStopHaveViolations(s SolutionStop) bool {
 	stop := s
 	if !stop.
 		vehicle().
@@ -326,6 +314,6 @@ func (l *latestImpl) DoesStopHaveViolations(s SolutionStop) bool {
 	return false
 }
 
-func (l *latestImpl) IsTemporal() bool {
+func (l *latest) IsTemporal() bool {
 	return true
 }

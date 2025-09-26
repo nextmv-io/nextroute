@@ -11,51 +11,9 @@ import (
 // cumulative value can be assigned to a vehicle type. The maximum cumulative
 // value is defined by the expression and the maximum value is defined by the
 // maximum expression.
-type Maximum interface {
-	ModelConstraint
-	ModelObjective
-
-	// Expression returns the expression which is used to calculate the
-	// cumulative value of each stop which is required to stay below the
-	// maximum value and above zero.
-	Expression() ModelExpression
-
-	// Maximum returns the maximum expression which defines the maximum
-	// cumulative value that can be assigned to a vehicle type.
-	Maximum() VehicleTypeExpression
-
-	// PenaltyOffset returns the penalty offset. Penalty offset is used to
-	// offset the penalty. The penalty offset is added to the penalty if there
-	// is at least one violation.
-	PenaltyOffset() float64
-
-	// SetPenaltyOffset sets the penalty offset. Penalty offset is used to
-	// offset the penalty. The penalty offset is added to the penalty if there
-	// is at least one violation. The default penalty offset is 0.0 and it can
-	// be changed by this method and must be positive.
-	SetPenaltyOffset(penaltyOffset float64) error
-}
-
-// NewMaximum creates a new maximum construct which can be used as constraint
-// or as objective.
-func NewMaximum(
-	expression ModelExpression,
-	maximum VehicleTypeExpression,
-) (Maximum, error) {
-	return &maximumImpl{
-		modelConstraintImpl: newModelConstraintImpl(
-			"maximum",
-			ModelExpressions{expression},
-		),
-		maximum:       maximum,
-		penaltyOffset: 0.0,
-	}, nil
-}
-
-type maximumImpl struct {
+type Maximum struct {
 	maximum VehicleTypeExpression
 	deltas  []float64
-	modelConstraintImpl
 	// hasNegativeValues is true if the expression has negative values.
 	// This is used to optimize the estimation cost.
 	hasNegativeValues bool
@@ -68,13 +26,35 @@ type maximumImpl struct {
 	maximumByVehicleType                 []float64
 	penaltyOffset                        float64
 	hasNoEffect                          []bool
+	name                                 string
 }
 
-func (l *maximumImpl) PenaltyOffset() float64 {
+// NewMaximum creates a new maximum construct which can be used as constraint
+// or as objective.
+func NewMaximum(
+	expression ModelExpression,
+	maximum VehicleTypeExpression,
+) (*Maximum, error) {
+	return &Maximum{
+		name:               "maximum",
+		resourceExpression: expression,
+		maximum:            maximum,
+		penaltyOffset:      0.0,
+	}, nil
+}
+
+// PenaltyOffset returns the penalty offset. Penalty offset is used to
+// offset the penalty. The penalty offset is added to the penalty if there
+// is at least one violation.
+func (l *Maximum) PenaltyOffset() float64 {
 	return l.penaltyOffset
 }
 
-func (l *maximumImpl) SetPenaltyOffset(penaltyOffset float64) error {
+// SetPenaltyOffset sets the penalty offset. Penalty offset is used to
+// offset the penalty. The penalty offset is added to the penalty if there
+// is at least one violation. The default penalty offset is 0.0 and it can
+// be changed by this method and must be positive.
+func (l *Maximum) SetPenaltyOffset(penaltyOffset float64) error {
 	if penaltyOffset < 0.0 {
 		return fmt.Errorf(
 			"maximum objective, penalty offset must be positive, it can not be %f",
@@ -87,7 +67,8 @@ func (l *maximumImpl) SetPenaltyOffset(penaltyOffset float64) error {
 	return nil
 }
 
-func (l *maximumImpl) Lock(model *Model) error {
+// Lock implements the Locker interface.
+func (l *Maximum) Lock(model *Model) error {
 	l.hasNegativeValues = l.Expression().HasNegativeValues()
 	l.hasPositiveValues = l.Expression().HasPositiveValues()
 	if _, ok := l.Expression().(ConstantExpression); ok {
@@ -97,7 +78,6 @@ func (l *maximumImpl) Lock(model *Model) error {
 		!l.hasNegativeValues {
 		l.hasStopExpressionAndNoNegativeValues = true
 	}
-	l.resourceExpression = l.expressions[0]
 	vehicleTypes := model.VehicleTypes()
 	l.maximumByVehicleType = make([]float64, len(vehicleTypes))
 	for _, vehicleType := range vehicleTypes {
@@ -135,19 +115,24 @@ func (l *maximumImpl) Lock(model *Model) error {
 	return nil
 }
 
-func (l *maximumImpl) String() string {
+// String returns the name of the constraint.
+func (l *Maximum) String() string {
 	return l.name
 }
 
-func (l *maximumImpl) ID() string {
+// ID returns the id of the constraint.
+func (l *Maximum) ID() string {
 	return l.name
 }
 
-func (l *maximumImpl) SetID(id string) {
+// SetID sets the id of the constraint.
+func (l *Maximum) SetID(id string) {
 	l.name = id
 }
 
-func (l *maximumImpl) EstimationCost() Cost {
+// EstimationCost returns the cost of estimating whether a move violates the
+// constraint.
+func (l *Maximum) EstimationCost() Cost {
 	if l.hasNegativeValues && !l.hasPositiveValues {
 		return Constant
 	}
@@ -163,15 +148,27 @@ func (l *maximumImpl) EstimationCost() Cost {
 	return LinearStop
 }
 
-func (l *maximumImpl) Expression() ModelExpression {
-	return l.expressions[0]
+// Expression returns the expression which is used to calculate the
+// cumulative value of each stop which is required to stay below the
+// maximum value and above zero.
+func (l *Maximum) Expression() ModelExpression {
+	return l.resourceExpression
 }
 
-func (l *maximumImpl) Maximum() VehicleTypeExpression {
+// ModelExpressions returns the expressions used by the constraint or objective.
+func (l *Maximum) ModelExpressions() ModelExpressions {
+	return ModelExpressions{l.resourceExpression}
+}
+
+// Maximum returns the maximum expression which defines the maximum
+// cumulative value that can be assigned to a vehicle type.
+func (l *Maximum) Maximum() VehicleTypeExpression {
 	return l.maximum
 }
 
-func (l *maximumImpl) DoesStopHaveViolations(s SolutionStop) bool {
+// DoesStopHaveViolations returns true if the stop has violations of the
+// constraint.
+func (l *Maximum) DoesStopHaveViolations(s SolutionStop) bool {
 	stop := s
 	// We check if the cumulative value is below zero or above the maximum.
 	// If there are stops with negative values, the cumulative value can be
@@ -188,7 +185,8 @@ func (l *maximumImpl) DoesStopHaveViolations(s SolutionStop) bool {
 	return cumulativeValue > maximum || cumulativeValue < 0.0
 }
 
-func (l *maximumImpl) EstimateIsViolated(
+// EstimateIsViolated estimates whether the given move violates the constraint.
+func (l *Maximum) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
@@ -290,7 +288,8 @@ func (m *maximumObjectiveDate) Copy() Copier {
 	}
 }
 
-func (l *maximumImpl) UpdateObjectiveStopData(
+// UpdateObjectiveStopData updates the objective data for the stop.
+func (l *Maximum) UpdateObjectiveStopData(
 	solutionStop SolutionStop,
 ) (Copier, error) {
 	if solutionStop.IsFirst() {
@@ -312,7 +311,9 @@ func (l *maximumImpl) UpdateObjectiveStopData(
 	}, nil
 }
 
-func (l *maximumImpl) EstimateDeltaValue(
+// EstimateDeltaValue estimates the delta value of the objective as a result
+// of the move.
+func (l *Maximum) EstimateDeltaValue(
 	move SolutionMoveStops,
 ) (deltaValue float64) {
 	moveImpl := move.(*solutionMoveStopsImpl)
@@ -401,7 +402,8 @@ func (l *maximumImpl) EstimateDeltaValue(
 	return estimateDeltaValue
 }
 
-func (l *maximumImpl) Value(
+// Value computes value of a solution.
+func (l *Maximum) Value(
 	solution *Solution,
 ) (value float64) {
 	score := 0.0

@@ -6,34 +6,23 @@ package nextroute
 // stops a vehicle type can have. The maximum number of stops is defined by
 // the maximum stops expression. The first stop of a vehicle is not counted
 // as a stop and the last stop of a vehicle is not counted as a stop.
-type MaximumStopsConstraint interface {
-	ModelConstraint
-
-	// MaximumStops returns the maximum stops expression which defines the
-	// maximum number of stops a vehicle type can have.
-	MaximumStops() VehicleTypeExpression
+type MaximumStopsConstraint struct {
+	maximumStops              VehicleTypeExpression
+	maximumStopsByVehicleType []float64
 }
 
 // NewMaximumStopsConstraint returns a new MaximumStopsConstraint.
 func NewMaximumStopsConstraint(
 	maximumStops VehicleTypeExpression,
-) (MaximumStopsConstraint, error) {
-	return &maximumStopsConstraintImpl{
-		modelConstraintImpl: newModelConstraintImpl(
-			"maximum_stops",
-			ModelExpressions{},
-		),
+) (*MaximumStopsConstraint, error) {
+	return &MaximumStopsConstraint{
 		maximumStops: maximumStops,
 	}, nil
 }
 
-type maximumStopsConstraintImpl struct {
-	maximumStops              VehicleTypeExpression
-	maximumStopsByVehicleType []float64
-	modelConstraintImpl
-}
-
-func (l *maximumStopsConstraintImpl) Lock(model *Model) error {
+// Lock locks the constraint to the model. It precomputes the maximum stops
+// for each vehicle type.
+func (l *MaximumStopsConstraint) Lock(model *Model) error {
 	vehicleTypes := model.VehicleTypes()
 	l.maximumStopsByVehicleType = make([]float64, len(vehicleTypes))
 	for _, vehicleType := range vehicleTypes {
@@ -46,11 +35,13 @@ func (l *maximumStopsConstraintImpl) Lock(model *Model) error {
 	return nil
 }
 
-func (l *maximumStopsConstraintImpl) String() string {
-	return l.name
+// String returns the string representation of the constraint.
+func (l *MaximumStopsConstraint) String() string {
+	return "maximum_stops"
 }
 
-func (l *maximumStopsConstraintImpl) EstimateIsViolated(
+// EstimateIsViolated estimates whether the given move violates the constraint.
+func (l *MaximumStopsConstraint) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
@@ -71,10 +62,13 @@ func (l *maximumStopsConstraintImpl) EstimateIsViolated(
 	return false, constNoPositionsHint
 }
 
-func (l *maximumStopsConstraintImpl) EstimationCost() Cost {
+// EstimationCost returns the cost of the constraint for estimation purposes.
+func (l *MaximumStopsConstraint) EstimationCost() Cost {
 	return Constant
 }
 
-func (l *maximumStopsConstraintImpl) MaximumStops() VehicleTypeExpression {
+// MaximumStops returns the maximum stops expression which defines the
+// maximum number of stops a vehicle type can have.
+func (l *MaximumStopsConstraint) MaximumStops() VehicleTypeExpression {
 	return l.maximumStops
 }

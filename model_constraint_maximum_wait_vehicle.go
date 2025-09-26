@@ -10,12 +10,8 @@ import (
 // a vehicle can wait at stops on its route. Wait is defined as the time between
 // arriving at a location of stop and starting (to work),
 // [SolutionStop.StartValue()] - [SolutionStop.ArrivalValue()].
-type MaximumWaitVehicleConstraint interface {
-	ModelConstraint
-
-	// Maximum returns the maximum expression which defines the maximum
-	// accumulated time a vehicle can wait on a route. Returns nil if not set.
-	Maximum() VehicleTypeDurationExpression
+type MaximumWaitVehicleConstraint struct {
+	maxima VehicleTypeDurationExpression
 }
 
 // NewMaximumWaitVehicleConstraint returns a new MaximumWaitVehicleConstraint.
@@ -25,22 +21,13 @@ type MaximumWaitVehicleConstraint interface {
 // [SolutionStop.StartValue()] - [SolutionStop.ArrivalValue()].
 func NewMaximumWaitVehicleConstraint(
 	maxima VehicleTypeDurationExpression,
-) (MaximumWaitVehicleConstraint, error) {
+) (*MaximumWaitVehicleConstraint, error) {
 	if maxima == nil {
 		return nil, fmt.Errorf("maxima must not be nil")
 	}
-	return &maximumWaitVehicleConstraintImpl{
-		modelConstraintImpl: newModelConstraintImpl(
-			"maximum_vehicle_wait",
-			ModelExpressions{},
-		),
+	return &MaximumWaitVehicleConstraint{
 		maxima: maxima,
 	}, nil
-}
-
-type maximumWaitVehicleConstraintImpl struct {
-	maxima VehicleTypeDurationExpression
-	modelConstraintImpl
 }
 
 type maximumWaitVehicleConstraintData struct {
@@ -53,19 +40,25 @@ func (c *maximumWaitVehicleConstraintData) Copy() Copier {
 	}
 }
 
-func (l *maximumWaitVehicleConstraintImpl) String() string {
-	return l.name
+// String returns the name of the constraint.
+func (l *MaximumWaitVehicleConstraint) String() string {
+	return "maximum_vehicle_wait"
 }
 
-func (l *maximumWaitVehicleConstraintImpl) EstimationCost() Cost {
+// EstimationCost returns the cost of estimating whether a move violates the
+// constraint.
+func (l *MaximumWaitVehicleConstraint) EstimationCost() Cost {
 	return LinearStop
 }
 
-func (l *maximumWaitVehicleConstraintImpl) Maximum() VehicleTypeDurationExpression {
+// Maximum returns the maximum expression which defines the maximum
+// accumulated time a vehicle can wait on a route. Returns nil if not set.
+func (l *MaximumWaitVehicleConstraint) Maximum() VehicleTypeDurationExpression {
 	return l.maxima
 }
 
-func (l *maximumWaitVehicleConstraintImpl) UpdateConstraintStopData(
+// UpdateConstraintStopData updates the constraint data for the given stop.
+func (l *MaximumWaitVehicleConstraint) UpdateConstraintStopData(
 	solutionStop SolutionStop,
 ) (Copier, error) {
 	if solutionStop.IsFirst() {
@@ -90,7 +83,8 @@ func (l *maximumWaitVehicleConstraintImpl) UpdateConstraintStopData(
 	}, nil
 }
 
-func (l *maximumWaitVehicleConstraintImpl) EstimateIsViolated(
+// EstimateIsViolated estimates if the constraint is violated by the given move.
+func (l *MaximumWaitVehicleConstraint) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
@@ -138,12 +132,15 @@ func (l *maximumWaitVehicleConstraintImpl) EstimateIsViolated(
 	return false, constNoPositionsHint
 }
 
-func (l *maximumWaitVehicleConstraintImpl) DoesStopHaveViolations(solution SolutionStop) bool {
+// DoesStopHaveViolations returns true if the stop has violations of the
+// constraint.
+func (l *MaximumWaitVehicleConstraint) DoesStopHaveViolations(solution SolutionStop) bool {
 	stop := solution
 	return stop.ConstraintData(l).(*maximumWaitVehicleConstraintData).accumulatedWait >
 		l.maxima.Value(stop.vehicle().ModelVehicle().VehicleType(), nil, nil)
 }
 
-func (l *maximumWaitVehicleConstraintImpl) IsTemporal() bool {
+// IsTemporal returns true if the constraint is temporal.
+func (l *MaximumWaitVehicleConstraint) IsTemporal() bool {
 	return true
 }

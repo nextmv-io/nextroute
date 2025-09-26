@@ -201,7 +201,7 @@ func addLatenessObjective(
 func addLatenessTargetStops(
 	input schema.Input,
 	model *nextroute.Model,
-	objective nextroute.LatestArrival,
+	objective *nextroute.LatestArrival,
 ) (bool, error) {
 	hasTargets := false
 
@@ -230,7 +230,7 @@ func addLatenessTargetStops(
 func addLatenessTargetsAlternateStops(
 	input schema.Input,
 	model *nextroute.Model,
-	objective nextroute.LatestArrival,
+	objective *nextroute.LatestArrival,
 ) (bool, error) {
 	if input.AlternateStops == nil {
 		return false, nil

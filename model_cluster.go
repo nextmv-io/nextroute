@@ -13,65 +13,47 @@ import (
 // cluster can only be added to a vehicles whose centroid is closer to the plan
 // cluster than the centroid of any other vehicle. In case of using it as an
 // objective, those vehicles will be preferred.
-type Cluster interface {
-	ConstraintStopDataUpdater
-	ModelConstraint
-	ModelObjective
-
-	// IncludeFirst returns whether the first stop of the vehicle is included in the
-	// centroid calculation. The centroid is used to determine the distance
-	// between a new stop and the cluster.
-	IncludeFirst() bool
-	// IncludeLast returns whether the last stop of the vehicle is included in
-	// the centroid calculation. The centroid is used to determine the distance
-	// between a new stop and the cluster.
-	IncludeLast() bool
-
-	// SetIncludeFirst sets whether the first stop of the vehicle is included in
-	// the centroid calculation. The centroid is used to determine the distance
-	// between a new stop and the cluster.
-	SetIncludeFirst(includeFirst bool)
-	// SetIncludeLast sets whether the last stop of the vehicle is included in
-	// the centroid calculation. The centroid is used to determine the distance
-	// between a new stop and the cluster.
-	SetIncludeLast(includeLast bool)
+type Cluster struct {
+	includeFirst bool
+	includeLast  bool
 }
 
 // NewCluster creates a new cluster component. It needs to be added as a
 // constraint or as an objective to the model to be taken into account.
 // By default, the first and last stop of a vehicle are not included in the
 // centroid calculation.
-func NewCluster() (Cluster, error) {
-	return &clusterImpl{
-		modelConstraintImpl: newModelConstraintImpl(
-			"cluster",
-			ModelExpressions{},
-		),
+func NewCluster() (*Cluster, error) {
+	return &Cluster{
 		includeFirst: false,
 		includeLast:  false,
 	}, nil
 }
 
-// Implements Cluster.
-type clusterImpl struct {
-	modelConstraintImpl
-	includeFirst bool
-	includeLast  bool
-}
-
-func (l *clusterImpl) IncludeFirst() bool {
+// IncludeFirst returns whether the first stop of the vehicle is included in the
+// centroid calculation. The centroid is used to determine the distance
+// between a new stop and the cluster.
+func (l *Cluster) IncludeFirst() bool {
 	return l.includeFirst
 }
 
-func (l *clusterImpl) IncludeLast() bool {
+// IncludeLast returns whether the last stop of the vehicle is included in
+// the centroid calculation. The centroid is used to determine the distance
+// between a new stop and the cluster.
+func (l *Cluster) IncludeLast() bool {
 	return l.includeLast
 }
 
-func (l *clusterImpl) SetIncludeFirst(includeFirst bool) {
+// SetIncludeFirst sets whether the first stop of the vehicle is included in
+// the centroid calculation. The centroid is used to determine the distance
+// between a new stop and the cluster.
+func (l *Cluster) SetIncludeFirst(includeFirst bool) {
 	l.includeFirst = includeFirst
 }
 
-func (l *clusterImpl) SetIncludeLast(includeLast bool) {
+// SetIncludeLast sets whether the last stop of the vehicle is included in
+// the centroid calculation. The centroid is used to determine the distance
+// between a new stop and the cluster.
+func (l *Cluster) SetIncludeLast(includeLast bool) {
 	l.includeLast = includeLast
 }
 
@@ -93,27 +75,31 @@ func (c *centroidData) String() string {
 	return fmt.Sprintf("%v", c.location)
 }
 
-func (l *clusterImpl) String() string {
-	return fmt.Sprintf("%v", l.name)
+// String implements fmt.Stringer.
+func (l *Cluster) String() string {
+	return "cluster"
 }
 
-func (l *clusterImpl) EstimationCost() Cost {
+// EstimationCost returns the cost of the constraint for estimation purposes.
+func (l *Cluster) EstimationCost() Cost {
 	return LinearVehicle
 }
 
-func (l *clusterImpl) UpdateObjectiveStopData(
+// UpdateObjectiveStopData implements ObjectiveStopDataUpdater.
+func (l *Cluster) UpdateObjectiveStopData(
 	solutionStop SolutionStop,
 ) (Copier, error) {
 	return l.updateData(solutionStop, true)
 }
 
-func (l *clusterImpl) UpdateConstraintStopData(
+// UpdateConstraintStopData implements ConstraintSolutionDataUpdater.
+func (l *Cluster) UpdateConstraintStopData(
 	solutionStop SolutionStop,
 ) (Copier, error) {
 	return l.updateData(solutionStop, false)
 }
 
-func (l *clusterImpl) updateData(
+func (l *Cluster) updateData(
 	solutionStop SolutionStop,
 	asObjective bool,
 ) (Copier, error) {
@@ -191,7 +177,9 @@ func compactness(
 	return compactness
 }
 
-func (l *clusterImpl) EstimateDeltaValue(
+// EstimateDeltaValue estimates the change in the objective value when applying
+// the given move.
+func (l *Cluster) EstimateDeltaValue(
 	move SolutionMoveStops,
 ) float64 {
 	score, _ := l.estimateDeltaScore(
@@ -201,7 +189,9 @@ func (l *clusterImpl) EstimateDeltaValue(
 	return score
 }
 
-func (l *clusterImpl) EstimateIsViolated(
+// EstimateIsViolated estimates whether the given move would violate the
+// constraint.
+func (l *Cluster) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	score, hint := l.estimateDeltaScore(
@@ -211,7 +201,7 @@ func (l *clusterImpl) EstimateIsViolated(
 	return score != 0.0, hint
 }
 
-func (l *clusterImpl) estimateDeltaScore(
+func (l *Cluster) estimateDeltaScore(
 	move SolutionMoveStops,
 	asConstraint bool,
 ) (deltaScore float64, stopPositionsHint StopPositionsHint) {
@@ -270,7 +260,7 @@ func (l *clusterImpl) estimateDeltaScore(
 	return deltaScore, constNoPositionsHint
 }
 
-func (l *clusterImpl) getSolutionStops(vehicle SolutionVehicle) []SolutionStop {
+func (l *Cluster) getSolutionStops(vehicle SolutionVehicle) []SolutionStop {
 	stops := make([]SolutionStop, 0, vehicle.NumberOfStops())
 	for _, stop := range vehicle.SolutionStops() {
 		if stop.IsFirst() && !l.includeFirst {
@@ -283,7 +273,9 @@ func (l *clusterImpl) getSolutionStops(vehicle SolutionVehicle) []SolutionStop {
 	}
 	return stops
 }
-func (l *clusterImpl) Value(solutionStop *Solution) float64 {
+
+// Value returns the value of the objective for the given solution.
+func (l *Cluster) Value(solutionStop *Solution) float64 {
 	sum := 0.0
 	for _, vehicle := range solutionStop.Vehicles() {
 		if vehicle.IsEmpty() {

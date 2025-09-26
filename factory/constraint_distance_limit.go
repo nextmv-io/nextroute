@@ -66,7 +66,7 @@ func addDistanceLimitConstraint(
 	if err != nil {
 		return nil, err
 	}
-	maxConstraint.(nextroute.Identifier).SetID("distance_limit")
+	maxConstraint.SetID("distance_limit")
 
 	err = model.AddConstraint(maxConstraint)
 	if err != nil {

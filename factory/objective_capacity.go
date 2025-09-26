@@ -244,7 +244,7 @@ func addMaximumObjectives(
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
-		maximum.(nextroute.Identifier).SetID("capacity_" + name)
+		maximum.SetID("capacity_" + name)
 		_, err = model.Objective().NewTerm(capacityObjective.Factor, maximum)
 		if err != nil {
 			return nil, nil, nil, nil, err

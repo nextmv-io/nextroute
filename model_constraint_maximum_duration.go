@@ -6,50 +6,41 @@ import (
 	"fmt"
 )
 
-// MaximumDurationConstraint is a constraint that limits the
-// duration of a vehicle.
-type MaximumDurationConstraint interface {
-	ModelConstraint
-
-	// Maximum returns the maximum expression which defines the maximum
-	// duration of a vehicle type.
-	Maximum() VehicleTypeDurationExpression
-}
-
 // NewMaximumDurationConstraint returns a new MaximumDurationConstraint.
 func NewMaximumDurationConstraint(
 	maximum VehicleTypeDurationExpression,
-) (MaximumDurationConstraint, error) {
-	return &maximumDurationConstraintImpl{
-		modelConstraintImpl: newModelConstraintImpl(
-			"maximum_duration",
-			ModelExpressions{},
-		),
+) (*MaximumDurationConstraint, error) {
+	return &MaximumDurationConstraint{
 		maximum: maximum,
 	}, nil
 }
 
-type maximumDurationConstraintImpl struct {
+// MaximumDurationConstraint is a constraint that limits the
+// duration of a vehicle.
+type MaximumDurationConstraint struct {
 	maximum VehicleTypeDurationExpression
-	modelConstraintImpl
 }
 
-func (l *maximumDurationConstraintImpl) String() string {
-	return fmt.Sprintf("MaximumDuration '%v', maxima: %v",
-		l.name,
+// String returns a string representation of the MaximumDurationConstraint.
+func (l *MaximumDurationConstraint) String() string {
+	return fmt.Sprintf("MaximumDuration maximum_duration', maxima: %v",
 		l.maximum,
 	)
 }
 
-func (l *maximumDurationConstraintImpl) EstimationCost() Cost {
+// EstimationCost returns the cost of the constraint for estimation purposes.
+func (l *MaximumDurationConstraint) EstimationCost() Cost {
 	return Constant
 }
 
-func (l *maximumDurationConstraintImpl) Maximum() VehicleTypeDurationExpression {
+// Maximum returns the maximum expression which defines the maximum
+// duration of a vehicle type.
+func (l *MaximumDurationConstraint) Maximum() VehicleTypeDurationExpression {
 	return l.maximum
 }
 
-func (l *maximumDurationConstraintImpl) EstimateIsViolated(
+// EstimateIsViolated estimates whether the given move violates the constraint.
+func (l *MaximumDurationConstraint) EstimateIsViolated(
 	move SolutionMoveStops,
 ) (isViolated bool, stopPositionsHint StopPositionsHint) {
 	moveImpl := move.(*solutionMoveStopsImpl)
@@ -96,11 +87,14 @@ func (l *maximumDurationConstraintImpl) EstimateIsViolated(
 	return false, constNoPositionsHint
 }
 
-func (l *maximumDurationConstraintImpl) DoesVehicleHaveViolations(vehicle SolutionVehicle) bool {
+// DoesVehicleHaveViolations returns whether the given vehicle has violations
+// of the constraint.
+func (l *MaximumDurationConstraint) DoesVehicleHaveViolations(vehicle SolutionVehicle) bool {
 	return vehicle.DurationValue() >
 		l.maximum.Value(vehicle.ModelVehicle().VehicleType(), nil, nil)
 }
 
-func (l *maximumDurationConstraintImpl) IsTemporal() bool {
+// IsTemporal returns whether the constraint is temporal.
+func (l *MaximumDurationConstraint) IsTemporal() bool {
 	return true
 }
