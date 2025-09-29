@@ -79,7 +79,7 @@ func (t *unplannedObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) floa
 func (t *unplannedObjectiveImpl) Value(solution *Solution) float64 {
 	unplannedScore := 0.0
 
-	units := solution.UnPlannedPlanUnits().(*solutionPlanUnitCollectionBaseImpl).solutionPlanUnits
+	units := solution.UnPlannedPlanUnits().solutionPlanUnits
 	for _, upu := range units {
 		switch upu := upu.(type) {
 		case *solutionPlanStopsUnitImpl:
