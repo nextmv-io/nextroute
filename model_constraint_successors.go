@@ -77,10 +77,10 @@ func (l *SuccessorConstraint) EstimateIsViolated(
 		stop := stopPosition.Stop().ModelStop()
 		nextModelStop := stopPosition.Next().ModelStop()
 		if disallowed := model.disallowedSuccessors[stop.Index()][nextModelStop.Index()]; disallowed {
-			return true, noPositionsHint()
+			return true, NoPositionsHint()
 		}
 	}
-	return false, noPositionsHint()
+	return false, NoPositionsHint()
 }
 
 // DoesStopHaveViolations returns true if the stop has violations of the

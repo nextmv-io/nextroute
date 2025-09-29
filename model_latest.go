@@ -204,7 +204,7 @@ func (l *latest) EstimateIsViolated(
 		move.(*solutionMoveStopsImpl),
 		true,
 	)
-	return score != 0.0, hint.(*stopPositionHintImpl)
+	return score != 0.0, hint
 }
 
 // EstimateDeltaValue estimates the change in value for the given move.
@@ -269,7 +269,7 @@ func (l *latest) estimateDeltaScore(
 		}
 
 		if asConstraint {
-			return 1.0, constNoPositionsHint
+			return 1.0, NoPositionsHint()
 		}
 
 		factor := l.latenessFactor.Value(nil, nil, modelStop)
@@ -289,7 +289,7 @@ func (l *latest) estimateDeltaScore(
 		deltaScore -= currentScore
 	}
 
-	return deltaScore, constNoPositionsHint
+	return deltaScore, NoPositionsHint()
 }
 
 func (l *latest) DoesStopHaveViolations(s SolutionStop) bool {

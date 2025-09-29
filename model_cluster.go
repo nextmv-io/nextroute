@@ -213,7 +213,7 @@ func (l *Cluster) estimateDeltaScore(
 	for _, stopPosition := range stopPositions {
 		vehicle := moveImpl.vehicle()
 		if vehicle.IsEmpty() {
-			return deltaScore, constNoPositionsHint
+			return deltaScore, NoPositionsHint()
 		}
 
 		candidate := stopPosition.Stop()
@@ -246,7 +246,7 @@ func (l *Cluster) estimateDeltaScore(
 					centroidOtherVehicle,
 					candidate.ModelStop().Location(),
 				).Value(common.Meters) < distanceToCentroid {
-					return 1.0, constSkipVehiclePositionsHint
+					return 1.0, SkipVehiclePositionsHint()
 				}
 			}
 		} else {
@@ -257,7 +257,7 @@ func (l *Cluster) estimateDeltaScore(
 			deltaScore -= c.compactness
 		}
 	}
-	return deltaScore, constNoPositionsHint
+	return deltaScore, NoPositionsHint()
 }
 
 func (l *Cluster) getSolutionStops(vehicle SolutionVehicle) []SolutionStop {

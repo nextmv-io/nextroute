@@ -438,10 +438,6 @@ func (s *Solution) addInitialSolution(model *Model) error {
 
 				isViolated, hint := constraint.EstimateIsViolated(move)
 
-				if hint == nil {
-					return newErrorOnNilHint(constraint)
-				}
-
 				s.Model().OnEstimatedIsViolated(move, constraint, isViolated, hint)
 
 				if isViolated {
@@ -874,17 +870,7 @@ func (s *Solution) checkConstraintsAndEstimateDeltaScore(
 			constraint,
 		)
 
-		var isViolated bool
-		var hint *stopPositionHintImpl
-
-		isViolatedTemp, hintTemp := constraint.EstimateIsViolated(m)
-
-		if hintTemp == nil {
-			panic(newErrorOnNilHint(constraint))
-		}
-
-		hint = hintTemp.(*stopPositionHintImpl)
-		isViolated = isViolatedTemp
+		isViolated, hint := constraint.EstimateIsViolated(m)
 
 		s.model.OnEstimatedIsViolated(
 			m,
@@ -907,32 +893,19 @@ func (s *Solution) checkConstraintsAndEstimateDeltaScore(
 
 	return objectiveEstimate,
 		true,
-		constNoPositionsHint
+		NoPositionsHint()
 }
-
-var constNoPositionsHintImpl = noPositionsHint()
 
 func (s *Solution) checkConstraints(
 	m SolutionMoveStops,
-) (feasible bool, planPositionsHint *stopPositionHintImpl) {
+) (feasible bool, planPositionsHint StopPositionsHint) {
 	model := s.model
 	for _, constraint := range model.constraints {
 		s.model.OnEstimateIsViolated(
 			constraint,
 		)
 
-		var isViolated bool
-		var hint *stopPositionHintImpl
-
-		isViolatedTemp, hintTemp := constraint.EstimateIsViolated(m)
-
-		if hintTemp == nil {
-			panic(newErrorOnNilHint(constraint))
-		}
-
-		hint = hintTemp.(*stopPositionHintImpl)
-
-		isViolated = isViolatedTemp
+		isViolated, hint := constraint.EstimateIsViolated(m)
 
 		s.model.OnEstimatedIsViolated(
 			m,
@@ -946,7 +919,7 @@ func (s *Solution) checkConstraints(
 		}
 	}
 
-	return true, constNoPositionsHintImpl
+	return true, NoPositionsHint()
 }
 
 func (s *Solution) estimateDeltaScore(

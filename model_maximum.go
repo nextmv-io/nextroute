@@ -192,13 +192,13 @@ func (l *Maximum) EstimateIsViolated(
 	moveImpl := move.(*solutionMoveStopsImpl)
 
 	if l.hasNoEffect[moveImpl.planUnit.modelPlanStopsUnit.Index()] {
-		return false, constNoPositionsHint
+		return false, NoPositionsHint()
 	}
 
 	// All contributions to the level are negative, no need to check
 	// it will always be below the implied minimum level of zero.
 	if l.hasNegativeValues && !l.hasPositiveValues {
-		return true, constSkipVehiclePositionsHint
+		return true, SkipVehiclePositionsHint()
 	}
 
 	vehicle := moveImpl.vehicle()
@@ -211,9 +211,9 @@ func (l *Maximum) EstimateIsViolated(
 	if l.hasConstantExpression {
 		value := expression.Value(nil, nil, nil)
 		if value > maximum || value < 0 {
-			return true, constSkipVehiclePositionsHint
+			return true, SkipVehiclePositionsHint()
 		}
-		return false, constNoPositionsHint
+		return false, NoPositionsHint()
 	}
 
 	// All contributions to the level are positive, it is sufficient to check
@@ -224,10 +224,10 @@ func (l *Maximum) EstimateIsViolated(
 		cumulativeValue := vehicle.Last().CumulativeValue(expression)
 
 		if cumulativeValue+l.deltas[moveImpl.planUnit.modelPlanStopsUnit.Index()] > maximum {
-			return true, constSkipVehiclePositionsHint
+			return true, SkipVehiclePositionsHint()
 		}
 
-		return false, constNoPositionsHint
+		return false, NoPositionsHint()
 	}
 
 	generator := newSolutionStopGenerator(*moveImpl, false, false)
@@ -246,7 +246,7 @@ func (l *Maximum) EstimateIsViolated(
 		)
 
 		if level > maximum || level < 0 {
-			return true, constNoPositionsHint
+			return true, NoPositionsHint()
 		}
 		previousStop = solutionStop
 		previousModelStop = modelStop
@@ -255,7 +255,7 @@ func (l *Maximum) EstimateIsViolated(
 	if !l.hasNegativeValues {
 		violated := level-previousStop.CumulativeValue(l.Expression())+
 			vehicle.Last().CumulativeValue(l.Expression()) > maximum
-		return violated, constNoPositionsHint
+		return violated, NoPositionsHint()
 	}
 
 	stop, _ := moveImpl.next()
@@ -268,14 +268,14 @@ func (l *Maximum) EstimateIsViolated(
 
 			if level > maximum || level < 0 {
 				// TODO we can hint the move has to be past this stop
-				return true, constNoPositionsHint
+				return true, NoPositionsHint()
 			}
 
 			stop = stop.Next()
 		}
 	}
 
-	return false, constNoPositionsHint
+	return false, NoPositionsHint()
 }
 
 type maximumObjectiveDate struct {
