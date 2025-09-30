@@ -3,7 +3,9 @@
 // Package common contains common types and functions.
 package common
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // DistanceUnit is the unit of distance.
 type DistanceUnit int
@@ -19,7 +21,6 @@ func NewDistance(
 	case Miles:
 		value *= factorMilesToMeters
 	}
-
 	return Distance{
 		meters: value,
 		unit:   unit,
