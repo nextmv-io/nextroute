@@ -31,10 +31,10 @@ type Solution struct {
 	// TODO: explore if stopToPlanUnit should rather contain interfaces
 	stopToPlanUnit       []*solutionPlanStopsUnitImpl
 	random               *rand.Rand
-	plannedPlanUnits     solutionPlanUnitCollectionBaseImpl
-	fixedPlanUnits       solutionPlanUnitCollectionBaseImpl
-	unPlannedPlanUnits   solutionPlanUnitCollectionBaseImpl
-	propositionPlanUnits solutionPlanUnitCollectionBaseImpl
+	plannedPlanUnits     *SolutionPlanUnitCollection
+	fixedPlanUnits       *SolutionPlanUnitCollection
+	unPlannedPlanUnits   *SolutionPlanUnitCollection
+	propositionPlanUnits *SolutionPlanUnitCollection
 	vehicleIndices       []int
 
 	vehicles                 []SolutionVehicle
@@ -115,19 +115,19 @@ func NewSolution(
 		constraintSolutionData:   make(map[ModelConstraint]Copier),
 		objectiveSolutionData:    make(map[ModelObjective]Copier),
 		random:                   random,
-		fixedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
+		fixedPlanUnits: allocateNewSolutionPlanUnitCollection(
 			random,
 			len(model.planUnits),
 		),
-		plannedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
+		plannedPlanUnits: allocateNewSolutionPlanUnitCollection(
 			random,
 			len(model.planUnits),
 		),
-		unPlannedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
+		unPlannedPlanUnits: allocateNewSolutionPlanUnitCollection(
 			random,
 			len(model.planUnits),
 		),
-		propositionPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
+		propositionPlanUnits: allocateNewSolutionPlanUnitCollection(
 			random,
 			len(model.planUnits),
 		),
@@ -658,16 +658,16 @@ func (s *Solution) Copy() *Solution {
 		values:                   make([][]float64, len(s.values)),
 		vehicleIndices:           vehicleIndices,
 		random:                   random,
-		fixedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
+		fixedPlanUnits: allocateNewSolutionPlanUnitCollection(
 			random, s.fixedPlanUnits.Size(),
 		),
-		plannedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
+		plannedPlanUnits: allocateNewSolutionPlanUnitCollection(
 			random, s.plannedPlanUnits.Size(),
 		),
-		unPlannedPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
+		unPlannedPlanUnits: allocateNewSolutionPlanUnitCollection(
 			random, s.unPlannedPlanUnits.Size(),
 		),
-		propositionPlanUnits: newSolutionPlanUnitCollectionBaseImpl(
+		propositionPlanUnits: allocateNewSolutionPlanUnitCollection(
 			random, s.propositionPlanUnits.Size(),
 		),
 		scores: make(map[ModelObjective]float64, len(s.scores)),
@@ -968,20 +968,20 @@ func (s *Solution) Score() float64 {
 // Fixed plan units are plan units that are not allowed to be planned or
 // unplanned. The union of fixed, planned and unplanned plan units
 // is the set of all plan units in the model.
-func (s *Solution) FixedPlanUnits() ImmutableSolutionPlanUnitCollection {
-	return &s.fixedPlanUnits
+func (s *Solution) FixedPlanUnits() *SolutionPlanUnitCollection {
+	return s.fixedPlanUnits
 }
 
 // PlannedPlanUnits returns the solution plan units that are planned as
 // a collection of solution plan units.
-func (s *Solution) PlannedPlanUnits() ImmutableSolutionPlanUnitCollection {
-	return &s.plannedPlanUnits
+func (s *Solution) PlannedPlanUnits() *SolutionPlanUnitCollection {
+	return s.plannedPlanUnits
 }
 
 // UnPlannedPlanUnits returns the solution plan units that are not
 // planned.
-func (s *Solution) UnPlannedPlanUnits() ImmutableSolutionPlanUnitCollection {
-	return &s.unPlannedPlanUnits
+func (s *Solution) UnPlannedPlanUnits() *SolutionPlanUnitCollection {
+	return s.unPlannedPlanUnits
 }
 
 // PreAllocatedMoveContainer is used to reduce allocations.
