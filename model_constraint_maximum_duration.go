@@ -72,7 +72,7 @@ func (l *MaximumDurationConstraint) EstimateIsViolated(
 		)
 
 		if endValue-startValue > maximumValue {
-			return true, constNoPositionsHint
+			return true, NoPositionsHint()
 		}
 
 		previousStop = solutionStop
@@ -81,10 +81,10 @@ func (l *MaximumDurationConstraint) EstimateIsViolated(
 	deltaEnd := endValue - previousStop.EndValue() - previousStop.SlackValue()
 
 	if vehicle.DurationValue()+deltaEnd > maximumValue {
-		return true, constNoPositionsHint
+		return true, NoPositionsHint()
 	}
 
-	return false, constNoPositionsHint
+	return false, NoPositionsHint()
 }
 
 // DoesVehicleHaveViolations returns whether the given vehicle has violations

@@ -68,7 +68,7 @@ func (l *MaximumTravelDurationConstraint) EstimateIsViolated(
 		value += travelDuration
 
 		if value+cumulativeDurationAtStart > maximum {
-			return true, constNoPositionsHint
+			return true, NoPositionsHint()
 		}
 
 		previousStop = solutionStop
@@ -79,10 +79,10 @@ func (l *MaximumTravelDurationConstraint) EstimateIsViolated(
 	delta := value - next.CumulativeTravelDurationValue()
 
 	if vehicle.Last().CumulativeTravelDurationValue()+delta > maximum {
-		return true, constNoPositionsHint
+		return true, NoPositionsHint()
 	}
 
-	return false, constNoPositionsHint
+	return false, NoPositionsHint()
 }
 
 // DoesVehicleHaveViolations returns true if the vehicle has violations of

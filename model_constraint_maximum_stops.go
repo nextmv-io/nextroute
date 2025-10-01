@@ -56,10 +56,10 @@ func (l *MaximumStopsConstraint) EstimateIsViolated(
 
 	if float64(vehicle.NumberOfStops()+nrStopsToBeAddedToSolution) >
 		maximumStops {
-		return true, constSkipVehiclePositionsHint
+		return true, SkipVehiclePositionsHint()
 	}
 
-	return false, constNoPositionsHint
+	return false, NoPositionsHint()
 }
 
 // EstimationCost returns the cost of the constraint for estimation purposes.

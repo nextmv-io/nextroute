@@ -347,7 +347,7 @@ func (l *NoMixConstraint) EstimateIsViolated(
 	moveImpl := move.(*solutionMoveStopsImpl)
 	_, hasRemoveMixItem := l.remove[moveImpl.stopPositions[0].Stop().ModelStop()]
 	if hasRemoveMixItem {
-		return true, constNoPositionsHint
+		return true, NoPositionsHint()
 	}
 
 	previousStopImp := moveImpl.stopPositions[0].Previous()
@@ -360,7 +360,7 @@ func (l *NoMixConstraint) EstimateIsViolated(
 	insertMixItem, hasInsertMixItem := l.insert[moveImpl.stopPositions[0].Stop().ModelStop()]
 	if hasInsertMixItem {
 		if contentName != insertMixItem.Name && previousNoMixData.content.Quantity != 0 {
-			return true, constNoPositionsHint
+			return true, NoPositionsHint()
 		}
 		deltaQuantity += insertMixItem.Quantity
 	}
@@ -370,7 +370,7 @@ func (l *NoMixConstraint) EstimateIsViolated(
 		// cannot be violated (as it is not mixing any new item between existing
 		// ones). Note that the content name of all stops of a move is the same,
 		// so it is enough to check the first stop.
-		return false, constNoPositionsHint
+		return false, NoPositionsHint()
 	}
 
 	tour := previousNoMixData.tour
@@ -385,13 +385,13 @@ func (l *NoMixConstraint) EstimateIsViolated(
 		if previousStopImp.IsPlanned() {
 			previousNoMixData = previousStopImp.ConstraintData(l).(*noMixSolutionStopData)
 			if previousNoMixData.tour != tour || previousNoMixData.content.Name != contentName {
-				return true, constNoPositionsHint
+				return true, NoPositionsHint()
 			}
 		}
 		insertMixItem, hasInsertMixItem = l.insert[moveImpl.stopPositions[idx].Stop().ModelStop()]
 		if hasInsertMixItem {
 			if contentName != insertMixItem.Name {
-				return true, constNoPositionsHint
+				return true, NoPositionsHint()
 			}
 			deltaQuantity += insertMixItem.Quantity
 			continue
@@ -399,10 +399,10 @@ func (l *NoMixConstraint) EstimateIsViolated(
 		removeMixItem, hasRemoveMixItem := l.remove[moveImpl.stopPositions[idx].Stop().ModelStop()]
 		if hasRemoveMixItem {
 			if contentName != removeMixItem.Name || contentQuantity+deltaQuantity < removeMixItem.Quantity {
-				return true, constNoPositionsHint
+				return true, NoPositionsHint()
 			}
 			deltaQuantity -= removeMixItem.Quantity
 		}
 	}
-	return false, constNoPositionsHint
+	return false, NoPositionsHint()
 }

@@ -123,13 +123,13 @@ func (l *MaximumWaitVehicleConstraint) EstimateIsViolated(
 		wait := start - arrival
 		accumulatedWait += wait
 		if accumulatedWait > maxWait {
-			return true, constNoPositionsHint
+			return true, NoPositionsHint()
 		}
 
 		from = to
 	}
 
-	return false, constNoPositionsHint
+	return false, NoPositionsHint()
 }
 
 // DoesStopHaveViolations returns true if the stop has violations of the

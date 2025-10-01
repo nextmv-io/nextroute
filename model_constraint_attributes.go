@@ -149,9 +149,9 @@ func (l *AttributesConstraint) EstimateIsViolated(
 	idx := l.mapTwoIndices(planUnitIdx, vehicleType.Index())
 	compatible := l.compatible[idx]
 	if compatible {
-		return false, constNoPositionsHint
+		return false, NoPositionsHint()
 	}
-	return true, constSkipVehiclePositionsHint
+	return true, SkipVehiclePositionsHint()
 }
 
 func (l *AttributesConstraint) mapTwoIndices(i, j int) int {
