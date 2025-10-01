@@ -1,8 +1,9 @@
 name: auto benchmark
 on:
+  workflow_dispatch:
   push:
     branches:
-      - "**"
+      - "develop"
 
 env:
   GO_VERSION: 1.25
