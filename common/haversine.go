@@ -10,6 +10,7 @@ import (
 // Haversine calculates the distance between two locations using the
 // Haversine formula. Haversine is a good approximation for short
 // distances (up to a few hundred kilometers).
+// It returns an error if either of the locations are invalid.
 func Haversine(from, to Location) (Distance, error) {
 	if !from.IsValid() || !to.IsValid() {
 		return Distance{},
@@ -25,26 +26,31 @@ func Haversine(from, to Location) (Distance, error) {
 			)
 	}
 
-	x1 := degreesToRadian(from.Longitude())
-	y1 := degreesToRadian(from.Latitude())
-	x2 := degreesToRadian(to.Longitude())
-	y2 := degreesToRadian(to.Latitude())
+	return Haversine0(from, to), nil
+}
+
+// Haversine0 calculates the distance between two locations using the
+// Haversine formula. Distance is 0 if either location is invalid.
+func Haversine0(from, to Location) Distance {
+	if !from.IsValid() || !to.IsValid() {
+		return Distance{meters: 0, unit: Meters}
+	}
+	x1 := from.longitudeRadians
+	y1 := from.latitudeRadians
+	x2 := to.longitudeRadians
+	y2 := to.latitudeRadians
 
 	dx := x1 - x2
 	dy := y1 - y2
 
 	sdy := math.Sin(dy / 2)
 	sdx := math.Sin(dx / 2)
+
 	a := (sdy * sdy) + math.Cos(y1)*math.Cos(y2)*sdx*sdx
-
-	return NewDistance(
-		2*radius*math.Atan2(math.Sqrt(a), math.Sqrt(1-a)),
-		Meters,
-	), nil
-}
-
-func degreesToRadian(d float64) float64 {
-	return d * math.Pi / 180.0
+	return Distance{
+		meters: 2 * radius * math.Atan2(math.Sqrt(a), math.Sqrt(1-a)),
+		unit:   Meters,
+	}
 }
 
 const radius = 6371 * 1000
