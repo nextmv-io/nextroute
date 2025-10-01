@@ -1,5 +1,8 @@
 name: go
-on: [push]
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 env:
   GO_VERSION: 1.22.0
