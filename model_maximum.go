@@ -466,8 +466,8 @@ func nonZero(value float64) bool {
 
 // outOf0Range returns true if value is less than zero or greater than max
 // considering a small epsilon.
-func outOf0Range(value, max float64) bool {
-	return value < -epsilon || value > max+epsilon
+func outOf0Range(value, maximum float64) bool {
+	return value < -epsilon || value > maximum+epsilon
 }
 
 // greaterThan returns true if value is greater than threshold considering a
