@@ -433,7 +433,7 @@ func (l *maximumImpl) Value(
 			}
 			solutionStop = solutionStop.Next()
 		}
-		if vehicleScore > EPSILON {
+		if greaterThanZero(vehicleScore) {
 			vehicleScore += l.penaltyOffset
 		}
 		score += vehicleScore
