@@ -29,19 +29,19 @@ func NewMaximumStopsConstraint(
 
 type maximumStopsConstraintImpl struct {
 	maximumStops              VehicleTypeExpression
-	maximumStopsByVehicleType []float64
+	maximumStopsByVehicleType []int
 	modelConstraintImpl
 }
 
 func (l *maximumStopsConstraintImpl) Lock(model Model) error {
 	vehicleTypes := model.VehicleTypes()
-	l.maximumStopsByVehicleType = make([]float64, len(vehicleTypes))
+	l.maximumStopsByVehicleType = make([]int, len(vehicleTypes))
 	for _, vehicleType := range vehicleTypes {
-		l.maximumStopsByVehicleType[vehicleType.Index()] = l.maximumStops.Value(
+		l.maximumStopsByVehicleType[vehicleType.Index()] = int(l.maximumStops.Value(
 			vehicleType,
 			nil,
 			nil,
-		)
+		))
 	}
 	return nil
 }
@@ -63,8 +63,7 @@ func (l *maximumStopsConstraintImpl) EstimateIsViolated(
 	vehicleType := vehicle.ModelVehicle().VehicleType().Index()
 	maximumStops := l.maximumStopsByVehicleType[vehicleType]
 
-	if float64(vehicle.NumberOfStops()+nrStopsToBeAddedToSolution) >
-		maximumStops {
+	if vehicle.NumberOfStops()+nrStopsToBeAddedToSolution > maximumStops {
 		return true, constSkipVehiclePositionsHint
 	}
 
