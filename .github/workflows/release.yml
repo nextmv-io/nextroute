@@ -153,7 +153,7 @@ jobs:
             platform: linux-amd64
           - image: ubuntu-24.04-arm
             platform: linux-arm64
-          - image: macos-13
+          - image: macos-15-intel
             platform: macos-amd64
           - image: macos-14
             platform: macos-arm64
