@@ -15,36 +15,31 @@ import (
 // and execute the best move until all unplanned plan-units are planned or
 // no more moves can be executed. In an unconstrained model all plan-units
 // will be planned after one iteration of this operator.
-type SolveOperatorPlan interface {
-	SolveOperator
-
-	// GroupSize returns the group size of the solve operator.
-	GroupSize() SolveParameter
+type SolveOperatorPlan struct {
+	solveOperator
 }
 
 // NewSolveOperatorPlan creates a new solve operator for nextroute that
 // plans units.
 func NewSolveOperatorPlan(
 	groupSize SolveParameter,
-) (SolveOperatorPlan, error) {
-	return &solveOperatorPlanImpl{
-		SolveOperator: NewSolveOperator(
-			1.0,
-			true,
-			SolveParameters{groupSize},
-		),
+) (*SolveOperatorPlan, error) {
+	return &SolveOperatorPlan{
+		solveOperator: solveOperator{
+			probability:            1.0,
+			canResultInImprovement: true,
+			parameters:             SolveParameters{groupSize},
+		},
 	}, nil
 }
 
-type solveOperatorPlanImpl struct {
-	SolveOperator
-}
-
-func (d *solveOperatorPlanImpl) GroupSize() SolveParameter {
+// GroupSize returns the group size of the solve operator.
+func (d *SolveOperatorPlan) GroupSize() SolveParameter {
 	return d.Parameters()[0]
 }
 
-func (d *solveOperatorPlanImpl) Execute(
+// Execute implements the SolveOperator interface.
+func (d *SolveOperatorPlan) Execute(
 	ctx context.Context,
 	runTimeInformation SolveInformation,
 ) error {

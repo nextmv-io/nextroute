@@ -6,31 +6,31 @@ import (
 	"context"
 )
 
-// NewSolveOperatorUnPlanLocation creates a new NewSolveOperatorUnPlanLocation.
-// SolveOperatorUnPlan is a solve-operator which un-plans planned plan-units.
+// NewSolveOperatorUnPlanLocation creates a new SolveOperatorUnPlanLocation.
+func NewSolveOperatorUnPlanLocation(
+	numberOfUnits SolveParameter,
+) (*SolveOperatorUnPlanLocation, error) {
+	return &SolveOperatorUnPlanLocation{
+		solveOperator: solveOperator{
+			probability:            1.0,
+			canResultInImprovement: false,
+			parameters:             SolveParameters{numberOfUnits},
+		},
+	}, nil
+}
+
+// SolveOperatorUnPlanLocation is a solve-operator which un-plans planned plan-units.
 // It is used to remove planned plan-units. from the solution.
 // In each iteration of the solve run, the number of plan-units. to un-plan
 // is determined by the number of units. The number of units is a
 // solve-parameter which can be configured by the user. In each iteration, the
 // number of units is sampled from a uniform distribution. The number of units
 // is always an integer between 1 and the number of units.
-func NewSolveOperatorUnPlanLocation(
-	numberOfUnits SolveParameter,
-) (SolveOperator, error) {
-	return &solveOperatorUnPlanLocationImpl{
-		SolveOperator: NewSolveOperator(
-			1.0,
-			false,
-			SolveParameters{numberOfUnits},
-		),
-	}, nil
+type SolveOperatorUnPlanLocation struct {
+	solveOperator
 }
 
-type solveOperatorUnPlanLocationImpl struct {
-	SolveOperator
-}
-
-func (d *solveOperatorUnPlanLocationImpl) unplanLocation(
+func (d *SolveOperatorUnPlanLocation) unplanLocation(
 	planUnit SolutionPlanUnit,
 ) (int, error) {
 	count := 0
@@ -65,11 +65,13 @@ func (d *solveOperatorUnPlanLocationImpl) unplanLocation(
 	return count, nil
 }
 
-func (d *solveOperatorUnPlanLocationImpl) NumberOfUnits() SolveParameter {
+// NumberOfUnits returns the number of units to unplan as a solve-parameter.
+func (d *SolveOperatorUnPlanLocation) NumberOfUnits() SolveParameter {
 	return d.Parameters()[0]
 }
 
-func (d *solveOperatorUnPlanLocationImpl) Execute(
+// Execute implements the SolveOperator interface.
+func (d *SolveOperatorUnPlanLocation) Execute(
 	ctx context.Context,
 	runTimeInformation SolveInformation,
 ) error {

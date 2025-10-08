@@ -10,11 +10,9 @@ import (
 // The operator will set the working solution to the best solution found so far
 // after MaximumIterations number of iterations without finding a better
 // solution.
-type SolveOperatorRestart interface {
-	SolveOperator
-
-	// MaximumIterations returns the maximum iterations of the solve operator.
-	MaximumIterations() SolveParameter
+type SolveOperatorRestart struct {
+	solveOperator
+	lastImprovement int
 }
 
 // NewSolveOperatorRestart creates a new solve-operator that restarts the solver
@@ -25,36 +23,35 @@ type SolveOperatorRestart interface {
 // solution with the best solution found so far.
 func NewSolveOperatorRestart(
 	maximumIterations SolveParameter,
-) (SolveOperatorRestart, error) {
-	return &solveOperatorRestartImpl{
-		SolveOperator: NewSolveOperator(
-			1.0,
-			true,
-			SolveParameters{maximumIterations},
-		),
+) (*SolveOperatorRestart, error) {
+	return &SolveOperatorRestart{
+		solveOperator: solveOperator{
+			probability:            1.0,
+			canResultInImprovement: true,
+			parameters:             SolveParameters{maximumIterations},
+		},
 	}, nil
 }
 
-type solveOperatorRestartImpl struct {
-	SolveOperator
-	lastImprovement int
-}
-
-func (d *solveOperatorRestartImpl) MaximumIterations() SolveParameter {
+// MaximumIterations returns the maximum iterations of the solve operator.
+func (d *SolveOperatorRestart) MaximumIterations() SolveParameter {
 	return d.Parameters()[0]
 }
 
-func (d *solveOperatorRestartImpl) OnStartSolve(_ SolveInformation) {
+// OnStartSolve implements the InterestedInStartSolve interface.
+func (d *SolveOperatorRestart) OnStartSolve(_ SolveInformation) {
 	d.lastImprovement = 0
 }
 
-func (d *solveOperatorRestartImpl) OnBetterSolution(
+// OnBetterSolution implements the InterestedInBetterSolution interface.
+func (d *SolveOperatorRestart) OnBetterSolution(
 	solveRunInformation SolveInformation,
 ) {
 	d.lastImprovement = solveRunInformation.Iteration()
 }
 
-func (d *solveOperatorRestartImpl) Execute(
+// Execute implements the SolveOperator interface.
+func (d *SolveOperatorRestart) Execute(
 	_ context.Context,
 	solveRunInformation SolveInformation,
 ) error {

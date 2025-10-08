@@ -17,12 +17,10 @@ import (
 // 0.3 then the first operator has a 0.1/0.6 chance to be selected, the second
 // operator has a 0.2/0.6 chance to be selected and the third operator has a
 // 0.3/0.6 chance to be selected.
-type SolveOperatorOr interface {
-	SolveOperator
-
-	// Operators returns the solve-operators one will be selected from in
-	// each loop.
-	Operators() SolveOperators
+type SolveOperatorOr struct {
+	solveOperator
+	alias     common.Alias
+	operators SolveOperators
 }
 
 // NewSolverOperatorOr creates a new solve-or-operator. The probability must be
@@ -31,7 +29,7 @@ type SolveOperatorOr interface {
 func NewSolverOperatorOr(
 	probability float64,
 	operators SolveOperators,
-) (SolveOperatorOr, error) {
+) (*SolveOperatorOr, error) {
 	if probability < 0 || probability > 1 {
 		return nil,
 			fmt.Errorf(
@@ -55,42 +53,37 @@ func NewSolverOperatorOr(
 	if err != nil {
 		return nil, err
 	}
-	return &solveOperatorOrImpl{
-		SolveOperator: NewSolveOperator(
-			probability,
-			common.Has(operators,
+	return &SolveOperatorOr{
+		solveOperator: solveOperator{
+			probability: probability,
+			canResultInImprovement: common.Has(operators,
 				true,
 				func(operator SolveOperator) bool {
 					return operator.CanResultInImprovement()
 				},
 			),
-			common.MapSlice(
+			parameters: common.MapSlice(
 				operators,
 				func(operator SolveOperator) []SolveParameter {
 					return operator.Parameters()
 				},
 			),
-		),
+		},
 		operators: operators,
 		alias:     alias,
 	}, nil
 }
 
-// SolveOperatorOrImpl is the implementation of the SolveOperatorOr interface.
-type solveOperatorOrImpl struct {
-	SolveOperator
-	alias     common.Alias
-	operators SolveOperators
-}
-
-func (s *solveOperatorOrImpl) Execute(
+// Execute implements the SolveOperator interface.
+func (s *SolveOperatorOr) Execute(
 	ctx context.Context,
 	runTimeInformation SolveInformation,
 ) error {
 	return s.operators[s.alias.Sample(runTimeInformation.Solver().Random())].Execute(ctx, runTimeInformation)
 }
 
-func (s *solveOperatorOrImpl) Parameters() SolveParameters {
+// Parameters implements the SolveOperator interface.
+func (s *SolveOperatorOr) Parameters() SolveParameters {
 	return common.MapSlice(
 		s.operators,
 		func(operator SolveOperator) []SolveParameter {
@@ -99,11 +92,14 @@ func (s *solveOperatorOrImpl) Parameters() SolveParameters {
 	)
 }
 
-func (s *solveOperatorOrImpl) Operators() SolveOperators {
+// Operators returns the solve-operators one will be selected from in
+// each loop.
+func (s *SolveOperatorOr) Operators() SolveOperators {
 	return s.operators
 }
 
-func (s *solveOperatorOrImpl) OnStartSolve(solveInformation SolveInformation) {
+// OnStartSolve implements the InterestedInStartSolve interface.
+func (s *SolveOperatorOr) OnStartSolve(solveInformation SolveInformation) {
 	for _, operator := range s.operators {
 		if interested, ok := operator.(InterestedInStartSolve); ok {
 			interested.OnStartSolve(solveInformation)
@@ -111,7 +107,8 @@ func (s *solveOperatorOrImpl) OnStartSolve(solveInformation SolveInformation) {
 	}
 }
 
-func (s *solveOperatorOrImpl) OnBetterSolution(solveInformation SolveInformation) {
+// OnBetterSolution implements the InterestedInBetterSolution interface.
+func (s *SolveOperatorOr) OnBetterSolution(solveInformation SolveInformation) {
 	for _, operator := range s.operators {
 		if interested, ok := operator.(InterestedInBetterSolution); ok {
 			interested.OnBetterSolution(solveInformation)

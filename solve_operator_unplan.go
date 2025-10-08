@@ -9,11 +9,8 @@ import (
 )
 
 // SolveOperatorUnPlan is a solve operator that un-plans units.
-type SolveOperatorUnPlan interface {
-	SolveOperator
-
-	// NumberOfUnits returns the number of units of the solve operator.
-	NumberOfUnits() SolveParameter
+type SolveOperatorUnPlan struct {
+	solveOperator
 }
 
 // NewSolveOperatorUnPlan creates a new SolveOperatorUnPlan.
@@ -26,39 +23,34 @@ type SolveOperatorUnPlan interface {
 // is always an integer between 1 and the number of units.
 func NewSolveOperatorUnPlan(
 	numberOfUnits SolveParameter,
-) (SolveOperatorUnPlan, error) {
-	return &solveOperatorUnPlanImpl{
-		SolveOperator: NewSolveOperator(
-			1.0,
-			false,
-			SolveParameters{numberOfUnits},
-		),
+) (*SolveOperatorUnPlan, error) {
+	return &SolveOperatorUnPlan{
+		solveOperator: solveOperator{
+			probability:            1.0,
+			canResultInImprovement: false,
+			parameters:             SolveParameters{numberOfUnits},
+		},
 	}, nil
 }
 
-type solveOperatorUnPlanImpl struct {
-	SolveOperator
-}
-
-func (d *solveOperatorUnPlanImpl) NumberOfUnits() SolveParameter {
+// NumberOfUnits returns the number of units of the solve operator.
+func (d *SolveOperatorUnPlan) NumberOfUnits() SolveParameter {
 	return d.Parameters()[0]
 }
 
-func (d *solveOperatorUnPlanImpl) Execute(
+// Execute implements the SolveOperator interface.
+func (d *SolveOperatorUnPlan) Execute(
 	ctx context.Context,
 	runTimeInformation SolveInformation,
 ) error {
 	workSolution := runTimeInformation.
 		Solver().
 		WorkSolution()
-
-	random := runTimeInformation.Solver().Random()
-
-	numberOfUnits := d.NumberOfUnits().Value()
-
 	if workSolution.PlannedPlanUnits().Size() == 0 {
 		return nil
 	}
+	random := runTimeInformation.Solver().Random()
+	numberOfUnits := d.NumberOfUnits().Value()
 
 Loop:
 	for i := 0; i < numberOfUnits &&
@@ -96,7 +88,7 @@ Loop:
 	return nil
 }
 
-func (d *solveOperatorUnPlanImpl) unplanOneStopIsland(
+func (d *SolveOperatorUnPlan) unplanOneStopIsland(
 	solutionStop SolutionStop,
 	numberOfStops int,
 ) (int, error) {
@@ -125,7 +117,7 @@ func (d *solveOperatorUnPlanImpl) unplanOneStopIsland(
 	return 1 + len(units), nil
 }
 
-func (d *solveOperatorUnPlanImpl) unplanClosestStops(
+func (d *SolveOperatorUnPlan) unplanClosestStops(
 	solutionStop SolutionStop,
 	numberOfStops int,
 ) (SolutionPlanUnits, error) {
@@ -163,7 +155,7 @@ func (d *solveOperatorUnPlanImpl) unplanClosestStops(
 	return planUnits, nil
 }
 
-func (d *solveOperatorUnPlanImpl) unplanOneIsland(
+func (d *SolveOperatorUnPlan) unplanOneIsland(
 	solution *Solution,
 	numberOfStops int,
 ) (int, error) {
@@ -179,7 +171,7 @@ func (d *solveOperatorUnPlanImpl) unplanOneIsland(
 	return 0, nil
 }
 
-func (d *solveOperatorUnPlanImpl) unplanSomeStopsOfOneVehicle(
+func (d *SolveOperatorUnPlan) unplanSomeStopsOfOneVehicle(
 	solution *Solution,
 	chance float64,
 ) (int, error) {
@@ -237,7 +229,7 @@ func (d *solveOperatorUnPlanImpl) unplanSomeStopsOfOneVehicle(
 	return count, nil
 }
 
-func (d *solveOperatorUnPlanImpl) unplanLocation(
+func (d *SolveOperatorUnPlan) unplanLocation(
 	planUnit SolutionPlanUnit,
 ) (int, error) {
 	count := 0

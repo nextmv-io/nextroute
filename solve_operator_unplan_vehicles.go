@@ -19,44 +19,37 @@ func NewSolveOperatorUnPlanVehicles(
 	numberOfVehicles SolveParameter,
 	distance common.Distance,
 	probability float64,
-) SolveOperatorUnPlanVehicles {
-	return &solveOperatorUnPlanVehiclesImpl{
-		SolveOperator: NewSolveOperator(
-			probability,
-			false,
-			SolveParameters{numberOfVehicles},
-		),
+) *SolveOperatorUnPlanVehicles {
+	return &SolveOperatorUnPlanVehicles{
+		solveOperator: solveOperator{
+			probability:            probability,
+			canResultInImprovement: false,
+			parameters:             SolveParameters{numberOfVehicles},
+		},
 		distance: distance,
 	}
 }
 
 // SolveOperatorUnPlanVehicles is a solve-operator which un-plans all the
 // stops of a vehicle.
-type SolveOperatorUnPlanVehicles interface {
-	SolveOperator
-
-	// Distance returns the distance to use for the un-planning.
-	Distance() common.Distance
-
-	// NumberOfVehicles returns the number of vehicles to unplan as a solve-parameter.
-	// Solve-parameters can change value during the solve run.
-	NumberOfVehicles() SolveParameter
-}
-
-type solveOperatorUnPlanVehiclesImpl struct {
-	SolveOperator
+type SolveOperatorUnPlanVehicles struct {
+	solveOperator
 	distance common.Distance
 }
 
-func (d *solveOperatorUnPlanVehiclesImpl) NumberOfVehicles() SolveParameter {
+// NumberOfVehicles returns the number of vehicles to unplan as a solve-parameter.
+// Solve-parameters can change value during the solve run.
+func (d *SolveOperatorUnPlanVehicles) NumberOfVehicles() SolveParameter {
 	return d.Parameters()[0]
 }
 
-func (d *solveOperatorUnPlanVehiclesImpl) Distance() common.Distance {
+// Distance returns the distance to use for the un-planning.
+func (d *SolveOperatorUnPlanVehicles) Distance() common.Distance {
 	return d.distance
 }
 
-func (d *solveOperatorUnPlanVehiclesImpl) Execute(
+// Execute implements the SolveOperator interface.
+func (d *SolveOperatorUnPlanVehicles) Execute(
 	ctx context.Context,
 	runTimeInformation SolveInformation,
 ) error {

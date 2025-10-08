@@ -11,19 +11,16 @@ import (
 
 // SolveOperatorAnd is a solve-operator which executes a set of solve-operators
 // in each iteration.
-type SolveOperatorAnd interface {
-	SolveOperator
-
-	// Operators returns the solve-operators that will be executed in each
-	// iteration.
-	Operators() SolveOperators
+type SolveOperatorAnd struct {
+	operators SolveOperators
+	solveOperator
 }
 
 // NewSolverOperatorAnd creates a new solve-and-operator.
 func NewSolverOperatorAnd(
 	probability float64,
 	operators SolveOperators,
-) (SolveOperatorAnd, error) {
+) (*SolveOperatorAnd, error) {
 	if probability < 0 || probability > 1 {
 		return nil,
 			fmt.Errorf(
@@ -40,33 +37,28 @@ func NewSolverOperatorAnd(
 					" zero must be greater than 0",
 			)
 	}
-	return &solveOperatorAndImpl{
-		SolveOperator: NewSolveOperator(
-			probability,
-			common.Has(operators,
+	return &SolveOperatorAnd{
+		solveOperator: solveOperator{
+			probability: probability,
+			canResultInImprovement: common.Has(operators,
 				true,
 				func(operator SolveOperator) bool {
 					return operator.CanResultInImprovement()
 				},
 			),
-			common.MapSlice(
+			parameters: common.MapSlice(
 				operators,
 				func(operator SolveOperator) []SolveParameter {
 					return operator.Parameters()
 				},
 			),
-		),
+		},
 		operators: operators,
 	}, nil
 }
 
-// solveOperatorAndImpl is the implementation of the SolveOperatorAnd interface.
-type solveOperatorAndImpl struct {
-	operators SolveOperators
-	SolveOperator
-}
-
-func (s *solveOperatorAndImpl) Execute(
+// Execute implements the SolveOperator interface.
+func (s *SolveOperatorAnd) Execute(
 	ctx context.Context,
 	runTimeInformation SolveInformation,
 ) error {
@@ -88,7 +80,8 @@ Loop:
 	return nil
 }
 
-func (s *solveOperatorAndImpl) Parameters() SolveParameters {
+// Parameters implements the SolveOperator interface.
+func (s *SolveOperatorAnd) Parameters() SolveParameters {
 	return common.MapSlice(
 		s.operators,
 		func(operator SolveOperator) []SolveParameter {
@@ -97,11 +90,13 @@ func (s *solveOperatorAndImpl) Parameters() SolveParameters {
 	)
 }
 
-func (s *solveOperatorAndImpl) Operators() SolveOperators {
+// Operators implements the SolveOperator interface.
+func (s *SolveOperatorAnd) Operators() SolveOperators {
 	return s.operators
 }
 
-func (s *solveOperatorAndImpl) OnStartSolve(solveInformation SolveInformation) {
+// OnStartSolve implements the InterestedInStartSolve interface.
+func (s *SolveOperatorAnd) OnStartSolve(solveInformation SolveInformation) {
 	for _, operator := range s.operators {
 		if interested, ok := operator.(InterestedInStartSolve); ok {
 			interested.OnStartSolve(solveInformation)
@@ -109,7 +104,8 @@ func (s *solveOperatorAndImpl) OnStartSolve(solveInformation SolveInformation) {
 	}
 }
 
-func (s *solveOperatorAndImpl) OnBetterSolution(solveInformation SolveInformation) {
+// OnBetterSolution implements the InterestedInBetterSolution interface.
+func (s *SolveOperatorAnd) OnBetterSolution(solveInformation SolveInformation) {
 	for _, operator := range s.operators {
 		if interested, ok := operator.(InterestedInBetterSolution); ok {
 			interested.OnBetterSolution(solveInformation)
