@@ -221,9 +221,9 @@ func (l *Maximum) EstimateIsViolated(
 	if l.hasStopExpressionAndNoNegativeValues {
 		cumulativeValue := vehicle.Last().CumulativeValue(expression)
 		violated := greaterThan(
-      cumulativeValue+l.deltas[moveImpl.planUnit.modelPlanStopsUnit.Index()],
-      maximum,
-    )
+			cumulativeValue+l.deltas[moveImpl.planUnit.modelPlanStopsUnit.Index()],
+			maximum,
+		)
 		return violated, skipVehicleIfViolated(violated)
 	}
 
