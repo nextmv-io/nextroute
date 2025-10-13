@@ -25,6 +25,12 @@ func SkipVehiclePositionsHint() StopPositionsHint {
 	}
 }
 
+func skipVehicleIfViolated(skipVehicle bool) StopPositionsHint {
+	return StopPositionsHint{
+		skipVehicle: skipVehicle,
+	}
+}
+
 // HasNextStopPositions returns true if the hint contains next positions.
 func (n StopPositionsHint) HasNextStopPositions() bool {
 	return false

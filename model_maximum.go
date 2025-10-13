@@ -210,10 +210,8 @@ func (l *Maximum) EstimateIsViolated(
 
 	if l.hasConstantExpression {
 		value := expression.Value(nil, nil, nil)
-		if value > maximum || value < 0 {
-			return true, SkipVehiclePositionsHint()
-		}
-		return false, NoPositionsHint()
+		violated := value > maximum || value < 0
+		return violated, skipVehicleIfViolated(violated)
 	}
 
 	// All contributions to the level are positive, it is sufficient to check
@@ -222,12 +220,8 @@ func (l *Maximum) EstimateIsViolated(
 	// is a stop expression.
 	if l.hasStopExpressionAndNoNegativeValues {
 		cumulativeValue := vehicle.Last().CumulativeValue(expression)
-
-		if cumulativeValue+l.deltas[moveImpl.planUnit.modelPlanStopsUnit.Index()] > maximum {
-			return true, SkipVehiclePositionsHint()
-		}
-
-		return false, NoPositionsHint()
+		violated := cumulativeValue+l.deltas[moveImpl.planUnit.modelPlanStopsUnit.Index()] > maximum
+		return violated, skipVehicleIfViolated(violated)
 	}
 
 	generator := newSolutionStopGenerator(*moveImpl, false, false)
