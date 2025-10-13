@@ -4,13 +4,16 @@ package nextroute
 
 // NewStopBalanceObjective returns a new StopBalanceObjective.
 func NewStopBalanceObjective() ModelObjective {
-	return &balanceObjectiveImpl{}
+	return &BalancedObjective{}
 }
 
-type balanceObjectiveImpl struct {
-}
+// BalancedObjective is an objective that tries to balance the number of stops
+// across all vehicles by minimizing the maximum number of stops assigned to a
+// single vehicle.
+type BalancedObjective struct{}
 
-func (t *balanceObjectiveImpl) EstimateDeltaValue(
+// EstimateDeltaValue implements the ModelObjective interface.
+func (t *BalancedObjective) EstimateDeltaValue(
 	move Move,
 ) float64 {
 	solution := move.Solution()
@@ -18,12 +21,13 @@ func (t *balanceObjectiveImpl) EstimateDeltaValue(
 	return float64(newMax - oldMax)
 }
 
-func (t *balanceObjectiveImpl) Value(solution *Solution) float64 {
+// Value implements the ModelObjective interface.
+func (t *BalancedObjective) Value(solution *Solution) float64 {
 	maxBefore, _ := t.maxStops(solution, nil)
 	return float64(maxBefore)
 }
 
-func (t *balanceObjectiveImpl) maxStops(solution *Solution, move SolutionMoveStops) (int, int) {
+func (t *BalancedObjective) maxStops(solution *Solution, move SolutionMoveStops) (int, int) {
 	maximum := 0
 	maximumBefore := 0
 	moveExists := move != nil
@@ -50,6 +54,6 @@ func (t *balanceObjectiveImpl) maxStops(solution *Solution, move SolutionMoveSto
 	return maximumBefore, maximum
 }
 
-func (t *balanceObjectiveImpl) String() string {
+func (t *BalancedObjective) String() string {
 	return "stop_balance"
 }

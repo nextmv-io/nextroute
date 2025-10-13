@@ -19,33 +19,13 @@ const (
 	OnArrival = 2
 )
 
-// EarlinessObjective is a construct that can be added to the model as an
-// objective. It uses to the difference of Arrival, Start or End to the target
-// time to penalize.
-type EarlinessObjective interface {
-	ModelObjective
-
-	// TargetTime returns the target time expression which defines target time
-	// that is compared to either arrival, start or end at the stop - depending
-	// on the given TemporalReference.
-	TargetTime() StopTimeExpression
-
-	// Earliness returns the earliness of a stop. The earliness is the
-	// difference between target time and the actual arrival, start or stop of a
-	// stop. Depending on the TemporalReference.
-	Earliness(stop SolutionStop) float64
-
-	// TemporalReference represents the arrival, start or stop.
-	TemporalReference() TemporalReference
-}
-
 // NewEarlinessObjective returns a new EarliestObjective construct.
 func NewEarlinessObjective(
 	targetTime StopTimeExpression,
 	earlinessFactor StopExpression,
 	temporalReference TemporalReference,
-) (EarlinessObjective, error) {
-	return &earlinessObjectiveImpl{
+) (*EarlinessObjective, error) {
+	return &EarlinessObjective{
 			index:             NewModelExpressionIndex(),
 			targetTime:        targetTime,
 			earlinessFactor:   earlinessFactor,
@@ -54,34 +34,46 @@ func NewEarlinessObjective(
 		nil
 }
 
-type earlinessObjectiveImpl struct {
+// EarlinessObjective is a construct that can be added to the model as an
+// objective. It uses to the difference of Arrival, Start or End to the target
+// time to penalize.
+type EarlinessObjective struct {
 	targetTime        StopTimeExpression
 	earlinessFactor   StopExpression
 	index             int
 	temporalReference TemporalReference
 }
 
-func (l *earlinessObjectiveImpl) TemporalReference() TemporalReference {
+// TemporalReference represents the arrival, start or stop.
+func (l *EarlinessObjective) TemporalReference() TemporalReference {
 	return l.temporalReference
 }
 
-func (l *earlinessObjectiveImpl) ModelExpressions() ModelExpressions {
+// ModelExpressions implements the RegisteredModelExpressions interface.
+func (l *EarlinessObjective) ModelExpressions() ModelExpressions {
 	return ModelExpressions{}
 }
 
-func (l *earlinessObjectiveImpl) Index() int {
+// Index returns the index of the objective.
+func (l *EarlinessObjective) Index() int {
 	return l.index
 }
 
-func (l *earlinessObjectiveImpl) TargetTime() StopTimeExpression {
+// TargetTime returns the target time expression which defines target time
+// that is compared to either arrival, start or end at the stop - depending
+// on the given TemporalReference.
+func (l *EarlinessObjective) TargetTime() StopTimeExpression {
 	return l.targetTime
 }
 
-func (l *earlinessObjectiveImpl) Earliness(stop SolutionStop) float64 {
+// Earliness returns the earliness of a stop. The earliness is the
+// difference between target time and the actual arrival, start or stop of a
+// stop. Depending on the TemporalReference.
+func (l *EarlinessObjective) Earliness(stop SolutionStop) float64 {
 	return l.earliness(stop)
 }
 
-func (l *earlinessObjectiveImpl) earliness(stop SolutionStop) float64 {
+func (l *EarlinessObjective) earliness(stop SolutionStop) float64 {
 	targetTime := l.targetTime.Value(nil, nil, stop.ModelStop())
 	compare := 0.
 	switch l.temporalReference {
@@ -96,7 +88,8 @@ func (l *earlinessObjectiveImpl) earliness(stop SolutionStop) float64 {
 	return math.Max(0, targetTime-compare)
 }
 
-func (l *earlinessObjectiveImpl) Value(solution *Solution) float64 {
+// Value implements the ModelObjective interface.
+func (l *EarlinessObjective) Value(solution *Solution) float64 {
 	value := 0.0
 	for _, vehicle := range solution.Vehicles() {
 		for s := vehicle.First().Next(); !s.IsLast(); s = s.Next() {
@@ -112,7 +105,8 @@ func (l *earlinessObjectiveImpl) Value(solution *Solution) float64 {
 	return value
 }
 
-func (l *earlinessObjectiveImpl) EstimateDeltaValue(
+// EstimateDeltaValue implements the ModelObjective interface.
+func (l *EarlinessObjective) EstimateDeltaValue(
 	move SolutionMoveStops,
 ) float64 {
 	moveImpl := move.(*solutionMoveStopsImpl)
@@ -210,7 +204,8 @@ func (l *earlinessObjectiveImpl) EstimateDeltaValue(
 	return deltaScore
 }
 
-func (l *earlinessObjectiveImpl) String() string {
+// String returns the string representation of the objective.
+func (l *EarlinessObjective) String() string {
 	switch l.temporalReference {
 	case OnStart:
 		return "early_start_penalty"

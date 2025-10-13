@@ -6,29 +6,23 @@ import (
 	"fmt"
 )
 
-func newModelObjectiveTerm(
-	factor float64,
-	objective ModelObjective,
-) ModelObjectiveTerm {
-	return modelObjectiveTermImpl{
-		factor:    factor,
-		objective: objective,
-	}
-}
-
-type modelObjectiveTermImpl struct {
+// ModelObjectiveTerm is a term in a model objective sum.
+type ModelObjectiveTerm struct {
 	objective ModelObjective
 	factor    float64
 }
 
-func (m modelObjectiveTermImpl) Factor() float64 {
+// Factor returns the factor by which the objective is multiplied.
+func (m ModelObjectiveTerm) Factor() float64 {
 	return m.factor
 }
 
-func (m modelObjectiveTermImpl) Objective() ModelObjective {
+// Objective returns the objective that is multiplied by the factor.
+func (m ModelObjectiveTerm) Objective() ModelObjective {
 	return m.objective
 }
 
-func (m modelObjectiveTermImpl) String() string {
+// String returns the string representation of the model objective term.
+func (m ModelObjectiveTerm) String() string {
 	return fmt.Sprintf("%v * %v", m.factor, m.objective)
 }

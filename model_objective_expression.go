@@ -2,40 +2,34 @@
 
 package nextroute
 
-// ExpressionObjective is an objective that uses an expression to calculate an
-// objective.
-type ExpressionObjective interface {
-	ModelObjective
-
-	// Expression returns the expression that is used to calculate the
-	// objective.
-	Expression() ModelExpression
-}
-
 // NewExpressionObjective is the implementation of sdk.NewExpressionObjective.
-func NewExpressionObjective(e ModelExpression) ExpressionObjective {
-	return &expressionObjectiveImpl{
+func NewExpressionObjective(e ModelExpression) *ExpressionObjective {
+	return &ExpressionObjective{
 		expression: e,
 		index:      NewModelExpressionIndex(),
 	}
 }
 
-// expressionObjectiveImpl implements the ExpressionObjective
-// interface.
-type expressionObjectiveImpl struct {
+// ExpressionObjective is an objective that uses an expression to calculate an
+// objective.
+type ExpressionObjective struct {
 	expression ModelExpression
 	index      int
 }
 
-func (e *expressionObjectiveImpl) Expression() ModelExpression {
+// Expression returns the expression that is used to calculate the
+// objective.
+func (e *ExpressionObjective) Expression() ModelExpression {
 	return e.expression
 }
 
-func (e *expressionObjectiveImpl) Index() int {
+// Index returns the index of the objective.
+func (e *ExpressionObjective) Index() int {
 	return e.index
 }
 
-func (e *expressionObjectiveImpl) Value(solution *Solution) float64 {
+// Value implements the ModelObjective interface.
+func (e *ExpressionObjective) Value(solution *Solution) float64 {
 	score := 0.0
 	for _, r := range solution.Vehicles() {
 		score += r.Last().CumulativeValue(e.expression)
@@ -43,7 +37,8 @@ func (e *expressionObjectiveImpl) Value(solution *Solution) float64 {
 	return score
 }
 
-func (e *expressionObjectiveImpl) EstimateDeltaValue(
+// EstimateDeltaValue implements the ModelObjective interface.
+func (e *ExpressionObjective) EstimateDeltaValue(
 	move SolutionMoveStops,
 ) float64 {
 	moveImpl := move.(*solutionMoveStopsImpl)
@@ -80,10 +75,12 @@ func (e *expressionObjectiveImpl) EstimateDeltaValue(
 	return value - currentValue
 }
 
-func (e *expressionObjectiveImpl) ModelExpressions() ModelExpressions {
+// ModelExpressions implements the RegisteredModelExpressions interface.
+func (e *ExpressionObjective) ModelExpressions() ModelExpressions {
 	return ModelExpressions{e.expression}
 }
 
-func (e *expressionObjectiveImpl) String() string {
+// String returns the string representation of the objective.
+func (e *ExpressionObjective) String() string {
 	return "expression_objective"
 }

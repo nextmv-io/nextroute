@@ -68,7 +68,7 @@ func NewModel() (*Model, error) {
 type Model struct {
 	epoch time.Time
 	modelDataImpl
-	objective    ModelObjectiveSum
+	objective    *ModelObjectiveSum
 	stopVehicles map[int]int
 	random       *rand.Rand
 	expressions  []ModelExpression
@@ -333,7 +333,7 @@ func (m *Model) Random() *rand.Rand {
 }
 
 // Objective returns the objective of the model.
-func (m *Model) Objective() ModelObjectiveSum {
+func (m *Model) Objective() *ModelObjectiveSum {
 	return m.objective
 }
 

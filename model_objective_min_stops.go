@@ -3,19 +3,22 @@
 package nextroute
 
 // NewMinStopsObjective returns a new MinStopsObjective.
-func NewMinStopsObjective(minStops, minStopsPenalty VehicleTypeExpression) ModelObjective {
-	return &minStopsObjectiveImpl{
+func NewMinStopsObjective(minStops, minStopsPenalty VehicleTypeExpression) *MinStopsObjective {
+	return &MinStopsObjective{
 		minStops:        minStops,
 		minStopsPenalty: minStopsPenalty,
 	}
 }
 
-type minStopsObjectiveImpl struct {
+// MinStopsObjective is an objective that tries to ensure that each vehicle has
+// at least a minimum number of stops assigned to it.
+type MinStopsObjective struct {
 	minStops        VehicleTypeExpression
 	minStopsPenalty VehicleTypeExpression
 }
 
-func (t *minStopsObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float64 {
+// EstimateDeltaValue implements the ModelObjective interface.
+func (t *MinStopsObjective) EstimateDeltaValue(move SolutionMoveStops) float64 {
 	moveImpl := move.(*solutionMoveStopsImpl)
 	vehicle := moveImpl.vehicle()
 	modelVehicle := vehicle.ModelVehicle()
@@ -49,7 +52,8 @@ func (t *minStopsObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float
 		-float64(oldDelta) * float64(oldDelta)
 }
 
-func (t *minStopsObjectiveImpl) Value(solution *Solution) float64 {
+// Value implements the ModelObjective interface.
+func (t *MinStopsObjective) Value(solution *Solution) float64 {
 	penaltySum := 0.0
 	for _, vehicle := range solution.vehicles {
 		vehicleNumberOfStops := vehicle.NumberOfStops()
@@ -67,6 +71,7 @@ func (t *minStopsObjectiveImpl) Value(solution *Solution) float64 {
 	return penaltySum
 }
 
-func (t *minStopsObjectiveImpl) String() string {
+// String returns the string representation of the objective.
+func (t *MinStopsObjective) String() string {
 	return "min_stops"
 }

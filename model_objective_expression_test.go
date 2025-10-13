@@ -45,10 +45,8 @@ func TestAddExpressionObjective(t *testing.T) {
 		t.Error("model objective should have an objective")
 	}
 
-	if registered, ok := objective.(nextroute.RegisteredModelExpressions); ok {
-		if len(registered.ModelExpressions()) != 1 {
-			t.Error("objective should have an expression")
-		}
+	if len(objective.ModelExpressions()) != 1 {
+		t.Error("objective should have an expression")
 	}
 
 	if len(model.Expressions())-expressions != 1 {

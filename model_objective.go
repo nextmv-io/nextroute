@@ -57,26 +57,6 @@ type ModelObjective interface {
 // ModelObjectives is a slice of model objectives.
 type ModelObjectives []ModelObjective
 
-// ModelObjectiveSum is a sum of model objectives.
-type ModelObjectiveSum interface {
-	ModelObjective
-
-	// NewTerm adds an objective to the sum. The objective is multiplied by the
-	// factor.
-	NewTerm(factor float64, objective ModelObjective) (ModelObjectiveTerm, error)
-
-	// Terms returns the model objective terms that are part of the sum.
-	Terms() ModelObjectiveTerms
-}
-
-// ModelObjectiveTerm is a term in a model objective sum.
-type ModelObjectiveTerm interface {
-	// Factor returns the factor by which the objective is multiplied.
-	Factor() float64
-	// Objective returns the objective that is multiplied by the factor.
-	Objective() ModelObjective
-}
-
 // ModelObjectiveTerms is a slice of model objective terms.
 type ModelObjectiveTerms []ModelObjectiveTerm
 
@@ -87,31 +67,26 @@ type ObjectiveDataUpdater interface {
 	UpdateObjectiveData(s SolutionStop) (Copier, error)
 }
 
-type modelObjectiveImpl struct{}
-
-func newModelObjectiveImpl() modelObjectiveImpl {
-	return modelObjectiveImpl{}
-}
-
-type modelObjectiveSumImpl struct {
-	modelObjectiveImpl
+// ModelObjectiveSum is a sum of model objectives.
+type ModelObjectiveSum struct {
 	model *Model
 	terms ModelObjectiveTerms
 }
 
-func (m *modelObjectiveSumImpl) ModelExpressions() ModelExpressions {
+// ModelExpressions implements the RegisteredModelExpressions interface.
+func (m *ModelObjectiveSum) ModelExpressions() ModelExpressions {
 	return ModelExpressions{}
 }
 
-func newModelObjectiveSum(m *Model) ModelObjectiveSum {
-	return &modelObjectiveSumImpl{
-		modelObjectiveImpl: newModelObjectiveImpl(),
-		terms:              make(ModelObjectiveTerms, 0, 1),
-		model:              m,
+func newModelObjectiveSum(m *Model) *ModelObjectiveSum {
+	return &ModelObjectiveSum{
+		terms: make(ModelObjectiveTerms, 0, 1),
+		model: m,
 	}
 }
 
-func (m *modelObjectiveSumImpl) String() string {
+// String returns the string representation of the model objective sum.
+func (m *ModelObjectiveSum) String() string {
 	var sb strings.Builder
 	for idx, term := range m.terms {
 		if idx > 0 {
@@ -125,7 +100,8 @@ func (m *modelObjectiveSumImpl) String() string {
 	return sb.String()
 }
 
-func (m *modelObjectiveSumImpl) EstimateDeltaValue(move SolutionMoveStops) float64 {
+// EstimateDeltaValue implements the ModelObjective interface.
+func (m *ModelObjectiveSum) EstimateDeltaValue(move SolutionMoveStops) float64 {
 	estimateDeltaScore := 0.0
 	for _, term := range m.terms {
 		estimateDeltaScore += term.Factor() * term.Objective().EstimateDeltaValue(move)
@@ -133,22 +109,29 @@ func (m *modelObjectiveSumImpl) EstimateDeltaValue(move SolutionMoveStops) float
 	return estimateDeltaScore
 }
 
-func (m *modelObjectiveSumImpl) Value(_ *Solution) float64 {
+// Value implements the ModelObjective interface.
+func (m *ModelObjectiveSum) Value(_ *Solution) float64 {
 	panic("use Solution.ObjectiveValue or solution.Score to query objective value")
 }
 
-func (m *modelObjectiveSumImpl) Terms() ModelObjectiveTerms {
+// Terms returns the model objective terms that are part of the sum.
+func (m *ModelObjectiveSum) Terms() ModelObjectiveTerms {
 	return m.terms
 }
 
-func (m *modelObjectiveSumImpl) NewTerm(
+// NewTerm adds an objective to the sum. The objective is multiplied by the
+// factor.
+func (m *ModelObjectiveSum) NewTerm(
 	factor float64,
 	objective ModelObjective,
 ) (ModelObjectiveTerm, error) {
-	term := newModelObjectiveTerm(factor, objective)
+	term := ModelObjectiveTerm{
+		objective: objective,
+		factor:    factor,
+	}
 	for _, existingTerm := range m.terms {
 		if &existingTerm == &term {
-			return nil, nmerror.NewModelCustomizationError(fmt.Errorf(
+			return term, nmerror.NewModelCustomizationError(fmt.Errorf(
 				"objective '%v' with address %v already added,"+
 					" if objective has not been added: address must be unique",
 				term,
@@ -157,7 +140,7 @@ func (m *modelObjectiveSumImpl) NewTerm(
 		}
 	}
 	if _, ok := objective.(ObjectiveDataUpdater); ok {
-		return nil, nmerror.NewModelCustomizationError(fmt.Errorf(
+		return term, nmerror.NewModelCustomizationError(fmt.Errorf(
 			"ObjectiveDataUpdater has been deprecated, "+
 				"please use ObjectiveStopDataUpdater instead, "+
 				"rename UpdateObjectiveData to UpdateObjectiveStopData for %s",
@@ -175,7 +158,7 @@ func (m *modelObjectiveSumImpl) NewTerm(
 		for _, expression := range registered.ModelExpressions() {
 			err := m.model.addExpression(expression)
 			if err != nil {
-				return nil, err
+				return term, err
 			}
 		}
 	}
