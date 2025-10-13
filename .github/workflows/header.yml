@@ -1,5 +1,8 @@
 name: header
-on: [push]
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 jobs:
   check-header:
     runs-on: ubuntu-latest
