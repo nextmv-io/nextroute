@@ -25,7 +25,7 @@ type ParallelSolveOptions struct {
 	Duration             time.Duration  `json:"duration" usage:"maximum duration of the solver" default:"5s"`
 	Plateau              PlateauOptions `json:"plateau"  usage:"plateau options"`
 	ParallelRuns         int            `json:"parallel_runs" usage:"maximum number of parallel runs, -1 results in using all available resources" default:"-1"`
-	StartSolutions       int            `json:"start_solutions" usage:"number of solutions to generate on top of those passed in; one solution generated with sweep algorithm, the rest generated randomly" default:"-1"`
+	StartSolutions       int            `json:"start_solutions" usage:"number of solutions to generate on top of those passed in; one solution generated with sweep algorithm, the rest generated randomly. Solutions are generated in parallel, but not more than 'parallel_runs' many at a time" default:"-1"`
 	RunDeterministically bool           `json:"run_deterministically"  usage:"run the parallel solver deterministically"`
 }
 

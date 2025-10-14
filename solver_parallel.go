@@ -105,25 +105,35 @@ func (p *parallelSolverWrapperImpl) Solve(
 		interpretedParallelSolveOptions.StartSolutions = runtime.NumCPU()
 	}
 
-	initialSolutions := make(Solutions, interpretedParallelSolveOptions.StartSolutions)
 	if interpretedParallelSolveOptions.StartSolutions > 0 {
+		initialSolutions := make(Solutions, interpretedParallelSolveOptions.StartSolutions)
 		var wg sync.WaitGroup
 		wg.Add(interpretedParallelSolveOptions.StartSolutions)
 		solution, err := NewSolution(p.solver.Model())
 		if err != nil {
 			return nil, err
 		}
-		for idx := 0; idx < interpretedParallelSolveOptions.StartSolutions; idx++ {
-			go func(idx int, sol Solution) {
-				defer wg.Done()
-				randomSolution, err := RandomSolutionConstruction(ctx, sol)
-				if err != nil {
-					panic(err)
+		// We generate start solutions in parallel.
+		// But only `ParallelRuns` at a time.
+		startSolutionnRequests := make(chan int)
+		for i := 0; i < interpretedParallelSolveOptions.ParallelRuns; i++ {
+			go func(sol Solution) {
+				for idx := range startSolutionnRequests {
+					randomSolution, err := RandomSolutionConstruction(ctx, sol)
+					if err != nil {
+						panic(err)
+					}
+					initialSolutions[idx] = randomSolution
+					wg.Done()
 				}
-				initialSolutions[idx] = randomSolution
-			}(idx, solution.Copy())
+			}(solution.Copy())
+		}
+
+		for i := 0; i < interpretedParallelSolveOptions.StartSolutions; i++ {
+			startSolutionnRequests <- i
 		}
 		wg.Wait()
+		close(startSolutionnRequests)
 		startSolutions = append(startSolutions, initialSolutions...)
 	}
 
