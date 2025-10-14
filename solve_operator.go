@@ -39,9 +39,6 @@ type SolveOperator interface {
 	// solve-operator. The probability is set by the SetProbability method.
 	Probability() float64
 
-	// SetProbability sets the probability of the solve-operator. Returns an
-	// error if the probability is not in the range [0, 1].
-	SetProbability(probability float64) error
 	// Parameters returns the solve-parameters of the solve-operator.
 	Parameters() SolveParameters
 }
@@ -65,41 +62,51 @@ type InterestedInStartSolve interface {
 // SolveOperators is a slice of solve-operators.
 type SolveOperators []SolveOperator
 
-// NewSolveOperator returns a new solve operator.
+// NewSolveOperator returns a new solve operator that cannot be executed.
 func NewSolveOperator(
 	probability float64,
 	canResultInImprovement bool,
 	parameters SolveParameters,
 ) SolveOperator {
-	return &solveOperatorImpl{
+	return solveOperator{
 		probability:            probability,
 		canResultInImprovement: canResultInImprovement,
 		parameters:             parameters,
 	}
 }
 
-type solveOperatorImpl struct {
+type solveOperator struct {
 	parameters             SolveParameters
 	probability            float64
 	canResultInImprovement bool
 }
 
-func (s *solveOperatorImpl) Execute(
+// Execute implements the SolveOperator interface.
+func (s solveOperator) Execute(
 	_ context.Context,
 	_ SolveInformation,
 ) error {
-	panic("implement me")
+	panic("The generic SolveOperator cannot be executed. " +
+		"Please use a specific implementation.")
 }
 
-func (s *solveOperatorImpl) Parameters() SolveParameters {
+// Parameters implements the SolveOperator interface.
+func (s solveOperator) Parameters() SolveParameters {
 	return s.parameters
 }
 
-func (s *solveOperatorImpl) Probability() float64 {
+// Probability implements the SolveOperator interface.
+func (s solveOperator) Probability() float64 {
 	return s.probability
 }
 
-func (s *solveOperatorImpl) SetProbability(
+// CanResultInImprovement implements the SolveOperator interface.
+func (s solveOperator) CanResultInImprovement() bool {
+	return s.canResultInImprovement
+}
+
+// SetProbability sets the probability of the solve-operator.
+func (s *solveOperator) SetProbability(
 	probability float64,
 ) error {
 	if probability < 0 || probability > 1 {
@@ -109,8 +116,4 @@ func (s *solveOperatorImpl) SetProbability(
 	}
 	s.probability = probability
 	return nil
-}
-
-func (s *solveOperatorImpl) CanResultInImprovement() bool {
-	return s.canResultInImprovement
 }

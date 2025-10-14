@@ -8,6 +8,13 @@ import (
 	"github.com/nextmv-io/nextroute/common"
 )
 
+// SolveOperatorUnPlanUnits is a solve-operator which un-plans all the
+// stops of a vehicle.
+type SolveOperatorUnPlanUnits struct {
+	solveOperator
+	distance common.Distance
+}
+
 // NewSolveOperatorUnPlanUnits creates a new SolveOperatorUnPlanUnits.
 // The operator un-plans a number of units. The number of units to
 // un-plan is determined by the solve-parameter. The solve-parameter can
@@ -18,44 +25,30 @@ func NewSolveOperatorUnPlanUnits(
 	numberOfUnits SolveParameter,
 	distance common.Distance,
 	probability float64,
-) SolveOperatorUnPlanUnits {
-	return &solveOperatorUnPlanUnitsImpl{
-		SolveOperator: NewSolveOperator(
-			probability,
-			false,
-			SolveParameters{numberOfUnits},
-		),
+) *SolveOperatorUnPlanUnits {
+	return &SolveOperatorUnPlanUnits{
+		solveOperator: solveOperator{
+			probability:            probability,
+			canResultInImprovement: false,
+			parameters:             SolveParameters{numberOfUnits},
+		},
 		distance: distance,
 	}
 }
 
-// SolveOperatorUnPlanUnits is a solve-operator which un-plans all the
-// stops of a vehicle.
-type SolveOperatorUnPlanUnits interface {
-	SolveOperator
-
-	// Distance returns the distance to use for the un-planning.
-	Distance() common.Distance
-
-	// NumberOfUnits returns the number of units to unplan as a solve-parameter.
-	// Solve-parameters can change value during the solve run.
-	NumberOfUnits() SolveParameter
-}
-
-type solveOperatorUnPlanUnitsImpl struct {
-	SolveOperator
-	distance common.Distance
-}
-
-func (d *solveOperatorUnPlanUnitsImpl) Distance() common.Distance {
+// Distance returns the distance to use for the un-planning.
+func (d *SolveOperatorUnPlanUnits) Distance() common.Distance {
 	return d.distance
 }
 
-func (d *solveOperatorUnPlanUnitsImpl) NumberOfUnits() SolveParameter {
+// NumberOfUnits returns the number of units to unplan as a solve-parameter.
+// Solve-parameters can change value during the solve run.
+func (d *SolveOperatorUnPlanUnits) NumberOfUnits() SolveParameter {
 	return d.Parameters()[0]
 }
 
-func (d *solveOperatorUnPlanUnitsImpl) Execute(
+// Execute implements the SolveOperator interface.
+func (d *SolveOperatorUnPlanUnits) Execute(
 	ctx context.Context,
 	runTimeInformation SolveInformation,
 ) error {
