@@ -54,11 +54,8 @@ func (l *MaximumStopsConstraint) EstimateIsViolated(
 	vehicleType := vehicle.ModelVehicle().VehicleType().Index()
 	maximumStops := l.maximumStopsByVehicleType[vehicleType]
 
-	if vehicle.NumberOfStops()+nrStopsToBeAddedToSolution > maximumStops {
-		return true, SkipVehiclePositionsHint()
-	}
-
-	return false, NoPositionsHint()
+	violated := vehicle.NumberOfStops()+nrStopsToBeAddedToSolution > maximumStops
+	return violated, skipVehicleIfViolated(violated)
 }
 
 // EstimationCost returns the cost of the constraint for estimation purposes.
