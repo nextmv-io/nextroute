@@ -6,25 +6,21 @@ import "fmt"
 
 // UnPlannedObjective is an objective that uses the un-planned stops as an
 // objective. Each unplanned stop is scored by the given expression.
-type UnPlannedObjective interface {
-	ModelObjective
+type UnPlannedObjective struct {
+	expression StopExpression
+	costs      []float64
 }
 
 // NewUnPlannedObjective returns a new UnPlannedObjective.
 func NewUnPlannedObjective(
 	expression StopExpression,
-) UnPlannedObjective {
-	return &unplannedObjectiveImpl{
+) *UnPlannedObjective {
+	return &UnPlannedObjective{
 		expression: expression,
 	}
 }
 
-type unplannedObjectiveImpl struct {
-	expression StopExpression
-	costs      []float64
-}
-
-func (t *unplannedObjectiveImpl) calculateCosts(
+func (t *UnPlannedObjective) calculateCosts(
 	planUnit ModelPlanUnit,
 ) (float64, error) {
 	switch unit := planUnit.(type) {
@@ -55,7 +51,8 @@ func (t *unplannedObjectiveImpl) calculateCosts(
 	}
 }
 
-func (t *unplannedObjectiveImpl) Lock(model *Model) error {
+// Lock implements the Locker interface.
+func (t *UnPlannedObjective) Lock(model *Model) error {
 	units := model.PlanUnits()
 	t.costs = make([]float64, len(units))
 	for _, planUnit := range units {
@@ -68,15 +65,18 @@ func (t *unplannedObjectiveImpl) Lock(model *Model) error {
 	return nil
 }
 
-func (t *unplannedObjectiveImpl) ModelExpressions() ModelExpressions {
+// ModelExpressions implements the RegisteredModelExpressions interface.
+func (t *UnPlannedObjective) ModelExpressions() ModelExpressions {
 	return ModelExpressions{}
 }
 
-func (t *unplannedObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float64 {
+// EstimateDeltaValue implements the ModelObjective interface.
+func (t *UnPlannedObjective) EstimateDeltaValue(move SolutionMoveStops) float64 {
 	return -1 * t.costs[move.(*solutionMoveStopsImpl).planUnit.modelPlanStopsUnit.Index()]
 }
 
-func (t *unplannedObjectiveImpl) Value(solution *Solution) float64 {
+// Value implements the ModelObjective interface.
+func (t *UnPlannedObjective) Value(solution *Solution) float64 {
 	unplannedScore := 0.0
 
 	units := solution.UnPlannedPlanUnits().solutionPlanUnits
@@ -91,6 +91,7 @@ func (t *unplannedObjectiveImpl) Value(solution *Solution) float64 {
 	return unplannedScore
 }
 
-func (t *unplannedObjectiveImpl) String() string {
+// String returns the string representation of the objective.
+func (t *UnPlannedObjective) String() string {
 	return "unplanned_penalty"
 }

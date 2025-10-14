@@ -2,17 +2,13 @@
 
 package nextroute
 
-// DistanceObjective minimizes total traveled distance.
-type DistanceObjective interface {
-	ModelObjective
-}
-
 // NewDistanceObjective returns a new DistanceObjective.
-func NewDistanceObjective() DistanceObjective {
-	return &distanceObjectiveImpl{}
+func NewDistanceObjective() *DistanceObjective {
+	return &DistanceObjective{}
 }
 
-type distanceObjectiveImpl struct{}
+// DistanceObjective minimizes total traveled distance.
+type DistanceObjective struct{}
 
 // distanceObjectiveVehicleData keeps track of the cumulative distance traveled
 // by a vehicle.
@@ -20,7 +16,8 @@ type distanceObjectiveVehicleData struct {
 	cumulativeDistance float64
 }
 
-func (d *distanceObjectiveImpl) UpdateObjectiveVehicleData(s SolutionVehicle) (Copier, error) {
+// UpdateObjectiveVehicleData implements the ObjectiveVehicleDataUpdater interface.
+func (d *DistanceObjective) UpdateObjectiveVehicleData(s SolutionVehicle) (Copier, error) {
 	distance := 0.0
 	vehicleType := s.ModelVehicle().vehicleType
 	distanceExpr := vehicleType.distance
@@ -34,18 +31,20 @@ func (d *distanceObjectiveImpl) UpdateObjectiveVehicleData(s SolutionVehicle) (C
 		previousStop = modelStop
 		return true
 	})
-	return &distanceObjectiveVehicleData{
+	return distanceObjectiveVehicleData{
 		cumulativeDistance: distance,
 	}, nil
 }
 
-func (d *distanceObjectiveVehicleData) Copy() Copier {
-	return &distanceObjectiveVehicleData{
+// Copy implements the Copier interface.
+func (d distanceObjectiveVehicleData) Copy() Copier {
+	return distanceObjectiveVehicleData{
 		cumulativeDistance: d.cumulativeDistance,
 	}
 }
 
-func (d *distanceObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float64 {
+// EstimateDeltaValue implements the ModelObjective interface.
+func (d *DistanceObjective) EstimateDeltaValue(move SolutionMoveStops) float64 {
 	impl := move.(*solutionMoveStopsImpl)
 	vehicle := impl.vehicle()
 	vehicleType := vehicle.ModelVehicle().VehicleType()
@@ -78,15 +77,17 @@ func (d *distanceObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float
 	return delta
 }
 
-func (d *distanceObjectiveImpl) Value(solution *Solution) float64 {
+// Value implements the ModelObjective interface.
+func (d *DistanceObjective) Value(solution *Solution) float64 {
 	total := 0.0
 	for _, v := range solution.vehicles {
-		data := v.ObjectiveData(d).(*distanceObjectiveVehicleData)
+		data := v.ObjectiveData(d).(distanceObjectiveVehicleData)
 		total += data.cumulativeDistance
 	}
 	return total
 }
 
-func (d *distanceObjectiveImpl) String() string {
+// String returns the string representation of the distance objective.
+func (d *DistanceObjective) String() string {
 	return "distance"
 }

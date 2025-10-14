@@ -4,26 +4,25 @@ package nextroute
 
 // TravelDurationObjective is an objective that uses the travel duration as an
 // objective.
-type TravelDurationObjective interface {
-	ModelObjective
-}
+type TravelDurationObjective struct{}
 
 // NewTravelDurationObjective returns a new TravelDurationObjective.
-func NewTravelDurationObjective() TravelDurationObjective {
-	return &travelDurationObjectiveImpl{}
+func NewTravelDurationObjective() *TravelDurationObjective {
+	return &TravelDurationObjective{}
 }
 
-type travelDurationObjectiveImpl struct{}
-
-func (t *travelDurationObjectiveImpl) ModelExpressions() ModelExpressions {
+// ModelExpressions implements the RegisteredModelExpressions interface.
+func (t *TravelDurationObjective) ModelExpressions() ModelExpressions {
 	return ModelExpressions{}
 }
 
-func (t *travelDurationObjectiveImpl) EstimateDeltaValue(move SolutionMoveStops) float64 {
+// EstimateDeltaValue implements the ModelObjective interface.
+func (t *TravelDurationObjective) EstimateDeltaValue(move SolutionMoveStops) float64 {
 	return move.(*solutionMoveStopsImpl).deltaTravelDurationValue()
 }
 
-func (t *travelDurationObjectiveImpl) Value(solution *Solution) float64 {
+// Value implements the ModelObjective interface.
+func (t *TravelDurationObjective) Value(solution *Solution) float64 {
 	score := 0.0
 	for _, vehicle := range solution.vehicles {
 		score += vehicle.Last().CumulativeTravelDurationValue()
@@ -31,6 +30,7 @@ func (t *travelDurationObjectiveImpl) Value(solution *Solution) float64 {
 	return score
 }
 
-func (t *travelDurationObjectiveImpl) String() string {
+// String returns the string representation of the objective.
+func (t *TravelDurationObjective) String() string {
 	return "travel_duration"
 }

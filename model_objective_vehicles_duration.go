@@ -6,16 +6,19 @@ import "slices"
 
 // VehiclesDurationObjective is an objective that uses the vehicle duration as an
 // objective.
-type VehiclesDurationObjective interface {
-	ModelObjective
+type VehiclesDurationObjective struct {
+	isDependentOnTimeByVehicleType []bool
+	vehicleTypesByIndex            []*ModelVehicleType
+	canIncurWaitingTime            bool
 }
 
 // NewVehiclesDurationObjective returns a new VehiclesDurationObjective.
-func NewVehiclesDurationObjective() VehiclesDurationObjective {
-	return &vehiclesDurationObjectiveImpl{}
+func NewVehiclesDurationObjective() *VehiclesDurationObjective {
+	return &VehiclesDurationObjective{}
 }
 
-func (t *vehiclesDurationObjectiveImpl) Lock(model *Model) error {
+// Lock implements the Locker interface.
+func (t *VehiclesDurationObjective) Lock(model *Model) error {
 	t.canIncurWaitingTime = slices.ContainsFunc(model.Stops(), func(stop *ModelStop) bool {
 		return stop.canIncurWaitingTime()
 	})
@@ -34,17 +37,14 @@ func (t *vehiclesDurationObjectiveImpl) Lock(model *Model) error {
 	return nil
 }
 
-type vehiclesDurationObjectiveImpl struct {
-	isDependentOnTimeByVehicleType []bool
-	vehicleTypesByIndex            []*ModelVehicleType
-	canIncurWaitingTime            bool
-}
-
-func (t *vehiclesDurationObjectiveImpl) ModelExpressions() ModelExpressions {
+// ModelExpressions returns the model expressions that are used by the
+// VehiclesDurationObjective.
+func (t *VehiclesDurationObjective) ModelExpressions() ModelExpressions {
 	return ModelExpressions{}
 }
 
-func (t *vehiclesDurationObjectiveImpl) EstimateDeltaValue(
+// EstimateDeltaValue implements the ModelObjective interface.
+func (t *VehiclesDurationObjective) EstimateDeltaValue(
 	move SolutionMoveStops,
 ) float64 {
 	solutionMoveStops := move.(*solutionMoveStopsImpl)
@@ -109,7 +109,8 @@ func (t *vehiclesDurationObjectiveImpl) EstimateDeltaValue(
 	return end - last.EndValue()
 }
 
-func (t *vehiclesDurationObjectiveImpl) Value(
+// Value implements the ModelObjective interface.
+func (t *VehiclesDurationObjective) Value(
 	solution *Solution,
 ) float64 {
 	score := 0.0
@@ -119,6 +120,7 @@ func (t *vehiclesDurationObjectiveImpl) Value(
 	return score
 }
 
-func (t *vehiclesDurationObjectiveImpl) String() string {
+// String returns the string representation of the VehiclesDurationObjective.
+func (t *VehiclesDurationObjective) String() string {
 	return "vehicles_duration"
 }
