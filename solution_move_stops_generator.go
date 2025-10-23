@@ -106,7 +106,7 @@ func SolutionMoveStopsGenerator(
 	m := preAllocatedMoveContainer.singleStopPosSolutionMoveStop
 	m.(*solutionMoveStopsImpl).reset()
 	m.(*solutionMoveStopsImpl).planUnit = planUnit
-	m.(*solutionMoveStopsImpl).allowed = false
+	m.(*solutionMoveStopsImpl).value = moveValueIfAllowed(0.0, false)
 	if len(source) == 0 {
 		yield(m)
 		return
@@ -129,7 +129,7 @@ func SolutionMoveStopsGenerator(
 			m.(*solutionMoveStopsImpl).reset()
 			m.(*solutionMoveStopsImpl).planUnit = planUnit
 			m.(*solutionMoveStopsImpl).stopPositions = positions
-			m.(*solutionMoveStopsImpl).allowed = false
+			m.(*solutionMoveStopsImpl).value = moveValueIfAllowed(0.0, false)
 			m.(*solutionMoveStopsImpl).valueSeen = 1
 			yield(m)
 		}, shouldStop)
@@ -148,7 +148,7 @@ func SolutionMoveStopsGenerator(
 			m.(*solutionMoveStopsImpl).reset()
 			m.(*solutionMoveStopsImpl).planUnit = planUnit
 			m.(*solutionMoveStopsImpl).stopPositions = positions
-			m.(*solutionMoveStopsImpl).allowed = false
+			m.(*solutionMoveStopsImpl).value = moveValueIfAllowed(0.0, false)
 			m.(*solutionMoveStopsImpl).valueSeen = 1
 			yield(m)
 		}, shouldStop)

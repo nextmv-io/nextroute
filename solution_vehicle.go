@@ -47,8 +47,7 @@ func (v SolutionVehicle) firstMovePlanStopsUnit(
 				stop = true
 				return
 			}
-			nextMove.(*solutionMoveStopsImpl).value = value
-			nextMove.(*solutionMoveStopsImpl).allowed = allowed
+			nextMove.(*solutionMoveStopsImpl).value = moveValueIfAllowed(value, allowed)
 			nextMove.(*solutionMoveStopsImpl).valueSeen = nextMove.ValueSeen()
 			if nextMove.IsExecutable() {
 				bestMove = takeBestInPlace(bestMove, nextMove)
@@ -231,7 +230,7 @@ func (v SolutionVehicle) bestMovePlanSingleStop(
 	}
 	if len(moves) == 0 {
 		returnToMoveContainerPool(movesPtr)
-		move.(*solutionMoveStopsImpl).allowed = false
+		move.(*solutionMoveStopsImpl).value = moveValueIfAllowed(0.0, false)
 		return move
 	}
 	// we got the best move here in O(n)
@@ -242,7 +241,6 @@ func (v SolutionVehicle) bestMovePlanSingleStop(
 		move,
 	)
 	if allowed {
-		move.(*solutionMoveStopsImpl).allowed = true
 		returnToMoveContainerPool(movesPtr)
 		return move
 	}
@@ -266,13 +264,12 @@ func (v SolutionVehicle) bestMovePlanSingleStop(
 			move,
 		)
 		if allowed {
-			move.(*solutionMoveStopsImpl).allowed = true
 			returnToMoveContainerPool(movesPtr)
 			return move
 		}
 	}
 	returnToMoveContainerPool(movesPtr)
-	move.(*solutionMoveStopsImpl).allowed = false
+	move.(*solutionMoveStopsImpl).value = moveValueIfAllowed(0.0, false)
 	return move
 }
 
@@ -293,8 +290,7 @@ func (v SolutionVehicle) bestMoveSequence(
 				stop = true
 				return
 			}
-			nextMove.(*solutionMoveStopsImpl).value = value
-			nextMove.(*solutionMoveStopsImpl).allowed = allowed
+			nextMove.(*solutionMoveStopsImpl).value = moveValueIfAllowed(value, allowed)
 			nextMove.(*solutionMoveStopsImpl).valueSeen = nextMove.ValueSeen()
 			if allowed {
 				bestMove = takeBestInPlace(bestMove, nextMove)

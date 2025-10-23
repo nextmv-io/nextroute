@@ -5,6 +5,7 @@ package nextroute
 import (
 	"context"
 	"fmt"
+	"math"
 
 	"github.com/nextmv-io/nextroute/common"
 )
@@ -82,7 +83,7 @@ func newNotExecutableSolutionMoveStops(planUnit *solutionPlanStopsUnitImpl) *sol
 	return &solutionMoveStopsImpl{
 		planUnit:  planUnit,
 		valueSeen: 1,
-		allowed:   false,
+		value:     math.NaN(),
 	}
 }
 
@@ -91,15 +92,20 @@ type solutionMoveStopsImpl struct {
 	stopPositions []StopPosition
 	valueSeen     int
 	value         float64
-	allowed       bool
+}
+
+func moveValueIfAllowed(value float64, allowed bool) float64 {
+	if !allowed {
+		return math.NaN()
+	}
+	return value
 }
 
 // reset resets the move to its initial state.
 // We assume the planUnit stays the same.
 func (m *solutionMoveStopsImpl) reset() {
 	m.stopPositions = m.stopPositions[:0]
-	m.allowed = false
-	m.value = 0.0
+	m.value = math.NaN()
 	m.valueSeen = 1
 }
 
@@ -109,7 +115,6 @@ func (m *solutionMoveStopsImpl) replaceBy(newStop *solutionMoveStopsImpl, newVal
 	m.reset()
 	m.value = newStop.value
 	m.valueSeen = newValueSeen
-	m.allowed = newStop.allowed
 	m.stopPositions = append(m.stopPositions, newStop.stopPositions...)
 }
 
@@ -120,7 +125,7 @@ func (m *solutionMoveStopsImpl) String() string {
 		m.stopPositions,
 		m.valueSeen,
 		m.value,
-		m.allowed,
+		m.isAllowed(),
 	)
 }
 
@@ -286,8 +291,12 @@ func (m *solutionMoveStopsImpl) StopPositionsLength() int {
 func (m *solutionMoveStopsImpl) IsExecutable() bool {
 	return m.stopPositions != nil &&
 		!m.planUnit.IsPlanned() &&
-		m.allowed &&
+		m.isAllowed() &&
 		!m.planUnit.IsFixed()
+}
+
+func (m *solutionMoveStopsImpl) isAllowed() bool {
+	return !math.IsNaN(m.value)
 }
 
 func (m *solutionMoveStopsImpl) IsImprovement() bool {
@@ -626,12 +635,10 @@ func newMoveStops(
 		stopPositions: stopPositionsImpl,
 		value:         0.0,
 		valueSeen:     0,
-		allowed:       true,
 	}
 	if checkConstraintsAndEstimateDeltaScore {
 		value, allowed, _ := planUnit.(*solutionPlanStopsUnitImpl).Solution().checkConstraintsAndEstimateDeltaScore(move)
-		move.value = value
-		move.allowed = allowed
+		move.value = moveValueIfAllowed(value, allowed)
 		move.valueSeen = 1
 	}
 	return move, nil

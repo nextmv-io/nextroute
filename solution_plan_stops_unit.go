@@ -195,7 +195,6 @@ func (p *solutionPlanStopsUnitImpl) unplan() (bool, error) {
 	move.planUnit = p
 	move.value = 0.0
 	move.valueSeen = 0
-	move.allowed = true
 	for _, solutionStop := range p.solutionStops {
 		move.stopPositions = append(move.stopPositions, newStopPosition(
 			solutionStop.Previous(),
