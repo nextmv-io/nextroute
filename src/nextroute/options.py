@@ -81,7 +81,7 @@ class Options(BaseModel):
     MODEL_OBJECTIVES_CAPACITIES: str = ""
     """
     Capacity objective, provide triple for each resource
-    `name:default;factor:1.0;offset;0.0`.
+    `name=default;factor=1.0;offset=0.0`.
     """
     MODEL_OBJECTIVES_CLUSTER: float = 0.0
     """Factor to weigh the cluster objective."""
