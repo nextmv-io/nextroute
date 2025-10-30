@@ -28,7 +28,7 @@ type Options struct {
 		} `json:"enable"`
 	} `json:"constraints"`
 	Objectives struct {
-		Capacities               string  `json:"capacities" usage:"capacity objective, provide triple for each resource 'name:default;factor:1.0;offset,0.0'" default:""`
+		Capacities               string  `json:"capacities" usage:"capacity objective, provide triple for each resource 'name=default;factor=1.0;offset=0.0'" default:""`
 		MinStops                 float64 `json:"min_stops" usage:"factor to weigh the min stops objective" default:"1.0"`
 		EarlyArrivalPenalty      float64 `json:"early_arrival_penalty" usage:"factor to weigh the early arrival objective" default:"1.0"`
 		LateArrivalPenalty       float64 `json:"late_arrival_penalty" usage:"factor to weigh the late arrival objective" default:"1.0"`
