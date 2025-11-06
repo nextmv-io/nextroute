@@ -76,6 +76,36 @@
         "relative_threshold": 0
       },
       "run_deterministically": true,
+      "solver": {
+        "plan": {
+          "delta": 0,
+          "delta_after_iterations": 0,
+          "max_value": 0,
+          "min_value": 0,
+          "snap_back_after_improvement": false,
+          "start_value": 0,
+          "zigzag": false
+        },
+        "restart": {
+          "delta": 0,
+          "delta_after_iterations": 0,
+          "max_value": 0,
+          "min_value": 0,
+          "snap_back_after_improvement": false,
+          "start_value": 0,
+          "zigzag": false
+        },
+        "unplan": {
+          "delta": 0,
+          "delta_after_iterations": 0,
+          "max_value": 0,
+          "min_value": 0,
+          "snap_back_after_improvement": false,
+          "start_value": 0,
+          "zigzag": false
+        },
+        "unplan_weights": "Vehicle:3,Island:1,Location:293"
+      },
       "start_solutions": 1
     }
   },
