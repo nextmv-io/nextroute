@@ -31,6 +31,36 @@ type SolverOptions struct {
 	Restart       IntParameterOptions `json:"restart"  usage:"restart parameter"`
 }
 
+// UnplanUnitsOptions are the options for the unplan units parameter.
+type UnplanUnitsOptions struct {
+	StartValue               int  `json:"start_value"  usage:"start value" default:"2"`
+	DeltaAfterIterations     int  `json:"delta_after_iterations"  usage:"delta after each iterations" default:"125"`
+	Delta                    int  `json:"delta"  usage:"delta" default:"2"`
+	MinValue                 int  `json:"min_value"  usage:"min value of parameter" default:"2"`
+	MaxValue                 int  `json:"max_value"  usage:"max value of parameter" default:"-1"`
+	SnapBackAfterImprovement bool `json:"snap_back_after_improvement"  usage:"snap back to start value after improvement of best solution" default:"true"`
+	Zigzag                   bool `json:"zigzag"  usage:"zigzag between min and max value lik a jig saw" default:"true"`
+}
+
+// PlanGroupSizeOptions are the options for the plan group size parameter.
+type PlanGroupSizeOptions struct {
+	StartValue               int  `json:"start_value"  usage:"start value" default:"2"`
+	DeltaAfterIterations     int  `json:"delta_after_iterations"  usage:"delta after each iterations" default:"1000000000"`
+	Delta                    int  `json:"delta"  usage:"delta" default:"0"`
+	MinValue                 int  `json:"min_value"  usage:"min value of parameter" default:"2"`
+	MaxValue                 int  `json:"max_value"  usage:"max value of parameter" default:"2"`
+	SnapBackAfterImprovement bool `json:"snap_back_after_improvement"  usage:"snap back to start value after improvement of best solution" default:"true"`
+	Zigzag                   bool `json:"zigzag"  usage:"zigzag between min and max value lik a jig saw" default:"true"`
+}
+
+// ParallelSolverOptions are the options for the solver and it's operators when
+// run inside a parallel solver.
+type ParallelSolverOptions struct {
+	UnplanUnits   UnplanUnitsOptions  `json:"unplan_units"  usage:"unplan units parameter"`
+	UnplanWeights string              `json:"unplan_weights"  usage:"unplan heuristic weights parameter, e.g.: Vehicle:3,Island:1,Location:300" default:"Vehicle:3,Island:1,Location:293"`
+	PlanGroupSize IntParameterOptions `json:"plan_group_size"  usage:"plan group size parameter"`
+}
+
 // PlateauOptions define how the solver should react to plateaus, i.e., periods
 // without significant improvement in the best solution. The solver stops when
 // either the Duration or Iterations condition is met, depending on which occurs

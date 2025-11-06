@@ -163,28 +163,69 @@ func DefaultSolverFactory() SolverFactory {
 		nrPlanUnits := len(solution.Model().PlanUnits())
 		parallelOptions := info.Options()
 
-		unplanCount := 2
-		maxUnplanCount := int(math.Max(2.0, 0.05*float64(nrPlanUnits)))
+		// Handle unplan units parameter - negative values indicate default
+		unplanUnitsStartValue := parallelOptions.Solver.UnplanUnits.StartValue
+		if unplanUnitsStartValue < 0 {
+			unplanUnitsStartValue = 2
+		}
+		unplanUnitsDeltaAfter := parallelOptions.Solver.UnplanUnits.DeltaAfterIterations
+		if unplanUnitsDeltaAfter < 0 {
+			unplanUnitsDeltaAfter = 125
+		}
+		unplanUnitsDelta := parallelOptions.Solver.UnplanUnits.Delta
+		if unplanUnitsDelta < 0 {
+			unplanUnitsDelta = 2
+		}
+		unplanUnitsMinValue := parallelOptions.Solver.UnplanUnits.MinValue
+		if unplanUnitsMinValue < 0 {
+			unplanUnitsMinValue = 2
+		}
+		unplanUnitsMaxValue := parallelOptions.Solver.UnplanUnits.MaxValue
+		if unplanUnitsMaxValue < 0 {
+			unplanUnitsMaxValue = int(math.Max(2.0, 0.05*float64(nrPlanUnits)))
+		}
+
+		// Handle plan group size parameter - negative values indicate default
+		planGroupSizeStartValue := parallelOptions.Solver.PlanGroupSize.StartValue
+		if planGroupSizeStartValue < 0 {
+			planGroupSizeStartValue = 2
+		}
+		planGroupSizeDeltaAfter := parallelOptions.Solver.PlanGroupSize.DeltaAfterIterations
+		if planGroupSizeDeltaAfter < 0 {
+			planGroupSizeDeltaAfter = 1000000000
+		}
+		planGroupSizeDelta := parallelOptions.Solver.PlanGroupSize.Delta
+		if planGroupSizeDelta < 0 {
+			planGroupSizeDelta = 0
+		}
+		planGroupSizeMinValue := parallelOptions.Solver.PlanGroupSize.MinValue
+		if planGroupSizeMinValue < 0 {
+			planGroupSizeMinValue = 2
+		}
+		planGroupSizeMaxValue := parallelOptions.Solver.PlanGroupSize.MaxValue
+		if planGroupSizeMaxValue < 0 {
+			planGroupSizeMaxValue = 2
+		}
 
 		options := SolverOptions{
 			Unplan: IntParameterOptions{
-				StartValue:               unplanCount,
-				DeltaAfterIterations:     125,
-				Delta:                    unplanCount,
-				MinValue:                 unplanCount,
-				MaxValue:                 maxUnplanCount,
-				SnapBackAfterImprovement: true,
-				Zigzag:                   true,
+				StartValue:               unplanUnitsStartValue,
+				DeltaAfterIterations:     unplanUnitsDeltaAfter,
+				Delta:                    unplanUnitsDelta,
+				MinValue:                 unplanUnitsMinValue,
+				MaxValue:                 unplanUnitsMaxValue,
+				SnapBackAfterImprovement: parallelOptions.Solver.UnplanUnits.SnapBackAfterImprovement,
+				Zigzag:                   parallelOptions.Solver.UnplanUnits.Zigzag,
 			},
 			UnplanWeights: parallelOptions.Solver.UnplanWeights,
 			Plan: IntParameterOptions{
-				StartValue:               2,
-				DeltaAfterIterations:     1000000000,
-				Delta:                    0,
-				MinValue:                 2,
-				MaxValue:                 2,
-				SnapBackAfterImprovement: true,
-				Zigzag:                   true,
+				StartValue:               planGroupSizeStartValue,
+				DeltaAfterIterations:     planGroupSizeDeltaAfter,
+				Delta:                    planGroupSizeDelta,
+				MinValue:                 planGroupSizeMinValue,
+				MaxValue:                 planGroupSizeMaxValue,
+				SnapBackAfterImprovement: parallelOptions.Solver.PlanGroupSize.SnapBackAfterImprovement,
+				Zigzag:                   parallelOptions.Solver.PlanGroupSize.Zigzag,
 			},
 		}
 
