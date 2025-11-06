@@ -290,3 +290,13 @@ func (d *solveOperatorUnPlanImpl) unplanLocation(
 
 	return count, nil
 }
+
+func isUnitsUnit(plannedPlanUnit SolutionPlanUnit) bool {
+	switch plannedPlanUnit.(type) {
+	case SolutionPlanStopsUnit:
+		return false
+	case SolutionPlanUnitsUnit:
+		return true
+	}
+	panic("unknown solution plan unit type")
+}
