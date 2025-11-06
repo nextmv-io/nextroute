@@ -67,33 +67,24 @@
     "parallel_runs": 1,
     "start_solutions": 1,
     "solver": {
-      "unplan": {
-        "start_value": 0,
-        "delta_after_iterations": 0,
-        "delta": 0,
-        "min_value": 0,
-        "max_value": 0,
-        "snap_back_after_improvement": false,
-        "zigzag": false
+      "unplan_units": {
+        "start_value": 2,
+        "delta_after_iterations": 125,
+        "delta": 2,
+        "min_value": 2,
+        "max_value": -1,
+        "snap_back_after_improvement": true,
+        "zigzag": true
       },
       "unplan_weights": "Vehicle:3,Island:1,Location:293",
-      "plan": {
-        "start_value": 0,
-        "delta_after_iterations": 0,
+      "plan_group_size": {
+        "start_value": 2,
+        "delta_after_iterations": 1000000000,
         "delta": 0,
-        "min_value": 0,
-        "max_value": 0,
-        "snap_back_after_improvement": false,
-        "zigzag": false
-      },
-      "restart": {
-        "start_value": 0,
-        "delta_after_iterations": 0,
-        "delta": 0,
-        "min_value": 0,
-        "max_value": 0,
-        "snap_back_after_improvement": false,
-        "zigzag": false
+        "min_value": 2,
+        "max_value": 2,
+        "snap_back_after_improvement": true,
+        "zigzag": true
       }
     },
     "run_deterministically": true
