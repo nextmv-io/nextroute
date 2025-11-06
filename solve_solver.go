@@ -25,9 +25,10 @@ type IntParameterOptions struct {
 
 // SolverOptions are the options for the solver and it's operators.
 type SolverOptions struct {
-	Unplan  IntParameterOptions `json:"unplan"  usage:"unplan parameter"`
-	Plan    IntParameterOptions `json:"plan"  usage:"plan parameter"`
-	Restart IntParameterOptions `json:"restart"  usage:"restart parameter"`
+	Unplan        IntParameterOptions `json:"unplan"  usage:"unplan parameter"`
+	UnplanWeights string              `json:"unplan_weights"  usage:"unplan heuristic weights parameter, e.g.: Vehicle:3,Island:1,Location:300" default:"Vehicle:3,Island:1,Location:293"`
+	Plan          IntParameterOptions `json:"plan"  usage:"plan parameter"`
+	Restart       IntParameterOptions `json:"restart"  usage:"restart parameter"`
 }
 
 // PlateauOptions define how the solver should react to plateaus, i.e., periods

@@ -34,7 +34,7 @@ func NewSolver(
 		return nil,
 			fmt.Errorf("options.Unplan: %w", err)
 	}
-	unplan, err := NewSolveOperatorUnPlan(numberOfUnits)
+	unplan, err := NewSolveOperatorUnPlan(numberOfUnits, options.UnplanWeights)
 	if err != nil {
 		return nil, err
 	}
@@ -157,10 +157,11 @@ func (s *solverWrapperImpl) SolveOperators() SolveOperators {
 // DefaultSolverFactory creates a new SolverFactory.
 func DefaultSolverFactory() SolverFactory {
 	return func(
-		_ ParallelSolveInformation,
+		info ParallelSolveInformation,
 		solution Solution,
 	) (Solver, error) {
 		nrPlanUnits := len(solution.Model().PlanUnits())
+		parallelOptions := info.Options()
 
 		unplanCount := 2
 		maxUnplanCount := int(math.Max(2.0, 0.05*float64(nrPlanUnits)))
@@ -175,6 +176,7 @@ func DefaultSolverFactory() SolverFactory {
 				SnapBackAfterImprovement: true,
 				Zigzag:                   true,
 			},
+			UnplanWeights: parallelOptions.Solver.UnplanWeights,
 			Plan: IntParameterOptions{
 				StartValue:               2,
 				DeltaAfterIterations:     1000000000,
@@ -203,7 +205,7 @@ func DefaultSolverFactory() SolverFactory {
 			return nil,
 				fmt.Errorf("options.Unplan: %w", err)
 		}
-		unplan, err := NewSolveOperatorUnPlan(numberOfUnits)
+		unplan, err := NewSolveOperatorUnPlan(numberOfUnits, options.UnplanWeights)
 		if err != nil {
 			return nil, err
 		}

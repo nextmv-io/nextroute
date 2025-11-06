@@ -4,6 +4,9 @@ package nextroute
 
 import (
 	"context"
+	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/nextmv-io/nextroute/common"
 )
@@ -26,18 +29,89 @@ type SolveOperatorUnPlan interface {
 // is always an integer between 1 and the number of units.
 func NewSolveOperatorUnPlan(
 	numberOfUnits SolveParameter,
+	operatorWeights string,
 ) (SolveOperatorUnPlan, error) {
+	chances, err := parseUnPlanWeights(operatorWeights)
+	if err != nil {
+		return nil, fmt.Errorf("parsing unplan weights: %w", err)
+	}
 	return &solveOperatorUnPlanImpl{
 		SolveOperator: NewSolveOperator(
 			1.0,
 			false,
 			SolveParameters{numberOfUnits},
 		),
+		operatorChances: chances,
 	}, nil
+}
+
+type solveOperatorUnPlanChances struct {
+	// chanceVehicle is the chance of unplanning multiple stops from one
+	// vehicle.
+	chanceVehicle float64
+	// chanceIsland is the chance of unplanning an island of stops (i.e., a
+	// group of stops that are close to each other). The chance is cumulative
+	// fpr performance reasons, i.e., it includes the chance(s) defined above.
+	chanceIsland float64
+	// chanceLocation is the chance of unplanning stops at a specific location.
+	// The chance is cumulative for performance reasons, i.e., it includes
+	// the chance(s) defined above.
+	chanceLocation float64
+}
+
+// parseUnPlanWeights parses the unplan weights string into a
+// solveOperatorUnPlanChances struct of cumulative chances that can be used
+// to determine which unplan heuristic to use.
+func parseUnPlanWeights(weights string) (solveOperatorUnPlanChances, error) {
+	chances := solveOperatorUnPlanChances{
+		chanceVehicle:  0.01,
+		chanceIsland:   0.0132,
+		chanceLocation: 1.0,
+	}
+	if weights == "" {
+		return chances, nil
+	}
+	totalWeight := 0.0
+	weightMap := make(map[string]float64)
+	parts := strings.Split(weights, ",")
+	for _, part := range parts {
+		subParts := strings.Split(part, ":")
+		if len(subParts) != 2 {
+			return chances, fmt.Errorf("invalid weight format: %s", part)
+		}
+		weightName := strings.TrimSpace(subParts[0])
+		weightValueStr := strings.TrimSpace(subParts[1])
+		weightValue, err := strconv.ParseFloat(weightValueStr, 64)
+		if err != nil {
+			return chances, fmt.Errorf("invalid weight value: %s", weightValueStr)
+		}
+		if weightValue < 0 {
+			return chances, fmt.Errorf("weight value must be non-negative: %s", weightValueStr)
+		}
+		weightMap[weightName] = weightValue
+		totalWeight += weightValue
+	}
+	if totalWeight == 0 {
+		return chances, nil
+	}
+	if weight, ok := weightMap["Location"]; ok {
+		chances.chanceLocation = weight / totalWeight
+	}
+	if weight, ok := weightMap["Island"]; ok {
+		chances.chanceIsland = weight / totalWeight
+	}
+	if weight, ok := weightMap["Vehicle"]; ok {
+		chances.chanceVehicle = weight / totalWeight
+	}
+	chances.chanceIsland += chances.chanceVehicle
+	chances.chanceLocation += chances.chanceIsland // this should be 1.0 now
+	return chances, nil
 }
 
 type solveOperatorUnPlanImpl struct {
 	SolveOperator
+
+	operatorChances solveOperatorUnPlanChances
 }
 
 func (d *solveOperatorUnPlanImpl) NumberOfUnits() SolveParameter {
@@ -69,13 +143,13 @@ Loop:
 		default:
 			chance := random.Float64()
 			switch {
-			case chance < 0.01:
+			case chance < d.operatorChances.chanceVehicle:
 				n, err := d.unplanSomeStopsOfOneVehicle(workSolution, 0.2)
 				if err != nil {
 					return err
 				}
 				i += n
-			case chance < 0.0132:
+			case chance < d.operatorChances.chanceIsland:
 				n, err := d.unplanOneIsland(workSolution, numberOfUnits-i)
 				if err != nil {
 					return err
