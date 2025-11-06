@@ -56,9 +56,9 @@ type PlanGroupSizeOptions struct {
 // ParallelSolverOptions are the options for the solver and it's operators when
 // run inside a parallel solver.
 type ParallelSolverOptions struct {
-	UnplanUnits   UnplanUnitsOptions  `json:"unplan_units"  usage:"unplan units parameter"`
-	UnplanWeights string              `json:"unplan_weights"  usage:"unplan heuristic weights parameter, e.g.: Vehicle:3,Island:1,Location:300" default:"Vehicle:3,Island:1,Location:293"`
-	PlanGroupSize IntParameterOptions `json:"plan_group_size"  usage:"plan group size parameter"`
+	UnplanUnits   UnplanUnitsOptions   `json:"unplan_units"  usage:"unplan units parameter"`
+	UnplanWeights string               `json:"unplan_weights"  usage:"unplan heuristic weights parameter, e.g.: Vehicle:3,Island:1,Location:300" default:"Vehicle:3,Island:1,Location:293"`
+	PlanGroupSize PlanGroupSizeOptions `json:"plan_group_size"  usage:"plan group size parameter"`
 }
 
 // PlateauOptions define how the solver should react to plateaus, i.e., periods
