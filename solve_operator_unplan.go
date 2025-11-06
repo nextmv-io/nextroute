@@ -168,6 +168,12 @@ func (d *solveOperatorUnPlanImpl) unplanOneIsland(
 	numberOfStops int,
 ) (int, error) {
 	planUnit := solution.PlannedPlanUnits().RandomElement()
+
+	// Reject island unplanning if it's a units-unit.
+	if isUnitsUnit(planUnit) {
+		return 0, nil
+	}
+
 	planStopsUnit := common.RandomElement(solution.Random(), planUnit.PlannedPlanStopsUnits())
 	for _, solutionStop := range planStopsUnit.(*solutionPlanStopsUnitImpl).solutionStops {
 		return d.unplanOneStopIsland(
@@ -222,10 +228,23 @@ func (d *solveOperatorUnPlanImpl) unplanSomeStopsOfOneVehicle(
 
 	for _, stop := range stops {
 		if stop.IsPlanned() && !stop.IsFixed() {
+			// TODO: should this be inverted (our chance is 0.2, so 80% chance
+			// to unplan - a.k.a. NOT skip unplanning)?
 			if solution.Random().Float64() < chance {
 				continue
 			}
-			unplanned, err := stop.PlanStopsUnit().UnPlan()
+
+			planStopsUnit := stop.PlanStopsUnit()
+
+			// // Get parent of unit to unplan full units.
+			// planStopsUnit := solution.PlannedPlanUnits().SolutionPlanUnit(stop.modelStop().planUnit)
+
+			// Reject unplanning if it's a units-unit.
+			if isUnitsUnit(planStopsUnit) {
+				continue
+			}
+
+			unplanned, err := planStopsUnit.UnPlan()
 			if err != nil {
 				return 0, err
 			}
