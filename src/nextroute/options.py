@@ -145,35 +145,35 @@ class Options(BaseModel):
     """Relative threshold for significant improvement."""
     SOLVE_RUNDETERMINISTICALLY: bool = False
     """Run the parallel solver deterministically."""
-    SOLVE_SOLVER_PLAN_GROUP_SIZE_DELTA: int = 2
+    SOLVE_SOLVER_PLANGROUPSIZE_DELTA: int = 0
     """Delta for the plan group size parameter."""
-    SOLVE_SOLVER_PLAN_GROUP_SIZE_DELTA_AFTER_ITERATIONS: int = 1000000000
+    SOLVE_SOLVER_PLANGROUPSIZE_DELTAAFTERITERATIONS: int = 1000000000
     """Delta after each iteration for the plan group size parameter."""
-    SOLVE_SOLVER_PLAN_GROUP_SIZE_MAX_VALUE: int = 2
+    SOLVE_SOLVER_PLANGROUPSIZE_MAXVALUE: int = 2
     """Maximum value for the plan group size parameter."""
-    SOLVE_SOLVER_PLAN_GROUP_SIZE_MIN_VALUE: int = 2
+    SOLVE_SOLVER_PLANGROUPSIZE_MINVALUE: int = 2
     """Minimum value for the plan group size parameter."""
-    SOLVE_SOLVER_PLAN_GROUP_SIZE_SNAP_BACK_AFTER_IMPROVEMENT: bool = True
+    SOLVE_SOLVER_PLANGROUPSIZE_SNAPBACKAFTERIMPROVEMENT: bool = True
     """Snap back to start value after improvement of best solution for the plan group size parameter."""
-    SOLVE_SOLVER_PLAN_GROUP_SIZE_START_VALUE: int = 2
+    SOLVE_SOLVER_PLANGROUPSIZE_STARTVALUE: int = 2
     """Start value for the plan group size parameter."""
-    SOLVE_SOLVER_PLAN_GROUP_SIZE_ZIGZAG: bool = True
+    SOLVE_SOLVER_PLANGROUPSIZE_ZIGZAG: bool = True
     """Zigzag between min and max value like a jig saw for the plan group size parameter."""
-    SOLVE_SOLVER_UNPLAN_UNITS_DELTA: int = 2
+    SOLVE_SOLVER_UNPLANUNITS_DELTA: int = 2
     """Delta for the unplan units parameter."""
-    SOLVE_SOLVER_UNPLAN_UNITS_DELTA_AFTER_ITERATIONS: int = 125
+    SOLVE_SOLVER_UNPLANUNITS_DELTAAFTERITERATIONS: int = 125
     """Delta after each iteration for the unplan units parameter."""
-    SOLVE_SOLVER_UNPLAN_UNITS_MAX_VALUE: int = -1
+    SOLVE_SOLVER_UNPLANUNITS_MAXVALUE: int = -1
     """Maximum value for the unplan units parameter."""
-    SOLVE_SOLVER_UNPLAN_UNITS_MIN_VALUE: int = 2
+    SOLVE_SOLVER_UNPLANUNITS_MINVALUE: int = 2
     """Minimum value for the unplan units parameter."""
-    SOLVE_SOLVER_UNPLAN_UNITS_SNAP_BACK_AFTER_IMPROVEMENT: bool = True
+    SOLVE_SOLVER_UNPLANUNITS_SNAPBACKAFTERIMPROVEMENT: bool = True
     """Snap back to start value after improvement of best solution for the unplan units parameter."""
-    SOLVE_SOLVER_UNPLAN_UNITS_START_VALUE: int = 2
+    SOLVE_SOLVER_UNPLANUNITS_STARTVALUE: int = 2
     """Start value for the unplan units parameter."""
-    SOLVE_SOLVER_UNPLAN_UNITS_ZIGZAG: bool = True
+    SOLVE_SOLVER_UNPLANUNITS_ZIGZAG: bool = True
     """Zigzag between min and max value like a jig saw for the unplan units parameter."""
-    SOLVE_SOLVER_UNPLAN_WEIGHTS: str = "Vehicle:3,Island:1,Location:293"
+    SOLVE_SOLVER_UNPLANWEIGHTS: str = "Vehicle:3,Island:1,Location:293"
     """Unplan heuristic weights parameter."""
     SOLVE_STARTSOLUTIONS: int = -1
     """

@@ -42,6 +42,10 @@ def _extract_option(line_1: str, line_2: str) -> Tuple[str, type, Any, str]:
             default = None  # No default extraction for value as this can be anything.
         else:
             raise ValueError(f"Unsupported type: {components[1]}")
+    else:
+        # Boolean flag
+        t = bool
+        default = default_extracted == "true" if default_extracted else False
 
     descr_end = line_2.find("(env") - 1
     if descr_end < 0:
@@ -66,7 +70,7 @@ def _extract_options() -> List[Tuple[str, type, Any, str]]:
         line = line.strip()
 
         if len(lines) <= line_idx + 1:
-            raise ValueError(f'Could not find the description for option: {line.split(" ")[0]}')
+            raise ValueError(f"Could not find the description for option: {line.split(' ')[0]}")
         next_line = lines[line_idx + 1]
 
         options.append(_extract_option(line, next_line))
