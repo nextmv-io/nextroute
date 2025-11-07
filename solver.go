@@ -34,7 +34,12 @@ func NewSolver(
 		return nil,
 			fmt.Errorf("options.Unplan: %w", err)
 	}
-	unplan, err := NewSolveOperatorUnPlan(numberOfUnits, options.UnplanWeights)
+	unplanWeights, err := ParseUnPlanWeights(options.UnplanWeights)
+	if err != nil {
+		return nil,
+			fmt.Errorf("options.UnplanWeights: %w", err)
+	}
+	unplan, err := NewSolveOperatorUnPlan(numberOfUnits, unplanWeights)
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +251,12 @@ func DefaultSolverFactory() SolverFactory {
 			return nil,
 				fmt.Errorf("options.Unplan: %w", err)
 		}
-		unplan, err := NewSolveOperatorUnPlan(numberOfUnits, options.UnplanWeights)
+		unplanWeights, err := ParseUnPlanWeights(options.UnplanWeights)
+		if err != nil {
+			return nil,
+				fmt.Errorf("options.UnplanWeights: %w", err)
+		}
+		unplan, err := NewSolveOperatorUnPlan(numberOfUnits, unplanWeights)
 		if err != nil {
 			return nil, err
 		}

@@ -29,7 +29,7 @@ type SolveOperatorUnPlan interface {
 // is always an integer between 1 and the number of units.
 func NewSolveOperatorUnPlan(
 	numberOfUnits SolveParameter,
-	operatorWeights string,
+	operatorWeights SolveOperatorUnPlanWeights,
 ) (SolveOperatorUnPlan, error) {
 	chances, err := parseUnPlanWeights(operatorWeights)
 	if err != nil {
@@ -43,6 +43,18 @@ func NewSolveOperatorUnPlan(
 		),
 		operatorChances: chances,
 	}, nil
+}
+
+// SolveOperatorUnPlanWeights defines the weights that control the probability
+// of each unplan heuristic.
+type SolveOperatorUnPlanWeights struct {
+	// Vehicle is the weight for unplanning multiple stops from one vehicle.
+	Vehicle float64
+	// Island is the weight for unplanning an island of stops (i.e., a group
+	// of stops that are close to each other).
+	Island float64
+	// Location is the weight for unplanning stops at a specific location.
+	Location float64
 }
 
 type solveOperatorUnPlanChances struct {
@@ -59,50 +71,60 @@ type solveOperatorUnPlanChances struct {
 	chanceLocation float64
 }
 
+// ParseUnPlanWeights parses a string representation of unplan weights into
+// a SolveOperatorUnPlanWeights struct. The input string should be in the format
+// "WeightName:WeightValue,WeightName:WeightValue,...", where WeightName is one
+// of "Vehicle", "Island", etc., and WeightValue is a non-negative float64
+// value.
+func ParseUnPlanWeights(weights string) (SolveOperatorUnPlanWeights, error) {
+	var unPlanWeights SolveOperatorUnPlanWeights
+	parts := strings.Split(weights, ",")
+	for _, part := range parts {
+		weightName, weightValueStr, found := strings.Cut(part, ":")
+		if !found {
+			return unPlanWeights, fmt.Errorf("invalid weight format: %s", part)
+		}
+		weightName = strings.TrimSpace(weightName)
+		weightValueStr = strings.TrimSpace(weightValueStr)
+		weightValue, err := strconv.ParseFloat(weightValueStr, 64)
+		if err != nil {
+			return unPlanWeights, fmt.Errorf("invalid weight value: %s", weightValueStr)
+		}
+		if weightValue < 0 {
+			return unPlanWeights, fmt.Errorf("weight value must be non-negative: %s", weightValueStr)
+		}
+		switch weightName {
+		case "Vehicle":
+			unPlanWeights.Vehicle = weightValue
+		case "Island":
+			unPlanWeights.Island = weightValue
+		case "Location":
+			unPlanWeights.Location = weightValue
+		default:
+			return unPlanWeights, fmt.Errorf("unknown weight name: %s", weightName)
+		}
+	}
+	return unPlanWeights, nil
+}
+
 // parseUnPlanWeights parses the unplan weights string into a
 // solveOperatorUnPlanChances struct of cumulative chances that can be used
 // to determine which unplan heuristic to use.
-func parseUnPlanWeights(weights string) (solveOperatorUnPlanChances, error) {
+func parseUnPlanWeights(weights SolveOperatorUnPlanWeights) (solveOperatorUnPlanChances, error) {
 	chances := solveOperatorUnPlanChances{
 		chanceVehicle:  0.01,
 		chanceIsland:   0.0132,
 		chanceLocation: 1.0,
 	}
-	if weights == "" {
-		return chances, nil
-	}
-	totalWeight := 0.0
-	weightMap := make(map[string]float64)
-	parts := strings.Split(weights, ",")
-	for _, part := range parts {
-		subParts := strings.Split(part, ":")
-		if len(subParts) != 2 {
-			return chances, fmt.Errorf("invalid weight format: %s", part)
-		}
-		weightName := strings.TrimSpace(subParts[0])
-		weightValueStr := strings.TrimSpace(subParts[1])
-		weightValue, err := strconv.ParseFloat(weightValueStr, 64)
-		if err != nil {
-			return chances, fmt.Errorf("invalid weight value: %s", weightValueStr)
-		}
-		if weightValue < 0 {
-			return chances, fmt.Errorf("weight value must be non-negative: %s", weightValueStr)
-		}
-		weightMap[weightName] = weightValue
-		totalWeight += weightValue
-	}
+	totalWeight := weights.Location + weights.Island + weights.Vehicle
 	if totalWeight == 0 {
 		return chances, nil
 	}
-	if weight, ok := weightMap["Location"]; ok {
-		chances.chanceLocation = weight / totalWeight
-	}
-	if weight, ok := weightMap["Island"]; ok {
-		chances.chanceIsland = weight / totalWeight
-	}
-	if weight, ok := weightMap["Vehicle"]; ok {
-		chances.chanceVehicle = weight / totalWeight
-	}
+	// Normalize weights to probabilities
+	chances.chanceLocation = weights.Location / totalWeight
+	chances.chanceIsland = weights.Island / totalWeight
+	chances.chanceVehicle = weights.Vehicle / totalWeight
+	// Convert to cumulative probabilities
 	chances.chanceIsland += chances.chanceVehicle
 	chances.chanceLocation += chances.chanceIsland // this should be 1.0 now
 	return chances, nil
