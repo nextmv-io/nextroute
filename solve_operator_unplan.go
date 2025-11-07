@@ -51,7 +51,7 @@ type solveOperatorUnPlanChances struct {
 	chanceVehicle float64
 	// chanceIsland is the chance of unplanning an island of stops (i.e., a
 	// group of stops that are close to each other). The chance is cumulative
-	// fpr performance reasons, i.e., it includes the chance(s) defined above.
+	// for performance reasons, i.e., it includes the chance(s) defined above.
 	chanceIsland float64
 	// chanceLocation is the chance of unplanning stops at a specific location.
 	// The chance is cumulative for performance reasons, i.e., it includes
