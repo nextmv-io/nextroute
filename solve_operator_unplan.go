@@ -31,10 +31,7 @@ func NewSolveOperatorUnPlan(
 	numberOfUnits SolveParameter,
 	operatorWeights SolveOperatorUnPlanWeights,
 ) (SolveOperatorUnPlan, error) {
-	chances, err := parseUnPlanWeights(operatorWeights)
-	if err != nil {
-		return nil, fmt.Errorf("parsing unplan weights: %w", err)
-	}
+	chances := convertUnPlanWeights(operatorWeights)
 	return &solveOperatorUnPlanImpl{
 		SolveOperator: NewSolveOperator(
 			1.0,
@@ -107,10 +104,10 @@ func ParseUnPlanWeights(weights string) (SolveOperatorUnPlanWeights, error) {
 	return unPlanWeights, nil
 }
 
-// parseUnPlanWeights parses the unplan weights string into a
+// convertUnPlanWeights parses the unplan weights string into a
 // solveOperatorUnPlanChances struct of cumulative chances that can be used
 // to determine which unplan heuristic to use.
-func parseUnPlanWeights(weights SolveOperatorUnPlanWeights) (solveOperatorUnPlanChances, error) {
+func convertUnPlanWeights(weights SolveOperatorUnPlanWeights) solveOperatorUnPlanChances {
 	chances := solveOperatorUnPlanChances{
 		chanceVehicle:  0.01,
 		chanceIsland:   0.0132,
@@ -118,7 +115,7 @@ func parseUnPlanWeights(weights SolveOperatorUnPlanWeights) (solveOperatorUnPlan
 	}
 	totalWeight := weights.Location + weights.Island + weights.Vehicle
 	if totalWeight == 0 {
-		return chances, nil
+		return chances
 	}
 	// Normalize weights to probabilities
 	chances.chanceLocation = weights.Location / totalWeight
@@ -127,7 +124,7 @@ func parseUnPlanWeights(weights SolveOperatorUnPlanWeights) (solveOperatorUnPlan
 	// Convert to cumulative probabilities
 	chances.chanceIsland += chances.chanceVehicle
 	chances.chanceLocation += chances.chanceIsland // this should be 1.0 now
-	return chances, nil
+	return chances
 }
 
 type solveOperatorUnPlanImpl struct {
