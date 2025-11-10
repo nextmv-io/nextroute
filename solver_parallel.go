@@ -85,6 +85,7 @@ func (p *parallelSolverWrapperImpl) Solve(
 		Duration:             solveOptions.Duration,
 		ParallelRuns:         solveOptions.ParallelRuns,
 		StartSolutions:       solveOptions.StartSolutions,
+		Solver:               solveOptions.Solver,
 		RunDeterministically: solveOptions.RunDeterministically,
 		Plateau:              solveOptions.Plateau,
 	}

@@ -21,12 +21,13 @@ const Iterations string = "iterations"
 
 // ParallelSolveOptions holds the options for the parallel solver.
 type ParallelSolveOptions struct {
-	Iterations           int            `json:"iterations"  usage:"maximum number of iterations, -1 assumes no limit; iterations are counted after start solutions are generated" default:"-1"`
-	Duration             time.Duration  `json:"duration" usage:"maximum duration of the solver" default:"5s"`
-	Plateau              PlateauOptions `json:"plateau"  usage:"plateau options"`
-	ParallelRuns         int            `json:"parallel_runs" usage:"maximum number of parallel runs, -1 results in using all available resources" default:"-1"`
-	StartSolutions       int            `json:"start_solutions" usage:"number of solutions to generate on top of those passed in; one solution generated with sweep algorithm, the rest generated randomly" default:"-1"`
-	RunDeterministically bool           `json:"run_deterministically"  usage:"run the parallel solver deterministically"`
+	Iterations           int                   `json:"iterations"  usage:"maximum number of iterations, -1 assumes no limit; iterations are counted after start solutions are generated" default:"-1"`
+	Duration             time.Duration         `json:"duration" usage:"maximum duration of the solver" default:"5s"`
+	Plateau              PlateauOptions        `json:"plateau"  usage:"plateau options"`
+	ParallelRuns         int                   `json:"parallel_runs" usage:"maximum number of parallel runs, -1 results in using all available resources" default:"-1"`
+	StartSolutions       int                   `json:"start_solutions" usage:"number of solutions to generate on top of those passed in; one solution generated with sweep algorithm, the rest generated randomly" default:"-1"`
+	Solver               ParallelSolverOptions `json:"solver"  usage:"solver options"`
+	RunDeterministically bool                  `json:"run_deterministically"  usage:"run the parallel solver deterministically"`
 }
 
 // ParallelSolver is the interface for parallel solver. The parallel solver will
@@ -72,12 +73,13 @@ type ParallelSolveInformation interface {
 	// how often a new solver has been created and started with the best
 	// solution of the previous runs.
 	Cycle() int
-
 	// Random returns the random number generator from the solution.
 	Random() *rand.Rand
 	// Run returns the current run. A run is a single solve run. In each cycle
 	// multiple runs are executed in parallel. Run identifies a run.
 	Run() int
+	// Options returns the currently active options of the parallel solver.
+	Options() ParallelSolveOptions
 }
 
 // The parallel solver will run multiple solver in parallel and return the best
@@ -104,18 +106,20 @@ func NewSkeletonParallelSolver(model Model) (ParallelSolver, error) {
 }
 
 // newParallelSolveInformation is a factory for creating new solve information.
-func newParallelSolveInformation(cycle, run int, random *rand.Rand) ParallelSolveInformation {
+func newParallelSolveInformation(cycle, run int, random *rand.Rand, options ParallelSolveOptions) ParallelSolveInformation {
 	return metaSolveInformationImpl{
-		cycle:  cycle,
-		run:    run,
-		random: random,
+		cycle:   cycle,
+		run:     run,
+		random:  random,
+		options: options,
 	}
 }
 
 type metaSolveInformationImpl struct {
-	random *rand.Rand
-	cycle  int
-	run    int
+	random  *rand.Rand
+	cycle   int
+	run     int
+	options ParallelSolveOptions
 }
 
 func (s metaSolveInformationImpl) Cycle() int {
@@ -128,6 +132,10 @@ func (s metaSolveInformationImpl) Run() int {
 
 func (s metaSolveInformationImpl) Random() *rand.Rand {
 	return s.random
+}
+
+func (s metaSolveInformationImpl) Options() ParallelSolveOptions {
+	return s.options
 }
 
 type parallelSolverImpl struct {
@@ -201,6 +209,7 @@ func (s *parallelSolverImpl) Solve(
 		ParallelRuns:         options.ParallelRuns,
 		StartSolutions:       options.StartSolutions,
 		RunDeterministically: options.RunDeterministically,
+		Solver:               options.Solver,
 		Plateau:              options.Plateau,
 	}
 
@@ -347,6 +356,7 @@ func (s *parallelSolverImpl) Solve(
 							cycle,
 							r,
 							solution.Random(),
+							options,
 						)
 
 						solver, err := s.solverFactory(
