@@ -211,10 +211,18 @@ type AlternateStop struct {
 type Stop struct {
 	// Precedes stops that must be visited after this one on the same route.
 	Precedes any `json:"precedes,omitempty"`
+	// PrecedesTemporally defines stops that must be visited after this one in
+	// time, i.e., the stops might be in a different route but must be scheduled
+	// after this one.
+	PrecedesTemporally any `json:"precedes_temporally,omitempty"`
 	// Quantity of the stop.
 	Quantity any `json:"quantity,omitempty"`
 	// Succeeds stops that must be visited before this one on the same route.
 	Succeeds any `json:"succeeds,omitempty"`
+	// SucceedsTemporally defines stops that must be visited before this one in
+	// time, i.e., the stops might be in a different route but must be scheduled
+	// before this one.
+	SucceedsTemporally any `json:"succeeds_temporally,omitempty"`
 	// CustomData arbitrary custom data.
 	CustomData any `json:"custom_data,omitempty"`
 	// Duration in seconds that the stop takes.

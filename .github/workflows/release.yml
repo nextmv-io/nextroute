@@ -176,6 +176,10 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
 
+      - name: Verify clean directory
+        run: git diff --exit-code
+        shell: bash
+
       - name: Build wheels
         if: matrix.platform != 'macos-arm64'
         uses: pypa/cibuildwheel@v2.21.3
@@ -192,10 +196,6 @@ jobs:
           # investigation for now and just disable the repair step.
           CIBW_REPAIR_WHEEL_COMMAND: ""
           MACOSX_DEPLOYMENT_TARGET: 14.0
-
-      - name: Verify clean directory
-        run: git diff --exit-code
-        shell: bash
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
