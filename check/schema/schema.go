@@ -97,6 +97,10 @@ type PlanUnit struct {
 	// execute it, it wasn't executable - this is an error in the constraint
 	// estimation.
 	HasPlannableBestMove bool `json:"has_plannable_best_move"`
+	// HasExecutableBestMove is true if a move is found and we were able to
+	// execute it successfully for the plan unit. A move might be executable but
+	// not plannable if it makes the objective worse.
+	HasExecutableBestMove bool `json:"has_executable_best_move"`
 	// PlanningMakesObjectiveWorse is true if the best move for the plan unit
 	// increases the objective.
 	PlanningMakesObjectiveWorse bool `json:"planning_makes_objective_worse"`
@@ -129,6 +133,9 @@ type VehiclesWithMovesDetail struct {
 	FailedConstraints []string `json:"failed_constraints,omitempty"`
 	// WasPlannable is true if the move was plannable, false otherwise.
 	WasPlannable bool `json:"was_plannable"`
+	// WasExecutable is true if the move was executable, false otherwise. A move
+	// can be executed if constraints are not violated.
+	WasExecutable bool `json:"was_executable"`
 	// Positions defines where the stop should be inserted.
 	Positions []Position `json:"positions"`
 }

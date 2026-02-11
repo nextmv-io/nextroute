@@ -219,6 +219,8 @@ SolutionPlanUnitLoop:
 					continue
 				}
 
+				m.output.PlanUnits[solutionPlanUnitIdx].HasExecutableBestMove = true
+
 				if m.output.PlanUnits[solutionPlanUnitIdx].VehiclesHaveMoves != nil {
 					*m.output.PlanUnits[solutionPlanUnitIdx].VehiclesHaveMoves++
 				}
@@ -228,6 +230,7 @@ SolutionPlanUnitLoop:
 					VehicleID:              solutionVehicle.ModelVehicle().ID(),
 					DeltaObjectiveEstimate: &value,
 					FailedConstraints:      []string{},
+					WasExecutable:          true,
 				}
 
 				if solutionMoveStops, ok := bestMove.(nextroute.SolutionMoveStops); ok {
@@ -325,12 +328,12 @@ SolutionPlanUnitLoop:
 				}
 			}
 
+			if !moveIsImprovement {
+				m.output.PlanUnits[solutionPlanUnitIdx].PlanningMakesObjectiveWorse = true
+				m.output.Summary.NumberOfPlanUnitsMakingObjectiveWorse++
+			}
 			if m.output.PlanUnits[solutionPlanUnitIdx].HasPlannableBestMove {
 				m.output.Summary.PlanUnitsBestMoveFound++
-				if !moveIsImprovement {
-					m.output.PlanUnits[solutionPlanUnitIdx].PlanningMakesObjectiveWorse = true
-					m.output.Summary.NumberOfPlanUnitsMakingObjectiveWorse++
-				}
 			} else {
 				m.output.Summary.PlanUnitsHaveNoMove++
 				constraints := make(map[string]int, len(m.solution.Model().Constraints()))
@@ -364,7 +367,6 @@ func (m *checkImpl) Check() {
 		localCtx,
 		m.solution.UnPlannedPlanUnits().SolutionPlanUnits(),
 	)
-
 	if err != nil {
 		errorStr := err.Error()
 		m.output.Error = &errorStr
