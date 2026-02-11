@@ -245,6 +245,21 @@ SolutionPlanUnitLoop:
 					}
 				}
 
+				if bestSolutionMoveStops, ok := bestMove.(nextroute.SolutionMoveStops); ok && int(m.verbosity) >= int(High) {
+					currentObjectiveTerms := []schema.ObjectiveTermDelta{}
+					for _, term := range m.solution.Model().Objective().Terms() {
+						deltaValue := term.Objective().EstimateDeltaValue(bestSolutionMoveStops)
+						currentObjectiveTerms = append(
+							currentObjectiveTerms,
+							schema.ObjectiveTermDelta{
+								Name:       fmt.Sprintf("%v", term.Objective()),
+								DeltaValue: deltaValue,
+							},
+						)
+					}
+					vehicleDetails.ObjectiveDeltas = currentObjectiveTerms
+				}
+
 				if m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves != nil {
 					m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves = append(
 						m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves,

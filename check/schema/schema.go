@@ -119,6 +119,17 @@ type PlanUnit struct {
 	Constraints map[string]int `json:"constraints,omitempty"`
 }
 
+// ObjectiveTermDelta contains information about the improvement of an objective
+// term caused by a move. A negative delta means the move improves the value for
+// the given term, a positive delta means the move worsens the value for the
+// given term.
+type ObjectiveTermDelta struct {
+	// Name is the name of the objective term.
+	Name string `json:"name"`
+	// DeltaValue is the difference in value of the objective term.
+	DeltaValue float64 `json:"delta_value"`
+}
+
 // VehiclesWithMovesDetail shows details of the vehicles that have moves.
 type VehiclesWithMovesDetail struct {
 	// Vehicle is the ID of the vehicle.
@@ -129,6 +140,10 @@ type VehiclesWithMovesDetail struct {
 	// DeltaObjective is the actual delta of the objective of that will be
 	// incurred by the move.
 	DeltaObjective *statistics.Float64 `json:"delta_objective,omitempty"`
+	// ObjectiveDeltas is the estimate of the objective value deltas of the
+	// move. I.e., the difference in value of the individual terms of the
+	// objective. This is only calculated if the verbosity is high.
+	ObjectiveDeltas []ObjectiveTermDelta `json:"objective_deltas,omitempty"`
 	// FailedConstraints are the constraints that are violated for the move.
 	FailedConstraints []string `json:"failed_constraints,omitempty"`
 	// WasPlannable is true if the move was plannable, false otherwise.
