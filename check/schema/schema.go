@@ -97,9 +97,10 @@ type PlanUnit struct {
 	// execute it, it wasn't executable - this is an error in the constraint
 	// estimation.
 	HasPlannableBestMove bool `json:"has_plannable_best_move"`
-	// HasExecutableBestMove is true if a move is found and we were able to
-	// execute it successfully for the plan unit. A move might be executable but
-	// not plannable if it makes the objective worse.
+	// HasExecutableBestMove is true if a best move is found for the plan unit
+	// and that best move is executable (i.e. it can be executed). A move might
+	// be executable but not plannable if it makes the objective worse or if
+	// its execution later fails.
 	HasExecutableBestMove bool `json:"has_executable_best_move"`
 	// PlanningMakesObjectiveWorse is true if the best move for the plan unit
 	// increases the objective.
