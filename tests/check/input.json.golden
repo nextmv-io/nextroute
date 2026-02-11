@@ -137,6 +137,16 @@
               {
                 "delta_objective": -999463.5469377702,
                 "delta_objective_estimate": -999463.5469377701,
+                "objective_deltas": [
+                  {
+                    "delta_value": 536.4530622299,
+                    "name": "vehicles_duration"
+                  },
+                  {
+                    "delta_value": -1000000,
+                    "name": "unplanned_penalty"
+                  }
+                ],
                 "positions": [
                   {
                     "next": "v1-end",
@@ -181,6 +191,16 @@
               {
                 "delta_objective": -999470.3860961162,
                 "delta_objective_estimate": -999470.386096116,
+                "objective_deltas": [
+                  {
+                    "delta_value": 529.6139038839777,
+                    "name": "vehicles_duration"
+                  },
+                  {
+                    "delta_value": -1000000,
+                    "name": "unplanned_penalty"
+                  }
+                ],
                 "positions": [
                   {
                     "next": "v1-end",
@@ -225,6 +245,16 @@
               {
                 "delta_objective": -999652.9791804887,
                 "delta_objective_estimate": -999652.9791804885,
+                "objective_deltas": [
+                  {
+                    "delta_value": 347.02081951153525,
+                    "name": "vehicles_duration"
+                  },
+                  {
+                    "delta_value": -1000000,
+                    "name": "unplanned_penalty"
+                  }
+                ],
                 "positions": [
                   {
                     "next": "v1-end",
@@ -269,6 +299,16 @@
               {
                 "delta_objective": -999587.4628559696,
                 "delta_objective_estimate": -999587.4628559696,
+                "objective_deltas": [
+                  {
+                    "delta_value": 412.537144030441,
+                    "name": "vehicles_duration"
+                  },
+                  {
+                    "delta_value": -1000000,
+                    "name": "unplanned_penalty"
+                  }
+                ],
                 "positions": [
                   {
                     "next": "v1-end",
@@ -313,6 +353,16 @@
               {
                 "delta_objective": -999520.8297026725,
                 "delta_objective_estimate": -999520.8297026723,
+                "objective_deltas": [
+                  {
+                    "delta_value": 479.1702973276746,
+                    "name": "vehicles_duration"
+                  },
+                  {
+                    "delta_value": -1000000,
+                    "name": "unplanned_penalty"
+                  }
+                ],
                 "positions": [
                   {
                     "next": "v1-end",
@@ -357,6 +407,16 @@
               {
                 "delta_objective": -999712.3838281464,
                 "delta_objective_estimate": -999712.3838281466,
+                "objective_deltas": [
+                  {
+                    "delta_value": 287.61617185337144,
+                    "name": "vehicles_duration"
+                  },
+                  {
+                    "delta_value": -1000000,
+                    "name": "unplanned_penalty"
+                  }
+                ],
                 "positions": [
                   {
                     "next": "v1-end",
@@ -401,6 +461,16 @@
               {
                 "delta_objective": -1000000,
                 "delta_objective_estimate": -1000000,
+                "objective_deltas": [
+                  {
+                    "delta_value": 0,
+                    "name": "vehicles_duration"
+                  },
+                  {
+                    "delta_value": -1000000,
+                    "name": "unplanned_penalty"
+                  }
+                ],
                 "positions": [
                   {
                     "next": "v1-end",
