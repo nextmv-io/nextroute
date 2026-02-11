@@ -209,7 +209,8 @@ SolutionPlanUnitLoop:
 			}
 
 			moveMinimumValue := math.MaxFloat64
-			moveIsImprovement := false
+			hasImprovingMove := false
+			hasExecutableMove := false
 			movesFailed := false
 		VehicleLoop:
 			for solutionVehicleIdx, solutionVehicle := range m.solution.Vehicles() {
@@ -218,6 +219,8 @@ SolutionPlanUnitLoop:
 				if !bestMove.IsExecutable() {
 					continue
 				}
+
+				hasExecutableMove = true
 
 				m.output.PlanUnits[solutionPlanUnitIdx].HasExecutableBestMove = true
 
@@ -285,7 +288,7 @@ SolutionPlanUnitLoop:
 					}
 
 					if planned {
-						moveIsImprovement = true
+						hasImprovingMove = true
 						vehicleDetails.WasPlannable = true
 						deltaObjective := statistics.Float64(m.solution.Score() - actualScoreBeforeMove)
 						vehicleDetails.DeltaObjective = &deltaObjective
@@ -343,7 +346,7 @@ SolutionPlanUnitLoop:
 				}
 			}
 
-			if !moveIsImprovement {
+			if hasExecutableMove && !hasImprovingMove {
 				m.output.PlanUnits[solutionPlanUnitIdx].PlanningMakesObjectiveWorse = true
 				m.output.Summary.NumberOfPlanUnitsMakingObjectiveWorse++
 			}
