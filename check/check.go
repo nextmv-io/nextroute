@@ -172,15 +172,13 @@ func (m *checkImpl) checkSolutionPlanUnits(
 	planUnitsObserver := newObserver()
 	moveObserver := newObserver()
 
-	if int(m.verbosity) >= int(Medium) {
-		defer func() {
-			m.solution.Model().RemoveSolutionObserver(planUnitsObserver)
-			m.solution.Model().RemoveSolutionObserver(moveObserver)
-		}()
+	defer func() {
+		m.solution.Model().RemoveSolutionObserver(planUnitsObserver)
+		m.solution.Model().RemoveSolutionObserver(moveObserver)
+	}()
 
-		m.solution.Model().AddSolutionObserver(planUnitsObserver)
-		m.solution.Model().AddSolutionObserver(moveObserver)
-	}
+	m.solution.Model().AddSolutionObserver(planUnitsObserver)
+	m.solution.Model().AddSolutionObserver(moveObserver)
 
 SolutionPlanUnitLoop:
 	for solutionPlanUnitIdx, solutionPlanUnit := range solutionPlanUnits {
@@ -285,6 +283,7 @@ SolutionPlanUnitLoop:
 							name,
 						)
 						failedForConstraint = true
+						vehicleDetails.WasExecutable = false
 					}
 
 					if !planned && !failedForConstraint {

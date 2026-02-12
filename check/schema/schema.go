@@ -127,7 +127,8 @@ type PlanUnit struct {
 type ObjectiveTermDelta struct {
 	// Name is the name of the objective term.
 	Name string `json:"name"`
-	// DeltaValue is the difference in value of the objective term.
+	// DeltaValue is the difference in value of the objective term (without the
+	// factor).
 	DeltaValue float64 `json:"delta_value"`
 }
 
