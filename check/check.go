@@ -210,7 +210,7 @@ SolutionPlanUnitLoop:
 
 			moveMinimumValue := math.MaxFloat64
 			hasImprovingMove := false
-			hasExecutableMove := false
+			hasWorseMove := false
 			movesFailed := false
 		VehicleLoop:
 			for solutionVehicleIdx, solutionVehicle := range m.solution.Vehicles() {
@@ -219,8 +219,6 @@ SolutionPlanUnitLoop:
 				if !bestMove.IsExecutable() {
 					continue
 				}
-
-				hasExecutableMove = true
 
 				m.output.PlanUnits[solutionPlanUnitIdx].HasExecutableBestMove = true
 
@@ -279,12 +277,18 @@ SolutionPlanUnitLoop:
 						return err
 					}
 
+					failedForConstraint := false
 					for _, constraint := range moveObserver.OnPlanFailedConstraints() {
 						name := fmt.Sprintf("%v", constraint)
 						vehicleDetails.FailedConstraints = append(
 							vehicleDetails.FailedConstraints,
 							name,
 						)
+						failedForConstraint = true
+					}
+
+					if !planned && !failedForConstraint {
+						hasWorseMove = true
 					}
 
 					if planned {
@@ -346,7 +350,7 @@ SolutionPlanUnitLoop:
 				}
 			}
 
-			if hasExecutableMove && !hasImprovingMove {
+			if !hasImprovingMove && hasWorseMove {
 				m.output.PlanUnits[solutionPlanUnitIdx].PlanningMakesObjectiveWorse = true
 				m.output.Summary.NumberOfPlanUnitsMakingObjectiveWorse++
 			}
