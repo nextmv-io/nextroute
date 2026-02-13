@@ -148,7 +148,8 @@ type VehiclesWithMovesDetail struct {
 	ObjectiveDeltas []ObjectiveTermDelta `json:"objective_deltas,omitempty"`
 	// FailedConstraints are the constraints that are violated for the move.
 	FailedConstraints []string `json:"failed_constraints,omitempty"`
-	// WasPlannable is true if the move was plannable, false otherwise.
+	// WasPlannable is true if the move was plannable, false otherwise. A move
+	// can be planned if it is executable and does not make the objective worse.
 	WasPlannable bool `json:"was_plannable"`
 	// WasExecutable is true if the move was executable, false otherwise. A move
 	// can be executed if constraints are not violated.
