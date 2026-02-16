@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"path"
@@ -22,20 +23,21 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	err = os.WriteFile(pythonFileDestination, input, 0644)
+	err = os.WriteFile(pythonFileDestination, input, 0o644)
 	if err != nil {
 		panic(err)
 	}
 
 	// Compile the Go binary that is needed for this test.
-	cmd := exec.Command(
+	cmd := exec.CommandContext(
+		context.Background(),
 		"go", "build",
 		"-o", path.Join("..", "..", "nextroute", "bin", "nextroute.exe"),
 		path.Join("..", "..", "..", "cmd", "main.go"),
 	)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	if err = cmd.Run(); err != nil {
 		panic(err)
 	}
 

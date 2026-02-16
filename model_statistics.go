@@ -82,8 +82,9 @@ func (v vehicleStatisticsImpl) FirstToLastSeconds() float64 {
 }
 
 func (v vehicleStatisticsImpl) FromFirstSeconds() common.Statistics {
-	stops := make(ModelStops, 0)
-	for _, planUnit := range v.vehicle.Model().PlanStopsUnits() {
+	planStopsUnits := v.vehicle.Model().PlanStopsUnits()
+	stops := make(ModelStops, 0, len(planStopsUnits))
+	for _, planUnit := range planStopsUnits {
 		stops = append(stops, planUnit.Stops()...)
 	}
 	return common.NewStatistics(
@@ -99,8 +100,9 @@ func (v vehicleStatisticsImpl) FromFirstSeconds() common.Statistics {
 }
 
 func (v vehicleStatisticsImpl) ToLastSeconds() common.Statistics {
-	stops := make(ModelStops, 0)
-	for _, planUnit := range v.vehicle.Model().PlanStopsUnits() {
+	planStopsUnits := v.vehicle.Model().PlanStopsUnits()
+	stops := make(ModelStops, 0, len(planStopsUnits))
+	for _, planUnit := range planStopsUnits {
 		stops = append(stops, planUnit.Stops()...)
 	}
 	return common.NewStatistics(
@@ -171,8 +173,9 @@ func (m modelStatisticsImpl) LastLocations() int {
 }
 
 func (m modelStatisticsImpl) Locations() int {
-	stops := make(ModelStops, 0)
-	for _, planUnit := range m.model.PlanStopsUnits() {
+	planStopsUnits := m.model.PlanStopsUnits()
+	stops := make(ModelStops, 0, len(planStopsUnits))
+	for _, planUnit := range planStopsUnits {
 		stops = append(stops, planUnit.Stops()...)
 	}
 	return len(

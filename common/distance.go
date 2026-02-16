@@ -1,7 +1,7 @@
 // © 2019-present nextmv.io inc
 
 // Package common contains common types and functions.
-package common
+package common // nolint:revive // we are not causing breaking changes to please the linter
 
 import "fmt"
 
