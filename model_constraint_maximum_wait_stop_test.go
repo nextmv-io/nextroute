@@ -79,9 +79,9 @@ func TestMaximumWaitStopConstraint_EstimateIsViolated(t *testing.T) {
 	modelPlanUnits := common.Filter(model.PlanStopsUnits(), func(planUnit nextroute.ModelPlanStopsUnit) bool {
 		return planUnit.NumberOfStops() == 1
 	})
-	solutionPlanUnits := []nextroute.SolutionPlanStopsUnit{}
-	for _, planUnit := range modelPlanUnits {
-		solutionPlanUnits = append(solutionPlanUnits, solution.SolutionPlanStopsUnit(planUnit))
+	solutionPlanUnits := make([]nextroute.SolutionPlanStopsUnit, len(modelPlanUnits))
+	for i, planUnit := range modelPlanUnits {
+		solutionPlanUnits[i] = solution.SolutionPlanStopsUnit(planUnit)
 	}
 	// Try to assign all stops and check success for expectation.
 	success := []bool{true, false, false, true}
@@ -152,7 +152,6 @@ func TestMaximumWaitStopConstraint(t *testing.T) {
 	}
 
 	err = model.AddConstraint(cnstr)
-
 	if err != nil {
 		t.Error(err)
 	}

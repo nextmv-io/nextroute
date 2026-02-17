@@ -1,6 +1,6 @@
 // © 2019-present nextmv.io inc
 
-package common
+package common //nolint:revive // we are not causing breaking changes to please the linter
 
 // Intersect returns the intersection of two slices.
 func Intersect[T comparable](a []T, b []T) []T {

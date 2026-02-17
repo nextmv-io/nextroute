@@ -81,6 +81,7 @@ type ModelObjectiveTerm interface {
 type ModelObjectiveTerms []ModelObjectiveTerm
 
 // ObjectiveDataUpdater is deprecated.
+//
 // Deprecated: Please use ObjectiveStopDataUpdater instead.
 type ObjectiveDataUpdater interface {
 	// UpdateObjectiveData is deprecated.

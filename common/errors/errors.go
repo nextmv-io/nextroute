@@ -1,7 +1,8 @@
 // © 2019-present nextmv.io inc
 
-// Package errors contains errors contains information about errors returned by nextmv functions.
-package errors
+// Package errors contains errors contains information about errors returned by
+// nextmv functions.
+package errors //nolint:revive // we are not causing breaking changes to please the linter
 
 import (
 	"fmt"

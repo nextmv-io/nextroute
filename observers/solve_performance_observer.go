@@ -118,7 +118,7 @@ type solvePerformanceObserverImpl struct {
 }
 
 func (p *solvePerformanceObserverImpl) OperatorObservers() []OperatorObserver {
-	observers := make([]OperatorObserver, 0)
+	observers := make([]OperatorObserver, 0, len(p.operatorData))
 	for _, data := range p.operatorData {
 		observers = append(observers, &data)
 	}

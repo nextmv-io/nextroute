@@ -44,7 +44,7 @@ func TestSequenceGenerator1(t *testing.T) {
 
 	quit := make(chan struct{})
 	defer close(quit)
-	sequences := make([]nextroute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0) //nolint:prealloc
 	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanStopsUnit(planUnit), quit) {
 		sequences = append(sequences, solutionStops)
 	}
@@ -94,7 +94,7 @@ func TestSequenceGenerator2(t *testing.T) {
 	quit := make(chan struct{})
 	defer close(quit)
 
-	sequences := make([]nextroute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0) //nolint:prealloc // not that relevant for testing
 	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanStopsUnit(planUnit), quit) {
 		sequences = append(sequences, solutionStops)
 	}
@@ -131,7 +131,7 @@ func TestSequenceGenerator3(t *testing.T) {
 
 	quit := make(chan struct{})
 	defer close(quit)
-	sequences := make([]nextroute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0) //nolint:prealloc // not that relevant for testing
 	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanStopsUnit(planUnit), quit) {
 		sequences = append(sequences, solutionStops)
 	}
@@ -168,7 +168,7 @@ func TestSequenceGenerator4(t *testing.T) {
 
 	quit := make(chan struct{})
 	defer close(quit)
-	sequences := make([]nextroute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0) //nolint:prealloc // not that relevant for testing
 	model.SetSequenceSampleSize(10)
 	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanStopsUnit(planUnit), quit) {
 		sequences = append(sequences, solutionStops)
@@ -201,7 +201,7 @@ func TestSequenceGeneratorSingleStop(t *testing.T) {
 
 	quit := make(chan struct{})
 	defer close(quit)
-	sequences := make([]nextroute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0) //nolint:prealloc // not that relevant for testing
 	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanStopsUnit(planUnit), quit) {
 		sequences = append(sequences, solutionStops)
 	}
@@ -234,7 +234,7 @@ func TestSequenceGeneratorSequence(t *testing.T) {
 
 	quit := make(chan struct{})
 	defer close(quit)
-	sequences := make([]nextroute.SolutionStops, 0)
+	sequences := make([]nextroute.SolutionStops, 0) //nolint:prealloc // not that relevant for testing
 	for solutionStops := range nextroute.SequenceGeneratorChannel(solution.SolutionPlanStopsUnit(planUnit), quit) {
 		sequences = append(sequences, solutionStops)
 	}

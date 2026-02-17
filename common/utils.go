@@ -106,7 +106,7 @@ func Map[T any, R any](v []T, f func(T) R) []R {
 // MapSlice maps a slice of type T to a slice of type R using the function f
 // returning a slice of R.
 func MapSlice[T any, R any](v []T, f func(T) []R) []R {
-	r := make([]R, 0)
+	r := make([]R, 0, len(v))
 	for _, x := range v {
 		r = append(r, f(x)...)
 	}
@@ -173,7 +173,8 @@ func Has[E any](s []E, condition bool, predicate func(E) bool) bool {
 // If a key exists in both maps, the value in destination is overwritten.
 func CopyMap[M1 ~map[K]V, M2 ~map[K]V, K comparable, V any](
 	destination M1,
-	source M2) {
+	source M2,
+) {
 	for k, v := range source {
 		destination[k] = v
 	}
