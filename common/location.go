@@ -1,6 +1,6 @@
 // © 2019-present nextmv.io inc
 
-package common // nolint:revive // we are not causing breaking changes to please the linter
+package common
 
 import (
 	"fmt"
