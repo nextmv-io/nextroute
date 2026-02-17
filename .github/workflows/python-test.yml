@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
 
 env:
-  GO_VERSION: 1.23
+  GO_VERSION: 1.26
 
 jobs:
   python-test:
@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.13"]
+        python-version: ["3.10", "3.13"]
         platform:
           [
             ubuntu-latest,

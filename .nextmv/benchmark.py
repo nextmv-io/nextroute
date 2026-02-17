@@ -11,6 +11,7 @@ import os
 import subprocess
 from datetime import datetime, timezone
 
+import nextmv
 import requests
 from nextmv import cloud
 
@@ -28,7 +29,7 @@ METRICS = [
         params=cloud.MetricParams(
             tolerance=cloud.MetricTolerance(
                 value=2,
-                type=cloud.ToleranceType.relative,
+                type=cloud.MetricToleranceType.relative,
             ),
             operator=cloud.Comparison.less_than_or_equal_to,
         ),
@@ -121,7 +122,7 @@ def run_acceptance_test(
         name=f"Auto-test {tag}",
         description=f"Automated test for {tag}",
         input_set_id="nextroute-bench-v20",
-        polling_options=cloud.PollingOptions(
+        polling_options=nextmv.PollingOptions(
             max_duration=600,  # 10 minutes
             max_tries=1000,  # basically forever - we'll stop by duration
         ),
