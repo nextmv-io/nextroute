@@ -127,10 +127,15 @@ type PlanUnit struct {
 type ObjectiveTermDelta struct {
 	// Name is the name of the objective term.
 	Name string `json:"name"`
-	// DeltaValue is the difference in value of the objective term (without the
-	// factor).
-	DeltaValue float64 `json:"delta_value"`
+	// DeltaValue is the estimated difference in value of the objective term
+	// (without the factor).
+	DeltaValueEstimated float64 `json:"delta_value_estimated"`
+	// DeltaValue is the difference in value of the objective term after
+	// executing the move (without the factor). This is only calculated if the
+	// move was executed successfully.
+	DeltaValue *float64 `json:"delta_value,omitempty"`
 }
+
 
 // VehiclesWithMovesDetail shows details of the vehicles that have moves.
 type VehiclesWithMovesDetail struct {
@@ -142,7 +147,7 @@ type VehiclesWithMovesDetail struct {
 	// DeltaObjective is the actual delta of the objective of that will be
 	// incurred by the move.
 	DeltaObjective *statistics.Float64 `json:"delta_objective,omitempty"`
-	// ObjectiveDeltas is the estimate of the objective value deltas of the
+	// ObjectiveDeltas are the (estimates of the) objective value deltas of the
 	// move. I.e., the difference in value of the individual terms of the
 	// objective. This is only calculated if the verbosity is high.
 	ObjectiveDeltas []ObjectiveTermDelta `json:"objective_deltas,omitempty"`

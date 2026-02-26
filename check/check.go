@@ -172,13 +172,13 @@ func (m *checkImpl) checkSolutionPlanUnits(
 	planUnitsObserver := newObserver()
 	moveObserver := newObserver()
 
+	m.solution.Model().AddSolutionObserver(planUnitsObserver)
+	m.solution.Model().AddSolutionObserver(moveObserver)
+	
 	defer func() {
 		m.solution.Model().RemoveSolutionObserver(planUnitsObserver)
 		m.solution.Model().RemoveSolutionObserver(moveObserver)
 	}()
-
-	m.solution.Model().AddSolutionObserver(planUnitsObserver)
-	m.solution.Model().AddSolutionObserver(moveObserver)
 
 SolutionPlanUnitLoop:
 	for solutionPlanUnitIdx, solutionPlanUnit := range solutionPlanUnits {
@@ -252,7 +252,7 @@ SolutionPlanUnitLoop:
 							currentObjectiveTerms,
 							schema.ObjectiveTermDelta{
 								Name:       fmt.Sprintf("%v", term.Objective()),
-								DeltaValue: deltaValue,
+								DeltaValueEstimated: deltaValue,
 							},
 						)
 					}
@@ -270,9 +270,23 @@ SolutionPlanUnitLoop:
 					actualScoreBeforeMove := m.solution.Score()
 					moveObserver.Reset()
 
+					previousObjectiveValues := make([]float64, len(m.solution.Model().Objective().Terms()))
+					if int(m.verbosity) >= int(High) {
+						for termIdx, term := range m.solution.Model().Objective().Terms() {
+							previousObjectiveValues[termIdx] = m.solution.ObjectiveValue(term.Objective())  / term.Factor()
+						}
+					}
+
 					planned, err := bestMove.Execute(ctx)
 					if err != nil {
 						return err
+					}
+
+					if int(m.verbosity) >= int(High) {
+						for termIdx, term := range m.solution.Model().Objective().Terms() {
+							value := m.solution.ObjectiveValue(term.Objective()) / term.Factor() - previousObjectiveValues[termIdx]
+							vehicleDetails.ObjectiveDeltas[termIdx].DeltaValue = &value
+						}
 					}
 
 					failedForConstraint := false
@@ -291,9 +305,9 @@ SolutionPlanUnitLoop:
 					}
 
 					if planned {
-						hasImprovingMove = true
 						vehicleDetails.WasPlannable = true
 						deltaObjective := statistics.Float64(m.solution.Score() - actualScoreBeforeMove)
+						hasImprovingMove = deltaObjective < 0
 						vehicleDetails.DeltaObjective = &deltaObjective
 
 						m.output.PlanUnits[solutionPlanUnitIdx].HasPlannableBestMove = true
