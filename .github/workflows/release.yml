@@ -94,7 +94,8 @@ jobs:
 
       - name: bump version in version file for Python
         run: |
-          echo "__version__ = \"$VERSION\"" > src/nextroute/__about__.py
+          echo "# © 2019-present nextmv.io inc" > src/nextroute/__about__.py
+          echo "__version__ = \"$VERSION\"" >> src/nextroute/__about__.py
         working-directory: ./nextroute
 
       - name: commit version bump
