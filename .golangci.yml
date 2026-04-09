@@ -211,6 +211,9 @@ linters:
           - tagliatelle
         path: schema/input\.go
       - linters:
+          - revive
+        text: avoid meaningless package names
+      - linters:
           - contextcheck
         path: check/format\.go
       - linters:
