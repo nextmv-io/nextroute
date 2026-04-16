@@ -73,7 +73,7 @@ func (t *composedPerVehicleTypeExpressionImpl) HasNegativeValues() bool {
 		return true
 	}
 	for _, expression := range t.expressions {
-		if expression.HasNegativeValues() {
+		if expression != nil && expression.HasNegativeValues() {
 			return true
 		}
 	}
@@ -85,7 +85,7 @@ func (t *composedPerVehicleTypeExpressionImpl) HasPositiveValues() bool {
 		return true
 	}
 	for _, expression := range t.expressions {
-		if expression.HasPositiveValues() {
+		if expression != nil && expression.HasPositiveValues() {
 			return true
 		}
 	}

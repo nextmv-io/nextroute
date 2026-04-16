@@ -92,8 +92,10 @@ jobs:
           echo $VERSION > VERSION
         working-directory: ./nextroute
 
-      - name: upgrade version with hatch for Python
-        run: hatch version ${{ env.VERSION }}
+      - name: bump version in version file for Python
+        run: |
+          echo "# © 2019-present nextmv.io inc" > src/nextroute/__about__.py
+          echo "__version__ = \"$VERSION\"" >> src/nextroute/__about__.py
         working-directory: ./nextroute
 
       - name: commit version bump
