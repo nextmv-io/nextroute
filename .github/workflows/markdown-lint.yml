@@ -3,6 +3,8 @@ on:
   push:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+permissions:
+  contents: read
 jobs:
   markdown-lint:
     runs-on: ubuntu-latest

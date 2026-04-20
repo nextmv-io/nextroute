@@ -5,6 +5,9 @@ on:
     branches:
       - "develop"
 
+permissions:
+  contents: read
+
 env:
   GO_VERSION: 1.26
   PYTHON_VERSION: 3.12
