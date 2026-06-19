@@ -172,15 +172,13 @@ func (m *checkImpl) checkSolutionPlanUnits(
 	planUnitsObserver := newObserver()
 	moveObserver := newObserver()
 
-	if int(m.verbosity) >= int(Medium) {
-		defer func() {
-			m.solution.Model().RemoveSolutionObserver(planUnitsObserver)
-			m.solution.Model().RemoveSolutionObserver(moveObserver)
-		}()
-
-		m.solution.Model().AddSolutionObserver(planUnitsObserver)
-		m.solution.Model().AddSolutionObserver(moveObserver)
-	}
+	m.solution.Model().AddSolutionObserver(planUnitsObserver)
+	m.solution.Model().AddSolutionObserver(moveObserver)
+	
+	defer func() {
+		m.solution.Model().RemoveSolutionObserver(planUnitsObserver)
+		m.solution.Model().RemoveSolutionObserver(moveObserver)
+	}()
 
 SolutionPlanUnitLoop:
 	for solutionPlanUnitIdx, solutionPlanUnit := range solutionPlanUnits {
@@ -209,7 +207,8 @@ SolutionPlanUnitLoop:
 			}
 
 			moveMinimumValue := math.MaxFloat64
-			moveIsImprovement := false
+			hasImprovingMove := false
+			hasWorseMove := false
 			movesFailed := false
 		VehicleLoop:
 			for solutionVehicleIdx, solutionVehicle := range m.solution.Vehicles() {
@@ -218,6 +217,8 @@ SolutionPlanUnitLoop:
 				if !bestMove.IsExecutable() {
 					continue
 				}
+
+				m.output.PlanUnits[solutionPlanUnitIdx].HasExecutableBestMove = true
 
 				if m.output.PlanUnits[solutionPlanUnitIdx].VehiclesHaveMoves != nil {
 					*m.output.PlanUnits[solutionPlanUnitIdx].VehiclesHaveMoves++
@@ -228,6 +229,7 @@ SolutionPlanUnitLoop:
 					VehicleID:              solutionVehicle.ModelVehicle().ID(),
 					DeltaObjectiveEstimate: &value,
 					FailedConstraints:      []string{},
+					WasExecutable:          true,
 				}
 
 				if solutionMoveStops, ok := bestMove.(nextroute.SolutionMoveStops); ok {
@@ -242,6 +244,21 @@ SolutionPlanUnitLoop:
 					}
 				}
 
+				if bestSolutionMoveStops, ok := bestMove.(nextroute.SolutionMoveStops); ok && int(m.verbosity) >= int(High) {
+					currentObjectiveTerms := []schema.ObjectiveTermDelta{}
+					for _, term := range m.solution.Model().Objective().Terms() {
+						deltaValue := term.Objective().EstimateDeltaValue(bestSolutionMoveStops)
+						currentObjectiveTerms = append(
+							currentObjectiveTerms,
+							schema.ObjectiveTermDelta{
+								Name:       fmt.Sprintf("%v", term.Objective()),
+								DeltaValueEstimated: deltaValue,
+							},
+						)
+					}
+					vehicleDetails.ObjectiveDeltas = currentObjectiveTerms
+				}
+
 				if m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves != nil {
 					m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves = append(
 						m.output.PlanUnits[solutionPlanUnitIdx].VehiclesWithMoves,
@@ -253,23 +270,44 @@ SolutionPlanUnitLoop:
 					actualScoreBeforeMove := m.solution.Score()
 					moveObserver.Reset()
 
+					previousObjectiveValues := make([]float64, len(m.solution.Model().Objective().Terms()))
+					if int(m.verbosity) >= int(High) {
+						for termIdx, term := range m.solution.Model().Objective().Terms() {
+							previousObjectiveValues[termIdx] = m.solution.ObjectiveValue(term.Objective())  / term.Factor()
+						}
+					}
+
 					planned, err := bestMove.Execute(ctx)
 					if err != nil {
 						return err
 					}
 
+					if int(m.verbosity) >= int(High) {
+						for termIdx, term := range m.solution.Model().Objective().Terms() {
+							value := m.solution.ObjectiveValue(term.Objective()) / term.Factor() - previousObjectiveValues[termIdx]
+							vehicleDetails.ObjectiveDeltas[termIdx].DeltaValue = &value
+						}
+					}
+
+					failedForConstraint := false
 					for _, constraint := range moveObserver.OnPlanFailedConstraints() {
 						name := fmt.Sprintf("%v", constraint)
 						vehicleDetails.FailedConstraints = append(
 							vehicleDetails.FailedConstraints,
 							name,
 						)
+						failedForConstraint = true
+						vehicleDetails.WasExecutable = false
+					}
+
+					if !planned && !failedForConstraint {
+						hasWorseMove = true
 					}
 
 					if planned {
-						moveIsImprovement = true
 						vehicleDetails.WasPlannable = true
 						deltaObjective := statistics.Float64(m.solution.Score() - actualScoreBeforeMove)
+						hasImprovingMove = deltaObjective < 0
 						vehicleDetails.DeltaObjective = &deltaObjective
 
 						m.output.PlanUnits[solutionPlanUnitIdx].HasPlannableBestMove = true
@@ -325,12 +363,12 @@ SolutionPlanUnitLoop:
 				}
 			}
 
+			if !hasImprovingMove && hasWorseMove {
+				m.output.PlanUnits[solutionPlanUnitIdx].PlanningMakesObjectiveWorse = true
+				m.output.Summary.NumberOfPlanUnitsMakingObjectiveWorse++
+			}
 			if m.output.PlanUnits[solutionPlanUnitIdx].HasPlannableBestMove {
 				m.output.Summary.PlanUnitsBestMoveFound++
-				if !moveIsImprovement {
-					m.output.PlanUnits[solutionPlanUnitIdx].PlanningMakesObjectiveWorse = true
-					m.output.Summary.NumberOfPlanUnitsMakingObjectiveWorse++
-				}
 			} else {
 				m.output.Summary.PlanUnitsHaveNoMove++
 				constraints := make(map[string]int, len(m.solution.Model().Constraints()))
@@ -364,7 +402,6 @@ func (m *checkImpl) Check() {
 		localCtx,
 		m.solution.UnPlannedPlanUnits().SolutionPlanUnits(),
 	)
-
 	if err != nil {
 		errorStr := err.Error()
 		m.output.Error = &errorStr

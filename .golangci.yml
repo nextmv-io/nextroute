@@ -219,6 +219,9 @@ linters:
       - linters:
           - nestif
         path: factory/validate\.go
+      - linters:
+          - revive
+        path: common/.*\.go # we do not want to break users to address the "common" package naming
     paths:
       - third_party$
       - builtin$
