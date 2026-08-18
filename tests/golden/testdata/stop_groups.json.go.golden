@@ -106,10 +106,10 @@
         "name": "1 * vehicles_duration + 1 * unplanned_penalty",
         "objectives": [
           {
-            "base": 823.605193191854,
+            "base": 848.9665904465403,
             "factor": 1,
             "name": "vehicles_duration",
-            "value": 823.605193191854
+            "value": 848.9665904465403
           },
           {
             "factor": 1,
@@ -117,7 +117,7 @@
             "value": 0
           }
         ],
-        "value": 823.605193191854
+        "value": 848.9665904465403
       },
       "unplanned": [],
       "vehicles": [
@@ -177,48 +177,10 @@
                 }
               },
               "travel_duration": 0
-            },
-            {
-              "cumulative_travel_duration": 0,
-              "stop": {
-                "id": "Gionmachi",
-                "location": {
-                  "lat": 35.002457,
-                  "lon": 135.775682
-                }
-              },
-              "travel_duration": 0
-            },
-            {
-              "cumulative_travel_distance": 2839,
-              "cumulative_travel_duration": 141,
-              "stop": {
-                "id": "Kyoto Imperial Palace",
-                "location": {
-                  "lat": 35.025431,
-                  "lon": 135.762057
-                }
-              },
-              "travel_distance": 2839,
-              "travel_duration": 141
-            },
-            {
-              "cumulative_travel_distance": 6249,
-              "cumulative_travel_duration": 312,
-              "stop": {
-                "id": "Kinkaku-ji",
-                "location": {
-                  "lat": 35.039705,
-                  "lon": 135.728898
-                }
-              },
-              "travel_distance": 3410,
-              "travel_duration": 170
             }
           ],
-          "route_duration": 312,
-          "route_travel_distance": 6249,
-          "route_travel_duration": 312
+          "route_duration": 0,
+          "route_travel_duration": 0
         },
         {
           "id": "v3",
@@ -246,8 +208,21 @@
               "travel_duration": 0
             },
             {
-              "cumulative_travel_distance": 6940,
-              "cumulative_travel_duration": 347,
+              "cumulative_travel_distance": 5752,
+              "cumulative_travel_duration": 287,
+              "stop": {
+                "id": "Kinkaku-ji",
+                "location": {
+                  "lat": 35.039705,
+                  "lon": 135.728898
+                }
+              },
+              "travel_distance": 5752,
+              "travel_duration": 287
+            },
+            {
+              "cumulative_travel_distance": 9081,
+              "cumulative_travel_duration": 454,
               "stop": {
                 "id": "Nijō Castle",
                 "location": {
@@ -255,13 +230,39 @@
                   "lon": 135.748134
                 }
               },
-              "travel_distance": 6940,
-              "travel_duration": 347
+              "travel_distance": 3329,
+              "travel_duration": 166
+            },
+            {
+              "cumulative_travel_distance": 10857,
+              "cumulative_travel_duration": 542,
+              "stop": {
+                "id": "Kyoto Imperial Palace",
+                "location": {
+                  "lat": 35.025431,
+                  "lon": 135.762057
+                }
+              },
+              "travel_distance": 1776,
+              "travel_duration": 88
+            },
+            {
+              "cumulative_travel_distance": 13696,
+              "cumulative_travel_duration": 684,
+              "stop": {
+                "id": "Gionmachi",
+                "location": {
+                  "lat": 35.002457,
+                  "lon": 135.775682
+                }
+              },
+              "travel_distance": 2839,
+              "travel_duration": 141
             }
           ],
-          "route_duration": 347,
-          "route_travel_distance": 6940,
-          "route_travel_duration": 347
+          "route_duration": 684,
+          "route_travel_distance": 13696,
+          "route_travel_duration": 684
         }
       ]
     }
@@ -269,9 +270,9 @@
   "statistics": {
     "result": {
       "custom": {
-        "activated_vehicles": 3,
+        "activated_vehicles": 2,
         "max_duration": 0.123,
-        "max_stops_in_vehicle": 3,
+        "max_stops_in_vehicle": 5,
         "max_travel_duration": 0.123,
         "min_duration": 0.123,
         "min_stops_in_vehicle": 2,
