@@ -5,7 +5,7 @@ Defines the output class.
 """
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from nextroute.base_model import BaseModel
 from nextroute.check.schema import Output as CheckOutput
@@ -28,7 +28,7 @@ class StopOutput(BaseModel):
     location: Location
     """Location of the stop."""
 
-    custom_data: Optional[Any] = None
+    custom_data: Any | None = None
     """Custom data of the stop."""
 
 
@@ -38,33 +38,33 @@ class PlannedStopOutput(BaseModel):
     stop: StopOutput
     """Basic information on the stop."""
 
-    arrival_time: Optional[datetime] = None
+    arrival_time: datetime | None = None
     """Actual arrival time at this stop."""
-    cumulative_travel_distance: Optional[float] = None
+    cumulative_travel_distance: float | None = None
     """Cumulative distance to travel from the first stop to this one, in meters."""
-    cumulative_travel_duration: Optional[float] = None
+    cumulative_travel_duration: float | None = None
     """Cumulative duration to travel from the first stop to this one, in seconds."""
-    custom_data: Optional[Any] = None
+    custom_data: Any | None = None
     """Custom data of the stop."""
-    duration: Optional[float] = None
+    duration: float | None = None
     """Duration of the service at the stop, in seconds."""
-    early_arrival_duration: Optional[float] = None
+    early_arrival_duration: float | None = None
     """Duration of early arrival at the stop, in seconds."""
-    end_time: Optional[datetime] = None
+    end_time: datetime | None = None
     """End time of the service at the stop."""
-    late_arrival_duration: Optional[float] = None
+    late_arrival_duration: float | None = None
     """Duration of late arrival at the stop, in seconds."""
-    mix_items: Optional[Any] = None
+    mix_items: Any | None = None
     """Mix items at the stop."""
-    start_time: Optional[datetime] = None
+    start_time: datetime | None = None
     """Start time of the service at the stop."""
-    target_arrival_time: Optional[datetime] = None
+    target_arrival_time: datetime | None = None
     """Target arrival time at this stop."""
-    travel_distance: Optional[float] = None
+    travel_distance: float | None = None
     """Distance to travel from the previous stop to this one, in meters."""
-    travel_duration: Optional[float] = None
+    travel_duration: float | None = None
     """Duration to travel from the previous stop to this one, in seconds."""
-    waiting_duration: Optional[float] = None
+    waiting_duration: float | None = None
     """Waiting duratino at the stop, in seconds."""
 
 
@@ -74,22 +74,22 @@ class VehicleOutput(BaseModel):
     id: str
     """ID of the vehicle."""
 
-    alternate_stops: Optional[List[str]] = None
+    alternate_stops: list[str] | None = None
     """List of alternate stops that were planned on the vehicle."""
-    custom_data: Optional[Any] = None
+    custom_data: Any | None = None
     """Custom data of the vehicle."""
-    route: Optional[List[PlannedStopOutput]] = None
+    route: list[PlannedStopOutput] | None = None
     """Route of the vehicle, which is a list of stops that were planned on
     it."""
-    route_duration: Optional[float] = None
+    route_duration: float | None = None
     """Total duration of the vehicle's route, in seconds."""
-    route_stops_duration: Optional[float] = None
+    route_stops_duration: float | None = None
     """Total duration of the stops of the vehicle, in seconds."""
-    route_travel_distance: Optional[float] = None
+    route_travel_distance: float | None = None
     """Total travel distance of the vehicle, in meters."""
-    route_travel_duration: Optional[float] = None
+    route_travel_duration: float | None = None
     """Total travel duration of the vehicle, in seconds."""
-    route_waiting_duration: Optional[float] = None
+    route_waiting_duration: float | None = None
     """Total waiting duration of the vehicle, in seconds."""
 
 
@@ -99,16 +99,16 @@ class ObjectiveOutput(BaseModel):
     name: str
     """Name of the objective."""
 
-    base: Optional[float] = None
+    base: float | None = None
     """Base of the objective."""
-    custom_data: Optional[Any] = None
+    custom_data: Any | None = None
     """Custom data of the objective."""
-    factor: Optional[float] = None
+    factor: float | None = None
     """Factor of the objective."""
-    objectives: Optional[List[Dict[str, Any]]] = None
+    objectives: list[dict[str, Any]] | None = None
     """List of objectives. Each list is actually of the same class
     `ObjectiveOutput`, but we avoid a recursive definition here."""
-    value: Optional[float] = None
+    value: float | None = None
     """Value of the objective, which is equivalent to `self.base *
     self.factor`."""
 
@@ -116,25 +116,25 @@ class ObjectiveOutput(BaseModel):
 class Solution(BaseModel):
     """Solution to a Vehicle Routing Problem (VRP)."""
 
-    unplanned: Optional[List[StopOutput]] = None
+    unplanned: list[StopOutput] | None = None
     """List of stops that were not planned in the solution."""
-    vehicles: Optional[List[VehicleOutput]] = None
+    vehicles: list[VehicleOutput] | None = None
     """List of vehicles in the solution."""
-    objective: Optional[ObjectiveOutput] = None
+    objective: ObjectiveOutput | None = None
     """Information of the objective (value function)."""
-    check: Optional[CheckOutput] = None
+    check: CheckOutput | None = None
     """Check of the solution, if enabled."""
 
 
 class Output(BaseModel):
     """Output schema for Nextroute."""
 
-    options: Dict[str, Any]
+    options: dict[str, Any]
     """Options used to obtain this output."""
     version: Version
     """Versions used for the solution."""
 
-    solutions: Optional[List[Solution]] = None
+    solutions: list[Solution] | None = None
     """Solutions to the problem."""
-    statistics: Optional[Statistics] = None
+    statistics: Statistics | None = None
     """Statistics of the solution."""

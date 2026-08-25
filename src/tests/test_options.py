@@ -2,7 +2,7 @@ import os
 import re
 import subprocess
 import unittest
-from typing import Any, List, Tuple
+from typing import Any
 
 import nextroute
 
@@ -14,7 +14,7 @@ def _compile_nextroute():
     subprocess.run(["go", "build", "-o", "nextroute.exe"], cwd=NEXTROUTE_CMD, check=True)
 
 
-def _extract_option(line_1: str, line_2: str) -> Tuple[str, type, Any, str]:
+def _extract_option(line_1: str, line_2: str) -> tuple[str, type, Any, str]:
     """Extracts an option from the help lines of the nextroute binary."""
     components = line_1.split(" ")
     name = components[0].replace(".", "_").upper()[1:]
@@ -55,7 +55,7 @@ def _extract_option(line_1: str, line_2: str) -> Tuple[str, type, Any, str]:
     return name, t, default, descr
 
 
-def _extract_options() -> List[Tuple[str, type, Any, str]]:
+def _extract_options() -> list[tuple[str, type, Any, str]]:
     """Extracts the options from the nextroute binary."""
     _compile_nextroute()
     executable = os.path.join(NEXTROUTE_CMD, "nextroute.exe")
