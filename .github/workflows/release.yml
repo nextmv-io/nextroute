@@ -89,7 +89,7 @@ jobs:
       - name: install dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install build hatch
         working-directory: ./nextroute
 
       - name: bump version in version file for Go
