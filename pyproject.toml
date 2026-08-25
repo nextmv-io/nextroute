@@ -10,8 +10,6 @@ classifiers = [
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -40,7 +38,7 @@ maintainers = [
 ]
 name = "nextroute"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 
 [project.urls]
 Homepage = "https://www.nextmv.io"
@@ -48,7 +46,7 @@ Documentation = "https://docs.nextmv.io/nextroute"
 Repository = "https://github.com/nextmv-io/nextroute"
 
 [tool.ruff]
-target-version = "py38"
+target-version = "py310"
 lint.select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -59,6 +57,8 @@ lint.select = [
     "UP",  # pyupgrade
 ]
 line-length = 120
+[tool.ruff.lint.mccabe]
+max-complexity = 20
 
 [tool.hatch.version]
 path = "src/nextroute/__about__.py"
@@ -72,7 +72,7 @@ nextroute = ["bin/*.exe"]
 
 [tool.cibuildwheel]
 test-command = 'python -c "exec(\"import nextroute\nprint(nextroute.nextroute_version())\")"'
-build = "cp3{8,9,10,11,12,13}-*"
+build = "cp3{10,11,12,13}-*"
 skip = "*musllinux*"
 archs = "native"
 manylinux-x86_64-image = "quay.io/pypa/manylinux_2_28_x86_64"
@@ -83,3 +83,13 @@ before-all = """
 dnf update -y
 dnf -y install go
 """
+
+[dependency-groups]
+benchmark = [
+    "nextmv==1.10.3",
+]
+dev = [
+    "nextmv==1.10.3",
+    "pytest==9.0.2",
+    "ruff==0.16.3",
+]

@@ -87,8 +87,8 @@ func TestPythonSolveGolden(t *testing.T) {
 			},
 			GoldenExtension: ".python.golden",
 			ExecutionConfig: &golden.ExecutionConfig{
-				Command:    "python3",
-				Args:       []string{pythonFileDestination},
+				Command:    "uv",
+				Args:       []string{"run", pythonFileDestination},
 				InputFlag:  "-input",
 				OutputFlag: "-output",
 			},
