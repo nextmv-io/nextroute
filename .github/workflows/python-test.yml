@@ -37,8 +37,19 @@ jobs:
           version: "0.9.29"
           python-version: ${{ matrix.python-version }}
 
+      # Go must be set up before installing the project, because `setup.py`
+      # compiles the Nextroute binary with `go build`.
+      - name: set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
       - name: install the project
         run: uv sync --locked --dev
+
+      - name: unit tests
+        run: uv run pytest
+        working-directory: src
 
       # There appears to be a bug around
       # `nextmv-io/sdk@v1.8.0/golden/file.go:75` specifically in Windows. When
@@ -48,16 +59,6 @@ jobs:
       # process.` We need to figure out why it only happens in Windows. Until
       # then, we will not run the golden file tests in Windows.
       # Source:https://github.com/nextmv-io/nextroute/actions/runs/11414952328/job/31764458969?pr=65
-      - name: set up Go
-        if: ${{ matrix.platform != 'windows-latest' }}
-        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: unit tests
-        run: uv run pytest
-        working-directory: src
-
       - name: golden file tests from Python package
         if: ${{ matrix.platform != 'windows-latest' }}
         run: go test $(go list ./... | grep github.com/nextmv-io/nextroute/src)
