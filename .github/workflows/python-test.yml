@@ -37,8 +37,6 @@ jobs:
           version: "0.9.29"
           python-version: ${{ matrix.python-version }}
 
-      # Go must be set up before installing the project, because `setup.py`
-      # compiles the Nextroute binary with `go build`.
       - name: set up Go
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
         with:

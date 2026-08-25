@@ -427,6 +427,7 @@ benchmark = [
     { name = "nextmv" },
 ]
 dev = [
+    { name = "nextmv" },
     { name = "pytest" },
     { name = "ruff" },
 ]
@@ -435,8 +436,9 @@ dev = [
 requires-dist = [{ name = "pydantic", specifier = ">=2.5.2" }]
 
 [package.metadata.requires-dev]
-benchmark = [{ name = "nextmv", specifier = ">=0.29.5.dev1" }]
+benchmark = [{ name = "nextmv", specifier = "==1.10.3" }]
 dev = [
+    { name = "nextmv", specifier = "==1.10.3" },
     { name = "pytest", specifier = "==9.0.2" },
     { name = "ruff", specifier = "==0.16.3" },
 ]

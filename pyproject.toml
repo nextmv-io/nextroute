@@ -86,9 +86,10 @@ dnf -y install go
 
 [dependency-groups]
 benchmark = [
-    "nextmv>=0.29.5.dev1",
+    "nextmv==1.10.3",
 ]
 dev = [
+    "nextmv==1.10.3",
     "pytest==9.0.2",
     "ruff==0.16.3",
 ]
