@@ -8,7 +8,7 @@ import json
 import os
 import platform
 import subprocess
-from typing import Any, Dict, Union
+from typing import Any
 
 from nextroute.options import Options
 from nextroute.schema.input import Input
@@ -21,8 +21,8 @@ SUPPORTED_ARCHITECTURES = ["amd64", "x86_64", "arm64", "aarch64"]
 
 
 def solve(
-    input: Union[Input, Dict[str, Any]],
-    options: Union[Options, Dict[str, Any]],
+    input: Input | dict[str, Any],
+    options: Options | dict[str, Any],
 ) -> Output:
     """
     Solve a Vehicle Routing Problem (VRP) using the Nextroute engine. The input

@@ -6,7 +6,7 @@ Options for working with the Nextroute engine.
 
 import json
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any
 
 from pydantic import Field
 
@@ -50,7 +50,7 @@ class Options(BaseModel):
     """Whether to disable the progression series."""
     MODEL_CONSTRAINTS_DISABLE_ATTRIBUTES: bool = False
     """Ignore the compatibility attributes constraint."""
-    MODEL_CONSTRAINTS_DISABLE_CAPACITIES: List[str] = Field(default_factory=list)
+    MODEL_CONSTRAINTS_DISABLE_CAPACITIES: list[str] = Field(default_factory=list)
     """Ignore the capacity constraint for the given resource names."""
     MODEL_CONSTRAINTS_DISABLE_CAPACITY: bool = False
     """Ignore the capacity constraint for all resources."""
@@ -181,7 +181,7 @@ class Options(BaseModel):
     generated with sweep algorithm, the rest generated randomly.
     """
 
-    def to_args(self) -> List[str]:
+    def to_args(self) -> list[str]:
         """
         Convert the options to command-line arguments.
 
@@ -229,7 +229,7 @@ class Options(BaseModel):
         return args
 
     @classmethod
-    def extract_from_dict(cls, data: Dict[str, Any]) -> "Options":
+    def extract_from_dict(cls, data: dict[str, Any]) -> "Options":
         """
         Extracts options from a dictionary. This dictionary may contain more
         keys that are not part of the Nextroute options.

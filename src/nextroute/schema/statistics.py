@@ -4,7 +4,7 @@
 Schema for statistics.
 """
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from pydantic import Field
 
@@ -26,16 +26,11 @@ class RunStatistics(BaseModel):
         Any]`.
     """
 
-    duration: Optional[float] = None
+    duration: float | None = None
     """Duration of the run in seconds."""
-    iterations: Optional[int] = None
+    iterations: int | None = None
     """Number of iterations."""
-    custom: Optional[
-        Union[
-            Any,
-            Dict[str, Any],
-        ]
-    ] = None
+    custom: Any | dict[str, Any] | None = None
     """Custom statistics created by the user. Can normally expect a `Dict[str,
     Any]`."""
 
@@ -55,16 +50,11 @@ class ResultStatistics(BaseModel):
         Any]`.
     """
 
-    duration: Optional[float] = None
+    duration: float | None = None
     """Duration of the run in seconds."""
-    value: Optional[float] = None
+    value: float | None = None
     """Value of the result."""
-    custom: Optional[
-        Union[
-            Any,
-            Dict[str, Any],
-        ]
-    ] = None
+    custom: Any | dict[str, Any] | None = None
     """Custom statistics created by the user. Can normally expect a `Dict[str,
     Any]`."""
 
@@ -99,9 +89,9 @@ class Series(BaseModel):
         Data of the series.
     """
 
-    name: Optional[str] = None
+    name: str | None = None
     """Name of the series."""
-    data_points: Optional[List[DataPoint]] = None
+    data_points: list[DataPoint] | None = None
     """Data of the series."""
 
 
@@ -117,9 +107,9 @@ class SeriesData(BaseModel):
         A list of series for custom statistics.
     """
 
-    value: Optional[Series] = None
+    value: Series | None = None
     """A series for the value of the solution."""
-    custom: Optional[List[Series]] = None
+    custom: list[Series] | None = None
     """A list of series for custom statistics."""
 
 
@@ -139,11 +129,11 @@ class Statistics(BaseModel):
         Schema (version). This class only supports `v1`.
     """
 
-    run: Optional[RunStatistics] = None
+    run: RunStatistics | None = None
     """Statistics about the run."""
-    result: Optional[ResultStatistics] = None
+    result: ResultStatistics | None = None
     """Statistics about the last result."""
-    series_data: Optional[SeriesData] = None
+    series_data: SeriesData | None = None
     """Data of the series."""
-    statistics_schema: Optional[str] = Field(alias="schema", default="v1")
+    statistics_schema: str | None = Field(alias="schema", default="v1")
     """Schema (version). This class only supports `v1`."""
