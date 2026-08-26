@@ -133,6 +133,13 @@ type solveOperatorUnPlanImpl struct {
 	operatorChances solveOperatorUnPlanChances
 }
 
+// rootPlanUnit returns the top-most plan unit that planUnit is a member of.
+// For a stop that belongs to a stop-group (a PlanAll units-unit) this is the
+// units-unit. For an ungrouped stop it is the stops-unit itself.
+func rootPlanUnit(planUnit SolutionPlanUnit) SolutionPlanUnit {
+	return planUnit.Solution().(*solutionImpl).unwrapRootPlanUnit(planUnit)
+}
+
 func (d *solveOperatorUnPlanImpl) NumberOfUnits() SolveParameter {
 	return d.Parameters()[0]
 }
@@ -197,9 +204,7 @@ func (d *solveOperatorUnPlanImpl) unplanOneStopIsland(
 		return 0, nil
 	}
 
-	unPlanned, err := solutionStop.
-		PlanStopsUnit().
-		UnPlan()
+	unPlanned, err := rootPlanUnit(solutionStop.PlanStopsUnit()).UnPlan()
 	if err != nil {
 		return 0, err
 	}
@@ -238,9 +243,9 @@ func (d *solveOperatorUnPlanImpl) unplanClosestStops(
 			solution.Random().Float64() > 0.5 {
 			continue
 		}
-		unPlanned, err := solution.
-			SolutionPlanStopsUnit(stop.PlanStopsUnit()).
-			UnPlan()
+		unPlanned, err := rootPlanUnit(
+			solution.SolutionPlanStopsUnit(stop.PlanStopsUnit()),
+		).UnPlan()
 		if err != nil {
 			return planUnits, err
 		}
@@ -318,7 +323,7 @@ func (d *solveOperatorUnPlanImpl) unplanSomeStopsOfOneVehicle(
 			if solution.Random().Float64() < chance {
 				continue
 			}
-			unplanned, err := stop.PlanStopsUnit().UnPlan()
+			unplanned, err := rootPlanUnit(stop.PlanStopsUnit()).UnPlan()
 			if err != nil {
 				return 0, err
 			}
@@ -342,17 +347,25 @@ func (d *solveOperatorUnPlanImpl) unplanLocation(
 			location := solutionStop.ModelStop().Location()
 			stop := solutionStop.Next()
 			for location.Equals(stop.ModelStop().Location()) && !stop.IsLast() {
-				unPlanUnits = append(unPlanUnits, stop.PlanStopsUnit())
+				unPlanUnits = append(unPlanUnits, rootPlanUnit(stop.PlanStopsUnit()))
 				stop = stop.Next()
 			}
 			stop = solutionStop.Previous()
 			for location.Equals(stop.ModelStop().Location()) && !stop.IsFirst() {
-				unPlanUnits = append(unPlanUnits, stop.PlanStopsUnit())
+				unPlanUnits = append(unPlanUnits, rootPlanUnit(stop.PlanStopsUnit()))
 				stop = stop.Previous()
 			}
 		}
 	}
+
+	// A neighbouring stop may share its (grouped) root unit with another
+	// neighbour or with planUnit itself. Unplan each root at most once.
+	seen := make(map[int]struct{}, len(unPlanUnits))
 	for _, unPlanUnit := range unPlanUnits {
+		if _, ok := seen[unPlanUnit.ModelPlanUnit().Index()]; ok {
+			continue
+		}
+		seen[unPlanUnit.ModelPlanUnit().Index()] = struct{}{}
 		unplanned, err := unPlanUnit.UnPlan()
 		if err != nil {
 			return count, err
