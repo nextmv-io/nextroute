@@ -1,17 +1,7 @@
 name: release
-run-name: Release ${{ inputs.VERSION }} (pre-release - ${{ inputs.IS_PRE_RELEASE }}) by @${{ github.actor }} from ${{ github.ref_name }}
+run-name: Release by @${{ github.actor }} from ${{ github.ref_name }}
 
-on:
-  workflow_dispatch:
-    inputs:
-      VERSION:
-        description: "The version to release"
-        required: true
-      IS_PRE_RELEASE:
-        description: "It IS a pre-release"
-        required: true
-        default: true
-        type: boolean
+on: [push]
 
 permissions:
   contents: read
@@ -21,116 +11,31 @@ env:
   PYTHON_VERSION: 3.12
 
 jobs:
-  bump-version:
-    runs-on: ubuntu-latest
-    env:
-      VERSION: ${{ inputs.VERSION }}
-      GH_TOKEN: ${{ github.token }}
-      SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+  # Determine whether a release is needed and, if so, create the tag and the
+  # GitHub release. The version is read from the VERSION file, which is bumped
+  # by a developer in a regular pull request.
+  release:
+    if: ${{ github.ref_type == 'branch' }}
+    uses: nextmv-io/release/.github/workflows/release.yml@949cbb3b90ab294f8da42cf9c314637deaa578f5 # develop
     permissions:
       contents: write
-    steps:
-      - name: ensure proper tagging
-        run: |
-          echo "If it's a pre-release, the version should contain a hyphen"
-          if [ ${{ inputs.IS_PRE_RELEASE }} = true ]; then
-            if [[ $VERSION != *-* ]]; then
-              echo "Pre-release versions should contain a hyphen"
-              exit 1
-            fi
-          else
-            if [[ $VERSION == *-* ]]; then
-              echo "Release versions should not contain a hyphen"
-              exit 1
-            fi
-          fi
-
-      - name: ensure version is not already released
-        run: |
-          if git ls-remote --tags origin | grep -q "refs/tags/$VERSION"; then
-            echo "Version $VERSION already exists"
-            exit 1
-          fi
-
-      - name: set up Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: set up go
-        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: configure git with the bot credentials
-        env:
-          REF_NAME: ${{ github.ref_name }}
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add - <<< "${{ secrets.NEXTMVBOT_SSH_KEY }}"
-
-          echo "${{ secrets.NEXTMVBOT_SIGNING_KEY }}" > ~/.ssh/signing.key
-          chmod 600 ~/.ssh/signing.key
-
-          git config --global user.name "nextmv-bot"
-          git config --global user.email "tech+gh-nextmv-bot@nextmv.io"
-          git config --global gpg.format ssh
-          git config --global user.signingkey ~/.ssh/signing.key
-
-          git clone git@github.com:nextmv-io/nextroute.git
-
-          cd nextroute
-          git checkout $REF_NAME
-
-          git rev-parse --short HEAD
-
-      - name: install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install build hatch
-        working-directory: ./nextroute
-
-      - name: bump version in version file for Go
-        run: |
-          echo $VERSION > VERSION
-        working-directory: ./nextroute
-
-      - name: bump version in version file for Python
-        run: |
-          echo "# © 2019-present nextmv.io inc" > src/nextroute/__about__.py
-          echo "__version__ = \"$VERSION\"" >> src/nextroute/__about__.py
-        working-directory: ./nextroute
-
-      - name: commit version bump
-        run: |
-          git add VERSION
-          git add src/nextroute/__about__.py
-
-          git commit -S -m "Bump version to $VERSION"
-          git push
-
-          git tag $VERSION
-          git push origin $VERSION
-        working-directory: ./nextroute
-
-      - name: create release
-        run: |
-          PRERELEASE_FLAG=""
-          if [ ${{ inputs.IS_PRE_RELEASE }} = true ]; then
-            PRERELEASE_FLAG="--prerelease"
-          fi
-
-          gh release create $VERSION \
-          --verify-tag \
-          --generate-notes \
-          --title $VERSION $PRERELEASE_FLAG
-        working-directory: ./nextroute
+      pull-requests: write
+    with:
+      BRANCH: ${{ github.ref_name }}
+      REPOSITORY: nextroute
+      LANGUAGE: go
+      PACKAGE_NAME: nextroute
+      PACKAGE_LOCATION: "" # VERSION file lives at the repository root.
+      VERSION_FILE: VERSION
+    secrets:
+      SLACK_URL_MISSION_CONTROL: ${{ secrets.SLACK_URL_MISSION_CONTROL }}
+      NEXTMVBOT_SSH_KEY: ${{ secrets.NEXTMVBOT_SSH_KEY }}
+      NEXTMVBOT_SIGNING_KEY: ${{ secrets.NEXTMVBOT_SIGNING_KEY }}
 
   build-sdist:
     name: wheels-sdist
-    needs: bump-version
+    needs: release
+    if: ${{ needs.release.outputs.RELEASE_NEEDED == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -151,7 +56,8 @@ jobs:
 
   build-wheels:
     name: wheels-${{ matrix.platform }}
-    needs: bump-version
+    needs: release
+    if: ${{ needs.release.outputs.RELEASE_NEEDED == 'true' }}
     runs-on: ${{ matrix.image }}
     strategy:
       fail-fast: false
@@ -212,19 +118,13 @@ jobs:
           name: wheels-artifacts-${{ matrix.platform }}
           path: wheelhouse/*.whl
 
-  release:
+  publish:
     runs-on: ubuntu-latest
-    needs: [build-wheels, build-sdist]
-    strategy:
-      matrix:
-        include:
-          - target-env: pypi
-            target-url: https://pypi.org/p/nextroute
-          - target-env: testpypi
-            target-url: https://test.pypi.org/p/nextroute
+    needs: [release, build-wheels, build-sdist]
+    if: ${{ needs.release.outputs.RELEASE_NEEDED == 'true' }}
     environment:
-      name: ${{ matrix.target-env }}
-      url: ${{ matrix.target-url }}
+      name: pypi
+      url: https://pypi.org/p/nextroute
     permissions:
       contents: read
       id-token: write # This is required for trusted publishing to PyPI
@@ -240,27 +140,17 @@ jobs:
           path: ./
 
       - name: Publish package distributions to PyPI
-        if: ${{ matrix.target-env == 'pypi' }}
         uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
         with:
-          packages-dir: ./dist
-
-      - name: Publish package distributions to TestPyPI
-        if: ${{ matrix.target-env == 'testpypi' }}
-        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
-        with:
-          repository-url: https://test.pypi.org/legacy/
           packages-dir: ./dist
 
   notify:
-    runs-on: ubuntu-latest
-    needs: release
-    if: ${{ needs.release.result == 'success' && inputs.IS_PRE_RELEASE == false }}
-    steps:
-      - name: notify slack
-        env:
-          VERSION: ${{ inputs.VERSION }}
-          SLACK_URL: ${{ secrets.SLACK_URL_MISSION_CONTROL }}
-        run: |
-          export DATA="{\"text\":\"Release notification - nextroute $VERSION (see <https://github.com/nextmv-io/nextroute/releases/$VERSION|release notes> / <https://pypi.org/project/nextroute|PyPI>)\"}"
-          curl -X POST -H 'Content-type: application/json' --data "$DATA" $SLACK_URL
+    needs: [release, publish]
+    if: ${{ needs.release.outputs.RELEASE_NEEDED == 'true' && needs.release.outputs.SHOULD_NOTIFY_SLACK == 'true' }}
+    uses: nextmv-io/release/.github/workflows/notify-slack.yml@949cbb3b90ab294f8da42cf9c314637deaa578f5 # develop
+    with:
+      PACKAGE_NAME: nextroute
+      VERSION: ${{ needs.release.outputs.VERSION }}
+      REPOSITORY: nextroute
+    secrets:
+      SLACK_URL_MISSION_CONTROL: ${{ secrets.SLACK_URL_MISSION_CONTROL }}
