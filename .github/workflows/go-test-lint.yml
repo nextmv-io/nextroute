@@ -41,3 +41,25 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
       - name: go test (exclude golden file tests from Python package)
         run: go test $(go list ./... | grep -v github.com/nextmv-io/nextroute/src)
+  # Ensure the Go version file (VERSION, embedded and used for releases) and the
+  # Python version file (src/nextroute/__about__.py) are kept in sync. The
+  # release workflow reads the version from VERSION, so any drift would ship a
+  # Python package whose reported version does not match the release tag.
+  version-consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - name: git clone
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: check VERSION matches src/nextroute/__about__.py
+        run: |
+          GO_VERSION="$(tr -d '[:space:]' < VERSION)"
+          PY_VERSION="$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' src/nextroute/__about__.py)"
+          echo "Go VERSION file:              $GO_VERSION"
+          echo "Python __about__.py version:  $PY_VERSION"
+          if [ "$GO_VERSION" != "$PY_VERSION" ]; then
+            echo "::error::Version mismatch: VERSION ($GO_VERSION) != src/nextroute/__about__.py ($PY_VERSION). Bump both files to the same value."
+            exit 1
+          fi
+          echo "Versions are in sync."
