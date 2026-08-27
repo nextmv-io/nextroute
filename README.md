@@ -83,40 +83,40 @@ Install using the Python package manager of your choice:
 
 | Feature | Description |
 | ------- | ----------- |
-| [Alternate stops](https://www.nextmv.io/docs/nextroute/features/alternate-stops) | Specify a set of alternate stops per vehicle for which only one should be serviced. |
-| [Compatibility attributes](https://www.nextmv.io/docs/nextroute/features/compatibility-attributes) | Specify which stops are compatible with which vehicles. |
-| [Capacity](https://www.nextmv.io/docs/nextroute/features/capacity) | Set capacities for vehicles and quantities (demanded or offered) at stops. |
-| [Cluster constraint](https://www.nextmv.io/docs/nextroute/features/cluster-constraint) | Enforce the creation of clustered routes. |
-| [Cluster objective](https://www.nextmv.io/docs/nextroute/features/cluster-objective) | Incentivize the creation of clustered routes. |
-| [Custom constraints](https://www.nextmv.io/docs/nextroute/features/custom-constraints) | Implement custom constraints with Nextmv SDK. |
-| [Custom data](https://www.nextmv.io/docs/nextroute/features/custom-data) | Add custom data that is preserved in the output. |
-| [Custom matrices](https://www.nextmv.io/docs/nextroute/features/custom-matrices) | Use custom matrices to achieve more precise drive time. |
-| [Custom objectives](https://www.nextmv.io/docs/nextroute/features/custom-objectives) | Implement custom objectives with Nextmv SDK. |
-| [Custom operators](https://www.nextmv.io/docs/nextroute/features/custom-operators) | Implement custom operators with Nextmv SDK. |
-| [Custom output](https://www.nextmv.io/docs/nextroute/features/custom-output) | Create a custom output for your app. |
-| [Distance matrix](https://www.nextmv.io/docs/nextroute/features/distance-matrix) | Specify a distance matrix in the input that provides the distance of going from location A to B. |
-| [Duration matrix](https://www.nextmv.io/docs/nextroute/features/duration-matrix) | Specify a duration matrix in the input that provides the duration of going from location A to B. |
-| [Duration groups](https://www.nextmv.io/docs/nextroute/features/duration-groups) | Specify a duration that is added every time a stop in the group is approached from a stop outside of the group. |
-| [Early arrival time penalty](https://www.nextmv.io/docs/nextroute/features/early-arrival-time-penalty) | Specify a penalty that is added to the objective when arriving before a stop's target arrival time. |
-| [Late arrival time penalty](https://www.nextmv.io/docs/nextroute/features/late-arrival-time-penalty) | Specify a penalty that is added to the objective when arriving after a stop's target arrival time. |
-| [Map data in cloud](https://www.nextmv.io/docs/nextroute/features/map-data) | Calculates duration and distance matrices using a hosted OSRM map service when running on Nextmv Cloud. Note that map data is a paid feature. |
-| [Maximum route distance](https://www.nextmv.io/docs/nextroute/features/max-distance) | Specify the maximum distance that a vehicle can travel. |
-| [Maximum route duration](https://www.nextmv.io/docs/nextroute/features/max-duration) | Specify the maximum duration that a vehicle can travel for. |
-| [Maximum route stops](https://www.nextmv.io/docs/nextroute/features/max-stops) | Specify the maximum stops that a vehicle can visit. |
-| [Maximum wait time](https://www.nextmv.io/docs/nextroute/features/max-wait) | Specify the maximum time a vehicle can wait when arriving before the start time window opens at a stop. |
-| [Minimum route stops](https://www.nextmv.io/docs/nextroute/features/min-stops) | Specify the minimum stops that a vehicle should visit (applying a penalty). |
-| [Nextcheck](https://www.nextmv.io/docs/nextroute/features/nextcheck) | Check which stops can be planned or why stops have been unplanned. |
-| [Precedence](https://www.nextmv.io/docs/nextroute/features/precedence) | Add pickups and deliveries or specify multiple pickups before deliveries and vice versa. |
-| [Stop duration](https://www.nextmv.io/docs/nextroute/features/stop-duration) | Specify the time it takes to service a stop. |
-| [Stop duration multiplier](https://www.nextmv.io/docs/nextroute/features/stop-duration-multiplier) | Specify a multiplier on time it takes a vehicle to service a stop. |
-| [Stop groups](https://www.nextmv.io/docs/nextroute/features/stop-groups) | Specify stops that must be assigned together on the same route, with no further requirements. |
-| [Stop mixing](https://www.nextmv.io/docs/nextroute/features/stop-mixing) | Specify properties of stops which can not be on the vehicle at the same time. |
-| [Time windows](https://www.nextmv.io/docs/nextroute/features/time-windows) | Specify the time window in which a stop must start service. |
-| [Unplanned penalty](https://www.nextmv.io/docs/nextroute/features/unplanned-penalty) | Specify a penalty that is added to the objective to leave a stop unplanned when all constraints cannot be fulfilled. |
-| [Vehicle activation penalty](https://www.nextmv.io/docs/nextroute/features/vehicle-activation-penalty) | Specify a penalty that is added to the objective for activating (using) a vehicle. |
-| [Vehicle initial stops](https://www.nextmv.io/docs/nextroute/features/vehicle-initial-stops) | Specify initial stops planned on a vehicle. |
-| [Vehicle start/end location](https://www.nextmv.io/docs/nextroute/features/vehicle-start-end-location) | Specify optional starting and ending locations for vehicles. |
-| [Vehicle start/end time](https://www.nextmv.io/docs/nextroute/features/vehicle-start-end-time) | Specify optional starting and ending time for a vehicle. |
+| [Alternate stops](https://docs.nextmv.io/nextroute/features/alternate-stops) | Specify a set of alternate stops per vehicle for which only one should be serviced. |
+| [Compatibility attributes](https://docs.nextmv.io/nextroute/features/compatibility-attributes) | Specify which stops are compatible with which vehicles. |
+| [Capacity](https://docs.nextmv.io/nextroute/features/capacity) | Set capacities for vehicles and quantities (demanded or offered) at stops. |
+| [Cluster constraint](https://docs.nextmv.io/nextroute/features/cluster-constraint) | Enforce the creation of clustered routes. |
+| [Cluster objective](https://docs.nextmv.io/nextroute/features/cluster-objective) | Incentivize the creation of clustered routes. |
+| [Custom constraints](https://docs.nextmv.io/nextroute/features/custom-constraints) | Implement custom constraints with Nextmv SDK. |
+| [Custom data](https://docs.nextmv.io/nextroute/features/custom-data) | Add custom data that is preserved in the output. |
+| [Custom matrices](https://docs.nextmv.io/nextroute/features/custom-matrices) | Use custom matrices to achieve more precise drive time. |
+| [Custom objectives](https://docs.nextmv.io/nextroute/features/custom-objectives) | Implement custom objectives with Nextmv SDK. |
+| [Custom operators](https://docs.nextmv.io/nextroute/features/custom-operators) | Implement custom operators with Nextmv SDK. |
+| [Custom output](https://docs.nextmv.io/nextroute/features/custom-output) | Create a custom output for your app. |
+| [Distance matrix](https://docs.nextmv.io/nextroute/features/distance-matrix) | Specify a distance matrix in the input that provides the distance of going from location A to B. |
+| [Duration matrix](https://docs.nextmv.io/nextroute/features/duration-matrix) | Specify a duration matrix in the input that provides the duration of going from location A to B. |
+| [Duration groups](https://docs.nextmv.io/nextroute/features/duration-groups) | Specify a duration that is added every time a stop in the group is approached from a stop outside of the group. |
+| [Early arrival time penalty](https://docs.nextmv.io/nextroute/features/early-arrival-time-penalty) | Specify a penalty that is added to the objective when arriving before a stop's target arrival time. |
+| [Late arrival time penalty](https://docs.nextmv.io/nextroute/features/late-arrival-time-penalty) | Specify a penalty that is added to the objective when arriving after a stop's target arrival time. |
+| [Map data in cloud](https://docs.nextmv.io/nextroute/features/map-data) | Calculates duration and distance matrices using a hosted OSRM map service when running on Nextmv Cloud. Note that map data is a paid feature. |
+| [Maximum route distance](https://docs.nextmv.io/nextroute/features/max-distance) | Specify the maximum distance that a vehicle can travel. |
+| [Maximum route duration](https://docs.nextmv.io/nextroute/features/max-duration) | Specify the maximum duration that a vehicle can travel for. |
+| [Maximum route stops](https://docs.nextmv.io/nextroute/features/max-stops) | Specify the maximum stops that a vehicle can visit. |
+| [Maximum wait time](https://docs.nextmv.io/nextroute/features/max-wait) | Specify the maximum time a vehicle can wait when arriving before the start time window opens at a stop. |
+| [Minimum route stops](https://docs.nextmv.io/nextroute/features/min-stops) | Specify the minimum stops that a vehicle should visit (applying a penalty). |
+| [Nextcheck](https://docs.nextmv.io/nextroute/features/nextcheck) | Check which stops can be planned or why stops have been unplanned. |
+| [Precedence](https://docs.nextmv.io/nextroute/features/precedence) | Add pickups and deliveries or specify multiple pickups before deliveries and vice versa. |
+| [Stop duration](https://docs.nextmv.io/nextroute/features/stop-duration) | Specify the time it takes to service a stop. |
+| [Stop duration multiplier](https://docs.nextmv.io/nextroute/features/stop-duration-multiplier) | Specify a multiplier on time it takes a vehicle to service a stop. |
+| [Stop groups](https://docs.nextmv.io/nextroute/features/stop-groups) | Specify stops that must be assigned together on the same route, with no further requirements. |
+| [Stop mixing](https://docs.nextmv.io/nextroute/features/stop-mixing) | Specify properties of stops which can not be on the vehicle at the same time. |
+| [Time windows](https://docs.nextmv.io/nextroute/features/time-windows) | Specify the time window in which a stop must start service. |
+| [Unplanned penalty](https://docs.nextmv.io/nextroute/features/unplanned-penalty) | Specify a penalty that is added to the objective to leave a stop unplanned when all constraints cannot be fulfilled. |
+| [Vehicle activation penalty](https://docs.nextmv.io/nextroute/features/vehicle-activation-penalty) | Specify a penalty that is added to the objective for activating (using) a vehicle. |
+| [Vehicle initial stops](https://docs.nextmv.io/nextroute/features/vehicle-initial-stops) | Specify initial stops planned on a vehicle. |
+| [Vehicle start/end location](https://docs.nextmv.io/nextroute/features/vehicle-start-end-location) | Specify optional starting and ending locations for vehicles. |
+| [Vehicle start/end time](https://docs.nextmv.io/nextroute/features/vehicle-start-end-time) | Specify optional starting and ending time for a vehicle. |
 
 ## Local benchmarking
 

@@ -1,2 +1,2 @@
 # © 2019-present nextmv.io inc
-__version__ = "v1.12.6"
+__version__ = "v1.12.7"
