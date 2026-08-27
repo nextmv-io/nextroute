@@ -42,7 +42,7 @@ requires-python = ">=3.10"
 
 [project.urls]
 Homepage = "https://www.nextmv.io"
-Documentation = "https://www.nextmv.io/docs/vehicle-routing"
+Documentation = "https://docs.nextmv.io/nextroute"
 Repository = "https://github.com/nextmv-io/nextroute"
 
 [tool.ruff]
