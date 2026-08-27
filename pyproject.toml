@@ -90,6 +90,6 @@ benchmark = [
 ]
 dev = [
     "nextmv==1.10.3",
-    "pytest==9.0.2",
+    "pytest==9.0.3",
     "ruff==0.16.3",
 ]
