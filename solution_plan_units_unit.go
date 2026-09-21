@@ -129,9 +129,11 @@ func (p *solutionPlanUnitsUnitImpl) UnPlan() (bool, error) {
 	}
 
 	solution := p.Solution().(*solutionImpl)
-
-	solution.plannedPlanUnits.remove(p)
-	solution.unPlannedPlanUnits.add(p)
+	// Guard against nested plan units unit. Only the top-level plan unit should be accounted for.
+	if _, isMemberOf := p.modelPlanUnitsUnit.PlanUnitsUnit(); !isMemberOf {
+		solution.plannedPlanUnits.remove(p)
+		solution.unPlannedPlanUnits.add(p)
+	}
 
 	for _, solutionPlanUnit := range p.solutionPlanUnits {
 		if solutionPlanUnit.IsPlanned() {

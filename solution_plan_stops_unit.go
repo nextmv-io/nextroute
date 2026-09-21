@@ -134,11 +134,7 @@ func (p *solutionPlanStopsUnitImpl) UnPlan() (bool, error) {
 
 	solution.Model().OnUnPlan(p)
 
-	if planUnitsUnit, isMemberOf := p.modelPlanStopsUnit.PlanUnitsUnit(); isMemberOf {
-		solutionPlanUnitsUnit := solution.SolutionPlanUnit(planUnitsUnit)
-		solution.plannedPlanUnits.remove(solutionPlanUnitsUnit)
-		solution.unPlannedPlanUnits.add(solutionPlanUnitsUnit)
-	} else {
+	if _, isMemberOf := p.modelPlanStopsUnit.PlanUnitsUnit(); !isMemberOf {
 		solution.plannedPlanUnits.remove(p)
 		solution.unPlannedPlanUnits.add(p)
 	}
