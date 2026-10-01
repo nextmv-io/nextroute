@@ -1,0 +1,5 @@
+# The Nextroute binary is a build artifact. It belongs in the wheels, but must
+# never be shipped inside the source distribution: it is platform-specific, it
+# adds ~15 MB, and whichever platform happened to build the sdist would leak its
+# own binary to everyone else.
+prune src/nextroute/bin
