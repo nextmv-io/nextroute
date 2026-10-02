@@ -14,6 +14,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
     "pydantic>=2.5.2",
@@ -38,6 +39,15 @@ maintainers = [
 ]
 name = "nextroute"
 readme = "README.md"
+# Intentionally no upper bound. The wheels are tagged py3-none-<platform> (see
+# get_tag in setup.py), so a newly released interpreter still finds a matching
+# wheel and keeps working without a new release from us. The package is pure
+# Python plus a bundled Go binary invoked as a subprocess: it has no C extension
+# and imports nothing beyond pydantic and long-stable stdlib modules, so there is
+# nothing here that tracks the interpreter version. The classifiers below list
+# the versions we actually exercise in CI; newer ones are expected to work and
+# are not blocked. Only add an upper bound if a specific Python release is known
+# to break us - in that case cap it at that version and say which one here.
 requires-python = ">=3.10"
 
 [project.urls]
@@ -72,7 +82,12 @@ nextroute = ["bin/*.exe"]
 
 [tool.cibuildwheel]
 test-command = 'python -c "exec(\"import nextroute\nprint(nextroute.nextroute_version())\")"'
-build = "cp3{10,11,12,13}-*"
+# The wheels are tagged py3-none-<platform> (see get_tag in setup.py), so one
+# build per platform covers every supported Python. Building more than one
+# interpreter per platform would just produce the same wheel repeatedly. We build
+# on the oldest supported Python so the emitted wheel cannot accidentally depend
+# on a newer interpreter.
+build = "cp310-*"
 skip = "*musllinux*"
 archs = "native"
 manylinux-x86_64-image = "quay.io/pypa/manylinux_2_28_x86_64"
