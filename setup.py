@@ -2,6 +2,7 @@
 
 import os
 import platform
+import shutil
 import subprocess
 
 from setuptools import Distribution, setup
@@ -16,7 +17,13 @@ try:
 
         def get_tag(self):
             python, abi, plat = _bdist_wheel.get_tag(self)
-            # python, abi = "py3", "none"
+            # The wheel bundles a prebuilt Go binary but contains no C
+            # extension, so it is platform-specific while being independent of
+            # the interpreter version. Tagging it py3-none-<platform> instead of
+            # cp3XX-cp3XX-<platform> means a single wheel per platform serves
+            # every Python we support, including versions released after this
+            # wheel was built.
+            python, abi = "py3", "none"
             return python, abi, plat
 
     class MyDistribution(Distribution):
@@ -59,9 +66,31 @@ if goarch not in ["amd64", "arm64"]:
     raise Exception(f"unsupported architecture: {goarch}")
 
 # Compile the binary.
+standalone_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "cmd")
+
+# The Go sources are deliberately not part of the source distribution, so a
+# build from the sdist cannot work. Fail with an explanation rather than with a
+# bare FileNotFoundError from the chdir below.
+if not os.path.isdir(standalone_dir):
+    raise Exception(
+        "cannot build nextroute from source: the Go sources required to compile "
+        "the Nextroute binary are not shipped in the source distribution. "
+        "Install one of the prebuilt wheels instead. If no wheel matches your "
+        "platform or Python version, build from a clone of "
+        "https://github.com/nextmv-io/nextroute."
+    )
+
+# Building also needs a Go toolchain, which cannot be expressed in
+# build-system.requires, so check for it up front.
+if shutil.which("go") is None:
+    raise Exception(
+        "cannot build nextroute from source: the Go toolchain is required to "
+        "compile the Nextroute binary but `go` was not found on PATH. Install Go "
+        "(https://go.dev/dl/), or install one of the prebuilt wheels instead."
+    )
+
 print(f"Compiling Nextroute binary for {goos} {goarch}...")
 cwd = os.getcwd()
-standalone_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "cmd")
 os.chdir(standalone_dir)
 call = ["go", "build", "-o", "../src/nextroute/bin/nextroute.exe", "."]
 
