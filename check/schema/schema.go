@@ -97,6 +97,11 @@ type PlanUnit struct {
 	// execute it, it wasn't executable - this is an error in the constraint
 	// estimation.
 	HasPlannableBestMove bool `json:"has_plannable_best_move"`
+	// HasExecutableBestMove is true if a best move is found for the plan unit
+	// and that best move is executable (i.e. it can be executed). A move might
+	// be executable but not plannable if it makes the objective worse or if
+	// its execution later fails.
+	HasExecutableBestMove bool `json:"has_executable_best_move"`
 	// PlanningMakesObjectiveWorse is true if the best move for the plan unit
 	// increases the objective.
 	PlanningMakesObjectiveWorse bool `json:"planning_makes_objective_worse"`
@@ -115,6 +120,23 @@ type PlanUnit struct {
 	Constraints map[string]int `json:"constraints,omitempty"`
 }
 
+// ObjectiveTermDelta contains information about the improvement of an objective
+// term caused by a move. A negative delta means the move improves the value for
+// the given term, a positive delta means the move worsens the value for the
+// given term.
+type ObjectiveTermDelta struct {
+	// Name is the name of the objective term.
+	Name string `json:"name"`
+	// DeltaValue is the estimated difference in value of the objective term
+	// (without the factor).
+	DeltaValueEstimated float64 `json:"delta_value_estimated"`
+	// DeltaValue is the difference in value of the objective term after
+	// executing the move (without the factor). This is only calculated if the
+	// move was executed successfully.
+	DeltaValue *float64 `json:"delta_value,omitempty"`
+}
+
+
 // VehiclesWithMovesDetail shows details of the vehicles that have moves.
 type VehiclesWithMovesDetail struct {
 	// Vehicle is the ID of the vehicle.
@@ -125,10 +147,18 @@ type VehiclesWithMovesDetail struct {
 	// DeltaObjective is the actual delta of the objective of that will be
 	// incurred by the move.
 	DeltaObjective *statistics.Float64 `json:"delta_objective,omitempty"`
+	// ObjectiveDeltas are the (estimates of the) objective value deltas of the
+	// move. I.e., the difference in value of the individual terms of the
+	// objective. This is only calculated if the verbosity is high.
+	ObjectiveDeltas []ObjectiveTermDelta `json:"objective_deltas,omitempty"`
 	// FailedConstraints are the constraints that are violated for the move.
 	FailedConstraints []string `json:"failed_constraints,omitempty"`
-	// WasPlannable is true if the move was plannable, false otherwise.
+	// WasPlannable is true if the move was plannable, false otherwise. A move
+	// can be planned if it is executable and does not make the objective worse.
 	WasPlannable bool `json:"was_plannable"`
+	// WasExecutable is true if the move was executable, false otherwise. A move
+	// can be executed if constraints are not violated.
+	WasExecutable bool `json:"was_executable"`
 	// Positions defines where the stop should be inserted.
 	Positions []Position `json:"positions"`
 }

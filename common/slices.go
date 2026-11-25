@@ -1,6 +1,6 @@
 // © 2019-present nextmv.io inc
 
-package common //nolint:revive // we are not causing breaking changes to please the linter
+package common
 
 // CopySliceFrom cuts of a slice from `alloc` and copies the data from `data`
 // into it. It returns the new slice and the remaining slice of `alloc`. This
